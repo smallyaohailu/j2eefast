@@ -42,6 +42,8 @@ public final class ConfigConstant {
 	public static final String 					TENANTMODEL 						= "fast.tenantModel.enabled";
 	public static final String					IGNORETABLE 				        = "fast.tenantModel.ignoreTable";
 	public static final String 				    SERVER_SERVLET_CONTEXTPATH          = "server.servlet.context-path";
+	public static final String					FAST_LOGIN_CSRF_TOKEN				= "FAST_LOGIN_CSRF_TOKEN";
+	public static final String					SHIRO_SESSION_ID					= "shiro:session:";
 	/**
 	 *  系统多租户忽略添加租户ID的表
 	 *  也可以称为多租户数据共享表 具体可以参考数据表描述

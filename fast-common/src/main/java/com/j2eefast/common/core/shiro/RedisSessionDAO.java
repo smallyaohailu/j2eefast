@@ -31,8 +31,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     @Autowired
     @Lazy
     private RedisUtil redisUtil;
-    @Value("#{ @environment['fast.csrf.enabled'] ?: false }")
-    private boolean csrfEnabled;
 
     /**
      * doReadSession be called about 10 times when login.
@@ -109,9 +107,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         }
         String key = getRedisSessionKey(session.getId());
         this.redisUtil.setSession(key, session, (int) (session.getTimeout() / MILLISECONDS_IN_A_SECOND));
-        if(csrfEnabled) {
-            this.redisUtil.setSession("sys_csrfToken:" + key, Base64Encoder.encode(MD5.create().digestHex16(session.getId().toString())) + Base64Encoder.encode(session.getId().toString()), (int) (session.getTimeout() / MILLISECONDS_IN_A_SECOND));
-        }
         return;
     }
 
@@ -127,9 +122,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         }
         try {
             redisUtil.delSession(getRedisSessionKey(session.getId()));
-            if(csrfEnabled) {
-                redisUtil.delSession("sys_csrfToken:" + getRedisSessionKey(session.getId()));
-            }
         } catch (SerializationException e) {
             log.error("delete session error. session id= {}",session.getId());
         }

@@ -1,5 +1,6 @@
 package com.j2eefast.framework.shiro;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.util.IdUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
@@ -135,7 +136,7 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         }
 
         if(csrfEnabled){
-            request.setAttribute("sys_csrfToken", redisUtil.getSession("sys_csrfToken:shiro:session:"+session.getId()));
+            request.setAttribute(ConfigConstant.FAST_LOGIN_CSRF_TOKEN, Base64Encoder.encode(loginUserEntity.getCsrfToken()));
         }
 
         //不限制同账号登录

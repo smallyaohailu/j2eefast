@@ -64,8 +64,8 @@
 <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 <meta content="IE=edge" http-equiv="X-UA-Compatible">
 <#----------------------------------------END--------------------------------------------------------------->
-<#if sys_csrfToken??>
-<meta content="${sys_csrfToken}" name="csrf-token" />
+<#if FAST_LOGIN_CSRF_TOKEN??>
+<meta content="${FAST_LOGIN_CSRF_TOKEN}" name="csrf-token" />
 </#if>
 <link rel="shortcut icon" href="${ctxStatic}/static/img/favicon.ico"/>
 <script src="${ctxStatic}/static/libs/jquery.min.js"></script>
