@@ -1168,8 +1168,8 @@
                 '</button>');
         }
 
-        //是否隐藏列下拉工具 如果是复杂表头不显示
-        if (this.options.showColumns && this.options.columns.length == 0) {
+        //TODO 是否隐藏列下拉工具 如果是复杂表头不显示
+        if (this.options.showColumns && this.options.columns.length == 1) {
             html.push(sprintf('<div class="keep-open btn-group" title="%s">',
                 this.options.formatColumns()),
                 '<button type="button" class="btn' +
@@ -1976,6 +1976,52 @@
         this.$selectItem = this.$body.find(sprintf('[name="%s"]', this.options.selectItemName));
         this.$selectItem.off('click').on('click', function (event) {
 
+            event.stopImmediatePropagation();
+
+            var $this = $(this),
+                checked = $this.prop('checked'),
+                row = that.data[$this.data('index')];
+
+            if (that.options.maintainSelected && $(this).is(':radio')) {
+                $.each(that.options.data, function (i, row) {
+                    row[that.header.stateField] = false;
+                });
+            }
+
+            if(that.options.rightFixedColumns){
+                var index = $(this).data('index');
+                if (that.options.singleSelect) {
+                    that.$rightfixedBody.find('tr').each(function () {
+                        $(this).removeClass('selected');
+                    })
+                    that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+                        $(this).addClass('selected');
+                    })
+                }else{
+                    that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+                        checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                    })
+                }
+            }
+
+            if(that.options.fixedColumns){
+                $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
+                that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
+            }
+
+            row[that.header.stateField] = checked;
+
+            if (that.options.singleSelect) {
+                that.$selectItem.not(this).each(function () {
+                    that.data[$(this).data('index')][that.header.stateField] = false;
+                });
+                that.$selectItem.filter(':checked').not(this).prop('checked', false);
+            }
+
+            that.updateSelected();
+            that.trigger(checked ? 'check' : 'uncheck', row, $this);
+
+
              // 允许其他监听
             //event.stopImmediatePropagation();
             //
@@ -2002,65 +2048,69 @@
             // that.trigger(checked ? 'check' : 'uncheck', row, $this);
 
 
-            //勾选点击事件
-            //event.stopImmediatePropagation();
-            var $this = $(this),
-                checked = $this.prop('checked'),
-                row = that.data[$this.data('index')];
-
-            if(that.options.fixedColumns){
-                //冻结点击事件
-                var index = $this.data('index');
-                // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
-                // console.log("----"+that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").html());
-                // if(that.options.rightFixedColumns){
-                //     that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
-                //         checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
-                //     })
-                // }
-
-
-                $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
-                that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
-
-                if (that.options.maintainSelected && $(this).is(':radio')) {
-                    $.each(that.options.data, function (i, row) {
-                        row[that.header.stateField] = false;
-                    });
-                }
-
-                row[that.header.stateField] = checked;
-
-                // //只能选一个
-                if (that.options.singleSelect) {
-                    that.$selectItem.not(this).each(function () {
-                        that.data[$(this).data('index')][that.header.stateField] = false;
-                    });
-                    that.$selectItem.filter(':checked').not(this).prop('checked', false);
-                }
-
-                that.updateSelected();
-                that.trigger(checked ? 'check' : 'uncheck', row, that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox"));
-                // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
-            }else{
-                if (that.options.maintainSelected && $(this).is(':radio')) {
-                    $.each(that.options.data, function (i, row) {
-                        row[that.header.stateField] = false;
-                    });
-                }
-
-                row[that.header.stateField] = checked;
-
-                if (that.options.singleSelect) {
-                    that.$selectItem.not(this).each(function () {
-                        that.data[$(this).data('index')][that.header.stateField] = false;
-                    });
-                    that.$selectItem.filter(':checked').not(this).prop('checked', false);
-                }
-
-                that.updateSelected();
-                that.trigger(checked ? 'check' : 'uncheck', row, $this);
-            }
+            // //勾选点击事件
+            // event.stopImmediatePropagation();
+            // var $this = $(this),
+            //     checked = $this.prop('checked'),
+            //     index = $this.data('index'),
+            //     row = that.data[$this.data('index')];
+            //
+            // if(that.options.fixedColumns){
+            //     //冻结点击事件
+            //     //var index = $this.data('index');
+            //     // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
+            //     // console.log("----"+that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").html());
+            //     // if(that.options.rightFixedColumns){
+            //     //     that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+            //     //         checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+            //     //     })
+            //     // }
+            //
+            //
+            //     $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
+            //     that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
+            //
+            //     if (that.options.maintainSelected && $(this).is(':radio')) {
+            //         $.each(that.options.data, function (i, row) {
+            //             row[that.header.stateField] = false;
+            //         });
+            //     }
+            //
+            //     row[that.header.stateField] = checked;
+            //
+            //     // //只能选一个
+            //     if (that.options.singleSelect) {
+            //         that.$selectItem.not(this).each(function () {
+            //             that.data[$(this).data('index')][that.header.stateField] = false;
+            //         });
+            //         that.$selectItem.filter(':checked').not(this).prop('checked', false);
+            //     }
+            //
+            //     that.updateSelected();
+            //     that.trigger(checked ? 'check' : 'uncheck', row, that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox"));
+            //     // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
+            // }else{
+            //
+            // }
+            //
+            //
+            // if (that.options.maintainSelected && $(this).is(':radio')) {
+            //     $.each(that.options.data, function (i, row) {
+            //         row[that.header.stateField] = false;
+            //     });
+            // }
+            //
+            // row[that.header.stateField] = checked;
+            //
+            // if (that.options.singleSelect) {
+            //     that.$selectItem.not(this).each(function () {
+            //         that.data[$(this).data('index')][that.header.stateField] = false;
+            //     });
+            //     that.$selectItem.filter(':checked').not(this).prop('checked', false);
+            // }
+            //
+            // that.updateSelected();
+            // that.trigger(checked ? 'check' : 'uncheck', row, $this);
 
         });
 
@@ -2258,7 +2308,6 @@
                     that.trigger('load-error', JSON.parse(xhr.responseText).msg || xhr.responseText, xhr);
                     that.$tableLoading.hide();
             	}catch(e){
-            		console.error(xhr);
             		that.trigger('load-error', '交易异常');
                     that.$tableLoading.hide();
             	}
@@ -2529,6 +2578,7 @@
                     //html.push('<div class="fht-cell"></div>');
                     html.push('</div>');
                     html.push('</td>');
+                    colspan++
                 }
             }
         });
