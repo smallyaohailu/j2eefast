@@ -2037,7 +2037,7 @@ if (typeof jQuery === "undefined") {
                     index =  opt.layer.open({
                         type: 2,
                         maxmin: true,
-                        shadeClose: true,
+                        shadeClose: opt.common.isEmpty(options.shadeClose) ? true : options.shadeClose,
                         title: _title,
                         area: [_width+'px',
                             _height + 'px'],
@@ -2048,7 +2048,11 @@ if (typeof jQuery === "undefined") {
                             var iframeWin = layero.find('iframe')[0];
                             //判断页面是否有
                             if(typeof(iframeWin.contentWindow.onLoadSuccess) === "function"){
-                                iframeWin.contentWindow.onLoadSuccess(index,layero,opt.layer);
+                                if(opt.common.isEmpty(options.obj)){
+                                    iframeWin.contentWindow.onLoadSuccess(index,layero,opt.layer);
+                                }else{
+                                    iframeWin.contentWindow.onLoadSuccess(options.obj,index,layero,opt.layer);
+                                }
                             }
                         },
                         btn: opt.common.isEmpty(options.btn) ? _btn : options.btn,
@@ -2076,7 +2080,7 @@ if (typeof jQuery === "undefined") {
                     index =  opt.layer.open({
                         type: 2,
                         maxmin: true,
-                        shadeClose: true,
+                        shadeClose: opt.common.isEmpty(options.shadeClose) ? true : options.shadeClose,
                         title: _title,
                         area: [_width+'px',
                             _height + 'px'],
@@ -2086,8 +2090,18 @@ if (typeof jQuery === "undefined") {
                             var iframeWin = layero.find('iframe')[0];
                             //判断页面是否有
                             if(typeof(iframeWin.contentWindow.onLoadSuccess) === "function"){
-                                iframeWin.contentWindow.onLoadSuccess(index,layero,opt.layer);
+                                if(opt.common.isEmpty(options.obj)){
+                                    iframeWin.contentWindow.onLoadSuccess(index,layero,opt.layer);
+                                }else{
+                                    iframeWin.contentWindow.onLoadSuccess(options.obj,index,layero,opt.layer);
+                                }
                             }
+                        },
+                        cancel: function(index, layero){
+                            if (!opt.common.isEmpty(options.cancel)) {
+                                options.cancel(index,layero);
+                            }
+                            return true;
                         }
                     });
                 }
