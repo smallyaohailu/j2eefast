@@ -902,8 +902,11 @@
         });
 
         //TODO J2eeFAST 2021年07月08日15:47:27 表格列过多,根据表头列宽固定表格宽度
+        //fix: 设置了固定宽度但是宽度没有达到窗体最大值就不设置
         if(pywh!=0 && this.options.isFixedColumn){
-            this.$el.width(pywh + 'px');
+            if(pywh > this.$tableContainer.outerWidth()){
+                this.$el.width(pywh + 'px');
+            }
             this.$el.css('max-width', 'inherit');
         }
 
