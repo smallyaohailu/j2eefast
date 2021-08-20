@@ -1355,25 +1355,45 @@ if (typeof jQuery === "undefined") {
             },
 
             /**
-             * 通过下载地址 静默下载
-             * @param url
+             * 通过下载地址 静默下载 支持批量下载
+             * @param files 为一个下载链接字符串为单个下载，若为下载数组链接字符串则批量循环下载
              */
-            downLoadFile :function(url){
-                var judgeDiv = document.getElementById("dwDiv");
-                if(judgeDiv!=null){
-                    document.body.removeChild(judgeDiv);
+            downLoadFile :function(files){
+                if(opt.common.isString(files)){
+                    var id = opt.common.randomString(10);
+                    var judgeDiv = document.getElementById("dwDiv_"+id);
+                    if(judgeDiv!=null){
+                        document.body.removeChild(judgeDiv);
+                    }
+                    var divObj = document.createElement("div");
+                    divObj.style.display = "none";
+                    divObj.id="dwDiv_"+id;
+                    var aObj  = document.createElement('a'); // 创建a标签
+                    divObj.appendChild(aObj);
+                    document.body.appendChild(divObj);
+                    var e = document.createEvent('MouseEvents') // 创建鼠标事件对象
+                    e.initEvent('click', false, false) // 初始化事件对象
+                    aObj.href=encodeURI(files);
+                    aObj.id = "hrefFile_"+id;
+                    aObj.dispatchEvent(e);
+                    judgeDiv = document.getElementById("dwDiv_"+id);
+                    if(judgeDiv!=null){
+                        document.body.removeChild(judgeDiv);
+                    }
                 }
-                var divObj = document.createElement("div");
-                divObj.id="dwDiv";
-                var aObj = document.createElement("a");
-                aObj.href=encodeURI(url);
-                aObj.id = "hrefFile";
-                divObj.appendChild(aObj);
-                document.body.appendChild(divObj);
-                document.getElementById("hrefFile").click();
-                judgeDiv = document.getElementById("dwDiv");
-                if(judgeDiv!=null){
-                    document.body.removeChild(judgeDiv);
+                if(opt.common.isArray(files)){
+                    files.forEach(url => {
+                        if (!!window.ActiveXObject || "ActiveXObject" in window) {  // IE
+                            window.open(url, '_blank')
+                        } else {
+                            let a = document.createElement('a') // 创建a标签
+                            let e = document.createEvent('MouseEvents') // 创建鼠标事件对象
+                            e.initEvent('click', false, false) // 初始化事件对象
+                            a.href = url // 设置下载地址
+                            a.download = '' // 设置下载文件名
+                            a.dispatchEvent(e)
+                        }
+                    })
                 }
             },
             digit: function(e, t) {
