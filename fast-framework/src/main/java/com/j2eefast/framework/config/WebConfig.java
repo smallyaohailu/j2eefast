@@ -37,10 +37,10 @@ import com.j2eefast.common.core.utils.ToolUtil;
 
 /**
  * WebMvc配置
+ * @author zhouzhou
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
 
 
 	@Value("#{ @environment['spring.messages.defaultLocale'] ?: 'zh_CN' }")
@@ -76,25 +76,6 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
 
-//    /**
-//     * web跨域访问配置
-//     */
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry)
-//    {
-//        // 设置允许跨域的路径
-//        registry.addMapping("/**")
-//                // 设置允许跨域请求的域名
-//                .allowedOrigins("*")
-//                // 是否允许证书
-//                .allowCredentials(true)
-//                // 设置允许的方法
-//                .allowedMethods("GET", "POST", "DELETE", "PUT")
-//                // 设置允许的header属性
-//                .allowedHeaders("*")
-//                // 跨域允许时间
-//                .maxAge(3600);
-//    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

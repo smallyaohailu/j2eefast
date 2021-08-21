@@ -61,7 +61,7 @@ public class ShiroConfig {
 	/**
 	 * 设置Cookie的域名
 	 */
-	@Value("${shiro.cookie.domain}")
+	@Value("#{ @environment['shiro.cookie.domain'] ?: '' }")
 	private String domain;
 
 	/**
@@ -85,7 +85,7 @@ public class ShiroConfig {
 	/**
 	 * 密钥
 	 */
-	@Value("${shiro.rememberMe.cipherKey}")
+	@Value("#{ @environment['shiro.rememberMe.cipherKey'] ?: '' }")
 	private String cipherKey;
 
 	/**
@@ -93,7 +93,13 @@ public class ShiroConfig {
 	 */
 	@Value("#{ @environment['shiro.cookie.maxAge'] ?: 30 }")
 	private int maxAge;
-	
+
+	/**
+	 * 设置会话ID
+	 */
+	@Value("#{ @environment['shiro.session.sessionId'] ?: 'fast.session.id' }")
+	private String sessionId;
+
 	/**
 	 * Shiro授权认证配置
 	 */
@@ -149,14 +155,10 @@ public class ShiroConfig {
 	 * 设置session cookie属性
 	 * @return
 	 */
-	@Bean
-    public Cookie cookieDAO() {
+    public Cookie setCookieId() {
 		Cookie cookie= new org.apache.shiro.web.servlet.SimpleCookie();
-		cookie.setName("fast.session.id");
-		cookie.setDomain(domain);
-		cookie.setPath(path);
-		cookie.setHttpOnly(httpOnly);
-		cookie.setMaxAge(-1);
+		cookie.setName(sessionId);
+		cookie.setHttpOnly(true);
 		return cookie;
     }
 
@@ -184,7 +186,7 @@ public class ShiroConfig {
 		sessionManager.setGlobalSessionTimeout(1000 * 60 * expireTime);
 		// 去掉 JSESSIONID
 		sessionManager.setSessionIdUrlRewritingEnabled(false);
-		sessionManager.setSessionIdCookie(cookieDAO());
+		sessionManager.setSessionIdCookie(setCookieId());
 		// 是否开启删除无效的session对象 默认为true
 		sessionManager.setDeleteInvalidSessions(true);
 		// 是否开启定时调度器进行检测过期session 默认为true
@@ -267,8 +269,6 @@ public class ShiroConfig {
 		}
         return cookieRememberMeManager;
     }
-
-
 
 	/** 
 	 * Shiro连接约束配置,即过滤链的定义
