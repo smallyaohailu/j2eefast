@@ -158,7 +158,7 @@ public class BussinessLogAop {
 			if (ToolUtil.isNotEmpty(e)){
 				operLog.setStatus(BusinessStatus.FAIL.ordinal());
 				//错误信息直接保存
-				operLog.setErrorMsg(e.getMessage());
+				operLog.setErrorMsg(ExceptionUtil.stacktraceToString(e,8000));
 			}
 			
 			// 设置方法名称

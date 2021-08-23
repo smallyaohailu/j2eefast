@@ -11,13 +11,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * <p>异常工具类.</p>
+ * <p>异常工具类. 暂停使用 统一使用hutool 工具类 ExceptionUtil</p>
  *
  * @author: zhouzhou Emall:loveingowp@163.com
  * @date: 2019-03-26 17:59
  * @web: http://www.j2eefast.com
  * @version: 1.0.1
  */
+@Deprecated
 public class ExceptionUtil {
     /**
      * 在request中获取异常类
