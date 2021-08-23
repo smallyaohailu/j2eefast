@@ -154,21 +154,54 @@
 		ORDER BY m.parent_id, m.order_num
 	</select>
 
+    <!-- 分页查询-->
+    <select id="findPage" resultType="com.j2eefast.framework.sys.entity.SysMenuEntity">
+        SELECT a.id, a.name, a.parent_id, a.order_num, a.url,  a.type, a.hide, a.is_new,
+        <if test="_databaseId  == 'oracle'">NVL(a.perms,'') AS perms,</if>
+        <if test="_databaseId  == 'mysql'">IFNULL(a.perms,'') AS perms,</if>
+        <if test="_databaseId  == 'postgresql'">COALESCE(a.perms,'') AS perms,</if>
+        <if test="_databaseId  == 'sqlserver'">ISNULL(a.perms,'') AS perms,</if>
+        a.target, a.icon,a.module_codes, a.create_by, a.create_time
+        ,(CASE  WHEN (SELECT COUNT(1) FROM sys_menu WHERE parent_id = a.id) >0 THEN 1 ELSE 0 END) AS "isTreeLeaf"
+        FROM sys_menu a
+        <where>
+            <if test="menu.name != null  and menu.name != ''">
+                AND a.name LIKE
+                <choose>
+                    <when test="_databaseId == 'oracle'">'%,'||#{menu.name}||',%'</when>
+                    <otherwise>CONCAT('%', #{menu.name}, '%')</otherwise>
+                </choose>
+            </if>
+            <if test="menu.hide != null "> AND a.hide = #{menu.hide} </if>
+            <if test="menu.type != null "> AND a.type = #{menu.type} </if>
+            <if test="menu.parentId != null "> AND a.parent_id = #{menu.parentId} </if>
+        </where>
+    </select>
+
     <select id="findMenuList" resultType="com.j2eefast.framework.sys.entity.SysMenuEntity">
-        <include refid="selectMenuVo"/>
+        SELECT a.id, a.name, a.parent_id, a.order_num, a.url,  a.type, a.hide, a.is_new,
+        <if test="_databaseId  == 'oracle'">NVL(a.perms,'') AS perms,</if>
+        <if test="_databaseId  == 'mysql'">IFNULL(a.perms,'') AS perms,</if>
+        <if test="_databaseId  == 'postgresql'">COALESCE(a.perms,'') AS perms,</if>
+        <if test="_databaseId  == 'sqlserver'">ISNULL(a.perms,'') AS perms,</if>
+        a.target, a.icon,a.module_codes, a.create_by, a.create_time
+        ,(CASE  WHEN (SELECT COUNT(1) FROM sys_menu WHERE parent_id = a.id) >0 THEN 1 ELSE 0 END) AS "isTreeLeaf"
+        FROM sys_menu a
         <where>
             <if test="name != null and name != ''">
-                AND name LIKE
+                AND a.name LIKE
                 <choose>
                     <when test="_databaseId == 'oracle'">'%,'||#{name}||',%'</when>
                     <otherwise>CONCAT('%', #{name}, '%')</otherwise>
                 </choose>
             </if>
             <if test="hide != null">
-                AND hide = #{hide}
+                AND a.hide = #{hide}
             </if>
+            <if test="type != null "> AND a.type = #{type} </if>
+            <if test="parentId != null "> AND a.parent_id = #{parentId} </if>
         </where>
-        ORDER BY parent_id, order_num
+        ORDER BY a.order_num DESC
     </select>
 
     <select id="findMenuListByUserId" resultType="com.j2eefast.framework.sys.entity.SysMenuEntity">

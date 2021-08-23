@@ -107,4 +107,9 @@ public class SysMenuEntity extends BaseEntity {
 	@TableField(exist = false)
 	private List<SysMenuEntity> children = new ArrayList<SysMenuEntity>();
 
+	/**
+	 * 是否有子元素
+	 */
+	@TableField(exist = false)
+	private Integer isTreeLeaf;
 }

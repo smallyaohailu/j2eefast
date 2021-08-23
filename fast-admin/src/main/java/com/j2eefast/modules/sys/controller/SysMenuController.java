@@ -7,11 +7,13 @@ package com.j2eefast.modules.sys.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
@@ -124,16 +126,27 @@ public class SysMenuController extends BaseController {
 	}
 
 
-	/**
-	 * 所有菜单列表
-	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	@RequiresPermissions("sys:menu:list")
 	@ResponseBody
-	public ResponseData list(SysMenuEntity menu) {
-		List<SysMenuEntity> menuList = sysMenuService.findMenuList(menu, UserUtils.getUserInfo());
-		return success().put("list", menuList);
+	public ResponseData list(@RequestParam Map<String, Object> params, SysMenuEntity menu) {
+		PageUtil page = sysMenuService.findPage(params, menu);
+		return success(page);
 	}
+
+	/**
+	 * 异步请求数据
+	 * @param menu
+	 * @return
+	 */
+	@RequestMapping("/listChild")
+	@RequiresPermissions("sys:menu:list")
+	@ResponseBody
+	public ResponseData listChild(SysMenuEntity menu) {
+		List<SysMenuEntity> list = sysMenuService.selectList(menu);
+		return success().put("list", list);
+	}
+
 
 	/**
 	 * 加载角色菜单列表树

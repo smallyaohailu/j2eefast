@@ -59,6 +59,20 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 		return menuList;
 	}
 
+	/**
+	 * 自定义分页查询，含关联实体对像
+	 */
+	public PageUtil findPage(Map<String, Object> params, SysMenuEntity menu) {
+		Page<SysMenuEntity> page = sysMenuMapper.findPage(new Query<SysMenuEntity>(params).getPage(), menu)  ;
+		return new PageUtil(page);
+	}
+
+
+
+	public List<SysMenuEntity> selectList(SysMenuEntity menu){
+		return this.baseMapper.findMenuList(menu);
+	}
+
 
 	/**
 	 * 通过菜单ID查询菜单
