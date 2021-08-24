@@ -322,7 +322,7 @@
 			var name_data = [];
 			<#list tableInfo as table>
 			<#if table.dict !="">
-			var ${table.field}_dict = ${dict.getDictListJson('${table.dict}')};
+			var ${table.field?replace(".","_")}_dict = ${dict.getDictListJson('${table.dict}')};
 			</#if>
 			</#list>
 			var prefix = baseURL + '${url}';
@@ -370,8 +370,8 @@
 							}
 						}
 						<#list tableInfo as table>
-						,{field: '${table.field}', title: "<@ctx.i18n text = "${table.title}"/>"<#if table.dict!="">, formatter: function (value, row, index) {
-								return $.table.selectDictLabel(${table.field}_dict, value);
+						,{field: '${table.field}', title: "<@ctx.i18n text = "${table.title}"/>"<#if table.sortable>,sortable: true</#if><#if table.dict!="">,formatter: function (value, row, index) {
+								return $.table.selectDictLabel(${table.field?replace(".","_")}_dict, value);
 							}</#if>}
 						</#list>
 					]
