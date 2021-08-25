@@ -52,6 +52,10 @@
 							idKey: "id",
 							pIdKey: "pId",
 							rootPId: -1
+						},
+						key: {
+							title: "name",
+							name: "title"
 						}
 					},
 					check: {
@@ -155,7 +159,7 @@
 				}
 				$("#treeId").val(ids.substr(0,ids.length-1));
 				$("#treeName").val(names.substr(0,names.length-1));
-				$("#treeTitle").val(titles.substr(0,names.length-1));
+				$("#treeTitle").val(titles.substr(0,titles.length-1));
 			}
 
 			function submitHandler(index, layero,_sf){
@@ -176,7 +180,7 @@
 				}
 				$("#treeId").val(ids.substr(0,ids.length-1));
 				$("#treeName").val(names.substr(0,names.length-1));
-				$("#treeTitle").val(titles.substr(0,names.length-1));
+				$("#treeTitle").val(titles.substr(0,titles.length-1));
 				return true;
 			}
 			</#if>
