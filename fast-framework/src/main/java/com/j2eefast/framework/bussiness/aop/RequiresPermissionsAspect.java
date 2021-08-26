@@ -73,14 +73,14 @@ public class RequiresPermissionsAspect {
                     if(!flag){
                         for (Object key : map.keySet()) {
                             if(map.keySet() !=null && map.get(key) instanceof  String){
-                                SQLFilter.paramsVerify((String)map.get(key));
+                                SQLFilter.sqlInject((String)map.get(key));
                             }
                         }
                     }
                 }else{
                     for (Object key : map.keySet()) {
                         if(map.keySet() !=null && map.get(key) instanceof  String){
-                            SQLFilter.paramsVerify((String)map.get(key));
+                            SQLFilter.sqlInject((String)map.get(key));
                         }
                     }
                 }
