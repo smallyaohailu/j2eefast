@@ -5,6 +5,7 @@
 * 2021-06-18 新增左右侧机构树查询 当isorga 为true是,支持机构左右侧展示 left, right 空不显示
 * 2021-07-10 新增支持treeselect 组件作为查询
 * 2021-07-25 新增单选支持双击选择
+* 2021-08-19 新增表格支持排序、字段排序
 -->
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark=true>
@@ -347,6 +348,12 @@
 					showRefresh: false,
 					showToggle: false,
 					<#if !checked>singleSelect: true,
+					</#if>
+					<#if sortName !="">
+					sortName:'${sortName}',
+					</#if>
+					<#if sortOrder !="">
+					sortOrder:'${sortOrder}',
 					</#if>
 					pageSize: 10,
 					pageList: [10, 20, 30],

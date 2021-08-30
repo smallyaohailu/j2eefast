@@ -19,6 +19,7 @@
                 placeholder=""
                 readonly = false <#-- 是否只读-->
                 viewMode =false
+                template = false <#-- 控件是否做template用-->
                 viewClass="label label-default"
                 >
     <#local  Assname="${id}"/>
@@ -53,7 +54,7 @@
     <#else>  <#-- view else -->
 
         <#if !multiple>
-            <select id="${AssId?replace(".","_")}" name="<#if id == "">${name}<#else>${AssId}</#if>" class="${class}" <#if required> required</#if><#if readonly> disabled="disabled"</#if> <#if placeholder != "">placeholder="<@ctx.i18n text = "${placeholder}"/>"</#if>>
+            <select id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if id == "">${name}<#else>${AssId}</#if>" class="${class}" <#if required> required</#if><#if readonly> disabled="disabled"</#if> <#if placeholder != "">placeholder="<@ctx.i18n text = "${placeholder}"/>"</#if>>
                 <#if blankValue !="false"><option value="${blankValue}"><@ctx.i18n text = "${blankLabel}"/></option></#if>
                 <#if dictType !="">
                     <#list dict.getType('${dictType}')>
@@ -124,10 +125,10 @@
         <#--        <@compress single_line=true>-->
             <script type="text/javascript">
                 $(function() {
-                    $("#${AssId?replace(".","_")}").on("change",function(e){
+                    $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").on("change",function(e){
                         /* 选择框回调事件*/
                         if(typeof selectCallback == 'function'){
-                            var data = $("#${AssId?replace(".","_")}").select2("data");
+                            var data = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").select2("data");
                             selectCallback('${Assname?replace(".","_")}', 'change', data);
                         }
                     });
@@ -137,8 +138,8 @@
         </#if>
 
         <#if multiple>
-            <input id="${AssId?replace(".","_")}" type="hidden" name="<#if id == "">${name}<#else>${AssId}</#if>"/>
-            <select id="__${AssId?replace(".","_")}slt" class="${class}" multiple="true" <#if class= "selectpicker">data-none-selected-text="请选择"</#if> <#if required> required</#if> <#if readonly> disabled="disabled"</#if>>
+            <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" type="hidden" name="<#if id == "">${name}<#else>${AssId}</#if>"/>
+            <select id="__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt" class="${class}" multiple="true" <#if class= "selectpicker">data-none-selected-text="请选择"</#if> <#if required> required</#if> <#if readonly> disabled="disabled"</#if>>
                 <#if blankValue !="false"><option value="${blankValue}"><@ctx.i18n text = "${blankLabel}"/></option></#if>
                 <#if dictType !="">
                     <#list dict.getType('${dictType}')>
@@ -210,13 +211,13 @@
             <script type="text/javascript">
                 $(function() {
                     <#if value !="">
-                    $("#${AssId?replace(".","_")}").val(opt.form.selectSelects("__${AssId?replace(".","_")}slt"));
+                    $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val(opt.form.selectSelects("__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt"));
                     </#if>
-                    $("#__${AssId?replace(".","_")}slt").on("change",function(e){
-                        $("#${AssId?replace(".","_")}").val(opt.form.selectSelects("__${AssId?replace(".","_")}slt"));
+                    $("#__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt").on("change",function(e){
+                        $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val(opt.form.selectSelects("__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt"));
                         /* 选择框回调事件*/
                         if(typeof selectCallback == 'function'){
-                            var data = $("#__${AssId?replace(".","_")}slt").select2("data");
+                            var data = $("#__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt").select2("data");
                             selectCallback('${Assname?replace(".","_")}', 'change', data);
                         }
                     })

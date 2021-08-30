@@ -25,6 +25,8 @@
                     correlationId="" <#-- 关联ID-->
                     checked= true
                     isorga = true <#-- 是否有机构选择-->
+                    sortName = "" <#-- 表格排序-->
+                    sortOrder = "" <#-- 表格排序-->
                     layout = "" <#--当isorga 为true是,支持机构左右侧展示 left, right 空不显示-->
                     helpTip = ""  <#--帮助提示 -->
                     separator = "," <#--多选参数分隔符 -->
@@ -87,7 +89,9 @@
                             keyId: "${keyId}",
                             keyName: "${keyName}",
                             layout: "${layout}",
-                            separator: "${separator}"
+                            separator: "${separator}",
+                            sortName: "${sortName}",
+                            sortOrder: "${sortOrder}"
                         },
                         obj: <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_data,
                         main: true,

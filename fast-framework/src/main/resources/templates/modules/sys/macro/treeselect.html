@@ -31,7 +31,7 @@
 				<#if checked== "false">
 				var options = {
 					url: url,
-					<#if expandLevel=="true">expandLevel : 2,<#else> expandLevel : 1,</#if>
+					<#if expandLevel=="true">expandLevel : 2,<#else> expandLevel : 0,</#if>
 					onClick : zOnClick,
 					onCheck : onCheck,
 					onDblClick: onDblClick,
@@ -45,7 +45,7 @@
 				var options = {
 					url: url,
 					_list:$("#treeId").val(),
-					<#if expandLevel=="true">expandLevel : 2,<#else> expandLevel : 1,</#if>
+					<#if expandLevel=="true">expandLevel : 2,<#else> expandLevel : 0,</#if>
 					data: {
 						simpleData: {
 							enable: true,
