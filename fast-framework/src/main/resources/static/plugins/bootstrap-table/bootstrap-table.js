@@ -956,6 +956,16 @@
         this.$selectAll.off('click').on('click', function () {
             var checked = $(this).prop('checked');
             that[checked ? 'checkAll' : 'uncheckAll']();
+
+            //TODO fix: 冻结左边全选显示异常问题
+            if (that.options.rightFixedColumns) {
+                that.$rightfixedBody.find('tr').each(function () {
+                    if($(this).data('index') != '-99999'){
+                        checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                    }
+                })
+            }
+
             that.updateSelected();
         });
 
