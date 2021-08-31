@@ -266,7 +266,9 @@
                 that.$fixedBodyColumns.find("input[name=btSelectItem]").closest('tr')[checked ? 'addClass' : 'removeClass']('selected');
                 if (that.options.rightFixedColumns) {
                     that.$rightfixedBody.find('tr').each(function () {
-                        checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                        if($(this).data('index') != '-99999'){
+                            checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                        }
                     })
                 }
             });
@@ -455,14 +457,20 @@
 
 
         //添加行事件
-        this.$body.find('> tr[data-index]').off('hover').hover(function () {
+        this.$body.find('> tr[data-index]').off('hover').hover(
+        function () {
             var index = $(this).data('index');
-            if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
-            if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
-        }, function () {
+            if(index != '-99999'){
+                if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+            }
+        },
+        function () {
             var index = $(this).data('index');
-            if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
-            if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+            if(index != '-99999') {
+                if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+            }
         });
 
         if (that.options.fixedColumns) {
@@ -486,24 +494,11 @@
 
 
             this.$fixedBody.css({
-                //width: width,
-                height: height,
-                top: '-1px'
+                // width: width,
+                // height: height,
+                top: '0px'
             }).show();
 
-            // 设置冻结内容宽度
-            // this.$header.find('tr:eq(0)').find('th').each(function(i){
-            //     for (var k = 0; k < that.options.fixedNumber; k++) {
-            //         if(i == k){
-            //             var width = $(this).outerWidth();
-            //             var field  = $(this).data('field');
-            //             var $th = that.$fixedHeaderColumns.find('th[data-field="'+field+'"]');
-            //             $th.find('.fht-cell').width(width);
-            //             that.$fixedBodyColumns.find('tr:eq(0)').find('td:eq('+k+')').css({width:width});
-            //             break;
-            //         }
-            //     }
-            // });
             this.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (i) {
                 var $this = $(this),
                     index = i;
@@ -524,29 +519,34 @@
 
             this.$fixedBody.find('tr[data-index]').off('hover').hover(function () {
                 var index = $(this).data('index');
-                that.$body.find('tr[data-index="' + index + '"]').addClass('hover');
-                if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                if(index != '-99999') {
+                    that.$body.find('tr[data-index="' + index + '"]').addClass('hover');
+                    if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                }
             }, function () {
                 var index = $(this).data('index');
-                that.$body.find('> tr[data-index="' + index + '"]').removeClass('hover');
-                if (that.options.rightFixedColumns)  that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                if(index != '-99999') {
+                    that.$body.find('> tr[data-index="' + index + '"]').removeClass('hover');
+                    if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                }
             });
 
 
-            if(that.options.rightFixedColumns){
-                //获取点击
-                this.$fixedBodyColumns.find('tr').each(function () {
-                    $(this).find('input[name="btSelectItem"]').each(function(){
-                        $(this).on('click', function () {
-                            var index = $(this).data('index');
-                            var checked = $(this).prop('checked');
-                            that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
-                                checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
-                            })
-                        });
-                    })
-                })
-            }
+            // if(that.options.rightFixedColumns){
+            //     //获取点击
+            //     this.$fixedBodyColumns.find('tr').each(function () {
+            //         $(this).find('input[name="btSelectItem"]').each(function(){
+            //             $(this).on('click', function () {
+            //                 console.log('000000--->>><<<');
+            //                 var index = $(this).data('index');
+            //                 var checked = $(this).prop('checked');
+            //                 that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+            //                     checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+            //                 })
+            //             });
+            //         })
+            //     })
+            // }
 
         }
 
@@ -565,19 +565,22 @@
 
             this.$rightfixedBody.find('tr[data-index]').off('hover').hover(function () {
                 var index = $(this).data('index');
-                that.$body.find('tr[data-index="' + index + '"]').addClass('hover');
-                if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                if(index != '-99999'){
+                    that.$body.find('tr[data-index="' + index + '"]').addClass('hover');
+                    if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                }
             }, function () {
                 var index = $(this).data('index');
-                that.$body.find('> tr[data-index="' + index + '"]').removeClass('hover');
-                if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                if(index != '-99999') {
+                    that.$body.find('> tr[data-index="' + index + '"]').removeClass('hover');
+                    if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                }
             });
         }
 
 
         // //是否点击选择行
         if(this.options.clickToSelect){
-
             this.$body.find('> tr[data-index] > td').off('click dblclick').on('click dblclick', function (e) {
                 var $td = $(this),
                     $tr = $td.parent();
@@ -596,7 +599,6 @@
                             if ($selectItem.length) {
                                 $selectItem[0].click(); // #144: .trigger('click') bug
                             }
-
                             if($tr.hasClass('selected')){
                                 that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass("selected");
                             }else{
@@ -623,12 +625,22 @@
 
             if(that.options.rightFixedColumns){
                 this.$rightfixedBody.find('tr[data-index]').off('click dblclick').on('click dblclick', function (e) {
+
                     var index = $(this).data('index');
                     var tr = that.$body.find('tr[data-index="' + index + '"]')
                     var $selectItem = tr.find('[name="'+that.options.selectItemName+'"]');
                     if ($selectItem.length) {
                         $selectItem[0].click(); // #144: .trigger('click') bug
                     }
+
+                    if(that.options.fixedColumns){
+                        var tr = that.$fixedBody.find('tr[data-index="' + index + '"] >td')
+                        var $selectItem = tr.find('[name="'+that.options.selectItemName+'"]');
+                        if ($selectItem.length) {
+                            $selectItem[0].click(); // #144: .trigger('click') bug
+                        }
+                    }
+
                 })
             }
         }
