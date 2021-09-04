@@ -678,6 +678,9 @@
         }
         if(this.options.height){
             this.$container.css('height',this.options.height + 'px');
+            //如果是设置高度设置表格相对位置
+            this.$tableBody.css('position','relative');
+
         }
         if ($.inArray('table-no-bordered', this.options.classes.split(' ')) !== -1) {
             this.$tableContainer.addClass('table-no-bordered');
