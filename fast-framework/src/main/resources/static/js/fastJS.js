@@ -4594,8 +4594,15 @@ if (typeof jQuery === "undefined") {
             search: function(formId) {
                 var currentId = opt.common.isEmpty(formId) ? $('form').attr('id') : formId;
                 var params = opt.common.formToJSON(currentId);
-                // 添加异步请求参数
                 params['__refre'] = true;
+                //如果表单为空添加异步请求数据
+                for(var o in params){
+                    if(opt.common.isNotEmpty(params[o])
+                        && o !== '__refre'){
+                        params['__refre'] = false;
+                        break;
+                    }
+                }
                 $.bttTable.bootstrapTreeTable('refresh', params);
             },
             // 刷新
