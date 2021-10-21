@@ -22,6 +22,8 @@ import org.springframework.util.AntPathMatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 处理请求权限控制字符保存请求Map
@@ -63,6 +65,14 @@ public class RequiresPermissionsAspect {
                 if(ToolUtil.isNotEmpty(tempExcludes)){
                     boolean flag = false;
                     for(String pattern: tempExcludes){
+
+                        Pattern p = Pattern.compile("^" + pattern);
+                        Matcher m = p.matcher(path);
+                        if (m.find()){
+                            flag = true;
+                            break;
+                        }
+
                         AntPathMatcher matcher = new AntPathMatcher();
                         if(matcher.match(pattern,path) ||
                                 matcher.matchStart(pattern,path)){

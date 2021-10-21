@@ -1,3 +1,8 @@
+/*
+ * All content copyright http://www.j2eefast.com, unless
+ * otherwise indicated. All rights reserved.
+ * No deletion without permission
+ */
 package com.j2eefast.common.core.xss;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +13,7 @@ import java.util.regex.Pattern;
 
 /**
  * SQL过滤
+ * @author huanzhou
  */
 public class SQLFilter {
 
