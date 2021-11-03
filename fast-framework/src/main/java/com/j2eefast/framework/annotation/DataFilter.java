@@ -20,6 +20,13 @@ import java.lang.annotation.Target;
 @Documented
 public @interface DataFilter {
 
+
+    /**
+     * 是否机构表 机构表权限查询特殊处理
+     * @return
+     */
+    boolean isDeptTable() default false;
+
     /**
      * sys_comp表的别名
      */
@@ -35,4 +42,8 @@ public @interface DataFilter {
      * 用户表的别名
      */
     String userAlias() default "";
+
+
+    AuthData[] auths() default {};
+
 }
