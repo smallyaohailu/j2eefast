@@ -1,6 +1,6 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="模块列表" libs=["table"]/>
+<@header title="模块管理" libs=["table"]/>
 <div class="container-div">
 	<div class="row">
 	<div class="col-sm-12 search-collapse">
@@ -8,16 +8,16 @@
         <div class="select-list">
             <ul>
                 <li>
-                    <@ctx.i18n text = "模块名称"/>：
+                    ${i18n("模块名称")}：
                     <input type="text" class="form-control" name="moduleName"/>
                 </li>
                 <li>
-                    <@ctx.i18n text = "状态"/>：
+                    ${i18n("状态")}：
                     <@f.select name="status" blankValue="" blankLabel="所有" dictType="sys_module_status" />
                 </li>
                 <li>
-                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>  <@ctx.i18n text = "查询"/></a>
-                    <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i> <@ctx.i18n text = "重置"/></a>
+                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>  ${i18n("查询")}</a>
+                    <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i> ${i18n("重置")}</a>
                 </li>
             </ul>
         </div>
@@ -25,14 +25,14 @@
     </div>
     <@table id="bootstrap-table">
         <@shiro.hasPermission name="sys:module:add">
-            <a class="btn btn-success" onclick="opt.operate.add()"><i class="fa fa-plus"></i> <@ctx.i18n text = "新增"/></a>
+            <a class="btn btn-success" onclick="opt.operate.add()"><i class="fa fa-plus"></i> ${i18n("新增")}</a>
         </@shiro.hasPermission>
         <@shiro.hasPermission name="sys:module:edit">
-            <a class="btn btn-primary single disabled" onclick="opt.operate.edit()"><i class="fa fa-pencil-square-o"></i> <@ctx.i18n text = "修改"/></a>
+            <a class="btn btn-primary single disabled" onclick="opt.operate.edit()"><i class="fa fa-pencil-square-o"></i> ${i18n("修改")}</a>
         </@shiro.hasPermission>
         <@shiro.hasPermission name="sys:module:del">
             <a class="btn btn-danger multiple disabled" onclick="opt.operate.delAll()">
-                <i class="fa fa-remove"></i> <@ctx.i18n text = "删除"/>
+                <i class="fa fa-remove"></i> ${i18n("删除")}
             </a>
         </@shiro.hasPermission>
     </@table>
@@ -54,39 +54,39 @@ sys:module:del,sys:module:add")?string('true', 'false')};
             addUrl: prefix + "/add",
             editUrl: prefix + "/edit/{id}",
             delUrl: prefix + "/del",
-            modalName: "模块",
+            modalName: "${i18n("模块")}",
             sortName: "id",
             uniqueId:    'id'                           , /* 唯一ID */
             columns: [{
-                title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
+                title: $.i18n.text("序号"), width: 5, align: "center", formatter: function (value, row, index) {
                     return $.table.serialNumber(index);
                 }
             }
                 ,{
                     field : 'id'
-                    ,title : '<@ctx.i18n text = "模块编码"/>'
+                    ,title : '${i18n("模块编码")}'
                     ,visible: false
                 }
                 ,{
                     field : 'moduleName'
-                    ,title : '<@ctx.i18n text = "模块名称"/>'
+                    ,title : '${i18n("模块名称")}'
                     ,formatter: function(value, row, index) {
                         return "<i class='"+row.icon+"'></i> "+value;
                     }
                 }
                 ,{
                     field : 'moduleCode'
-                    ,title : '<@ctx.i18n text = "模块编码"/>'
+                    ,title : '${i18n("模块编码")}'
                 }
                 ,{
                     field : 'description'
-                    ,title : '<@ctx.i18n text = "模块描述"/>'
+                    ,title : '${i18n("模块描述")}'
                 }
                 ,{
                     field : 'currentVersion'
                     ,align: 'left'
                     ,halign: 'left'
-                    ,title : '<@ctx.i18n text = "版本"/>'
+                    ,title : '${i18n("版本")}'
                     ,formatter: function (value, row, index) {
                         var v = 0;
                         if(row.moduleCode == 'core'){
@@ -97,26 +97,26 @@ sys:module:del,sys:module:add")?string('true', 'false')};
                 }
                 ,{
                     field : 'status'
-                    ,title : '<@ctx.i18n text = "状态"/>'
+                    ,title : '${i18n("状态")}'
                     ,formatter: function(value, row, index) {
                         return $.table.selectDictLabel(statusDatas, value);
                     }
                 }
                 ,{
-                    title:"<@ctx.i18n text = "操作"/>"
+                    title:"${i18n("操作")}"
                     ,align: 'left'
                     ,visible:visible
                     ,class:'action'
                     ,formatter: function(value, row, index) {
                         var actions = [];
-                        actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "编辑"/>" onclick="opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
+                        actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="${i18n("编辑")}" onclick="opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
                         if(row.status == '0' && row.moduleCode != 'core'){
-                            actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "停用"/>" onclick="disable(\'' + row.id + '\')"><i class="glyphicon glyphicon-ban-circle"></i></a> ');
+                            actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("停用")}" onclick="disable(\'' + row.id + '\')"><i class="glyphicon glyphicon-ban-circle"></i></a> ');
                         }
                         if(row.moduleCode == 'core'){
-                            actions.push("  "+$.table.tooltip('禁止删除操作!',5));
+                            actions.push("  "+$.table.tooltip('${i18n("禁止删除操作!")}',5));
                         }else{
-                            actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "删除"/>" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
+                            actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
                         }
                         return actions.join('');
                     }
@@ -128,14 +128,14 @@ sys:module:del,sys:module:add")?string('true', 'false')};
 
     /* 用户管理-停用 */
     function disable(id) {
-        opt.modal.confirm("确认要停用模块吗？", function() {
+        opt.modal.confirm("${i18n("确认要停用模块吗?")}", function() {
             opt.operate.post(prefix + "/status", { "id": id, "status": 1 });
         })
     }
 
     /* 用户管理启用 */
     function enable(id) {
-        opt.modal.confirm("确认要启用模块吗？", function() {
+        opt.modal.confirm("${i18n("确认要启用模块吗?")}", function() {
             opt.operate.post(prefix + "/status", { "id": id, "status": 0 });
         })
     }

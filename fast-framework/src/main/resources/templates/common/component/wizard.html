@@ -22,26 +22,26 @@
                     return;
                 }
                 var refresh = $('<button type="button" class="btn btn-sm btn-primary hide"' +
-                    ' id="${id}_refresh"><i class="fa fa-refresh"></i> <@ctx.i18n text = "${refresh}"/></button>')
+                    ' id="${id}_refresh"><i class="fa fa-refresh"></i> ${i18n("${refresh}")}</button>')
                     .on('click', function(){
                         $('#${id}').smartWizard("reset");
                         return true;
                     });
                 var prev = $('<button type="button" class="btn btn-sm btn-danger hide"' +
-                    ' id="${id}_prev"><i class="fa fa-mail-reply"></i> <@ctx.i18n text = "上一步"/></button>')
+                    ' id="${id}_prev"><i class="fa fa-mail-reply"></i> ${i18n("上一步")}</button>')
                     .on('click',function(){
                         $('#${id}').smartWizard("prev");
                         return true;
                     });
                 var next = $('<button type="button" class="btn btn-sm btn-warning"' +
-                    ' id="${id}_next"><i class="fa fa-share"></i> <@ctx.i18n text = "下一步"/></button>')
+                    ' id="${id}_next"><i class="fa fa-share"></i> ${i18n("下一步")}</button>')
                     .on('click',function(){
                         $('#${id}').smartWizard("next");
                         return true;
                     });
 
                 var complete = $('<button type="button" class="btn btn-sm btn-success hide" ' +
-                    'id="${id}_complete"><i class="fa fa-check"></i> <@ctx.i18n text = "${complete}"/></button>').on('click',function(){
+                    'id="${id}_complete"><i class="fa fa-check"></i> ${i18n("${complete}")}</button>').on('click',function(){
                     if(typeof wizardCallback == 'function' ){
                         wizardCallback('${id}', 'ok');
                     }

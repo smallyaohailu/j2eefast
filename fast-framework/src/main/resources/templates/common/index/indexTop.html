@@ -14,7 +14,7 @@
             <ul class="nav navbar-nav" id="topMenu">
                 <#if modules?? && (modules?size > 0)>
                     <#list modules as c>
-                            <li class="treeview"><a href="javascript:" class="addTabPage" title="${c['moduleName']}" data-code="${c['moduleCode']}"><i class="fa-fw ${c['icon']}"></i> <span class="hidden-xs"><@ctx.i18n text = "${c['moduleName']}"/></span></a></li>
+                            <li class="treeview"><a href="javascript:" class="addTabPage" title="${c['moduleName']}" data-code="${c['moduleCode']}"><i class="fa-fw ${c['icon']}"></i> <span class="hidden-xs">${i18n("${c['moduleName']}")}</span></a></li>
                     </#list>
                 </#if>
             </ul>
@@ -46,7 +46,7 @@
                     /*设置菜单新*/
                     <#--
                     setTimeout(function(){
-                        $('.navbar-nav [data-code="bpm"]').append('<span data-index="_new" class="label label-danger"><@ctx.i18n text = "新"/></span>');
+                        $('.navbar-nav [data-code="bpm"]').append('<span data-index="_new" class="label label-danger">${i18n("新")}</span>');
                     },2000); -->
                 })
             </script>
@@ -57,12 +57,12 @@
                 <#if superTenant?? && superTenant>
                 <li class="dropdown messages-menu">
                 <a href="#" onclick="$('#switchTenanSelectBut').click();"
-                   title="<@ctx.i18n text = "当前租户:"/> (${user.tenanName?default("-")})">
+                   title="${i18n("当前租户")}: (${user.tenanName?default("-")})">
                     <i class="fa fa-institution"></i>
-                    <span class="hidden-xs"><@ctx.i18n text = "当前租户:"/> (${user.tenanName?default("-")})</span>
+                    <span class="hidden-xs">${i18n("当前租户")} (${user.tenanName?default("-")})</span>
                 </a>
                 <div class="hide">
-                    <@f.treeselect name="switchTenanSelect" boxTitle="租户切换" isClear=false width="300" height="500" url="sys/tenant/findTenantTree"
+                    <@f.treeselect name="switchTenanSelect" boxTitle="租户切换" isClear=false maxmin=false width="300" height="500" url="sys/tenant/findTenantTree"
                     callbackFunName="switchTenanSelectCallback" value="${user.tenantId?default('')}" labelValue="${user.tenanName?default('-')}" expandLevel=true/>
                 </div>
                 </li>
@@ -94,27 +94,27 @@
                     <a href="#" id="fullScreen" data-toggle="tooltip"
                        data-placement="bottom"
 <#--                       data-custom-class="tooltip-primary"-->
-                       title="<@ctx.i18n text = "全屏显示"/>" class="dropdown-toggle">
+                       title="${i18n("全屏显示")}" class="dropdown-toggle">
                         <i class="fa icon-size-fullscreen"></i>
-                        <span class="hidden-xs"><@ctx.i18n text = "全屏显示"/></span>
+                        <span class="hidden-xs">${i18n("全屏显示")}</span>
                     </a>
                 </li>
                 <li class="dropdown messages-menu">
                     <a href="#" id="lockOs" data-toggle="tooltip"
                        data-placement="bottom"
 <#--                       data-custom-class="tooltip-primary"-->
-                       title="<@ctx.i18n text = "锁屏"/>" class="dropdown-toggle">
+                       title="${i18n("锁屏")}" class="dropdown-toggle">
                         <i class="fa fa-lock"></i>
-                        <span class="hidden-xs"><@ctx.i18n text = "锁屏"/></span>
+                        <span class="hidden-xs">${i18n("锁屏")}</span>
                     </a>
                 </li>
                 <li class="dropdown messages-menu">
                     <a href="#" id="sticky" data-toggle="tooltip"
                        data-placement="bottom"
-                       title="<@ctx.i18n text = "便签"/>" class="dropdown-toggle">
+                       title="${i18n("便签")}" class="dropdown-toggle">
                         <i class="fa fa-tags"></i>
-                        <sapn class="hidden-xs"><@ctx.i18n text = "便签"/></sapn>
-<#--                        <span data-index="_new" class="label label-danger"><@ctx.i18n text = "新"/></span>-->
+                        <sapn class="hidden-xs">${i18n("便签")}</sapn>
+<#--                        <span data-index="_new" class="label label-danger">${i18n("新")}</span>-->
                     </a>
                 </li>
                 <!-- Notifications: style can be found in dropdown.less -->
@@ -141,19 +141,24 @@
                 <li class="dropdown tasks-menu">
                     <a href="javascript:void(0);" class="dropdown-toggle">
                         <i class="fa fa-language"></i>
-                        <sapn class="hidden-xs"><@ctx.i18n text = "中文(简体)"/></sapn>
+                        <sapn class="hidden-xs">${dict.getLabel("sys_lang_type","${config.getSysLang()}")}</sapn>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="mt5"></li>
                         <#list dict.getType('sys_lang_type')>
                             <#items as d>
                                 <#if d.status =='0' >
-                                    <li><a href="${ctxStatic}/index?_lang=${d.dictValue}">${d.dictLabel}</a></li>
+                                    <li><a onclick="__clearLang();" href="${ctxStatic}/index?_lang=${d.dictValue}">${d.dictLabel}</a></li>
                                 </#if>
                             </#items>
                         </#list>
                         <li class="mt5"></li>
                     </ul>
+                    <script>
+                        function __clearLang(){
+                            window.localStorage.removeItem("i18nLang");
+                        }
+                    </script>
                 </li>
                 <!-- User Account: style can be found in dropdown.less -->
                 <li class="dropdown user user-menu">
@@ -169,23 +174,23 @@
                             <img src="${ctxStatic}<#if user.avatar?? && user.avatar!="">${user.avatar}<#else>/static/img/user2-160x160.jpg</#if>"
                               onerror="imgUserError();"   class="img-circle" alt="User Image" />
                             <p>
-                            <h4><@ctx.i18n text = "上次登陆时间"/> :
+                            <h4>${i18n("上次登陆时间")} :
                                 <#if user.loginTime?exists>
                                     ${user.loginTime?string('yyyy-MM-dd HH:mm:ss')}
                                 </#if>
                                 </h4>
-                            <small><@ctx.i18n text = "上次登陆地点"/>:${user.loginLocation?default("/")}</small>
+                            <small>${i18n("上次登陆地点")}:${user.loginLocation?default("/")}</small>
                             </p>
                         </li>
                         <!-- Menu Body -->
                         <li class="user-body">
                             <div class="row">
                                 <div class="col-xs-6 text-left">
-                                    <a click-id="userInfo" href="javascript:void(0);"><i class="fa fa-address-card"></i> <@ctx.i18n text = "个人中心"/></a>
+                                    <a click-id="userInfo" href="javascript:void(0);"><i class="fa fa-address-card"></i> ${i18n("个人中心")}</a>
                                 </div>
                                 <div class="col-xs-6 text-right">
-                                  <a id="switchSkin" href="javascript:void(0);"><i class="fa fa-dashboard"></i> <@ctx.i18n text = "切换主题"/></a>
-                                  <span data-index="_new" class="label label-danger" style="top: -9px;"><@ctx.i18n text = "新"/></span>
+                                  <a id="switchSkin" href="javascript:void(0);"><i class="fa fa-dashboard"></i> ${i18n("切换主题")}</a>
+                                  <span data-index="_new" class="label label-danger" style="top: -9px;">${i18n("新")}</span>
                                 </div>
                                 <!-- <div class="col-xs-4 text-center">
                                   <a href="#">Friends</a>
@@ -195,11 +200,11 @@
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a id="updatePassword" href="javascript:void(0);" title="<@ctx.i18n text = "修改密码"/>" class="btn btn-default btn-flat" style="width: 120px;overflow: hidden;
-                                 white-space: nowrap;text-overflow: ellipsis;"><i class="fa icon-lock-open"></i> <@ctx.i18n text = "修改密码"/></a>
+                                <a id="updatePassword" href="javascript:void(0);" title="${i18n("修改密码")}" class="btn btn-default btn-flat" style="width: 120px;overflow: hidden;
+                                 white-space: nowrap;text-overflow: ellipsis;"><i class="fa icon-lock-open"></i> ${i18n("修改密码")}</a>
                             </div>
                             <div class="pull-right">
-                                <a click-id="logout" href="javascript:void(0);" title="<@ctx.i18n text = "退出"/>" class="btn btn-default btn-flat"><i class="fa icon-power"></i> <@ctx.i18n text = "退出"/></a>
+                                <a click-id="logout" href="javascript:void(0);" title="${i18n("退出")}" class="btn btn-default btn-flat"><i class="fa icon-power"></i> ${i18n("退出")}</a>
                             </div>
                         </li>
                     </ul>
@@ -219,7 +224,7 @@
 	<i class="layui-icon layui-icon-face-surprised"></i>
 	<p>便签中的内容会存储在本地,这样即便你关掉了浏览器,在下次打开时,依然会读取到上一次的记录。是个非常小巧实用的本地备忘录</p>
 </div>
-<div class="btn-notadd" id="noteAddBtn" title="<@ctx.i18n text = "添加便签"/>" style="position: absolute;">
+<div class="btn-notadd" id="noteAddBtn" title="${i18n("添加便签")}" style="position: absolute;">
 	<i class="layui-icon layui-icon-add-1"></i>
 </div>
 <script>
@@ -286,7 +291,7 @@
             var id = data ? data.id : undefined, content = data ? data.content : '';
             opt.layer.open({
                 id: 'layer-note-edit',
-                title: '<i class="fa fa-sticky-note"></i> '+ "<@ctx.i18n text = "便签"/>",
+                title: '<i class="fa fa-sticky-note"></i> '+ "${i18n("便签")}",
                 type: 1,
                 skin:'layui-layer-note',
 				shade: 0.1,

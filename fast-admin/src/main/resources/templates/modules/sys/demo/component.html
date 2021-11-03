@@ -676,7 +676,7 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
                                         1. id 控件id 必输
                                         2. 与普通表格一样支持上面功能按钮. 例如:
                                         <@table id="bootstrap-tree-table">
-                                        <a class="btn btn-info" id="expandAllBtn"><i class="fa fa-exchange"></i><@ctx.i18n text = "展开/折叠"/></a>
+                                        <a class="btn btn-info" id="expandAllBtn"><i class="fa fa-exchange"></i>${i18n("展开/折叠")}</a>
                                         </@table>
                                         JS.函数参数简单说明:
                                         url: 数据请求url
@@ -732,16 +732,16 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
             asynUrl: prefix + "/listChild", // 点击异步请求
             columns: [
                 {field: 'selectItem', radio: true}, //是否需要点击选择
-                {field : 'name',title : '<@ctx.i18n text = "(行政代码)名称"/>',width:'250px', align: 'left',halign:"center",formatter: function(value, row, index) {
+                {field : 'name',title : '${i18n("(行政代码)名称")}',width:'250px', align: 'left',halign:"center",formatter: function(value, row, index) {
                         return "（"+row.areaCode+"）"+value;
                     }
                 }
-                ,{field : 'wholeName',title : '<@ctx.i18n text = "区域全称"/>',width:'300px', align: 'left', formatter: function(value, row, index) {return $.table.tooltip(value,30);}}
-                ,{field : 'level',title : '<@ctx.i18n text = "区域等级"/>', align: 'center', formatter: function(value, row, index) {return $.table.selectDictLabel(datas_type, value);}}
-                ,{field : 'cityCode',title : '<@ctx.i18n text = "电话区号"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-                ,{field : 'zipCode',title : '<@ctx.i18n text = "邮政编码"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-                ,{field : 'lon',title : '<@ctx.i18n text = "本区域经度"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-                ,{field : 'lat',title : '<@ctx.i18n text = "本区域纬度"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+                ,{field : 'wholeName',title : '${i18n("区域全称")}',width:'300px', align: 'left', formatter: function(value, row, index) {return $.table.tooltip(value,30);}}
+                ,{field : 'level',title : '${i18n("区域等级")}', align: 'center', formatter: function(value, row, index) {return $.table.selectDictLabel(datas_type, value);}}
+                ,{field : 'cityCode',title : '${i18n("电话区号")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+                ,{field : 'zipCode',title : '${i18n("邮政编码")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+                ,{field : 'lon',title : '${i18n("本区域经度")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+                ,{field : 'lat',title : '${i18n("本区域纬度")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
             ]
         };
         $.treeTable.init(options);

@@ -6,6 +6,11 @@
   @version v1.0.1
   //修改ID适配页面传值特殊符号问题
 -->
+<#-- 国际化-->
+<#function i18n text args=[]>
+    <#assign tt="${springMacroRequestContext.getMessage(text,args,text)}">
+    <#return tt>
+</#function>
 <#--获取动态传入参数值 -->
 <#macro getName value key>
     <#list value?keys as attr>
@@ -30,7 +35,6 @@
     <#nested>
     </form>
 </#macro>
-
 <#include "input.html"/>
 <#include "iconselect.html"/>
 <#include "tableselect.html"/>

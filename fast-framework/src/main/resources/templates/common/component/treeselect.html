@@ -16,6 +16,8 @@
                     labelValue=""
                     labelName="" <#--标签名称 -->
                     checked=false
+                    maxmin=true <#--弹出窗体是否有大小化按钮 -->
+                    closeBtn=1 <#--弹出窗体关闭按钮样式 -->
                     radioType="all" <#-- 当checked=false 单选时 控制同级单选互斥还是整个树互斥 all 整个树互斥 level, checked=true 多选此值无效-->
                     required=false <#-- 是否必输-->
                     readonly=true <#-- 是否只读模式-->
@@ -48,7 +50,7 @@
     </#if>
     <div class="input-group" id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Div" data-url="${url}">
         <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>"  type="hidden" value="${value}"/>
-        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name" <#if labelName!="">name="${labelName}"</#if> type="text" placeholder="${placeholder}" class="${class} inputZtree" value="${labelValue}" <#if readonly> readonly = "readonly"</#if> <#if required> required</#if>/>
+        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name" <#if labelName!="">name="${labelName}"</#if> type="text" placeholder="${i18n("${placeholder}")}" class="${class} inputZtree" value="${labelValue}" <#if readonly> readonly = "readonly"</#if> <#if required> required</#if>/>
         <#if isParentIds?string == "true">
             <input name="${parenName}" <#if parenIdsValue!="">value="${parenIdsValue}"</#if> type="hidden"/>
         </#if>
@@ -67,19 +69,21 @@
                 <#if correlationId !="">
                 var correlationId = $("#${correlationId}").val() == "" ? "${correlationValue}": $("#${correlationId}").val();
                 if(opt.common.isEmpty(correlationId) || correlationId == '-1'){
-                    opt.error("<@ctx.i18n text = "关联信息不能为空"/>");
+                    opt.error("${i18n("关联信息不能为空")}");
                     return;
                 }
                 <#else>
                 var correlationId = "";
                 </#if>
                 var options = {
-                    title: <#if boxTitle =="">"<@ctx.i18n text = "请选择数据"/>" <#else>"${boxTitle}"</#if>,
+                    title: <#if boxTitle =="">"${i18n("请选择数据")}" <#else>"${i18n("${boxTitle}")}"</#if>,
                     width: "${width}",
                     <#if height != "">
                     height: ${height},
                     </#if>
                     url: baseURL + "sys/component/treeselect",
+                    maxmin: <#if maxmin?string == "true">true<#else>false</#if>,
+                    closeBtn: ${closeBtn},
                     <#-- POST提交组件控制类参数-->
                     fromData:{
                         url: $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Div").data("url"),
@@ -115,6 +119,12 @@
                 if(typeof ${callbackFunName} == 'function'){
                     ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'ok', index, layero, nodes);
                 }
+                /*校验*/
+                <#if required>
+                $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name")
+                    .parentsUntil('from').validate()
+                    .element($("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name"));
+                </#if>
                 selfLayer.close(index);
             };
             <#if isClear?string == "true">
@@ -127,6 +137,12 @@
                 if(typeof ${callbackFunName}  == 'function'){
                     ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'clear', index, layero, '');
                 }
+                /*校验*/
+                <#if required>
+                $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name")
+                    .parentsUntil('from').validate()
+                    .element($("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name"));
+                </#if>
                 selfLayer.close(index);
             };
             </#if>

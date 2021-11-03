@@ -1,12 +1,12 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="在线用户列表" libs=["table"]/>
+<@header title="用户监控" libs=["table"]/>
 <div class="container-div" id="_app">
 <div class="row">
 <@table id="bootstrap-table">
 	<@shiro.hasPermission name="sys:online:forceLogout">
 		<a class="btn btn-danger multiple disabled" onclick="javascript:batchForceLogout()">
-			<i class="fa fa-sign-out"></i> 强退
+			<i class="fa fa-sign-out"></i> ${i18n("强退")}
 		</a>
 	</@shiro.hasPermission>
 </@table>
@@ -30,30 +30,30 @@
 					{title: $.i18n.prop("序号"), formatter: function (value, row, index) {
                  	    return $.table.serialNumber(index);}
                     },
-					{field: 'sid', title: '会话编号'},
-					{field: 'name', title: '姓名'},
-					{field: 'username', title: '登录名称'},
-					{field: 'compName',	title: '所属公司'},
-					{field: 'loginIp', title: '主机'},
-					{field: 'loginLocation', title: '登陆地点'},
+					{field: 'sid', title: '${i18n("会话编号")}'},
+					{field: 'name', title: '${i18n("姓名")}'},
+					{field: 'username', title: '${i18n("登录账号")}'},
+					{field: 'compName',	title: '${i18n("归属公司")}'},
+					{field: 'loginIp', title: '${i18n("IP")}'},
+					{field: 'loginLocation', title: '${i18n("登陆地点")}'},
 					{
 		            field: 'loginStatus',
-		            title: '会话状态',
+		            title: '${i18n("会话")}',
 		            align: 'center',
 		            formatter: function(value, row, index) {
 		                if (value == '1') {
-		                    return '<span class="badge badge-primary">在线</span>';
+		                    return '<span class="badge badge-primary">${i18n("在线")}</span>';
 		                }if (value == '-1') {
-							return '<span class="badge badge-warning">锁屏</span>';
+							return '<span class="badge badge-warning">${i18n("锁屏")}</span>';
 						}if (value == '-9') {
-							return '<span class="badge badge-warning">已踢,等待下线</span>';
+							return '<span class="badge badge-warning">${i18n("已踢,等待下线")}</span>';
 						}else{
-		                    return '<span class="badge badge-danger">离线</span>';
+		                    return '<span class="badge badge-danger">${i18n("离线")}</span>';
 		                }
 		            }},
-					{field: 'loginTime', title: '登录时间'},
-					{title:"<@ctx.i18n text = "操作"/>", align: 'center', formatter: function(value, row, index) {
-		                var msg = '<a class="btn btn-danger btn-xs ' + forceFlag + '" href="javascript:void(0)" onclick="forceLogout(\'' + row.sid + '\')"><i class="fa fa-sign-out"></i>强退</a> ';
+					{field: 'loginTime', title: '${i18n("登录时间")}'},
+					{title:"${i18n("操作")}", align: 'center', formatter: function(value, row, index) {
+		                var msg = '<a class="btn btn-danger btn-xs ' + forceFlag + '" href="javascript:void(0)" onclick="forceLogout(\'' + row.sid + '\')"><i class="fa fa-sign-out"></i>${i18n("强退")}</a> ';
 		                return msg;}
 					}]
 		    };

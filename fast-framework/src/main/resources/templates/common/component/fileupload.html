@@ -18,7 +18,7 @@
                     >
     <div id="<#if id == "">${name}<#else>${id}</#if>_wup" class="wup_container ">
         <input id="<#if id == "">${name}<#else>${id}</#if>" name="<#if bizType == "">${name}<#else>${bizType}</#if>" value="" class="wup_input ${uploadType}"
-               data-msg-required="请上传图片"/>
+               data-msg-required="${i18n("请上传图片")}"/>
         <input id="<#if id == "">${name}<#else>${id}</#if>__del" name="<#if bizType == "">${name}<#else>${bizType}</#if>__del" value="" type="hidden"/>
         <div class="area">
             <div id="<#if id == "">${name}<#else>${id}</#if>_Uploader" class="wup_<#if uploadType=="image">img<#else>file</#if>">
@@ -30,7 +30,7 @@
                     <div class="info"></div>
                     <div class="btns">
                         <div id="<#if id == "">${name}<#else>${id}</#if>_filePicker2" class="webuploader-container"></div>
-                        <div class="uploadBtn state-pedding">开始上传</div>
+                        <div class="uploadBtn state-pedding">${i18n("开始上传")}</div>
                     </div>
                 </div>
                 <div class="queueList">
@@ -45,7 +45,17 @@
                     </#if>
                     <div id="<#if id == "">${name}<#else>${id}</#if>dndArea" class="placeholder">
                         <div id="<#if id == "">${name}<#else>${id}</#if>_filePicker" class="webuploader-container"></div>
-                        <p><#if !readonly>或将<#if uploadType == "image">照片<#else>文件</#if>拖到这里，最多可选 ${maxUploadNum} <#if uploadType == "image">张<#else>个</#if><#else>无文件附件</#if></p>
+                        <p>
+                            <#if !readonly>
+                                <#local ff=""/>
+                                <#if uploadType == "image"><#local ff="照片"/><#else><#local ff="文件"/></#if>
+                                <#local gg=""/>
+                                <#if uploadType == "image"><#local gg="张"/><#else><#local gg="个"/></#if>
+                                ${i18n("或将{0}拖到这里,最多可选{1}{2}",['${i18n("${ff}")}','${maxUploadNum}','${i18n("${gg}")}'])}
+                            <#else>
+                                ${i18n("无文件附件")}
+                            </#if>
+                        </p>
                     </div>
                 </div>
             </div>

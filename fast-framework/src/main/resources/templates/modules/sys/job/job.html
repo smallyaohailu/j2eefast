@@ -8,20 +8,20 @@
 		<div class="select-list">
 			<ul>
 				<li>
-					<@ctx.i18n text = "任务名称"/>：
+					${i18n("任务名称")}：
 					<input type="text" class="form-control" name="jobName"/>
 				</li>
 				<li>
-					<@ctx.i18n text = "任务分组"/>：
+					${i18n("任务分组")}：
 					<@f.select name="jobGroup" blankValue="" blankLabel="所有" dictType="sys_job_group" />
 				</li>
 				<li>
-					<@ctx.i18n text = "任务状态"/>：
+					${i18n("任务状态")}：
 					<@f.select name="status" blankValue="" blankLabel="所有" dictType="sys_job_status" />
 				</li>
 				<li>
-					<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-					<a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+					<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;${i18n("搜索")}</a>
+					<a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
 				</li>
 			</ul>
 		</div>
@@ -29,19 +29,19 @@
 	</div>
 	<@table id="bootstrap-table">
 			<@shiro.hasPermission name="sys:job:add">
-				<a class="btn btn-success" onclick="opt.operate.addTab()"><i class="fa fa-plus"></i>&nbsp;<@ctx.i18n text = "新增"/></a>
+				<a class="btn btn-success" onclick="opt.operate.addTab()"><i class="fa fa-plus"></i>&nbsp;${i18n("新增")}</a>
 			</@shiro.hasPermission>
 			<@shiro.hasPermission name="sys:job:edit">
-				<a class="btn btn-primary single disabled" onclick="opt.operate.editTab()"><i class="fa fa-pencil-square-o"></i>&nbsp;<@ctx.i18n text = "修改"/></a>
+				<a class="btn btn-primary single disabled" onclick="opt.operate.editTab()"><i class="fa fa-pencil-square-o"></i>&nbsp;${i18n("修改")}</a>
 			</@shiro.hasPermission>
 			<@shiro.hasPermission name="sys:job:del">
 				<a class="btn btn-danger multiple disabled" onclick="opt.operate.delAll()">
-					<i class="fa fa-remove"></i> <@ctx.i18n text = "删除"/>
+					<i class="fa fa-remove"></i> ${i18n("删除")}
 				</a>
 			</@shiro.hasPermission>
 			<@shiro.hasPermission name="sys:job:loglist">
 				<a class="btn btn-info" onclick="javascript:jobLog()">
-					<i class="fa fa-list"></i> 日志
+					<i class="fa fa-list"></i> ${i18n("日志")}
 				</a>
 			</@shiro.hasPermission>
 	</@table>
@@ -66,46 +66,46 @@
 		        sortName: "createTime",
 		        uniqueId: "id",
 		        sortOrder: "asc",
-		        modalName: "任务",
+		        modalName: "${i18n("任务")}",
 		        columns: [
 	        	{
-                    title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
+                    title: $.i18n.text("序号"), width: 5, align: "center", formatter: function (value, row, index) {
                         return $.table.serialNumber(index);
                     }
                 },
 		        {
 		            field: 'id',
-		            title: '任务编号'
+		            title: '${i18n("任务编号")}'
 		        },
 		        {
 		            field: 'jobName',
-		            title: '任务名称'
+		            title: '${i18n("任务名称")}'
 		        },
 		        {
 		            field: 'jobGroup',
-		            title: '任务分组',
+		            title: '${i18n("任务分组")}',
 		            formatter: function(value, row, index) {
 		            	return $.table.selectDictLabel(datas, value);
 		            }
 		        },
 				{
 					field: 'invokeTarget',
-					title: '调用目标字符串',
+					title: '${i18n("调用目标字符串")}',
 					formatter: function(value, row, index) {
 						return $.table.tooltip(value);
 					}
 				},
 		        {
 		            field: 'cronExpression',
-		            title: '执行表达式'
+		            title: '${i18n("执行表达式")}'
 		        },
 				{
 					field: 'nextDate',
-					title: '下次执行时间'
+					title: '${i18n("下次执行时间")}'
 				},
 		        {
 		        	visible: statusFlag == 'hidden' ? false : true,
-		        	title: '任务状态',
+		        	title: '${i18n("任务状态")}',
 		        	align: 'center',
 		        	formatter: function (value, row, index) {
 		        		return statusTools(row);
@@ -117,13 +117,13 @@
 		            sortable: true
 		        },
 		        {
-		            title:"<@ctx.i18n text = "操作"/>",
+		            title:"${i18n("操作")}",
 		            align: 'center',
 					visible:visible,
 		            formatter: function(value, row, index) {
 		                var actions = [];
-		                actions.push('<a class="btn btn-primary btn-xs ' + statusFlag + '" href="javascript:void(0)" onclick="run(\'' + row.id + '\', \'' + row.jobGroup + '\')"><i class="fa fa-play-circle-o"></i> 执行一次</a> ');
-		                /*actions.push('<a class="btn btn-warning btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="opt.operate.detail(\'' + row.jobId + '\')"><i class="fa fa-search"></i>详细</a> ');*/
+		                actions.push('<a class="btn btn-primary btn-xs ' + statusFlag + '" href="javascript:void(0)" onclick="run(\'' + row.id + '\', \'' + row.jobGroup + '\')"><i class="fa fa-play-circle-o"></i> ${i18n("执行一次")}</a> ');
+		                /*actions.push('<a class="btn btn-warning btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="opt.operate.detail(\'' + row.jobId + '\')"><i class="fa fa-search"></i> ${i18n("详细")}</a> ');*/
 		                return actions.join('');
 		            }
 		        }]
@@ -142,21 +142,21 @@
 		
 		/* 立即执行一次 */
 		function run(jobId, jobGroup) {
-			opt.modal.confirm("确认要立即执行一次任务吗？", function() {
+			opt.modal.confirm("${i18n("确认要立即执行一次任务吗?")}", function() {
 				opt.operate.post(prefix + "/run", { "ids": jobId});
 		    })
 		}
 
 		/* 调度任务-停用 */
 		function stop(jobId, jobGroup) {
-			opt.modal.confirm("确认要停用任务吗？", function() {
+			opt.modal.confirm("${i18n("确认要{0}任务吗?",["${i18n('停用')}"])}", function() {
 				opt.operate.post(prefix + "/status", { "id": jobId, "jobGroup": jobGroup, "status": "1"});
 		    })
 		}
 
 		/* 调度任务-启用 */
 		function start(jobId, jobGroup) {
-			opt.modal.confirm("确认要启用任务吗？", function() {
+			opt.modal.confirm("${i18n("确认要{0}任务吗?",["${i18n('启用')}"])}", function() {
 				opt.operate.post(prefix + "/status", { "id": jobId, "jobGroup": jobGroup, "status": "0"});
 		    })
 		}
@@ -164,7 +164,7 @@
 		/* 调度日志查询 */
 		function jobLog(id) {
 			var url = baseURL + 'sys/jobLog';
-			opt.modal.openTab("调度日志", url);
+			opt.modal.openTab("${i18n("调度日志")}", url);
 		}
 	</script>
 </@footer>

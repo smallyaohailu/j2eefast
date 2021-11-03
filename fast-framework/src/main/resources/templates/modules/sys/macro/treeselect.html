@@ -12,16 +12,16 @@
 	<@f.hidden  name="parentIds" value="${parentIds?default('')}" />
 	<@f.hidden  name="type" />
 	<div class="treeShowHideButton" onclick="$.tree.toggleSearch();">
-		<label id="btnShow" title="显示搜索" style="display:none;">︾</label>
-		<label id="btnHide" title="隐藏搜索">︽</label>
+		<label id="btnShow" title="${i18n("显示搜索")}" style="display:none;">︾</label>
+		<label id="btnHide" title="${i18n("隐藏搜索")}">︽</label>
 	</div>
 	<div class="treeSearchInput" id="search">
-		<label for="keyword">关键字：</label><input type="text" class="empty" id="keyword" maxlength="50">
-		<button class="btn" id="btn" onclick="$.tree.searchNode()"> 搜索 </button>
+		<label for="keyword">${i18n("关键字")}：</label><input type="text" class="empty" id="keyword" maxlength="50">
+		<button class="btn" id="btn" onclick="$.tree.searchNode()"> ${i18n("搜索")} </button>
 	</div>
 	<div class="treeExpandCollapse">
-		<a href="#" onclick="$.tree.expand()">展开</a> /
-		<a href="#" onclick="$.tree.collapse()">折叠</a>
+		<a href="#" onclick="$.tree.expand()">${i18n("展开")}</a> /
+		<a href="#" onclick="$.tree.collapse()">${i18n("折叠")}</a>
 	</div>
 	<div id="tree" class="ztree treeselect"></div>
 	<@footer>

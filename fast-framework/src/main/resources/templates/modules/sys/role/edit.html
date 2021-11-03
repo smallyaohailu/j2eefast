@@ -5,82 +5,55 @@
 <@f.form id="form-role-edit" class="form-horizontal">
     <@f.hidden id="id" name="id" value="${role.id?default('')}"/>
     <div class="form-group">
-        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>角色名称：</label>
+        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>${i18n("角色名称")}：</label>
         <div class="col-sm-8">
-            <input class="form-control" type="text" name="roleName" id="roleName" value="${role.roleName?default("")}">
+            <@f.input name="roleName" value="${role.roleName?default('')}" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>权限字符：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("权限字符")}：</label>
         <div class="col-sm-8">
-            <input class="form-control" type="text" name="roleKey" id="roleKey" value="${role.roleKey?default("")}" required>
+            <@f.input name="roleKey" value="${role.roleKey?default('')}" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><@ctx.i18n text = "管理模块"/>：</label>
+        <label class="col-sm-3 control-label">${i18n("管理模块")}：</label>
         <div class="col-sm-8">
             <@f.checkbox name="moduleCodes" value="${selectModules}" items=modules itemLabel="moduleName" itemValue="moduleCode" required=true/>
-<#--            <#list modules>-->
-<#--                <#items as d>-->
-<#--                    <#if d.status =='0' >-->
-<#--                        <#if lisModule?? && (lisModule?size > 0)>-->
-<#--                            <#assign a=0 />-->
-<#--                            <#list lisModule as c>-->
-<#--                                <#if c == d.moduleCode >-->
-<#--                                    <#assign a=1 />-->
-<#--                                </#if>-->
-<#--                            </#list>-->
-<#--                            <#if a== 1>-->
-<#--                                 <label>-->
-<#--                                    <label class="check-box"><input type="checkbox" name="moduleCodes" value="${d.moduleCode}" checked required/><@ctx.i18n text = "${d.moduleName}" /></label>-->
-<#--                                </label>-->
-<#--                            <#else>-->
-<#--                                 <label>-->
-<#--                                    <label class="check-box"><input type="checkbox" name="moduleCodes" value="${d.moduleCode}" required/><@ctx.i18n text = "${d.moduleName}" /></label>-->
-<#--                                </label>-->
-<#--                            </#if>-->
-<#--                        <#else>-->
-<#--                            <label>-->
-<#--                                <label class="check-box"><input type="checkbox" name="moduleCodes" value="${d.moduleCode}" required/><@ctx.i18n text = "${d.moduleName}" /></label>-->
-<#--                            </label>-->
-<#--                        </#if>-->
-<#--                    </#if>-->
-<#--                </#items>-->
-<#--            </#list>-->
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>显示顺序：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("显示排序")}：</label>
         <div class="col-sm-8">
             <@f.input name="roleSort" value="${role.roleSort?default('')}"  required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>状态：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("状态")}：</label>
         <div class="col-sm-8">
             <@f.switch name="status" value="${role.status}"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">备注：</label>
+        <label class="col-sm-3 control-label">${i18n("备注")}：</label>
         <div class="col-sm-8">
             <@f.textarea name="remark" value="${role.remark?default('')}"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">菜单权限: </label>
+        <label class="col-sm-3 control-label">${i18n("菜单权限")}: </label>
         <div  class="col-sm-8">
             <div class="box box-solid" style="background:#FAFAFA;border-top: 1px solid rgb(210, 214, 222);">
                 <div class="box-header">
                     <div class="box-title">
                         <label class="check-box">
-                            <input type="checkbox" id="checkall"/> 全部勾选
+                            <input type="checkbox" id="checkall"/> ${i18n("全部勾选")}
                         </label>
                     </div>
                     <div class="box-tools pull-right" style="top:8px;">
                         <a class="btn btn-box-tool" id="expand"
-                           value="dataScopeTree" >展开</a>/
-                        <a class="btn btn-box-tool" id="collapse" value="dataScopeTree" >折叠</a>
+                           value="dataScopeTree" >${i18n("展开")}</a>/
+                        <a class="btn btn-box-tool" id="collapse" value="dataScopeTree" >${i18n("折叠")}</a>
                     </div>
                 </div>
                 <div class="box-body">

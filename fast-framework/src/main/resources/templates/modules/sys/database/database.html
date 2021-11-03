@@ -8,12 +8,12 @@
         <div class="select-list">
             <ul>
                 <li>
-                    <@ctx.i18n text = "名称"/>：
+                    ${i18n("数据库名称")}：
                     <input type="text" class="form-control" name="dbName"/>
                 </li>
                 <li>
-                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>  <@ctx.i18n text = "查询"/></a>
-                    <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i> <@ctx.i18n text = "重置"/></a>
+                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>  ${i18n("查询")}</a>
+                    <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i> ${i18n("重置")}</a>
                 </li>
             </ul>
         </div>
@@ -21,7 +21,7 @@
     </div>
     <@table id="bootstrap-table">
         <@shiro.hasPermission name="sys:database:add">
-            <a class="btn btn-success" onclick="opt.operate.add()"><i class="fa fa-plus"></i> <@ctx.i18n text = "新增"/></a>
+            <a class="btn btn-success" onclick="opt.operate.add()"><i class="fa fa-plus"></i> ${i18n("新增")}</a>
         </@shiro.hasPermission>
     </@table>
     </div>
@@ -43,7 +43,7 @@ sys:database:del,sys:database:add")?string('true', 'false')};
                 addUrl: prefix + "/add",
                 editUrl: prefix + "/edit/{id}",
                 delUrl: prefix + "/del",
-                modalName: "多源数据",
+                modalName: "${i18n("多源数据")}",
                 uniqueId:    'id'                           , /* 唯一ID */
                 sortName: "createTime",
                 sortOrder: "desc",
@@ -67,67 +67,67 @@ sys:database:del,sys:database:add")?string('true', 'false')};
                     }
                     ,{
                         field : 'dbName'
-                        ,title : '<@ctx.i18n text = "数据库名称"/>'
+                        ,title : '${i18n("数据库名称")}'
                         ,sortable: true
                     }
                     ,{
                         field : 'jdbcDriver'
-                        ,title : '<@ctx.i18n text = "驱动类型"/>'
+                        ,title : '${i18n("驱动类型")}'
                     }
                     ,{
                         field : 'jdbcUrl'
-                        ,title : '<@ctx.i18n text = "URL"/>'
+                        ,title : '${i18n("URL")}'
                         ,formatter: function(value, row, index) {
                             return $.table.tooltip(value,35);
                         }
                     }
                     ,{
                         field : 'userName'
-                        ,title : '<@ctx.i18n text = "账号"/>'
+                        ,title : '${i18n("账号")}'
                         ,formatter: function(value, row, index) {
                             return $.table.tooltip(value,10);
                         }
                     }
                     ,{
                         field : 'password'
-                        ,title : '<@ctx.i18n text = "密码"/>'
+                        ,title : '${i18n("密码")}'
                         ,formatter: function(value, row, index) {
                             return $.table.tooltip(value,10);
                         }
                     }
                     ,{
                         field : 'encType'
-                        ,title : '<@ctx.i18n text = "加密类型"/>'
+                        ,title : '${i18n("加密类型")}'
                         ,formatter: function(value, row, index) {
                             return $.table.selectDictLabel(typeDatas, value);
                         }
                     }
                     ,{
                         field : 'status'
-                        ,title : '<@ctx.i18n text = "状态"/>'
+                        ,title : '${i18n("状态")}'
                         ,formatter: function(value, row, index) {
                             return $.table.selectDictLabel(statusDatas, value);
                         }
                     }
                     ,{
                         field : 'remark'
-                        ,title : '<@ctx.i18n text = "备注"/>'
+                        ,title : '${i18n("备注")}'
                         ,formatter: function(value, row, index) {
                             return $.table.tooltip(value,10);
                         }
                     }
                     ,{
-                        title:"<@ctx.i18n text = "操作"/>"
+                        title:"${i18n("操作")}"
                         ,width: 80
                         ,visible:visible
                         ,class:'action'
                         ,formatter: function(value, row, index) {
                             var actions = [];
                             if(!(row.dbName ==='DEFAULT' || row.dbName ==='MASTER' || row.dbName ==='FLOWABLE')){
-                                //actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "编辑"/>" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
-                                actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "删除"/>" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
+                                //actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="${i18n("编辑")}" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
+                                actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
                             }else{
-                                actions.push($.table.tooltip('禁止操作!',3));
+                                actions.push($.table.tooltip('${i18n("禁止操作")}!',3));
                             }
                             return actions.join('');
                         }

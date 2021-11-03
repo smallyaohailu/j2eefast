@@ -1,25 +1,25 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="新增公告" bodyClass="white-bg" libs=["ueditor","bootstrapSelect"]/>
+<@header title="公告管理" bodyClass="white-bg" libs=["ueditor","bootstrapSelect"]/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-notice-add" class="form-horizontal">
         <div class="alert alert-dismissible callout callout-info animated bounceInDown">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <p><i class="icon fa fa-info"></i><strong>重要提示:</strong>如果选择发布公告,等级是<u>严重</u>才会在登陆页面Top提示,等级是<u>紧急</u>只在登陆之后Top提示,等级是<u>普通</u>则在Top提醒栏提示!</p>
+            <p><i class="icon fa fa-info"></i><strong>${i18n("重要提示")}:</strong>如果选择发布公告,等级是<u>严重</u>才会在登陆页面Top提示,等级是<u>紧急</u>只在登陆之后Top提示,等级是<u>普通</u>则在Top提醒栏提示!</p>
         </div>
-        <h4 class="form-header h4">基本信息</h4>
+        <h4 class="form-header h4">${i18n("基本信息")}</h4>
         <div class="row">
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>公告标题：</label>
+                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("公告标题")}：</label>
                     <div class="col-sm-8">
-                        <@f.input name="noticeTitle" placeholder="请输入公告标题" required=true/>
+                        <@f.input name="noticeTitle" required=true/>
                     </div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>公告类型：</label>
+                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("公告类型")}：</label>
                     <div class="col-sm-8">
                         <@f.select name="noticeType" dictType="sys_notice_type" required=true/>
                     </div>
@@ -29,15 +29,15 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label">提示标题：</label>
+                    <label class="col-sm-4 control-label">${i18n("提示标题")}：</label>
                     <div class="col-sm-8">
-                        <@f.input name="noticeTipTitle" maxlength="100" placeholder="提示标题" required=true/>
+                        <@f.input name="noticeTipTitle" maxlength="100" required=true/>
                     </div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>等级：</label>
+                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("等级")}：</label>
                     <div class="col-sm-8">
                         <@f.select name="noticeLevel" dictType="sys_notice_level" required=true/>
                     </div>
@@ -47,26 +47,23 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>有效时长：</label>
+                    <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("有效时长")}：</label>
                     <div class="col-sm-8">
                         <div class="time-label">
-                            <input type="text" class="time-input" id="startTime" placeholder="发布时间" name="startTime" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+                            <@f.input type="date" dataType="datetime" dataFormat="yyyy-MM-dd HH:mm:ss" name="startTime" placeholder="开始时间"  dataCallback="$('#endTime').trigger('click')"/>
                             <span>-</span>
-                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss" required/>
+                            <@f.input type="date" dataType="datetime" dataFormat="yyyy-MM-dd HH:mm:ss"  name="endTime" placeholder="结束时间"/>
                         </div>
                     </div>
                 </div>
             </div>
 
         </div>
-        <h4 class="form-header h4">公告内容</h4>
+        <h4 class="form-header h4">${i18n("公告内容")}</h4>
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <div class="col-sm-12">
-<#--                        <input id="noticeContent" name="noticeContent" type="hidden">-->
-<#--                        &lt;#&ndash;<div class="summernote"></div>&ndash;&gt;-->
-<#--                        <script id="noticeContentUE" type="text/plain" style="width:100%;height:300px;"></script>-->
                         <@f.ueditor name="noticeContent"/>
                     </div>
                 </div>
@@ -76,8 +73,8 @@
     <div class="hr-line-dashed"></div>
     <div class="row" id="_addTab">
         <div class="col-sm-offset-5 col-sm-10">
-            <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><@ctx.i18n text = "保存"/></button>&nbsp;
-            <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>${i18n("保存")}</button>&nbsp;
+            <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>${i18n("关闭")}</button>
         </div>
     </div>
 </div>

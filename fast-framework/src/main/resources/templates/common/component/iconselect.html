@@ -29,7 +29,7 @@
     </#if>
     <div class="input-group">
         <span class="input-group-addon"><i id="menuIcon<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" class="fa fa-fw ${value}"></i></span>
-        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if id == "">${name}<#else>${AssId}</#if>" class="${class} iconselect" type="${type}" value="${value}" class="${class}" <#if readonly> readonly = "readonly"</#if> placeholder="${placeholder}" <#if required> required</#if>>
+        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if id == "">${name}<#else>${AssId}</#if>" class="${class} iconselect" type="${type}" value="${value}" class="${class}" <#if readonly> readonly = "readonly"</#if> placeholder="${i18n("${placeholder}")}" <#if required> required</#if>>
         <span class="input-group-btn"><a id="menuIconButton${AssId?replace(".","_")}" href="javascript:"><i class="${butClass}"></i></a></span>
         <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
     </div>
@@ -38,7 +38,7 @@
             $("#menuIconButton<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").unbind('click').on('click',function(){
                 var var_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>iconValue =  $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val();
                 var options = {
-                    title: <#if boxTitle =="">"<@ctx.i18n text = "图标选择"/>" <#else>"${boxTitle}"</#if>,
+                    title: <#if boxTitle =="">"${i18n("图标选择")}" <#else>"${boxTitle}"</#if>,
                     url: baseURL + "sys/component/iconselect",
                     width: "${width}",
                     <#if height != "">

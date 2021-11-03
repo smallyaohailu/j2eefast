@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-xs-3 control-label"><@ctx.i18n text = "流程类型"/>：</label>
+                <label class="col-xs-3 control-label">${i18n("流程类型")}：</label>
                 <div class="col-xs-8">
                     <@f.select name="category" dictType="sys_bpm_category" />
                 </div>
@@ -27,8 +27,8 @@
 </@f.form>
     <div class="hr-line-dashed"></div>
     <div class="row" style="text-align: center;" id="_addTab">
-            <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><@ctx.i18n text = "保存"/></button>&nbsp;
-            <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.close()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>${i18n("保存")}</button>&nbsp;
+            <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.close()"><i class="fa fa-reply-all"></i>${i18n("关闭")}</button>
     </div>
 </div>
 <@footer>

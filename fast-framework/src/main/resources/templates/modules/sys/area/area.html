@@ -1,6 +1,6 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="行政区域查询" libs=["treeTable"]/>
+<@header title="行政区域" libs=["treeTable"]/>
     <div class="container-div">
         <div class="row">
             <div class="col-sm-12 search-collapse">
@@ -8,16 +8,16 @@
                     <div class="select-list">
                         <ul>
                             <li>
-                                <label> <@ctx.i18n text = "名称"/>：
+                                <label> ${i18n("(行政代码)名称")}：
                                     <input type="text" class="form-control" name="name"/> </label>
                             </li>
                             <li>
-                                <label> <@ctx.i18n text = "行政区划代码"/>：
+                                <label> ${i18n("行政区划代码")}：
                                     <input type="text" class="form-control" name="areaCode"/> </label>
                             </li>
                             <li>
-                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.treeTable.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;<@ctx.i18n text = "查询"/></a>
-                                <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;<@ctx.i18n text = "重置"/></a>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.treeTable.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;${i18n("查询")}</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
                             </li>
                         </ul>
                     </div>
@@ -46,16 +46,16 @@
             asynUrl: prefix + "/listChild", // 点击异步请求
             columns: [
                 //{field: 'selectItem', radio: true}, //是否需要点击选择
-                {field : 'name',title : '<@ctx.i18n text = "(行政代码)名称"/>',width:'250px', align: 'left',halign:"center",formatter: function(value, row, index) {
+                {field : 'name',title : '${i18n("(行政代码)名称")}',width:'250px', align: 'left',halign:"center",formatter: function(value, row, index) {
                     return "（"+row.areaCode+"）"+value;
                     }
                 }
-               ,{field : 'wholeName',title : '<@ctx.i18n text = "区域全称"/>',width:'350px', align: 'left', formatter: function(value, row, index) {return $.table.tooltip(value,30);}}
-               ,{field : 'areaLevel',title : '<@ctx.i18n text = "区域等级"/>', align: 'center', formatter: function(value, row, index) {return $.table.selectDictLabel(datas_type, value);}}
-               ,{field : 'cityCode',title : '<@ctx.i18n text = "电话区号"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-               ,{field : 'zipCode',title : '<@ctx.i18n text = "邮政编码"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-               ,{field : 'lon',title : '<@ctx.i18n text = "本区域经度"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-               ,{field : 'lat',title : '<@ctx.i18n text = "本区域纬度"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+               ,{field : 'wholeName',title : '${i18n("区域全称")}',width:'350px', align: 'left', formatter: function(value, row, index) {return $.table.tooltip(value,30);}}
+               ,{field : 'areaLevel',title : '${i18n("区域等级")}', align: 'center', formatter: function(value, row, index) {return $.table.selectDictLabel(datas_type, value);}}
+               ,{field : 'cityCode',title : '${i18n("电话区号")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+               ,{field : 'zipCode',title : '${i18n("邮政编码")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+               ,{field : 'lon',title : '${i18n("本区域经度")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+               ,{field : 'lat',title : '${i18n("本区域纬度")}', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
                 ]
             };
             $.treeTable.init(options);

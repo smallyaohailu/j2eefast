@@ -11,7 +11,7 @@
 <@pageTheme mark=true>
 	<#assign zt = 0>
 	<#if isorga && layout?? && (layout?length >0 ) && (layout == "left" || layout == "right")>
-		<@header title="表格选择组件" bodyClass="gray-bg animated fadeInRight" isAnimation=false libs=["table","tokenfield","zTree","layout-latest"]>
+		<@header title="表格组件" bodyClass="gray-bg animated fadeInRight" isAnimation=false libs=["table","tokenfield","zTree","layout-latest"]>
 			<style>
 				#selectName >span {
 					margin: 0 8px 8px 0;
@@ -111,13 +111,12 @@
 		<div class="box box-main">
 			<div class="box-header">
 				<div class="box-title">
-					<i class="fa icon-grid"></i>组织机构
+					<i class="fa icon-grid"></i>${i18n("组织机构")}
 				</div>
 				<div class="box-tools pull-right">
-					<a type="button" class="btn btn-box-tool" href="#" onclick="comp()" title="公司管理"><i class="fa fa-edit"></i></a>
-					<button type="button" class="btn btn-box-tool" id="btnExpand" title="展开" style="display:none;"><i class="fa fa-chevron-up"></i></button>
-					<button type="button" class="btn btn-box-tool" id="btnCollapse" title="折叠"><i class="fa fa-chevron-down"></i></button>
-					<button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新部门"><i class="fa fa-refresh"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnExpand" title="${i18n("展开")}" style="display:none;"><i class="fa fa-chevron-up"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnCollapse" title="${i18n("折叠")}"><i class="fa fa-chevron-down"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnRefresh" title="${i18n("刷新部门")}"><i class="fa fa-refresh"></i></button>
 				</div>
 			</div>
 			<div class="ui-layout-content">
@@ -144,25 +143,25 @@
 												<#if tb.filedQueryZtree>
 													<#assign zt = 1>
 													<li>
-														<label> <@ctx.i18n text = "${tb.title}"/>：
+														<label> ${i18n("${tb.title}")}：
 															<div class="control-div width-120">
 																<@f.treeselect name="${tb.ztree.name}" keyId="${tb.ztree.keyId}" boxTitle="请选择${tb.title}" url="${tb.ztree.url}"
 																expandLevel="${tb.ztree.expandLevel?string('true', 'false')}"
 																isSelectParent= "${tb.ztree.selectParent?string('true', 'false')}"
 																isClear = "${tb.ztree.clear?string('true', 'false')}"
 																checked = "${tb.ztree.checked?string('true', 'false')}"
-																placeholder="请选择${tb.title}"/>
+																/>
 															</div>
 														</label>
 													</li>
 												<#elseif tb.dict !="">
 													<li>
-														<@ctx.i18n text = "${tb.title}"/>:
+														${i18n("${tb.title}")}:
 														<@f.select name="${tb.field}" dictType="${tb.dict}" blankValue="" blankLabel="所有"/>
 													</li>
 												<#else>
 													<li>
-														<@ctx.i18n text = "${tb.title}"/>: <input type="text" class="form-control" name="${tb.field}"/>
+														${i18n("${tb.title}")}: <input type="text" class="form-control" name="${tb.field}"/>
 													</li>
 												</#if>
 											</#if>
@@ -170,11 +169,11 @@
 												<#if isorga>
 													<#assign tag++>
 													<li>
-														<label><@ctx.i18n text = "机构查询"/></label>：
+														<label>${i18n("归属机构")}</label>：
 														<div class="control-div width-150">
 															<@f.treeselect name="compId" boxTitle="请选择归属机构" url="sys/comp/treeData"
 															expandLevel=true
-															placeholder="请选择上级机构"/>
+															/>
 														</div>
 													</li>
 												</#if>
@@ -189,7 +188,7 @@
 												<#if tb.filedQueryZtree>
 													<#assign zt = 1>
 													<li>
-														<label> <@ctx.i18n text = "${tb.title}"/>：</label>
+														<label> ${i18n("${tb.title}")}：</label>
 														<div class="control-div width-120">
 															<@f.treeselect name="${tb.ztree.name}" keyId="${tb.ztree.keyId}" boxTitle="请选择${tb.title}" url="${tb.ztree.url}"
 															expandLevel="${tb.ztree.expandLevel?string('true', 'false')}"
@@ -201,12 +200,12 @@
 													</li>
 												<#elseif tb.dict !="">
 													<li>
-														<label><@ctx.i18n text = "${tb.title}"/>:</label>
+														<label>${i18n("${tb.title}")}:</label>
 														<@f.select name="${tb.field}" dictType="${tb.dict}" blankValue="" blankLabel="所有"/>
 													</li>
 												<#else>
 													<li>
-														<label><@ctx.i18n text = "${tb.title}"/>:</label>
+														<label>${i18n("${tb.title}")}:</label>
 														<input type="text" class="form-control" name="${tb.field}"/>
 													</li>
 												</#if>
@@ -214,19 +213,18 @@
 										</#list>
 										<#if isorga>
 											<li>
-												<label><@ctx.i18n text = "机构查询"/></label>：
+												<label>${i18n("归属机构")}</label>：
 												<div class="control-div width-150">
 													<@f.treeselect name="compId" boxTitle="请选择归属机构" url="sys/comp/treeData"
-													expandLevel=true
-													placeholder="请选择上级机构"/>
+													expandLevel=true/>
 												</div>
 											</li>
 										</#if>
 									</#if>
 									<li>
-										<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;<@ctx.i18n text = "查询"/></a>
-										<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;<@ctx.i18n text = "重置"/></a>
-										<#if (queryNum > 4)><a class="btn btn-default btn-rounded btn-sm" data-toggle="formMore"><i class="fa fa-angle-double-down"></i>&nbsp;<@ctx.i18n text = "更多"/></a></#if>
+										<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;${i18n("查询")}</a>
+										<a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
+										<#if (queryNum > 4)><a class="btn btn-default btn-rounded btn-sm" data-toggle="formMore"><i class="fa fa-angle-double-down"></i>&nbsp;${i18n("更多")}</a></#if>
 									</li>
 								</ul>
 							</div>
@@ -246,7 +244,7 @@
 													<#if tb.filedQueryZtree>
 														<#assign zt = 1>
 														<li>
-															<label> <@ctx.i18n text = "${tb.title}"/>：</label>
+															<label> ${i18n("${tb.title}")}：</label>
 															<div class="control-div width-120">
 																<@f.treeselect name="${tb.ztree.name}" keyId="${tb.ztree.keyId}" boxTitle="请选择${tb.title}" url="${tb.ztree.url}"
 																expandLevel="${tb.ztree.expandLevel?string('true', 'false')}"
@@ -258,12 +256,12 @@
 														</li>
 													<#elseif tb.dict !="">
 														<li>
-															<label> <@ctx.i18n text = "${tb.title}"/>：</label>
+															<label> ${i18n("${tb.title}")}：</label>
 															<@f.select name="${tb.field}" dictType="${tb.dict}" blankValue="" blankLabel="所有"/>
 														</li>
 													<#else>
 														<li>
-															<label> <@ctx.i18n text = "${tb.title}"/>：</label>
+															<label> ${i18n("${tb.title}")}：</label>
 															<input type="text" class="form-control" name="${tb.field}"/>
 														</li>
 													</#if>
@@ -283,8 +281,8 @@
 					<div class="col-sm-2 pl0 right">
 						<div class="ibox mt10">
 							<div class="ibox-title">
-								<h5><i class="fa icon-check"></i>  已选中(<span id="selectNum">0</span>)信息</h5>
-								<i class="fa fa-trash-o pull-right clear" id="clear" title="清空所有选项"></i>
+								<h5><i class="fa icon-check"></i> ${i18n("已选中({0})信息",['<span id="selectNum">0</span>'])}</h5>
+								<i class="fa fa-trash-o pull-right clear" id="clear" title="${i18n("清空所有选项")}"></i>
 							</div>
 							<div class="ibox-content pl5 pr5">
 								<div id="selectName">
@@ -301,8 +299,8 @@
 					<div class="col-sm-2 pl0 pr0">
 						<div class="ibox mt10">
 							<div class="ibox-title">
-								<h5><i class="fa icon-check"></i>  已选中(<span id="selectNum">0</span>)信息</h5>
-								<i class="fa fa-trash-o pull-right clear" id="clear" title="清空所有选项"></i>
+								<h5><i class="fa icon-check"></i>  ${i18n("已选中({0})信息",['<span id="selectNum">0</span>'])}</h5>
+								<i class="fa fa-trash-o pull-right clear" id="clear" title="${i18n("清空所有选项")}"></i>
 							</div>
 							<div class="ibox-content pl5 pr5">
 								<div id="selectName">
@@ -358,6 +356,7 @@
 					pageSize: 10,
 					pageList: [10, 20, 30],
 					showColumns: false,
+					height: $(window).height() - 120,
 					onSelectData: onSelectData,
 					<#if !checked>onDblClickRow: onDblClickRow, </#if>
 					responseHandler: responseHandler,
@@ -372,12 +371,12 @@
 						},
 						</#if>
 						{
-							title: "<@ctx.i18n text = "序号"/>", width: 10, formatter: function (value, row, index) {
+							title: "${i18n("序号")}", width: 10, formatter: function (value, row, index) {
 								return $.table.serialNumber(index);
 							}
 						}
 						<#list tableInfo as table>
-						,{field: '${table.field}', title: "<@ctx.i18n text = "${table.title}"/>"<#if table.sortable>,sortable: true</#if><#if table.dict!="">,formatter: function (value, row, index) {
+						,{field: '${table.field}', title: "${i18n("${table.title}")}"<#if table.sortable>,sortable: true</#if><#if table.dict!="">,formatter: function (value, row, index) {
 								return $.table.selectDictLabel(${table.field?replace(".","_")}_dict, value);
 							}</#if>}
 						</#list>

@@ -10,7 +10,7 @@
       <div class="box box-success box-solid">
         <div class="box-header with-border">
 	        <i class="fa fa-windows"></i>
-	        <h5 class="box-title"><small style="color:#FFF">服务器信息</small></h5>
+	        <h5 class="box-title"><small style="color:#FFF">${i18n("服务器信息")}</small></h5>
 	        <div class="box-tools pull-right">
 	           <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 	        </div>
@@ -19,18 +19,18 @@
         <div class="box-body no-padding">
              <table class="table table-hover">
                <tr>
-                 <td>服务器名称</td>
+                 <td>${i18n("服务器名称")}</td>
                  <td>{{computerName}}</td>
                  <td>
-                   	操作系统
+                   	${i18n("操作系统")}
                  </td>
                  <td>{{osName}}</td>
                </tr>
                 <tr>
-                 <td>服务器IP</td>
+                 <td>${i18n("服务器IP")}</td>
                  <td>{{computerIp}}</td>
                  <td>
-                   	系统架构
+                   	${i18n("系统架构")}
                  </td>
                  <td>{{osArch}}</td>
                </tr>
@@ -58,25 +58,25 @@
             <div class="box-body">
 				<table class="table table-hover">
                 <tr>
-                  <th style="width:50%">属性</th>
-                  <th style="width:50%">值</th>
+                  <th style="width:50%">${i18n("属性")}</th>
+                  <th style="width:50%">${i18n("值")}</th>
                 </tr>
                 <tr>
-                  <td>核心数量</td>
-                  <td>{{cpuNum}} 个</td>
+                  <td>${i18n("核心数量")}</td>
+                  <td>{{cpuNum}}</td>
                 </tr>
                  <tr>
-                  <td>用户使用率</td>
+                  <td>${i18n("用户使用率")}</td>
                   <td v-if="used > 80"><span class="badge bg-red">{{used}} %</span></td>
                   <td v-else><span class="badge bg-green">{{used}} %</span></td>
                 </tr>
                  <tr>
-                  <td>系统使用率</td>
+                  <td>${i18n("系统使用率")}</td>
                    <td v-if="sys > 80"><span class="badge bg-red">{{sys}} %</span></td>
                   <td v-else><span class="badge bg-green">{{sys}} %</span></td>
                 </tr>
                 <tr>
-                  <td>当前空闲率</td>
+                  <td>${i18n("当前空闲率")}</td>
                   <td v-if="free < 20"><span class="badge bg-red">{{free}} %</span></td>
                   <td v-else><span class="badge bg-green">{{free}} %</span></td>
                 </tr>
@@ -99,7 +99,7 @@
           <div class="box box-primary">
             <div class="box-header">
               <i class="fa fa-slack"></i>
-              <h3 class="box-title"><small>内存</small></h3>
+              <h3 class="box-title"><small>${i18n("内存")}</small></h3>
               <div class="box-tools pull-right">
 	            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
           	  </div>
@@ -107,27 +107,27 @@
             <div class="box-body">
 				<table class="table table-hover">
                 <tr>
-                  <th style="width:40%">属性</th>
-                  <th style="width:30%">系统内存</th>
-                  <th style="width:30%">JVM内存</th>
+                  <th style="width:40%">${i18n("属性")}</th>
+                  <th style="width:30%">${i18n("系统内存")}</th>
+                  <th style="width:30%">${i18n("JVM内存")}</th>
                 </tr>
                 <tr>
-                  <td>总内存</td>
+                  <td>${i18n("总内存")}</td>
                   <td>{{memTotal}} GB</td>
                   <td>{{jvmTotal}} MB</td>
                 </tr>
                  <tr>
-                  <td>已用内存</td>
+                  <td>${i18n("已用内存")}</td>
                   <td>{{memUsed}} GB</td>
                   <td>{{jvmUsed}} MB</td>
                 </tr>
                  <tr>
-                  <td>剩余内存</td>
+                  <td>${i18n("剩余内存")}</td>
                   <td>{{memFree}} GB</td>
                   <td>{{jvmFree}} MB</td>
                 </tr>
                 <tr>
-                  <td>使用率</td>
+                  <td>${i18n("使用率")}</td>
                   <td v-if="memUsage > 80"><span class="badge bg-red">{{memUsage}} %</span></td>
                   <td v-else><span class="badge bg-green">{{memUsage}} %</span></td>
                   <td v-if="jvmUsage > 80"><span class="badge bg-red">{{jvmUsage}} %</span></td>
@@ -149,7 +149,7 @@
         <div class="box box-solid">
 	        <div class="box-header with-border">
 	        <i class="fa fa-coffee"></i>
-	          <h5 class="box-title"><small>Java虚拟机信息</small></h5>
+	          <h5 class="box-title"><small>${i18n("Java虚拟机信息")}</small></h5>
 	          <div class="box-tools pull-right">
 	            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 	          </div>
@@ -166,21 +166,21 @@
 	                </tr>
 	                -->
 	                <tr>
-	                  <td>Java名称</td>
+	                  <td>${i18n("Java名称")}</td>
 	                  <td>{{jvmName}}</td>
-	                  <td>Java版本</td>
+	                  <td>${i18n("Java版本")}</td>
 	                  <td>{{jvmVersion}}</td>
 	                </tr>
 	                <tr>
-	                  <td>启动时间</td>
+	                  <td>${i18n("启动时间")}</td>
 	                  <td>{{jvmStartTime}}</td>
-	                  <td>运行时长</td>
+	                  <td>${i18n("运行时长")}</td>
 	                  <td>{{jvmRunTime}}</td>
 	                </tr>
 	                <tr>
-	                  <td>JDK路径</td>
+	                  <td>${i18n("JDK路径")}</td>
 	                  <td>{{jvmHome}}</td>
-	                  <td>项目路径</td>
+	                  <td>${i18n("安装路径")}</td>
 	                  <td>{{sysUserDir}}</td>
 	                </tr>
 	              </table>
@@ -196,7 +196,7 @@
         <div class="box box-solid">
 	        <div class="box-header with-border">
 	        <i class="fa fa-hdd-o"></i>
-	          <h5 class="box-title"><small>磁盘信息</small></h5>
+	          <h5 class="box-title"><small>${i18n("磁盘信息")}</small></h5>
 	          <div class="box-tools pull-right">
 	            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 	          </div>
@@ -205,13 +205,13 @@
 	        <div class="box-body no-padding">
 	              <table class="table table-hover">
 	                <tr>
-	                  <th>盘符路径</th>
-	                  <th>文件系统</th>
-	                  <th>盘符类型</th>
-	                  <th>总大小</th>
-	                  <th>可用大小</th>
-	                  <th>已用大小</th>
-	                  <th>已用百分百</th>
+	                  <th>${i18n("盘符路径")}</th>
+	                  <th>${i18n("文件系统")}</th>
+	                  <th>${i18n("盘符类型")}</th>
+	                  <th>${i18n("总大小")}</th>
+	                  <th>${i18n("可用大小")}</th>
+	                  <th>${i18n("已用大小")}</th>
+	                  <th>${i18n("已用百分百")}</th>
 	                </tr>
 	                <tr v-for="file in sysFile">
 				       <td>{{ file.dirName }}</td>

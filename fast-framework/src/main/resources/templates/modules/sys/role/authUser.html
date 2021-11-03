@@ -1,6 +1,6 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="授权角色列表" libs=["table"]/>
+<@header title="角色管理" libs=["table"]/>
 <div class="container-div">
 	<div class="row">
 	<div class="col-sm-12 search-collapse">
@@ -8,29 +8,29 @@
      <@f.hidden name="roleId" value="${roleId}" refresh=false />
      <div class="select-list">
              <li>
-                 <@ctx.i18n text = "登陆账号"/>:<input type="text" class="form-control" name="username"/>
+                 ${i18n("账号")}:<input type="text" class="form-control" name="username"/>
              </li>
              <li>
-                 <@ctx.i18n text = "邮箱"/>:<input type="text" class="form-control" name="email"/>
+                 ${i18n("邮箱")}:<input type="text" class="form-control" name="email"/>
              </li>
              <li>
-                 <@ctx.i18n text = "手机号码"/>:<input type="text" class="form-control" name="mobile"/>
+                 ${i18n("手机号码")}:<input type="text" class="form-control" name="mobile"/>
              </li>
              <li>
-                 <label><@ctx.i18n text = "机构查询"/></label>：
+                 <label>${i18n("归属机构")}</label>：
                  <div class="control-div width-150">
                      <@f.treeselect name="compId" boxTitle="请选择归属机构" url="sys/comp/treeData"
                      expandLevel=true
-                     placeholder="请选择上级机构"/>
+                     placeholder="请选择归属机构"/>
                  </div>
              </li>
              <li>
-                 <@ctx.i18n text = "用户状态"/>：
+                 ${i18n("用户状态")}：
                  <@f.select name="status" blankValue="" blankLabel="所有" dictType="sys_normal_disable" />
              </li>
              <li>
-                 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;<@ctx.i18n text = "查询"/></a>
-                 <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;<@ctx.i18n text = "重置"/></a>
+                 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;${i18n("查询")}</a>
+                 <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
              </li>
          </ul>
      </div>
@@ -38,13 +38,13 @@
     </div>
     <@table id="bootstrap-table">
         <@shiro.hasPermission name="sys:user:add">
-           <a class="btn btn-success" onclick="selectUser()"><i class="fa fa-plus"></i>&nbsp;<@ctx.i18n text = "批量添加用户"/></a>
+           <a class="btn btn-success" onclick="selectUser()"><i class="fa fa-plus"></i>&nbsp;${i18n("批量添加用户")}</a>
          </@shiro.hasPermission>
          <@shiro.hasPermission name="sys:user:edit">
-             <a class="btn btn-primary multiple disabled" onclick="cancelAuthUserAll()"><i class="fa fa-pencil-square-o"></i>&nbsp;<@ctx.i18n text = "批量取消"/></a>
+             <a class="btn btn-danger multiple disabled" onclick="cancelAuthUserAll()"><i class="fa fa-remove"></i>&nbsp;${i18n("批量取消")}</a>
          </@shiro.hasPermission>
         <a class="btn btn-warning" onclick="opt.modal.closeTab()">
-            <i class="fa fa-reply-all"></i> <@ctx.i18n text = "关闭"/>
+            <i class="fa fa-reply-all"></i> ${i18n("关闭")}
         </a>
     </@table>
     </div>
@@ -70,29 +70,29 @@
             modalName: "用户角色权限",
             columns: [
                 {
-                    title: "<@ctx.i18n text = "序号"/>", width: 10, formatter: function (value, row, index) {
+                    title: "${i18n("序号")}", width: 10, formatter: function (value, row, index) {
                         return $.table.serialNumber(index);
                     }
                 },
-                {field: 'username', title: "<@ctx.i18n text = "账号"/>"},
-                {field: 'name', title: "<@ctx.i18n text = "姓名"/>"},
-                {field: 'compName', title: "<@ctx.i18n text = "归属公司"/>"},
-                {field: 'deptName', title:  "<@ctx.i18n text = "归属机构"/>"},
-                {field: 'email', title: "<@ctx.i18n text = "邮箱"/>"},
-                {field: 'mobile', title: "<@ctx.i18n text = "手机"/>"},
+                {field: 'username', title: "${i18n("账号")}"},
+                {field: 'name', title: "${i18n("姓名")}"},
+                {field: 'compName', title: "${i18n("归属公司")}"},
+                {field: 'deptName', title:  "${i18n("归属机构")}"},
+                {field: 'email', title: "${i18n("邮箱")}"},
+                {field: 'mobile', title: "${i18n("手机")}"},
                 {
-                    field: 'status', title: "<@ctx.i18n text = "状态"/>", formatter: function (value, row, index) {
+                    field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
                         return $.table.selectDictLabel(datas, value);
                     }
                 },
-                {field: 'createTime', title: "<@ctx.i18n text = "创建时间"/>", sortable: true},
+                {field: 'createTime', title: "${i18n("创建时间")}", sortable: true},
                 {
-                    title: "<@ctx.i18n text = "操作"/>",
+                    title: "${i18n("操作")}",
                     visible: visible,
                     class: 'action',
                     formatter: function (value, row, index) {
                         var actions = [];
-                        actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "删除"/>" onclick="cancelAuthUser(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
+                        actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="cancelAuthUser(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
                         return actions.join('');
                     }
                 }
@@ -118,7 +118,7 @@
     
     /*取消授权*/
     function cancelAuthUser(userId) {
-        opt.modal.confirm("<@ctx.i18n text = "确定确认要取消该用户角色吗?"/>", function() {
+        opt.modal.confirm("${i18n("确定确认要取消该用户角色吗?")}", function() {
             var data = [];
             data.push({"name": "roleId", "value": $("#roleId").val()});
             data.push({"name": "userIds", "value": userId});
@@ -129,7 +129,7 @@
     /*批量添加用户*/
     function selectUser(){
         var url = prefix + '/selectUser/' + $("#roleId").val();
-        opt.modal.open("<i class='fa fa-address-book-o'/> <@ctx.i18n text ="选择用户"/>", url,1000);
+        opt.modal.open("<i class='fa fa-address-book-o'/> ${i18n("选择用户")}", url,1000);
     }
 
     /* 分配用户-批量取消授权 */
@@ -139,7 +139,7 @@
             opt.modal.warning("请至少选择一条记录!");
             return;
         }*/
-        opt.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function() {
+        opt.modal.confirm($.i18n.text("确认要删除选中的{0}条数据吗?",rows.length), function() {
             var data = [];
             data.push({"name": "roleId", "value": $("#roleId").val()});
             data.push({"name": "userIds", "value": rows});

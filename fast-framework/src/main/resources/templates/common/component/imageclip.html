@@ -35,7 +35,7 @@ ${value}
 ${ctxStatic}/sys/comm/fileAvatarView?filePath=${value?url}
 </#if>
 </#if>" onerror="imgUserError();"/></p>
-        <#if readonly><p style="width: ${width}px;text-align: center;"><a href="javascript:" id="<#if id == "">${Assname}<#else>${AssId}</#if>_but"><@ctx.i18n text = "${tipHelp}"/></a></p></#if>
+        <#if readonly><p style="width: ${width}px;text-align: center;"><a href="javascript:" id="<#if id == "">${Assname}<#else>${AssId}</#if>_but">${i18n("${tipHelp}")}</a></p></#if>
     </div>
     <#if readonly>
         <@compress single_line=true>
@@ -44,7 +44,7 @@ ${ctxStatic}/sys/comm/fileAvatarView?filePath=${value?url}
                     $("#<#if id="">${Assname}<#else>${AssId}</#if>_but,#<#if id=="">${Assname}<#else>${AssId}</#if>_head").unbind('click').on('click',function(){
                         var var_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_inpt =  $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_img").attr("src");
                         var options = {
-                            title: "<li class='fa fa-fw fa icon-crop'></li>"+<#if boxTitle =="">"<@ctx.i18n text = "图片剪切"/>" <#else>"${boxTitle}"</#if>,
+                            title: "<li class='fa fa-fw fa icon-crop'></li>"+<#if boxTitle =="">"${i18n("图片剪切")}" <#else>"${boxTitle}"</#if>,
                             url: baseURL + "sys/component/cropperImg",
                             width: $(top.window).width() - 350,
                             height: $(top.window).height() - 160,

@@ -1,37 +1,34 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="新增参数" bodyClass="white-bg"/>
+<@header title="参数管理" bodyClass="white-bg"/>
 <div class="wrapper wrapper-content ibox-content">
     <@f.form id="form-config-add" class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-3 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "参数名称"/>：</label>
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("参数名称")}：</label>
             <div class="col-sm-8">
                 <@f.input name="paramName" required=true/>
             </div>
         </div>
         <div class="form-group">	
-            <label class="col-sm-3 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "参数键名"/>：</label>
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("参数键名")}：</label>
             <div class="col-sm-8">
-<#--                <input id="paramKey" name="paramKey" class="form-control" type="text" required>-->
-<#--                <span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i></span>-->
-                <@f.input name="paramKey" required=true/>
-                <span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>统一规范:请务必使用大写字母下划线定义.页面获取,如: <#noparse>${config.getKey("SYS_KEY")}</#noparse></span>
+                <@f.input name="paramKey" required=true helpTip="${i18n('统一规范:请务必使用大写字母下划线定义.页面获取,如:{0}{1}{2}',['${','config.getKey(\"SYS_KEY\")','}'])}"/>
             </div>
         </div>
         <div class="form-group">	
-            <label class="col-sm-3 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "参数键值"/>：</label>
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("参数键值")}：</label>
             <div class="col-sm-8">
                 <@f.textarea name="paramValue" rows="10"  required=true/>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "系统内置"/>：</label>
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("系统内置")}：</label>
             <div class="col-sm-8">
                 <@f.radio name="configType" dictType="sys_yes_no"/>
             </div>
         </div>
 		<div class="form-group">	
-            <label class="col-sm-3 control-label"><@ctx.i18n text = "备注"/>：</label>
+            <label class="col-sm-3 control-label">${i18n("备注")}：</label>
             <div class="col-sm-8">
                 <@f.textarea name="remark"/>
             </div>
@@ -63,7 +60,7 @@
         },
         messages: {
             "configKey": {
-                remote: "参数键名已经存在"
+                remote: "${i18n("已经存在")}"
             }
         },
         focusCleanup: true

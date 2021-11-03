@@ -19,9 +19,9 @@
         <#list dict.getType('${dictType}')>
             <#items as d>
                 <#if status == "status">
-                    <#if d.status =='0' >
+                    <#if d.status?? && d.status =='0' >
                         <#if value == "">
-                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if d.isDefault =='Y'>checked</#if>><@ctx.i18n text = "${d.dictLabel}"/></label>
+                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" data-name="${d.dictLabel}" <#if d.isDefault =='Y'>checked</#if>>${i18n("${d.dictLabel}")}</label>
                         <#else>
                             <#assign a=0 />
                             <#list value?split(",") as x>
@@ -29,12 +29,12 @@
                                     <#assign a=1 />
                                 </#if>
                             </#list>
-                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if a== 1>checked</#if>><@ctx.i18n text = "${d.dictLabel}"/></label>
+                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" data-name="${d.dictLabel}"  <#if a== 1>checked</#if>>${i18n("${d.dictLabel}")}</label>
                         </#if>
                     </#if>
                 <#else>
                     <#if value == "">
-                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if d.isDefault =='Y'>checked</#if>><@ctx.i18n text = "${d.dictLabel}"/></label>
+                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" data-name="${d.dictLabel}"  <#if d.isDefault =='Y'>checked</#if>>${i18n("${d.dictLabel}")}</label>
                     <#else>
                         <#assign a=0 />
                         <#list value?split(",") as x>
@@ -42,18 +42,19 @@
                                 <#assign a=1 />
                             </#if>
                         </#list>
-                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if a== 1>checked</#if>><@ctx.i18n text = "${d.dictLabel}"/></label>
+                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" data-name="${d.dictLabel}"  <#if a== 1>checked</#if>>${i18n("${d.dictLabel}")}</label>
                     </#if>
                 </#if>
             </#items>
         </#list>
+        <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
     <#else>
         <#list items>
             <#items as d>
                 <#if status == "status">
-                    <#if d.status =='0' >
+                    <#if !d.status?? || d.status =='0' >
                         <#if value == "">
-                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" <#if required> required</#if>/><@ctx.i18n text = "${d['${itemLabel}']}" /></label>
+                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" data-name="${d['${itemLabel}']}" <#if required> required</#if>/>${i18n("${d['${itemLabel}']}")}</label>
                         <#else>
                             <#assign a=0 />
                             <#list value?split(",") as x>
@@ -61,12 +62,12 @@
                                     <#assign a=1 />
                                 </#if>
                             </#list>
-                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" <#if a== 1>checked</#if> <#if required> required</#if>/><@ctx.i18n text = "${d['${itemLabel}']}" /></label>
+                            <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" data-name="${d['${itemLabel}']}" <#if a== 1>checked</#if> <#if required> required</#if>/>${i18n("${d['${itemLabel}']}")}</label>
                         </#if>
                     </#if>
                 <#else>
                     <#if value == "">
-                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" <#if required> required</#if>/><@ctx.i18n text = "${d['${itemLabel}']}" /></label>
+                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" data-name="${d['${itemLabel}']}" <#if required> required</#if>/>${i18n("${d['${itemLabel}']}")}</label>
                     <#else>
                         <#assign a=0 />
                         <#list value?split(",") as x>
@@ -74,10 +75,11 @@
                                 <#assign a=1 />
                             </#if>
                         </#list>
-                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" <#if a== 1>checked</#if> <#if required> required</#if>/><@ctx.i18n text = "${d['${itemLabel}']}" /></label>
+                        <label class="${class}"><input type="checkbox" name="<#if id == "">${name}<#else>${id}</#if>" value="${d['${itemValue}']}" data-name="${d['${itemLabel}']}" <#if a== 1>checked</#if> <#if required> required</#if>/>${i18n("${d['${itemLabel}']}")}</label>
                     </#if>
                 </#if>
             </#items>
         </#list>
+        <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${i18n("${helpTip}")}</span></#if>
     </#if>
 </#macro>

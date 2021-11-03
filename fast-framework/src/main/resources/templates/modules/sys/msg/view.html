@@ -1,7 +1,7 @@
 <!-- 系统自动生成 Date:2021-02-21 22:43 -->
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="查看内部消息" bodyClass="white-bg" libs=["bootstrapSelect","fileupload","comments"]>
+<@header title="系统消息" bodyClass="white-bg" libs=["bootstrapSelect","fileupload","comments"]>
 <style>
     .article-title {
         padding: 25px 10px 30px 10px;
@@ -72,30 +72,32 @@
     <div class="box-body article-view">
         <h2 class="article-title">${sysMsgPush.msgTitle?default('')}</h2>
         <ul class="content-info">
-            <li><i class="fa fa-user"></i> 发送者：超级管理员</li>
-            <li><i class="fa fa-calendar"></i> 发送时间：2019-07-09 02:52</li>
-            <li><i class="fa fa-bookmark-o"></i> 等级：${dict.getLabel("sys_notice_level","${sysMsgPush.msgLevel?default('')}")}</li>
-            <li><i class="fa fa-comments-o"></i> 是否开放评论：${dict.getLabel("sys_msg_comments","${sysMsgPush.isComments?default('')}")}</li>
-            <li><a data-toggle="collapse" href="#c_hidden" aria-expanded="true">接收者 <i class="fa fa-angle-double-down"></i></a></li>
+            <li><i class="fa fa-user"></i> ${i18n("发送者")}：超级管理员</li>
+            <li><i class="fa fa-calendar"></i> ${i18n("发送时间")}：${sysMsgPush.pushDate?string('yyyy-MM-dd HH:mm:ss')}</li>
+            <li><i class="fa fa-bookmark-o"></i> ${i18n("等级")}：${i18n("${dict.getLabel('sys_notice_level','${sysMsgPush.msgLevel?default(\"\")}')}")}</li>
+            <li><i class="fa fa-comments-o"></i> ${i18n("是否开放评论")}：${i18n("${dict.getLabel('sys_msg_comments','${sysMsgPush.isComments?default(\"\")}')}")}</li>
+            <li><a data-toggle="collapse" href="#c_hidden" aria-expanded="true">${i18n("接收者")} <i class="fa fa-angle-double-down"></i></a></li>
         </ul>
         <ul class="content-info_hide panel-collapse collapse" id="c_hidden">
             <li><i class="fa fa-address-book-o"></i>
-                接收者:
+                ${i18n("接收者")}:
                 <#list pushUserList as pushUser>
-                    ${pushUser.userName} <#if pushUser.isRead == "0"><span style="font-weight: bold">(未阅)</span></#if><#if pushUser?counter != pushUserList?size>,</#if>
+                    ${pushUser.userName} <#if pushUser.isRead == "0"><span style="font-weight: bold">(${i18n("未阅")})</span></#if><#if pushUser?counter != pushUserList?size>,</#if>
                 </#list>
             </li>
             <li><i class="fa fa-address-book-o"></i>
-                抄送者:
+                ${i18n("抄送者")}:
                 <#list ccUserList as ccUser>
-                    ${ccUser.userName} <#if ccUser.isRead == "0"><span style="font-weight: bold">(未阅)</span></#if><#if ccUser?counter != ccUserList?size>,</#if>
+                    ${ccUser.userName} <#if ccUser.isRead == "0"><span style="font-weight: bold">(${i18n("未阅")})</span></#if><#if ccUser?counter != ccUserList?size>,</#if>
                 </#list>
             </li>
         </ul>
         <div class="content-text">
             ${sysMsgPush.msgContent?default('')}
         </div>
-        <@f.fileupload name="upload_file" bizId="${sysMsgPush.id}" bizType="sys_msg_push_file" tipTitle="<i class='fa fa-paperclip'></i> <span style='color:#000'>附件</span>:" isLazy=true preview="true" readonly=true uploadType="all"/>
+        <@f.fileupload name="upload_file" bizId="${sysMsgPush.id}" bizType="sys_msg_push_file" 
+        tipTitle="<i class='fa fa-paperclip'></i> <span style='color:#000'>${i18n('附件')}</span>:" 
+        isLazy=true preview="true" readonly=true uploadType="all"/>
         <#if sysMsgPush.isComments?default('') == '1'>
             <@f.comment name="commentId" msgId="${sysMsgPush.id}"/>
         </#if>
@@ -103,7 +105,7 @@
 <div class="hr-line-dashed"></div>
 <div class="row" id="_addTab">
     <div class="col-sm-offset-5 col-sm-10">
-<#--        <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>-->
+<#--        <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>${i18n("关闭"/></button>-->
     </div>
 </div>
 </div>
