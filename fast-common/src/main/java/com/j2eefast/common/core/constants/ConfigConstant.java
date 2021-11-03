@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ConfigConstant {
 
-	public static final String 					TIPS_END 							= "，若想忽略此提示，请在系统工具->参数管理，设置相关参数！";
+	public static final String 					TIPS_END 							= "若想忽略此提示，请在系统工具->参数管理，设置相关参数！";
 	public static final String 					DEOM_MODE_PROMPT 					= "演示模式,禁止操作!";
 	public static final String 					REQUEST_PROMPT 						= "客户端请求异常拦截!";
 	public static final String					DEOM_MODE_SHOW						= "*** 演示模式，不展示数据 ***";
@@ -37,6 +37,7 @@ public final class ConfigConstant {
 	public static final String 					BASE_PATH							= "basePath";
 	public static final String 					FAST_SESSION_ID						= "fast.session.id";
 	public static final String 					JTA_ENABLED_YML 					= "fast.jta.enabled";
+	public static final String 					UREPORT_ENABLED_YML 				= "fast.ureport.enabled";
 	public static final String 					TRUE 								= "true";
 	public static final String 					FLOWABLE_ENABLED_YML 				= "fast.flowable.enabled";
 	public static final String 					TENANTMODEL 						= "fast.tenantModel.enabled";
@@ -44,6 +45,12 @@ public final class ConfigConstant {
 	public static final String 				    SERVER_SERVLET_CONTEXTPATH          = "server.servlet.context-path";
 	public static final String					FAST_LOGIN_CSRF_TOKEN				= "FAST_LOGIN_CSRF_TOKEN";
 	public static final String					SHIRO_SESSION_ID					= "shiro:session:";
+	public static final String 					SQLFILTER 							= "sqlFilter";
+	public static final String 					SQL_FILTER 							= "sql_filter";
+	public static byte[]                  		PRIVKEY								= HexUtil.decodeHex("a1ab63f9b726482d47d7529b4bdb57fbdd68c492d19cf8e3f1140fb68d193f7b");
+	public static String                  		PUBKEY								= "QTwb20ZMEftb9jFnjgRBCULM7+LmKW+x/3wpuIOuVLTeHTkivKZVX8QNBGeexn5EDeymBaWbEgU/IGAyqofN3w==";
+	public static String						I18N_ATG							= "";
+	
 	/**
 	 *  系统多租户忽略添加租户ID的表
 	 *  也可以称为多租户数据共享表 具体可以参考数据表描述
@@ -56,9 +63,9 @@ public final class ConfigConstant {
 			"sys_user_post","sys_dict_data","sys_tenant","sys_index","sys_role_menu","sys_role_module","sys_role_dept",
 			"sys_dict_type","sys_menu","sys_area","sys_user_role","tables","columns","gen_table_column",
 			"sys_job_log","sys_notice","sys_msg_push","sys_msg_push_user","sys_file_upload","sys_msg_cc_user",
-			"extended_properties",
+			"extended_properties","sys_lang",
 			"act_*", /* 所有工作流表*/
-			"gen_table","sys_database"
+			"gen_table","sys_database","gen_edit_code"
 	);
 
 	/**
@@ -86,6 +93,8 @@ public final class ConfigConstant {
 	 * API服务器
 	 */
 	public final static String CLOUD_CONFIG_APP = "CLOUD_CONFIG_APP";
+
+	public final static String SMSKEY 		= "SYS_SMS_CONFIG";
 	
 	public final static String SYS_CONFIG_TITLE = "SYS_CONFIG_TITLE" ;
 	
@@ -133,6 +142,12 @@ public final class ConfigConstant {
 	 */
 	
 	public final static String SYS_CONFIG_KEY = "SYS_CONFIG_KEY";
+	
+	
+	/**
+	 * 短信登录
+	 */
+	public final static String SYS_LOGIN_SMS = "SYS_LOGIN_SMS";
 	
 	/**
 	 * 支付参数

@@ -7,8 +7,8 @@ package com.j2eefast.common.core.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.utils.CookieUtil;
-import com.j2eefast.common.core.utils.HttpContextUtil;
 import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ServletUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -29,31 +29,31 @@ public class BaseController {
 
 
     protected HttpServletRequest getHttpServletRequest() {
-        return HttpContextUtil.getRequest();
+        return ServletUtil.getRequest();
     }
 
     protected HttpServletResponse getHttpServletResponse() {
-        return HttpContextUtil.getResponse();
+        return ServletUtil.getResponse();
     }
 
     protected HttpSession getSession() {
-        return Objects.requireNonNull(HttpContextUtil.getRequest()).getSession();
+        return Objects.requireNonNull(ServletUtil.getRequest()).getSession();
     }
 
     protected HttpSession getSession(Boolean flag) {
-        return Objects.requireNonNull(HttpContextUtil.getRequest()).getSession(flag);
+        return Objects.requireNonNull(ServletUtil.getRequest()).getSession(flag);
     }
 
     protected String getPara(String name) {
-        return StrUtil.nullToDefault(HttpContextUtil.getRequest().getParameter(name),"");
+        return StrUtil.nullToDefault(ServletUtil.getRequest().getParameter(name),"");
     }
 
     protected String getPara(String name,String default1) {
-        return StrUtil.nullToDefault(HttpContextUtil.getRequest().getParameter(name),default1);
+        return StrUtil.nullToDefault(ServletUtil.getRequest().getParameter(name),default1);
     }
 
     protected void setAttr(String name, Object value) {
-        Objects.requireNonNull(HttpContextUtil.getRequest()).setAttribute(name, value);
+        Objects.requireNonNull(ServletUtil.getRequest()).setAttribute(name, value);
     }
 
     /**

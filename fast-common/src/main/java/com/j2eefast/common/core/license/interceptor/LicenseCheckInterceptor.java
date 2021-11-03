@@ -35,7 +35,7 @@ public class LicenseCheckInterceptor implements HandlerInterceptor {
     private LicenseCheckListener listener;
     @Lazy
     @Resource
-    private RedisSessionDAO redisSessionDAO;
+    private RedisSessionDAO sessionDAO;
 
     public LicenseCheckInterceptor(){
     }
@@ -63,7 +63,7 @@ public class LicenseCheckInterceptor implements HandlerInterceptor {
                    }
                    if(vertify.equals("online")){
                        int online = licenseVerify.onlineNumVerify(listener.getVerifyParam());
-                       if (!redisSessionDAO.checkNumber(online)) {
+                       if (!sessionDAO.checkNumber(online)) {
                            response.setCharacterEncoding("utf-8");
                            response.setContentType("text/html;charset=utf-8");
                            response.getWriter().write(JSONUtil.parse(ResponseData.error("99997","在线用户已达最大,限制登录!!")).toString());

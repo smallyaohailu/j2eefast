@@ -6,6 +6,7 @@
 package com.j2eefast.common.core.base.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.j2eefast.common.core.enums.LoginType;
 import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
@@ -41,15 +42,15 @@ public class LoginUserEntity implements Serializable {
 	 */
 	private String mobile;
 
-	/**
-	 * 盐
-	 */
-	private String salt;
-
-	/**
-	 * 密码
-	 */
-	private String password;
+//	/**
+//	 * 盐
+//	 */
+//	private String salt;
+//
+//	/**
+//	 * 密码
+//	 */
+//	private String password;
 
 	/**
 	 * 姓名
@@ -77,14 +78,19 @@ public class LoginUserEntity implements Serializable {
 	private Long deptId;
 
 	/**
-	 * 角色集
+	 * 登录途径 账号密码、手机验证码、第三方登录
 	 */
-	private List<Long> roleList;
+	private LoginType loginType;
 
-	/**
-	 * 部门名称
-	 */
-	private String deptName;
+//	/**
+//	 * 角色集
+//	 */
+//	private List<Long> roleList;
+
+//	/**
+//	 * 部门名称
+//	 */
+//	private String deptName;
 
 	/**
 	 * 后端密码安全等级
@@ -96,20 +102,26 @@ public class LoginUserEntity implements Serializable {
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
 	private Date pwdUpdateDate;
+
 	/**
 	 * 公司名称
 	 */
 	private String compName;
 
-	/**
-	 * 角色名称集
-	 */
-	private List<String> roleNames;
+//	/**
+//	 * 角色名称集
+//	 */
+//	private List<String> roleNames;
+
+//	/**
+//	 * 角色备注（code）
+//	 */
+//	private List<String> roleKey;
 
 	/**
-	 * 角色备注（code）
+	 * 用户角色集合
 	 */
-	private List<String> roleKey;
+	private List<Object> roles;
 
 	/**
 	 * 角色权限范围 0=未设置, 1=仅本人数据, 2=本公司数据,3=本部门及以下数据权限,4=本部门数据权限, 5=自定义数据权限  6 所有数据权限
@@ -120,29 +132,29 @@ public class LoginUserEntity implements Serializable {
 	 */
 //	private List<String> dataScope;
 
-	/**
-	 * 系统标识集合
-	 */
-	private List<Map<String, Object>> modules;
+//	/**
+//	 * 系统标识集合
+//	 */
+//	private List<Map<String, Object>> modules;
+//
+//	/**
+//	 * 用户角色对应菜单的权限
+//	 */
+//	private List<Map<Object,Object>> rolePerm;
 
-	/**
-	 * 用户角色对应菜单的权限
-	 */
-	private List<Map<Object,Object>> rolePerm;
-
-	/**
-	 * 拥有菜单的权限
-	 */
-	private Set<String> permissions;
+//	/**
+//	 * 拥有菜单的权限
+//	 */
+//	private Set<String> permissions;
 
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
 	private Date loginTime;
 
-	/**
-	 * 登录IP
-	 */
-	private String loginIp;
+//	/**
+//	 * 登录IP
+//	 */
+//	private String loginIp;
 
 	/**
 	 * 登陆状态
@@ -154,16 +166,16 @@ public class LoginUserEntity implements Serializable {
 	 */
 	private String loginLocation;
 
-	/**
-	 * 当前登陆时间
-	 */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
-	private Date nowLoginTime;
+//	/**
+//	 * 当前登陆时间
+//	 */
+//	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
+//	private Date nowLoginTime;
 
-	/**
-	 * 当前登陆地点
-	 */
-	private String nowLoginLocation;
+//	/**
+//	 * 当前登陆地点
+//	 */
+//	private String nowLoginLocation;
 
 	/**
 	 * 租户ID

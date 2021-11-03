@@ -6,9 +6,9 @@
 package com.j2eefast.common.core.auth;
 
 
-import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import org.apache.shiro.authc.UsernamePasswordToken;
 
-import java.util.List;
+import com.j2eefast.common.core.base.entity.LoginUserEntity;
 
 /**
  * <p>授权数据库操作</p>
@@ -35,21 +35,23 @@ public interface AuthService {
 	 * @param password
 	 * @return
 	 */
-	LoginUserEntity loginVerify(String username, String password);
+	LoginUserEntity loginVerify(UsernamePasswordToken taken);
 
 	/**
 	 * 免密授权登录
 	 * @param openId
 	 * @return
 	 */
-	LoginUserEntity freeLoginVerify(String openId);
-
+	LoginUserEntity freeLoginVerify(String openId, String tenantId);
+	
+	
 	/**
-	 * 获取权限列表通过角色id
-	 * @param roleId 角色id
+	 * 手机验证码登录
+	 * @date 2021-09-24
+	 * @param mobile
 	 * @return
 	 */
-	List<String> findPermissionsByRoleId(Long roleId);
+	LoginUserEntity valideCodeLoginVerify(String mobile, String valideCode);
 
 
 	/**
@@ -67,5 +69,14 @@ public interface AuthService {
 	 * @param userId
 	 */
 	void setLoginDetails(LoginUserEntity loginUser, Long userId, String source);
+	
+	
+	/**
+	 * 排挤登录
+	 * @author ZhouZhou
+	 * @date 2021-10-15
+	 * @param username
+	 */
+	void excludeLogin(LoginUserEntity loginUser);
 
 }

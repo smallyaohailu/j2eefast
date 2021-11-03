@@ -18,6 +18,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  * p>资源供给</p>
  * @author ThinkGem
  */
+@Deprecated
 public class ResourceUtil extends org.springframework.util.ResourceUtils {
 
     private static ResourceLoader resourceLoader;

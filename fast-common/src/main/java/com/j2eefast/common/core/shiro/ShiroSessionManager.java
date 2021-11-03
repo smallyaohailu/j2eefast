@@ -1,6 +1,5 @@
 package com.j2eefast.common.core.shiro;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -14,10 +13,12 @@ import java.io.Serializable;
  * @author: wangsaichao/J2eeFAST
  * @description: 解决单次请求需要多次访问redis, 降低Session更新的频率
  */
-@Slf4j
 public class ShiroSessionManager extends DefaultWebSessionManager {
 
     private static final long DEFAULT_SESSION_IN_MEMORY_TIMEOUT = 1000L * 60 * 3;
+
+    public ShiroSessionManager(){
+    }
 
     /**
      * 获取session
@@ -40,8 +41,10 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
                 return (Session) sessionObj;
             }
         }
+
         //从缓存获取
         Session session = super.retrieveSession(sessionKey);
+
         if (request != null && null != sessionId) {
             //保存
             request.setAttribute(sessionId.toString(), session);

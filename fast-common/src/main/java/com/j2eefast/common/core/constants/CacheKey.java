@@ -16,6 +16,11 @@ public interface CacheKey {
      */
     String ROLE = "role_";
 
+    String PERMISSIONS = "permissions_";
+
+
+    String MODULES = "modules_";
+
     /**
      * 角色Key
      */

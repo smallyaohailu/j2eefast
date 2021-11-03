@@ -13,6 +13,11 @@ public interface Cache {
     String ROLECONSTANT = "ROLECONSTANT";
 
     /**
+     * 模块
+     */
+    String MODULES_CONSTANT = "MODULESCONSTANT";
+
+    /**
      * 临时常量 可能需要清除
      */
     String MENU_CONSTANT = "MENUCONSTANT";

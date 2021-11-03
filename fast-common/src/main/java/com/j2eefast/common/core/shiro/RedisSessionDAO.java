@@ -2,8 +2,10 @@ package com.j2eefast.common.core.shiro;
 
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.crypto.digest.MD5;
+import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.ValidatingSession;
@@ -100,7 +102,7 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      * @throws UnknownSessionException
      */
     private void saveSession(Session session) throws UnknownSessionException {
-        log.info("更新保存:{}",session.getId());
+        log.debug("更新保存saveSession:{}",session.getId());
         if (session == null || session.getId() == null) {
             log.error("session or session id is null");
             throw new UnknownSessionException("session or session id is null");
@@ -120,6 +122,7 @@ public class RedisSessionDAO extends AbstractSessionDAO {
             log.error("session or session id is null");
             return;
         }
+        log.info("删除会话:"+session.getId());
         try {
             redisUtil.delSession(getRedisSessionKey(session.getId()));
         } catch (SerializationException e) {
@@ -166,6 +169,7 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      */
     @Override
     protected Serializable doCreate(Session session) {
+        log.debug("创建会话:" + session);
         if (session == null) {
             log.error("session is null");
             throw new UnknownSessionException("session is null");

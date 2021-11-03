@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.extra.ftp.Ftp;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.system.SystemUtil;
@@ -37,6 +38,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import oshi.hardware.NetworkIF;
 
 /**
@@ -61,6 +67,19 @@ public class ToolUtil{
             // pdf
             "pdf" };
 
+    private static ResourceLoader resourceLoader;
+    private static ResourcePatternResolver resourceResolver;
+    static{
+        resourceLoader = new DefaultResourceLoader();
+        resourceResolver = new PathMatchingResourcePatternResolver(resourceLoader);
+    }
+
+    /**
+     * 获取资源加载器（可读取jar内的文件）
+     */
+    public static Resource getResource(String location) {
+        return resourceLoader.getResource(location);
+    }
 
     /**
      * 检查文件是否可下载
@@ -383,7 +402,7 @@ public class ToolUtil{
     public static String getProjectPath(){
         String projectPath = "";
         try {
-            File file = ResourceUtil.getResource("").getFile();
+            File file = getResource("").getFile();
             if (file != null){
                 while(true){
                     File f = new File(FileUtil.normalize(file.getPath() + "/src/main"));
@@ -467,7 +486,7 @@ public class ToolUtil{
     public static String getWebappPath(){
         String webappPath = "";
         try {
-            File file = ResourceUtil.getResource("").getFile();
+            File file = getResource("").getFile();
             if (file != null){
                 while(true){
                     File f = new File(FileUtil.normalize(file.getPath() + "/WEB-INF/classes"));
