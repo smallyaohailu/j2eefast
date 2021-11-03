@@ -8,9 +8,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="sysUreportFileColumns">
          a.id AS "id" ,
          a.name AS "name" ,
+         a.file_name AS "fileName" ,
          a.content AS "content" ,
          a.create_time AS "createTime" ,
-         a.update_time AS "updateTime" 
+         a.update_time AS "updateTime" ,
+         a.remark AS "remark"
     </sql>
 
     <!--  根据主键获取实体   -->
@@ -18,7 +20,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         <include refid="sysUreportFileColumns"/>
 		FROM  sys_ureport_file a
-		WHERE a.id = '${id}'
+		WHERE a.id = #{id}
+    </select>
+    
+    <select id="getUreportFileByFileName"  resultType="com.j2eefast.framework.sys.entity.SysUreportFileEntity" >
+        SELECT
+        a.id AS "id" ,
+        a.name AS "name" ,
+        a.content AS "content"
+		FROM  sys_ureport_file a
+		WHERE a.name = #{name}
     </select>
 
     <!--  根据获取实体List   -->

@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
        SELECT
        <include refid="genTableColumns"/>
        FROM gen_table_column
-       WHERE table_id = '${tableId}'
+       WHERE table_id = #{tableId}
        ORDER BY sort
     </select>
     
@@ -82,7 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ,(CASE WHEN a.attnotnull = 't'  THEN '1' ELSE '0' END) AS isRequired
             , (CASE WHEN POSITION(CAST( a.attnum AS VARCHAR) IN k.pik) > 0 THEN '1' ELSE '0' END) AS isPk
             FROM pg_class c, pg_attribute a , pg_type t, pg_description d, (SELECT p.conrelid,p.conkey::text AS pik FROM pg_constraint AS p) AS k
-            WHERE  c.relname = '${tableName}' AND a.attnum>0 AND a.attrelid = c.oid AND a.atttypid = t.oid AND  d.objoid=a.attrelid AND d.objsubid=a.attnum
+            WHERE  c.relname = #{tableName} AND a.attnum>0 AND a.attrelid = c.oid AND a.atttypid = t.oid AND  d.objoid=a.attrelid AND d.objsubid=a.attnum
             AND c.oid = k.conrelid
         </if>
 
@@ -128,7 +128,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             LEFT JOIN syscomments e ON a.cdefault=e.id
             LEFT JOIN sys.extended_properties g ON a.id=g.major_id AND a.colid=g.minor_id
             LEFT JOIN sys.extended_properties f ON d.id=f.major_id AND f.minor_id=0
-            WHERE d.name = '${tableName}'
+            WHERE d.name = #{tableName}
             ORDER BY
             a.id,a.colorder
         </if>
@@ -137,7 +137,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteGenTableColumnByIds" parameterType="Long">
         DELETE FROM gen_table_column WHERE table_id IN
         <foreach collection="array" item="tableId" open="(" separator="," close=")">
-            '${tableId}'
+            #{tableId}
         </foreach>
     </delete>
 

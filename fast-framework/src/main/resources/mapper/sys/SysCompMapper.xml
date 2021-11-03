@@ -30,7 +30,7 @@
             <if test="_databaseId == 'postgresql'">AND (('${id}' = ANY(STRING_TO_ARRAY(c.parent_ids, ',')))</if>
             <if test="_databaseId == 'oracle'">AND (INSTR(','||c.parent_ids||',',',${id},') > 0</if>
             <if test="_databaseId == 'sqlserver'">AND (CHARINDEX(','+'${id}'+',', ','+c.parent_ids+',') > 0</if>
-            OR (c.id = '${id}' AND c.del_flag = '0'))
+            OR (c.id = #{id} AND c.del_flag = '0'))
         </if>
         <if test="name != null and name != ''">
             AND c.name LIKE

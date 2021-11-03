@@ -140,9 +140,26 @@
         </if>
     </select>
 
+    <select id="findUserByUserNameNoDel" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
+        <include refid="selectsysUserVo"/>
+        ,t.tenant_name AS "tenantName"
+        FROM sys_user u
+        LEFT JOIN sys_tenant t ON u.tenant_id = t.tenant_id
+        WHERE u.username = #{userName}
+    </select>
+
+	<!-- 第三方登录通过uuid获取用户 -->
     <select id="findAuthByUuid" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
-        SELECT b.id AS "id", b.username AS "username",b.password AS "password" FROM sys_auth_user a LEFT JOIN sys_user b ON a.user_id = b.id
-        WHERE a.uuid = #{uuid} AND b.del_flag = '0'
+        <include refid="selectsysUserVo"/>
+        ,t.tenant_name AS "tenantName"
+        FROM sys_auth_user a 
+        LEFT JOIN sys_user u ON a.user_id = u.id
+        LEFT JOIN sys_tenant t ON a.tenant_id = t.tenant_id
+        WHERE a.uuid = #{uuid} 
+        AND u.del_flag = '0'
+        <if test = "tenantId !=null and tenantId!=''">
+            AND a.tenant_id = #{tenantId}
+        </if>
     </select>
 
     <select id="findAuthByUserName" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
@@ -182,6 +199,13 @@
         LEFT JOIN sys_comp ur ON ur.id = u.comp_id
         WHERE u.id = #{id} AND u.del_flag != '1'
     </select>
+    
+    <select id="findDeptNameByUserId" resultType="String">
+        SELECT ur.name AS DeptName
+        FROM  sys_user u
+        LEFT JOIN sys_comp ur ON ur.id = u.dept_id
+        WHERE u.id = #{id} AND u.del_flag != '1'
+    </select>
 
     <!-- 查询用户的所有菜单ID -->
     <select id="findAllMenuId" resultType="long">
@@ -189,6 +213,30 @@
         LEFT JOIN sys_role_menu rm ON ur.role_id = rm.role_id
 		WHERE ur.user_id = #{id}
 	</select>
+	
+	<!-- 查询手机是否存在系统 -->
+	<select id="findIsMobile" resultType="Integer">
+		SELECT count(1) FROM sys_user u
+		WHERE u.mobile = #{mobile}
+		<if test = "tenantId !=null and tenantId!=''">
+            AND u.tenant_id = #{tenantId}
+        </if>
+	</select>
+
+    <!--查询机构下角色的手机号码 -->
+    <select id="findMobilesByUserId" resultType="String">
+        SELECT u.mobile AS mobile
+        FROM  sys_user u
+        LEFT JOIN sys_user_role r ON u.id = r.user_id
+        LEFT JOIN sys_role l ON r.role_id = l.id
+        WHERE  u.del_flag != '1'
+        <if test = "deptId !=null and deptId!=''">
+            AND u.dept_id = #{deptId}
+        </if>
+        <if test = "roleKey !=null and roleKey!=''">
+            AND l.role_key = #{roleKey}
+        </if>
+    </select>
 
     <!-- 用户页面表格 分页查询-->
     <select id="findPage" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
@@ -208,12 +256,15 @@
         <if test = "roleKey !=null and roleKey!=''">
             AND l.role_key = #{roleKey}
         </if>
+        <if test = "noId !=null and noId !=''">
+            AND u.id = #{noId}
+        </if>
         <if test="compId != null and compId !=''">
             <if test="_databaseId == 'mysql'">AND (FIND_IN_SET(#{compId},d.parent_ids)</if>
             <if test="_databaseId == 'postgresql'">AND ('${compId}' = ANY(STRING_TO_ARRAY(d.parent_ids, ','))</if>
             <if test="_databaseId == 'oracle'">AND (INSTR(','||d.parent_ids||',',',${compId},') > 0</if>
             <if test="_databaseId == 'sqlserver'">AND (CHARINDEX(','+'${compId}'+',', ','+d.parent_ids+',') > 0</if>
-            OR (u.dept_id = '${compId}' AND u.del_flag = '0'))
+            OR (u.dept_id = #{compId} AND u.del_flag = '0'))
         </if>
         <if test="deptId != null and deptId != ''">
             <choose>
@@ -252,12 +303,14 @@
             <otherwise>GROUP BY u.id,u.username, u.name,u.password,u.salt,u.email,u.mobile,u.status,u.card_id,u.create_time,u.dept_id,u.comp_id,c.name, d.name</otherwise>
         </choose>
     </select>
+    
+    
 
     <select id="findUserByRolePage" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
         <include refid="sqlpage"/>
         WHERE
         u.del_flag = '0' AND
-        r.role_id = '${roleId}'
+        r.role_id = #{roleId}
         <include refid="selectConditions"/>
         <if test = "status !=null and status!=''">
             AND u.status = #{status}
@@ -267,7 +320,7 @@
             <if test="_databaseId == 'postgresql'">AND ('${compId}' = ANY(STRING_TO_ARRAY(d.parent_ids, ','))</if>
             <if test="_databaseId == 'oracle'">AND (INSTR(','||d.parent_ids||',',',${compId},') > 0</if>
             <if test="_databaseId == 'sqlserver'">AND (CHARINDEX(','+'${compId}'+',', ','+d.parent_ids+',') > 0</if>
-            OR (u.dept_id = '${compId}' AND u.del_flag = '0'))
+            OR (u.dept_id = #{compId} AND u.del_flag = '0'))
         </if>
         <if test = "sql_filter !=null and sql_filter!=''">
             AND ${sql_filter}
@@ -281,8 +334,8 @@
     <!-- 角色授权用户 还没有授权的用户列表-->
     <select id="findUnallocatedList" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
         <include refid="sqlpage"/>
-        WHERE (l.id != '${roleId}' OR l.id IS NULL)
-        AND u.id NOT IN (SELECT u.id FROM sys_user u INNER JOIN sys_user_role ur ON u.id = ur.user_id AND ur.role_id = '${roleId}')
+        WHERE (l.id != #{roleId} OR l.id IS NULL)
+        AND u.id NOT IN (SELECT u.id FROM sys_user u INNER JOIN sys_user_role ur ON u.id = ur.user_id AND ur.role_id = #{roleId})
         AND u.del_flag = '0'
         <include refid="selectConditions"/>
         <if test="compId != null and compId !=''">
@@ -290,7 +343,7 @@
             <if test="_databaseId == 'postgresql'">AND ('${compId}' = ANY(STRING_TO_ARRAY(d.parent_ids, ','))</if>
             <if test="_databaseId == 'oracle'">AND (INSTR(','||d.parent_ids||',',',${compId},') > 0</if>
             <if test="_databaseId == 'sqlserver'">AND (CHARINDEX(','+'${compId}'+',', ','+d.parent_ids+',') > 0</if>
-            OR (u.dept_id = '${compId}' AND u.del_flag = '0'))
+            OR (u.dept_id = #{compId} AND u.del_flag = '0'))
         </if>
         <!-- 数据范围过滤 -->
         <if test = "sql_filter !=null and sql_filter!=''">
@@ -321,4 +374,8 @@
         WHERE u.id = #{id} AND u.del_flag = '0'
     </select>
 
+    <!-- 彻底清理用户信息-->
+    <update id="cleanUser">
+        DELETE FROM sys_user WHERE id = #{id}
+    </update>
 </mapper>

@@ -57,6 +57,11 @@
         </if>
     </select>
 
+    <insert id="insertLogininfor" parameterType="com.j2eefast.framework.log.entity.SysLoginInfoEntity">
+		insert into sys_login_infor (id,username, ipaddr, login_location, user_agent, browser, os, mobile, status,msg,login_time,comp_id,dept_id,login_type,tenant_id)
+		values (#{id}, #{username}, #{ipaddr}, #{loginLocation}, #{userAgent}, #{browser}, #{os}, #{mobile},#{status},#{msg},#{loginTime},#{compId},#{deptId},#{loginType},#{tenantId})
+	</insert>
+
     <select id="findPage"  resultType="com.j2eefast.framework.log.entity.SysLoginInfoEntity">
         SELECT
         <include refid="sysLoginInfoColumns"/>
@@ -90,7 +95,7 @@
                 <if test="_databaseId == 'postgresql'">AND ('${deptId}' = ANY(STRING_TO_ARRAY(d.parent_ids, ','))</if>
                 <if test="_databaseId == 'oracle'">AND (INSTR(','||d.parent_ids||',',',${deptId},') > 0</if>
                 <if test="_databaseId == 'sqlserver'">AND (CHARINDEX(','+'${deptId}'+',', ','+d.parent_ids+',') > 0</if>
-                OR a.dept_id = '${deptId}')
+                OR a.dept_id = #{deptId})
             </if>
             <if test="_databaseId == 'mysql'">
                 <if test="beginTime != null and beginTime != ''">
