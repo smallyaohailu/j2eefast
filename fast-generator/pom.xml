@@ -26,12 +26,11 @@
     </dependencies>
 	<build>
 		<plugins>
-			<!-- 打jar包的插件 -->
+			<!-- 打jar包的插件 不打包资源文件（配置文件和依赖包分开）
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<!-- 不打包资源文件（配置文件和依赖包分开）-->
 					<excludes>
 						<exclude>templates/**</exclude>
 						<exclude>mapper/**</exclude>
@@ -40,6 +39,13 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			-->
+			<!-- 资源不分离-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

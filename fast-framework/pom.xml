@@ -11,9 +11,26 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>fast-framework</artifactId>
 	<name>fast 核心模块</name>
+	
 	<description>
 		fast 核心模块
 	</description>
+	
+	<developers>  
+		<developer>
+			<id>J2eeFAST</id>
+			<name>ZHOUZHOU</name>
+			<email>loveingowp at 163.com</email>
+			<url>http://www.j2eefast.com</url>
+		</developer>
+	</developers>
+	
+	<licenses>
+	    <license>
+	      <name>Apache-2.0</name>
+	      <url>https://gitee.com/zhouhuanOGP/J2EEFAST/blob/master/LICENSE</url>
+	    </license>
+	</licenses>
 	
 	<dependencies>
 		
@@ -98,6 +115,7 @@
 
 	<build>
 		<plugins>
+		
 			<!-- YUI Compressor Maven压缩JS/CSS插件
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
@@ -130,12 +148,12 @@
 				</configuration>
 			</plugin>
 	        -->
-			<!-- 打jar包的插件-->
+
+			<!-- 打jar包的插件 不打包资源文件（配置文件和依赖包分开）
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<!-- 不打包资源文件（配置文件和依赖包分开）-->
 					<excludes>
 						<exclude>templates/**</exclude>
 						<exclude>mapper/**</exclude>
@@ -143,9 +161,15 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			-->
+			<!-- 资源文件不分离-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
 
 		</plugins>
 
 	</build>
-
+	
 </project>
