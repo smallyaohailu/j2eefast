@@ -1,4 +1,4 @@
-/* 前后端通信相关的配置,注释只允许使用多行方式 */
+/* 前后端通信相关的配置,注释只允许使用多行方式 此文件修改及生效,不用重启服务*/
 {
     /*j2eefast 新增在线删除图片功能*/
     "delimageActionName": "delimage",/* 执行删除图片的action名称 */
@@ -12,6 +12,8 @@
     "imageAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp"], /* 上传图片格式显示 */
     "imageCompressEnable": true, /* 是否压缩图片,默认是true */
     "imageCompressBorder": 1600, /* 图片压缩最长边限制 */
+    "imagePressEnable":true, /* 上传图片是否添加水印*/
+    "imagePressText":"J2eeFAST",/* 上传图片水印文字*/
     "imageInsertAlign": "none", /* 插入的图片浮动方式 */
     "imageUrlPrefix": "", /* 图片访问路径前缀 */
     "imagePathFormat": "/editor/upload/image/{yyyy}{mm}{dd}/{time}{rand:6}", /* 上传保存路径,可以自定义保存路径和文件名格式 */
