@@ -1,5 +1,5 @@
 /*!
- * 在线代码编辑器
+ * 在线代码编辑器 基于1.4.12
  * Copyright (c) 2020-Now http://www.j2eefast.com All rights reserved.
  * No deletion without permission
  * @author ZhouHZhou
@@ -75,7 +75,13 @@ if (typeof jQuery === "undefined") {
     AceEditorData.prototype.initAce = function () {
         var that = this;
         //获取控件   id ：codeEditor
-        this.editor = ace.edit(that.options.id);
+        //console.log( $('#'+that.options.id));
+        //if(typeof  $('#'+that.options.id) === "undefined"){
+        //     this.editor = ace.edit(that.$el);
+        // }else{
+            this.editor = ace.edit(that.options.id);
+        // }
+
 
         var theme = "eclipse";
         //theme = "terminal";
@@ -103,6 +109,19 @@ if (typeof jQuery === "undefined") {
             enableSnippets: true,
             enableLiveAutocompletion: true
         });
+
+        this.editor.commands.addCommand(
+            { name: 'myCommand',
+            bindKey: {win: 'Ctrl-S', mac: 'Command-S'},
+                    exec: function(editor) {
+                        if (typeof  that.options.saveAceCallback == "function"){
+                            that.options.saveAceCallback(that.options.id,editor);
+                        }
+                    }, readOnly: true // 如果不需要使用只读模式，这里设置false
+                    });
+
+        // var addCompleter = this.editor.autoCompleter();
+        // addCompleter.save(that.data);
         this.langTools.addCompleter({
             getCompletions: function(editor, session, pos, prefix, callback) {
                 if (prefix.length === 0) {
@@ -115,6 +134,22 @@ if (typeof jQuery === "undefined") {
 
         this.setHeight(this.options.height);
         this.setTop(this.options.top);
+
+        console.log(this.$el.offset().top);
+
+        //style="position:absolute;right: 49px;top: 80px;z-index:100;"
+        if($('#'+this.options.id+'_toolBar')){
+            this.$el.append($('#'+this.options.id+'_toolBar'));
+            // $('#'+this.options.id+'_toolBar').css({
+            //     // 'position':'absolute',
+            //     // 'right':'10px', //obj.offsetLeft
+            //     // 'top': '0px',
+            //     // 'line-height': '8px',
+            //     // 'text-align': 'center',
+            //     // 'float': 'left',
+            //     'z-index':'1000'
+            // })
+        }
     };
 
     //本地初始化
@@ -123,9 +158,13 @@ if (typeof jQuery === "undefined") {
         if (typeof ace === "undefined") {
             throw new Error("ace 对象为空,请检查是否引入!");
         }
-        if(that.options.language == 'ftl' || that.options.language == 'freeMarker'){
-            that.data = that.sysFtlKeydata();
-            if(that.options.keywordsData && that.options.keywordsData.length > 0){
+
+        $.extend(this.options, $.fn.aceEditor.locales['data']);
+
+        if(that.options.lang == 'ftl' || that.options.lang == 'freeMarker'){
+            that.data = that.options.sysFtlKeydata();
+            if(that.options.keywordsData &&
+                that.options.keywordsData.length > 0){
                 for(var i=0; i< that.options.keywordsData.length; i++){
                     var keydata = {};
                     keydata.meta = that.options.keywordsData[i].meta;
@@ -204,8 +243,13 @@ if (typeof jQuery === "undefined") {
         }
     }
 
+
+    AceEditorData.prototype.resize = function () {
+        this.editor.resize();
+    }
+
     AceEditorData.LOCALES = {};
-    AceEditorData.LOCALES.data = {
+    AceEditorData.LOCALES['data'] = AceEditorData.LOCALES.data = {
         sysFtlKeydata: function () {
             var data = [];
             data.push({meta: "javascript", caption: "script(脚本)", value: "script"})
@@ -223,6 +267,8 @@ if (typeof jQuery === "undefined") {
         }
     };
 
+    $.extend(AceEditorData.DEFAULTS, AceEditorData.LOCALES['data'] );
+
     AceEditorData.DEFAULTS = {
         id: 'aceEdit',             // 加载容器id
         theme: 'chrome',          // 设置编辑器界面风格 默认eclipse、terminal、chrome
@@ -238,7 +284,12 @@ if (typeof jQuery === "undefined") {
         'setLang',
         'setTheme',
         'setFontSize',
-        'setReadOnly'
+        'setReadOnly',
+        'getValue',
+        'setHeight',
+        'insert',
+        'setTop',
+        'resize'
     ];
 
     $.fn.aceEditor = function (option) {

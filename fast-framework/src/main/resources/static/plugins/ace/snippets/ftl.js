@@ -1,9 +1,11 @@
+/*!
+ * Copyright (c) 2020-Now http://www.j2eefast.com All rights reserved.
+ * No deletion without permission
+ * @author ZhouZhou 2021年07月11日
+ * J2eeFAST 修改支持自定义语法提示
+ */
 define("ace/snippets/ftl",["require","exports","module"], function(require, exports, module) {
     "use strict";
-/**
- * J2eeFAST 修改支持自定义语法提示
- * 2021年07月11日
- */
     exports.snippetText = {
     scope: 'ftl',
     snippetText: [
@@ -52,8 +54,7 @@ ${1: // 页面公共头部..}\n\
         {
             snippet: 'permission(JS权限)',
             content:
-"${2:$}{permission.hasPermi(\'${1}\')}\n\
-"
+"${2:$}{permission.hasPermi(\"${1}\")}"
         }
         ,
         {
@@ -105,6 +106,59 @@ ${1: // 页面公共头部..}\n\
         }
         ,
         {
+         snippet: "f.tableselect(表格组件)",
+         content:
+"<@f.tableselect name=\"${1}\" boxTitle=\"${2}\" url=\"${3}\" tableInfo=\"${4}\"/>"
+        }
+        ,
+        {
+         snippet: "link 引入样式",
+         content:
+"<link rel=\"${1}\" href=\"${2}\"/>"
+        }
+        ,
+        {
+         snippet: "tableCallback(表格组件回调函数)",
+         content:
+"function tableCallback(id, event, index, layero, nodes){\n\
+    ${1}\n\
+}"
+        }
+        ,{
+         snippet: "div 提示",
+         content:
+"<div>\n\
+ ${1}\n\
+ </div>"
+        }
+        ,{
+        snippet: "div. class",
+        content:
+"<div class=\"${1}\">\n\
+ ${2}\n\
+ </div>"
+        },
+        {
+        snippet: "div#",
+        content:
+"<div id=\"${1}\">\n\
+${2}\n\
+</div>"
+        },
+        {
+            snippet: "try (JS异常捕获)",
+            content:
+"try {\n\
+    ${0:/* code */}\n\
+} catch (e) {}"
+        },
+        {
+            snippet: "jsons (JSON转换)",
+            content:
+"JSON.stringify(${1:object});"
+        }
+        ,
+        {
             snippet:"include(前端模板引擎)",
             content:
 "<#include \"/common/defaultEngine.html\"/>"
@@ -128,9 +182,19 @@ ${1: // 页面公共头部..}\n\
 });"
         },
         {
-        snippet: 'ci18n',
+        snippet: 'i18n',
         content:
-"<@ctx.i18n text = \"${1}\"/>"
+"${2:$}{i18n(\"${1}\")}"
+        },
+        {
+            snippet: 'log(浏览器控制台日志)',
+            content:
+"console.log(${1})"
+        },
+        {
+            snippet: '$i18(JS获取国际化)',
+            content:
+"$.i18n.text(\"${1}\")"
         }
     ]
 }
