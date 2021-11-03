@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 
 /**
- * SM4 加密工具类
+ * SM4 SM3 SM2 加密工具类
  * @author ZhouZhou
  */
 public class SoftEncryption {
@@ -44,9 +44,9 @@ public class SoftEncryption {
 
             byte[] priKey = HexUtil.subByte(keys, 0, 32);
             byte[] pubKey = HexUtil.subByte(keys, 32, 64);
-            returnData.put("state", Boolean.valueOf(true)).put("pubKey", HexUtil.encodeHexStr(pubKey))
-                    .put("priKey",
-                            HexUtil.encodeHexStr(priKey)).put("pubKeyByte",pubKey).put("priKeyByte",pubKey);
+            returnData.set("state", Boolean.valueOf(true)).set("pubKey", HexUtil.encodeHexStr(pubKey))
+                    .set("priKey",
+                            HexUtil.encodeHexStr(priKey)).set("pubKeyByte",pubKey).set("priKeyByte",priKey);
             return returnData;
         } catch (Exception e) {
             LOG.error("===========使用SM2算法生成秘钥对失败===========");
@@ -59,10 +59,10 @@ public class SoftEncryption {
         JSONObject returnData = new JSONObject();
         try {
             byte[] cipher = SM2Utils.encrypt(pubKey, data, 1);
-            returnData.put("state", Boolean.valueOf(true))
-                    .put("bytes", cipher)
-                    .put("hex",
-                            HexUtil.encodeHexStr(cipher)).put("b64",Base64.encode(cipher));;
+            returnData.set("state", Boolean.valueOf(true))
+                    .set("bytes", cipher)
+                    .set("hex",
+                            HexUtil.encodeHexStr(cipher)).set("b64",Base64.encode(cipher));;
         }
         catch (Exception e) {
             LOG.error("===========使用SM2算法加密失败==========");
@@ -77,10 +77,10 @@ public class SoftEncryption {
         JSONObject returnData = new JSONObject();
         try {
             byte[] source = SM2Utils.decrypt(priKey, data,1);
-            returnData.put("state", Boolean.valueOf(true))
-                    .put("hex",
+            returnData.set("state", Boolean.valueOf(true))
+                    .set("hex",
                             HexUtil.encodeHexStr(source))
-                    .put("bytes", source);
+                    .set("bytes", source);
         }
         catch (Exception e) {
             LOG.error("===========使用SM2算法解密失败==========");
@@ -95,10 +95,10 @@ public class SoftEncryption {
         JSONObject returnData = new JSONObject();
         try {
             byte[] sign = SM2Utils.sign(priKey, data, null, true);
-            returnData.put("state", Boolean.valueOf(true))
-                    .put("bytes", sign)
-                    .put("hex",
-                            HexUtil.encodeHexStr(sign)).put("b64",Base64.encode(sign));
+            returnData.set("state", Boolean.valueOf(true))
+                    .set("bytes", sign)
+                    .set("hex",
+                            HexUtil.encodeHexStr(sign)).set("b64",Base64.encode(sign));
         }
         catch (Exception e) {
             LOG.error("===========使用SM2算法对摘要签名失败==========");
@@ -125,10 +125,10 @@ public class SoftEncryption {
         JSONObject returnData = new JSONObject();
         try {
             byte[] result = SM3Digest.update(data);
-            return returnData.put("state", Boolean.valueOf(true))
-                    .put("bytes", result)
-                    .put("hex",
-                            HexUtil.encodeHexStr(result)).put("b64", Base64.encode(result));
+            return returnData.set("state", Boolean.valueOf(true))
+                    .set("bytes", result)
+                    .set("hex",
+                            HexUtil.encodeHexStr(result)).set("b64", Base64.encode(result));
         }
         catch (Exception e) {
             LOG.error("===========SM3算法摘要失败==========");
@@ -144,11 +144,10 @@ public class SoftEncryption {
 
             if (16 == size) {
                 String keys = IdUtil.fastSimpleUUID();
-                //System.out.println(HexUtil.convertByteArrayToHexStr(HexUtil.decodeHex(keys)));
-                return returnData.put("state", Boolean.valueOf(true))
-                        .put("hex",
+                return returnData.set("state", Boolean.valueOf(true))
+                        .set("hex",
                                 keys)
-                        .put("bytes",
+                        .set("bytes",
                                 HexUtil.decodeHex(keys));
             }
 
@@ -163,11 +162,11 @@ public class SoftEncryption {
                 res.append(str.charAt(random.nextInt(str_len)));
             }
             String keys = res.toString();
-            return returnData.put("state", Boolean.valueOf(true))
-                    .put("hex",
+            return returnData.set("state", Boolean.valueOf(true))
+                    .set("hex",
                             HexUtil.encodeHexStr(keys
                                     .getBytes()))
-                    .put("bytes", keys
+                    .set("bytes", keys
                             .getBytes());
         }
         catch (Exception e)
@@ -183,10 +182,10 @@ public class SoftEncryption {
         {
             JSONObject returnData = new JSONObject();
             byte[] result = SM4.encryptData_ECB(data,key);
-            returnData.put("state", Boolean.valueOf(true))
-                    .put("bytes", result)
-                    .put("hex",
-                            HexUtil.encodeHexStr(result)).put("b64",Base64.encode(result));
+            returnData.set("state", Boolean.valueOf(true))
+                    .set("bytes", result)
+                    .set("hex",
+                            HexUtil.encodeHexStr(result)).set("b64",Base64.encode(result));
 
             return returnData;
         } catch (Exception e) {
@@ -201,10 +200,10 @@ public class SoftEncryption {
         {
             JSONObject returnData = new JSONObject();
             byte[] result = SM4.decryptData_ECB(ciphertext,key);
-            returnData.put("state", Boolean.valueOf(true))
-                    .put("bytes", result)
-                    .put("hex",
-                            HexUtil.encodeHexStr(result)).put("b64",Base64.encode(result));
+            returnData.set("state", Boolean.valueOf(true))
+                    .set("bytes", result)
+                    .set("hex",
+                            HexUtil.encodeHexStr(result)).set("b64",Base64.encode(result));
             return returnData;
         } catch (Exception e) {
             LOG.error("===========使用SM4算法解密失败==========");
@@ -252,23 +251,23 @@ public class SoftEncryption {
                             if (state) {
                                 byte[] ciphertext = result.get("bytes",byte[].class);
                                 String ciphertextStr = result.getStr("hex");
-                                returnData.put("state", Boolean.valueOf(true)).put("envelope", envelope).put("envelopeHex",envelopeHex).put("signature", signature).
-                                        put("signatureHex", signatureHex).put("ciphertext", ciphertext).put("ciphertextStr", ciphertextStr).put("zy", zy).
-                                        put("hex", result.getStr("hex")).put("key", key);
+                                returnData.set("state", Boolean.valueOf(true)).set("envelope", envelope).set("envelopeHex",envelopeHex).set("signature", signature).
+                                set("signatureHex", signatureHex).set("ciphertext", ciphertext).set("ciphertextStr", ciphertextStr).set("zy", zy).
+                                set("hex", result.getStr("hex")).set("key", key);
                             } else {
-                                returnData.put("state", Boolean.valueOf(false));
+                                returnData.set("state", Boolean.valueOf(false));
                             }
                         } else {
-                            returnData.put("state", Boolean.valueOf(false));
+                            returnData.set("state", Boolean.valueOf(false));
                         }
                     } else {
-                        returnData.put("state", Boolean.valueOf(false));
+                        returnData.set("state", Boolean.valueOf(false));
                     }
                 } else {
-                    returnData.put("state", Boolean.valueOf(false));
+                    returnData.set("state", Boolean.valueOf(false));
                 }
             } else {
-                returnData.put("state", Boolean.valueOf(false));
+                returnData.set("state", Boolean.valueOf(false));
             }
         }
         catch (Exception e) {

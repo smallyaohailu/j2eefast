@@ -46,11 +46,6 @@
     }
 </style>
 </@header>
-<script>
-//<![CDATA[
-var baseURL = "${ctxStatic}/" ; function imgUserError(){var img=event.srcElement;img.src=baseURL+"static/img/user2-160x160.jpg"; img.onerror=null;}
-//]]>
-</script>
 <body class="hold-transition lockscreen">
 <#include "/common/upgrade.html"><!-- 如果客户浏览器版本过低，则显示浏览器升级提示-->
 <!-- Automatic element centering -->
@@ -74,7 +69,7 @@ var baseURL = "${ctxStatic}/" ; function imgUserError(){var img=event.srcElement
         <form class="lockscreen-credentials" id="form-lock" method="post" action="#" onsubmit="return false;">
             <input type="hidden" name="username" value="<@shiro.principal property="username"/>"/>
             <div class="input-group">
-                <input type="password" name="password"  class="form-control" placeholder="<@ctx.i18n text = "密码"/>">
+                <input type="password" name="password"  class="form-control" placeholder="${i18n("密码")}">
                 <div class="input-group-btn">
                     <button type="button" class="btn" onclick="submitLock()" onkeydown="if(event.keyCode==13){submitLock();}"><i class="fa fa-arrow-right text-muted"></i></button>
                 </div>
@@ -85,10 +80,10 @@ var baseURL = "${ctxStatic}/" ; function imgUserError(){var img=event.srcElement
     </div>
     <!-- /.lockscreen-item -->
     <div class="help-block text-center" style="font-size: 12px; margin-top: 50px;">
-        <@ctx.i18n text = "系统锁屏,请输入密码登陆!"/>
+        ${i18n("系统锁屏,请输入密码登陆!")}
     </div>
     <div class="text-center">
-        <a href="${ctxStatic}/logout" style="font-size: 13px"><@ctx.i18n text = "退出重新登陆"/></a>
+        <a href="${ctxStatic}/logout" style="font-size: 13px">${i18n("退出重新登陆")}</a>
     </div>
     <div class="lockscreen-footer text-center">
         Copyright &copy; 2018-${config.getCopyrightYear()} <a href="http://www.lixinfintech.com">${config.getCompany()}</a><br>
@@ -109,9 +104,8 @@ var baseURL = "${ctxStatic}/" ; function imgUserError(){var img=event.srcElement
 <script type="text/javascript" src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.min.js"></script>
 <script type="text/javascript" src="${ctxStatic}/static/plugins/flipcountdown/jquery.flipcountdown.js"></script>
 <script type="text/javascript" src="${ctxStatic}/static/plugins/fullscreen/jquery.fullscreen.js"></script>
-<script type="text/javascript" src="${ctxStatic}/static/libs/SM4.min.js?V=${config.getDvVersion()}"></script>
+<script type="text/javascript" src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
 <script type="text/javascript">
-    var  _secretKey = "${_secretKey}";
     (function ($) {
 
         /*扩展Date*/
@@ -169,7 +163,7 @@ var baseURL = "${ctxStatic}/" ; function imgUserError(){var img=event.srcElement
 
      function errrInfo(text){
         $.toast({
-            heading: '<@ctx.i18n text = "警告"/>',
+            heading: '${i18n("警告")}',
             text: text,
             hideAfter:3000,
             position: 'bottom-right',
@@ -286,18 +280,19 @@ var baseURL = "${ctxStatic}/" ; function imgUserError(){var img=event.srcElement
             errrInfo("请输入密码!");
             return;
         }
-        var s4 = new SM4Util(getCookie("_secretKey"));
-        data[0].value = s4.encryptData_ECB(data[0].value);
-        data[1].value = s4.encryptData_ECB(data[1].value);
-
+        var s4 = SoftEncryption.loginSM2Encry(data[0].value,data[1].value,getCookie("_secretKey"));
+        var senData = {"username":s4.username,
+            "password":s4.password,
+            "kg4":s4.kg4,
+            "sign":s4.sign};
         var config = {
             url: "${ctxStatic}/Account/login",
             type: "POST",
             dataType: "JSON",
-            data: data,
+            data: senData,
             beforeSend: function () {
                 $(window).block({ message: '<div class="loaderbox"><div class="loading-activity"></div> ' +
-                        '<@ctx.i18n text = "数据正在认证,请稍后..."/>' + '</div>' });
+                        '${i18n("数据正在认证,请稍后...")}' + '</div>' });
             },
             success: function(result) {
                 $(window).unblock();

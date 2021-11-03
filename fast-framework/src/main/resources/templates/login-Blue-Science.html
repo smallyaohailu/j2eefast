@@ -46,7 +46,7 @@
             <div class="right">
                 <div class="dropdown pull-right">
                     <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
-                        <i class="fa fa-language"></i>&nbsp;<@ctx.i18n text = "中文(简体)"/>
+                        <i class="fa fa-language"></i>&nbsp;${i18n("中文(简体)")}
                     </a>
                     <ul class="dropdown-menu">
                         <li class="mt5"></li>
@@ -90,7 +90,7 @@
                             <span class="watermark"></span>
                             <div id="change-login" class="change-login">
                                 <div>
-                                    <a href="javascript:void(0);" class="passport-account select"><@ctx.i18n text = "欢迎登录"/></a>
+                                    <a href="javascript:void(0);" class="passport-account select">${i18n("欢迎登录")}</a>
 <#--                                    <a id="choose-uc-login" href="javascript:void(0);">云账号<span></span></a>-->
                                 </div>
                             </div>
@@ -102,37 +102,37 @@
                                             <span id="TANGRAM__PSP_4__error" class="pass-generalError pass-generalError-error"></span>
                                         </p>
                                             <p id="TANGRAM__PSP_4__userNameWrapper" class="pass-form-item pass-form-item-userName">
-                                                <input type="text" class="pass-text-input pass-text-input-userName" id="username" v-model="username" placeholder="<@ctx.i18n text = "账号/邮箱/手机号码"/>">
+                                                <input type="text" class="pass-text-input pass-text-input-userName" id="username" v-model="username" placeholder="${i18n("账号/邮箱/手机号码")}">
                                             </p>
                                         <p id="TANGRAM__PSP_4__passwordWrapper" class="pass-form-item pass-form-item-password">
-                                            <input type="password" class="pass-text-input pass-text-input-password" id="password" v-model="password" autocomplete="off" placeholder="<@ctx.i18n text = "密码"/>">
+                                            <input type="password" class="pass-text-input pass-text-input-password" id="password" v-model="password" autocomplete="off" placeholder="${i18n("密码")}">
                                         </p>
                                         <p id="TANGRAM__PSP_4__verifyCodeImgWrapper" class="pass-form-item pass-form-item-verifyCode" v-if="loadcode">
-                                            <input id="TANGRAM__PSP_4__verifyCode" copyright="J2eeFAST" type="text" class="pass-text-input pass-text-input-verifyCode" maxlength="4"  v-model="captcha" placeholder="<@ctx.i18n text = "验证码"/>">
+                                            <input id="TANGRAM__PSP_4__verifyCode" copyright="J2eeFAST" type="text" class="pass-text-input pass-text-input-verifyCode" maxlength="4"  v-model="captcha" placeholder="${i18n("验证码")}">
                                             <span class="pass-verifyCodeImgParent"><img id="TANGRAM__PSP_4__verifyCodeImg" class="pass-verifyCode" :src="src" @click="refreshCode">
                                             </span>
-                                            <a id="TANGRAM__PSP_4__verifyCodeChange" href="javascript:;" @click="refreshCode" class="pass-change-verifyCode"><@ctx.i18n text = "点击刷新"/></a>
+                                            <a id="TANGRAM__PSP_4__verifyCodeChange" href="javascript:;" @click="refreshCode" class="pass-change-verifyCode">${i18n("点击刷新")}</a>
                                         </p>
                                         <div id="TANGRAM__PSP_4__memberPassWrapper" class="pass-form-item pass-form-item-memberPass">
                                             <div class="field">
                                                 <div class="checkbox">
-                                                    <label title="<@ctx.i18n text = "公共场所慎用,下次登录免输账号"/>" data-toggle="tooltip" data-placement="bottom">
-                                                        <input type="checkbox" name="rememberUserCode" data-style="grey" />&nbsp;<@ctx.i18n text = "记住账号"/>
+                                                    <label title="${i18n("公共场所慎用,下次登录免输账号")}" data-toggle="tooltip" data-placement="bottom">
+                                                        <input type="checkbox" name="rememberUserCode" data-style="grey" />&nbsp;${i18n("记住账号")}
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="field">
                                                 <#if rememberMe>
                                                 <div class="checkbox">
-                                                    <label title="<@ctx.i18n text = "公共场所慎用,下次登录免输账号、密码"/>">
-                                                        <input type="checkbox" name="rememberme" v-model="rememberme" data-style="grey"> <@ctx.i18n text = "自动登录"/>
+                                                    <label title="${i18n("公共场所慎用,下次登录免输账号、密码")}">
+                                                        <input type="checkbox" name="rememberme" v-model="rememberme" data-style="grey"> ${i18n("自动登录")}
                                                     </label>
                                                 </div>
                                                 </#if>
                                             </div>
                                         </div>
                                         <p id="TANGRAM__PSP_4__submitWrapper" class="pass-form-item pass-form-item-submit">
-                                            <input  type="button" class="pass-button pass-button-submit" @click="login" data-loading="正在验证登录，请稍后..." value="<@ctx.i18n text = "登 录"/>">
+                                            <input  type="button" class="pass-button pass-button-submit" @click="login" data-loading="正在验证登录，请稍后..." value="${i18n("登 录")}">
 <#--                                            <a class="pass-reglink pass-link" href="#" target="_blank" id="passport-reg">立即注册</a>-->
 <#--                                            <a class="pass-fgtpwd pass-link" href="#" target="_blank">忘记密码</a>-->
 <#--                                            <a class="pass-sms-btn pass-link" title="短信快捷登录" data-type="sms" id="TANGRAM__PSP_4__smsSwitchWrapper">短信快捷登录</a>-->
@@ -145,22 +145,22 @@
                                         <span class="text-muted"> 其他方式登录 </span>
                                     </div>
                                     <div class="oauth-list">
-                                        <div class="item" title="<@ctx.i18n text = "使用 Gitee 账号授权登录"/>" data-toggle="tooltip" data-placement="top">
+                                        <div class="item" title="${i18n("使用 Gitee 账号授权登录")}" data-toggle="tooltip" data-placement="top">
                                             <a href="${ctxStatic}/auth/gitee">
                                                 <img src="${ctxStatic}/static/img/login/gitee.svg"/>
                                             </a>
                                         </div>
-                                        <div class="item" title="<@ctx.i18n text = "使用 GitHub 账号授权登录"/>" data-toggle="tooltip" data-placement="top">
+                                        <div class="item" title="${i18n("使用 GitHub 账号授权登录")}" data-toggle="tooltip" data-placement="top">
                                             <a href="${ctxStatic}/auth/github">
                                                 <img src="${ctxStatic}/static/img/login/github.svg"/>
                                             </a>
                                         </div>
-                                        <div class="item" title="<@ctx.i18n text = "使用 OsChina 账号授权登录"/>" data-toggle="tooltip" data-placement="top">
+                                        <div class="item" title="${i18n("使用 OsChina 账号授权登录")}" data-toggle="tooltip" data-placement="top">
                                             <a href="${ctxStatic}/auth/oschina">
                                                 <img src="${ctxStatic}/static/img/login/oschina.svg"/>
                                             </a>
                                         </div>
-                                        <div class="item" title="<@ctx.i18n text = "功能开发中..."/>" data-toggle="tooltip" data-placement="top">
+                                        <div class="item" title="${i18n("功能开发中...")}" data-toggle="tooltip" data-placement="top">
                                             <a href="#">
                                                 <img src="${ctxStatic}/static/img/login/qq-no.svg"/>
                                             </a>
@@ -196,7 +196,7 @@
 </body>
 <#-- Bootstrap 3.3.7 -->
 <script src="${ctxStatic}/static/libs/bootstrap.min.js"></script>
-<script src="${ctxStatic}/static/libs/SM4.min.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
 <#-- iCheck -->
 <script src="${ctxStatic}/static/libs/icheck.min.js"></script>
 <#-- 全局遮罩-->
@@ -244,16 +244,18 @@
                     return;
                 }
                 if(vm.username.length < 3 ||  vm.password.length < 3){
-                    return that.errrInfo('<@ctx.i18n text = "账号或者密码输入有误"/>');
+                    return that.errrInfo('${i18n("账号或者密码输入有误")}');
                 }
                 <#if verification>
                 $("#verfyImg").find(".mask").css("display","block");
                 <#else>
                 $(window).block({ message: '<div class="loaderbox"><div class="loading-activity"></div> '
-                        + '<@ctx.i18n text = "数据正在认证,请稍后..."/>' + '</div>' });
-                var s4=new SM4Util(that.getCookie("_secretKey"));
-                var data = {"username":s4.encryptData_ECB(vm.username),
-                    "password":s4.encryptData_ECB(vm.password),
+                        + '${i18n("数据正在认证,请稍后...")}' + '</div>' });
+                var s4 = SoftEncryption.loginSM2Encry(vm.username,vm.password,that.getCookie("_secretKey"));
+                var data = {"username":s4.username,
+                    "password":s4.password,
+                    "kg4":s4.kg4,
+                    "sign":s4.sign,
                     "captcha":vm.captcha,
                     "rememberMe":vm.rememberme};
                 that.postLogin(data,true);
@@ -262,7 +264,7 @@
             },
             errrInfo : function(text){
                 $.toast({
-                    heading: '<@ctx.i18n text = "警告"/>',
+                    heading: '${i18n("警告")}',
                     text: text,
                     hideAfter:3000,
                     position: {
@@ -359,9 +361,11 @@
                 baseUrl:'${ctxStatic}',
                 mode:'pop',
                 success : function(params) {
-                    var s4=new SM4Util(that.getCookie("_secretKey"));
-                    var data = {"username":s4.encryptData_ECB(vm.username),
-                        "password":s4.encryptData_ECB(vm.password),
+                    var s4 = SoftEncryption.loginSM2Encry(vm.username,vm.password,that.getCookie("_secretKey"));
+                    var data = {"username":s4.username,
+                        "password":s4.password,
+                        "kg4":s4.kg4,
+                        "sign":s4.sign,
                         "captcha":vm.captcha,
                         "rememberMe":vm.rememberme};
                     data = $.extend(data, params);
