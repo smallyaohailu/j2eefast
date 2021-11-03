@@ -6,7 +6,7 @@
 productName: J2eeFAST 开源版本
 
 # ¢此版本号最好不要改动、有助于你后期维修解决问题都会用到当前版本¢
-version: 2.5.0
+version: 2.5.1
 
 server:
   tomcat:
@@ -46,12 +46,6 @@ spring:
     suffix: .html
     request-context-attribute: request
     #cache: true
-  # 资源信息
-  messages:
-    # 国际化资源文件路径
-    basename: i18n/i18n
-    #默认语言（2.0.3+）
-    defaultLocale: zh_CN
 
   #redis数据库服务器
   redis:
@@ -127,6 +121,8 @@ shiro:
     validationTime: 5
     #设置浏览器sessionId名称
     sessionId: 'fast.session.id'
+    #踢出之前登录的/之后登录的用户，默认踢出之前登录的用户
+    kickoutAfter: true
   rememberMe:
     # 是否开启记住我
     enabled: false
@@ -148,6 +144,9 @@ shiro:
     maxAge: 3600
     #允许携带信息头
     credentials: true
+  #是否允许嵌入到外部网站iframe中 (true 允许, false 不允许)
+  selfIframe:
+    enabled: false
 
 #mybatis 配置
 mybatis-plus:
@@ -227,9 +226,9 @@ fast:
     # 过滤开关
     enabled: true
     # 排除链接（多个用逗号分隔）
-    excludes: /sys/notice/*,/sys/database/add,/sys/msg/*,/sys/area/load,/tool/gen/column/*
+    excludes: /sys/notice/*,/sys/database/add,/sys/msg/*,/sys/area/load,/tool/gen/*,/tool/gen/column/list
     # 匹配链接
-    urlPatterns: /sys/*,/tool/*
+    urlPatterns: /sys/*
   #是否开启csrf 防护,此开启针对需要系统授权所有的POST请求
   csrf:
     enabled: true
@@ -248,6 +247,12 @@ fast:
     enabled: false
     #多租户需要略拼接多租户ID的表 多个表之间, 分割 注意大小写. 例如: 'sys_user,sys_comp'
     ignoreTable: ~
+  messages:
+    # 国际化资源文件路径
+    basename: i18n/
+    #默认语言（2.0.3+）
+    defaultLocale: zh_CN
+
 #web页面相关
 web:
    view:
