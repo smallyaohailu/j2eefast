@@ -79,7 +79,7 @@
         this.$container = $([
             '<div class="comment-wrap-box">',
                 '<div class="comment-wrap-box__title">',
-                    '<i class="'+this.options.titleIcon+'"></i>' + this.options.title,
+                    '<i class="'+this.options.titleIcon+'"></i>' + $.i18n.text(this.options.title),
                 '</div>',
                 '<div class="comment-wrap-box__inner">',
                     '<div class="comment-wrap-box-loading">',
@@ -133,7 +133,7 @@
             if(result && result.code == opt.variable.web_status.SUCCESS) {
                 html.push(
                     '<div title="'+result.name+'" data-user-id="'+that.options.userId+'" class="comment-avatar _35x35">',
-                        '<img src="'+baseURL.substr(0,baseURL.length-1)+result.url+'" alt="'+result.name+'" title="'+result.name+'">',
+                        '<img src="'+ctx+result.url+'" alt="'+result.name+'" title="'+result.name+'">',
                     '</div>'
                 );
                 that.$comment_avatar_wrap.append(html.join(''));
@@ -552,7 +552,7 @@
             avatar = ['<div class="comment-item__avatar">',
                 '<a href="#">',
                 '<div class="comment-avatar _35x35" title="'+row.userName+'" data-user-id="'+row.userId+'">',
-                '<img src="'+row.avatar+'" alt="'+row.userName+'" title="'+row.userName+'">',
+                '<img src="'+ctx+row.avatar+'" alt="'+row.userName+'" title="'+row.userName+'">',
                 '</div></a></div>'
             ].join('');
             html.push(avatar);
@@ -795,25 +795,25 @@
 
     CommentsData.LOCALES['zh-CN'] = CommentsData.LOCALES.zh = {
         formatLoadingMessage: function () {
-            return '努力加载中,请稍后';
+            return $.i18n.text('努力加载中,请稍后');
         },
         formatCancel: function () {
-            return '取消';
+            return $.i18n.text('取消');
         },
         formatRelease: function () {
-            return '发布';
+            return $.i18n.text('发布');
         },
         formatCommentTitle: function (totalRows) {
-           return sprintf('最新评论(%s)',  totalRows);
+           return $.i18n.text('最新评论{0}',  "("+totalRows+")");
         },
         formatCommentReply: function () {
-            return '回复';
+            return $.i18n.text('回复');
         },
         formatDelCommentReply: function () {
-            return '删除';
+            return $.i18n.text('删除');
         },
         formatCommentMore: function () {
-            return '更多评论';
+            return $.i18n.text('更多评论');
         }
     };
 
@@ -822,7 +822,7 @@
 
     CommentsData.DEFAULTS = {
         id: '',                    // 加载容器id
-        userId: _userId,           // 当前评论用户id
+        userId: userId,           // 当前评论用户id
         msgId: '',                 //消息ID
         locale: 'zh-CN',           //
         sortName: "createTime",    // 排序字段

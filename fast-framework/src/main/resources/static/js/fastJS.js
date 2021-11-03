@@ -190,7 +190,7 @@ if (typeof jQuery === "undefined") {
                 opt.toast({
                     heading: $.i18n.prop('警告'),
                     text: msg,
-                    hideAfter:4000,
+                    hideAfter:8000,
                     position: {
                         right: 7,
                         bottom: 32
@@ -418,6 +418,32 @@ if (typeof jQuery === "undefined") {
                 window.open('','_self');
                 window.close();
             }
+        },
+        //数字自增到某一值动画参数（目标元素,自定义配置）
+        animateNum: function (targetEle, options) {
+            /*可以自己改造下传入的参数，按照自己的需求和喜好封装该函数*/
+            //不传配置就把它绑定在相应html元素的data-xxxx属性上吧
+            options = options || {};
+            var $this = document.getElementById(targetEle),
+                time = options.time || $this.data('time') || 2500, //总时间--毫秒为单位
+                finalNum = options.num || $this.data('value'), //要显示的真实数值
+                regulator = options.regulator || 100, //调速器，改变regulator的数值可以调节数字改变的速度
+                step = finalNum / (time / regulator),/*每30ms增加的数值--*/
+                count = 0, //计数器
+                initial = 0;
+            var timer = setInterval(function() {
+                count = count + step;
+                if(count >= finalNum) {
+                    clearInterval(timer);
+                    count = finalNum;
+                }
+                //t未发生改变的话就直接返回
+                //避免调用text函数，提高DOM性能
+                var t = Math.floor(count);
+                if(t == initial) return;
+                initial = t;
+                $this.innerHTML = initial;
+            }, 30);
         },
 
         //页面遮罩
@@ -868,7 +894,7 @@ if (typeof jQuery === "undefined") {
                 var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
                 var maxPos = $chars.length;
                 var pwd = '';
-                for (i = 0; i < len; i++) {
+                for (var i = 0; i < len; i++) {
                     pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
                 }
                 return pwd;
@@ -1354,6 +1380,90 @@ if (typeof jQuery === "undefined") {
                 $.ajax(config);
             },
 
+            selectDate: function(value, startId,endId){
+                var date;
+                switch(value) {
+                    case "0":
+                        date = dateRangeUtil.getToDay();
+                        break;
+                    case "1":
+                        var oneDayTime = 24 * 60 * 60 * 1000;
+                        var dateNow = new Date();
+                        var lastDay = new Date(dateNow.getTime() - 1 * oneDayTime);
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(lastDay)));
+                        date.push(opt.common.formatDat(Date.parse(lastDay)));
+                        break;
+                    case "2":
+                        var date0 = dateRangeUtil.getCurrentWeek();
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(date0[0])));
+                        date.push(opt.common.formatDat(Date.parse(date0[1])));
+                        break;
+                    case "3":
+                        var date0 = dateRangeUtil.getPreviousWeek();
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(date0[0])));
+                        date.push(opt.common.formatDat(Date.parse(date0[1])));
+                        break;
+                    case "4":
+                        var date0 = dateRangeUtil.getPreviousMonth();
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(date0[0])));
+                        date.push(opt.common.formatDat(Date.parse(date0[1])));
+                        break;
+                    case "5":
+                        var oneDayTime = 24 * 60 * 60 * 1000;
+                        var dateNow = new Date();
+                        date = new Array();
+                        var lastDay = new Date(dateNow.getTime() - 30 * oneDayTime);
+                        date.push(opt.common.formatDat(Date.parse(lastDay)));
+                        date.push(opt.common.formatDat(Date.parse(dateNow)));
+                        break;
+                    case "6":
+                        var oneDayTime = 24 * 60 * 60 * 1000;
+                        var dateNow = new Date();
+                        date = new Array();
+                        var lastDay = new Date(dateNow.getTime() - 60 * oneDayTime);
+                        date.push(opt.common.formatDat(Date.parse(lastDay)));
+                        date.push(opt.common.formatDat(Date.parse(dateNow)));
+                        break;
+                    case "7":
+                        var oneDayTime = 24 * 60 * 60 * 1000;
+                        var dateNow = new Date();
+                        date = new Array();
+                        var lastDay = new Date(dateNow.getTime() - 90 * oneDayTime);
+                        date.push(opt.common.formatDat(Date.parse(lastDay)));
+                        date.push(opt.common.formatDat(Date.parse(dateNow)));
+                        break;
+                    case "8":
+                        var date0 = dateRangeUtil.getCurrentSeason();
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(date0[0])));
+                        date.push(opt.common.formatDat(Date.parse(date0[1])));
+                        break;
+                    case "9":
+                        var date0 = dateRangeUtil.getCurrentYear();
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(date0[0])));
+                        date.push(opt.common.formatDat(Date.parse(date0[1])));
+                        break;
+                    case "10":
+                        var date0 = dateRangeUtil.getPreviousYear();
+                        date = new Array();
+                        date.push(opt.common.formatDat(Date.parse(date0[0])));
+                        date.push(opt.common.formatDat(Date.parse(date0[1])));
+                        break;
+                    default:
+                        date = new Array();
+                        date.push("");
+                        date.push("");
+                        break;
+                }
+                $('#'+startId).val(date[0]);
+                $('#'+endId).val(date[1]);
+            },
+
             /**
              * 通过下载地址 静默下载 支持批量下载
              * @param files 为一个下载链接字符串为单个下载，若为下载数组链接字符串则批量循环下载
@@ -1382,7 +1492,7 @@ if (typeof jQuery === "undefined") {
                     }
                 }
                 if(opt.common.isArray(files)){
-                    files.forEach(url => {
+                    files.forEach(function(url){
                         if (!!window.ActiveXObject || "ActiveXObject" in window) {  // IE
                             window.open(url, '_blank')
                         } else {
@@ -1396,6 +1506,7 @@ if (typeof jQuery === "undefined") {
                     })
                 }
             },
+           //
             digit: function(e, t) {
                 var i = "";
                 e = String(e),
@@ -1404,7 +1515,11 @@ if (typeof jQuery === "undefined") {
                     i += "0";
                 return e < Math.pow(10, t) ? i + (0 | e) : e
             },
-            //日期格式转换
+            /**
+             * 日期格式转换
+             * @param data 日期
+             * @param t 转换的格式
+             */
             toDateString: function(data, t) {
                 var that = this
                     , n = new Date(data || new Date)
@@ -1420,7 +1535,7 @@ if (typeof jQuery === "undefined") {
                 if (!format) format = "yyyy-MM-dd";
                 switch(typeof date) {
                     case "string":
-                        date = new Date(date.replace(/-/, "/"));
+                        date = new Date(date.replace(/-/g, "/"));
                         break;
                     case "number":
                         date = new Date(date);
@@ -1448,6 +1563,10 @@ if (typeof jQuery === "undefined") {
             escape: function(html){
                 return String(html||'').replace(/&(?!#?[a-zA-Z0-9]+;)/g, '&amp;')
                     .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+            },
+            //反转义
+            escapeHtml: function(value){
+                return value.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
             },
             //url编码
             encodeUrl: function(a) {
@@ -1710,7 +1829,7 @@ if (typeof jQuery === "undefined") {
                     area: [($(window).outerWidth()-width) + 'px', '100%'],
                     success: function(layero, index){
                         if(opt.common.isNotEmpty(isEdit) && isEdit){
-                            var update = $('<div id="'+index+'" class="layui-right-update"><i class="fa fa-mail-reply-all"></i> 修改</div>').on('click',function(){
+                            var update = $('<div id="'+index+'" class="layui-right-update"><i class="fa fa-mail-reply-all"></i> '+$.i18n.text("修改")+'</div>').on('click',function(){
                                 opt.layer.close($(this).attr('id'));
                                 if( typeof  editFun == "function"){
                                     window.setTimeout(function(){
@@ -1722,7 +1841,7 @@ if (typeof jQuery === "undefined") {
                                 $(layero).find('.layui-layer-title').attr("style","font-size:13px;").before(update);
                             }
                         }else{
-                            var update = $('<div id="'+index+'" class="layui-right-update"><i class="fa fa fa-times-circle-o"></i> 关闭</div>').on('click',function(){
+                            var update = $('<div id="'+index+'" class="layui-right-update"><i class="fa fa fa-times-circle-o"></i> '+$.i18n.text("关闭")+'</div>').on('click',function(){
                                 opt.layer.close($(this).attr('id'));
                             });
                             if(!$(layero).find('.layui-right-update').html()){
@@ -1811,7 +1930,7 @@ if (typeof jQuery === "undefined") {
                     //不固定
                     maxmin: true,
                     //shade: 0.3,
-                    title: $.i18n.prop(title),
+                    title: title,
                     content: url,
                     btn: ['<i class="fa fa-check"></i> '+$.i18n.prop("确定"), '<i class="fa fa-close"></i> '+$.i18n.prop("取消")],
                     // 弹层外区域关闭
@@ -1860,21 +1979,28 @@ if (typeof jQuery === "undefined") {
                 var _height = opt.common.isEmpty(options.height) ? ($(window).height() - 50) : options.height;
                 var _framData = opt.common.isEmpty(options.fromData) ? {} : options.fromData;
                 var _type = opt.common.isEmpty(options.type) ? 2 : options.type;
-
+                var _auto = opt.common.isEmpty(options.auto) ? true : options.auto;
+                var _closeBtn = opt.common.isEmpty(options.closeBtn) ? 1: options.closeBtn;
+                var _maxmin = opt.common.isEmpty(options.maxmin) ? true: options.maxmin;
                 var full = false;
+
                 //如果是移动端，就使用自适应大小弹窗
                 if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
                     _width = 'auto';
                     _height = 'auto';
                     full = true;
                 }
-                var index;
-                //自动适配窗口大小 如果传的大小比所在窗口大 则最大化
-                if(_width !== 'auto' || _height !== 'auto'){
-                    if(_width > $(window).width() || _height > $(window).height() ){
-                        full = true;
+
+                if(_auto){
+                    //自动适配窗口大小 如果传的大小比所在窗口大 则最大化
+                    if(_width !== 'auto' || _height !== 'auto'){
+                        if(_width > $(window).width() || _height > $(window).height() ){
+                            full = true;
+                        }
                     }
                 }
+
+                var index;
                 if(options.clear){
                     if(_btn.length == 0){
                         _btn = ['<i class="fa fa-check"></i> '+$.i18n.prop("确定"), '<i class="fa fa-trash-o"></i> '+$.i18n.prop("清除"),'<i class="fa fa-close"></i> '+$.i18n.prop("取消")];
@@ -1913,9 +2039,10 @@ if (typeof jQuery === "undefined") {
 
                 index = _sf.open({
                     type: _type,
-                    maxmin: true,
+                    maxmin: _maxmin,
                     //shade: 0.3,
                     title: _title,
+                    closeBtn: _closeBtn,
                     fix: false,
                     area: [_width + 'px', _height + 'px'],
                     content: _url,
@@ -1955,6 +2082,12 @@ if (typeof jQuery === "undefined") {
                             options.cancel(index,layero);
                         }
                         return true;
+                    },
+                    end: function(){
+                        if (!opt.common.isEmpty(options.end)) {
+                            options.end(index,opt.layer);
+                        }
+                        return true;
                     }
                 });
 
@@ -1976,7 +2109,9 @@ if (typeof jQuery === "undefined") {
                 var _title = opt.common.isEmpty(options.title) ? $.i18n.prop("系统窗口") : $.i18n.prop(options.title);
                 var _width = opt.common.isEmpty(options.width) ? $(top.window).width() - 100 : options.width;
                 var _height = opt.common.isEmpty(options.height) ? $(top.window).height() - 100 : options.height;
+                var _closeBtn = opt.common.isEmpty(options.closeBtn) ? 1: options.closeBtn;
                 var _framData = opt.common.isEmpty(options.fromData) ? {} : options.fromData;
+                var _maxmin = opt.common.isEmpty(options.maxmin) ? true: options.maxmin;
                 var full = false;
                 //如果是移动端，就使用自适应大小弹窗
                 if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
@@ -2036,9 +2171,10 @@ if (typeof jQuery === "undefined") {
 
                     index =  opt.layer.open({
                         type: 2,
-                        maxmin: true,
+                        maxmin: _maxmin,
+                        closeBtn: _closeBtn,
                         shadeClose: opt.common.isEmpty(options.shadeClose) ? true : options.shadeClose,
-                        title: _title,
+                        title: options.title === false? false : _title,
                         area: [_width+'px',
                             _height + 'px'],
                         scrollbar: false,
@@ -2074,14 +2210,21 @@ if (typeof jQuery === "undefined") {
                             }
                             //opt.layer.close(index);
                             return true;
+                        },
+                        end: function(){
+                            if (!opt.common.isEmpty(options.end)) {
+                                options.end(index,opt.layer);
+                            }
+                            return true;
                         }
                     });
                 }else{
                     index =  opt.layer.open({
                         type: 2,
-                        maxmin: true,
+                        maxmin: _maxmin,
+                        closeBtn: _closeBtn,
                         shadeClose: opt.common.isEmpty(options.shadeClose) ? true : options.shadeClose,
-                        title: _title,
+                        title: options.title === false? false : _title,
                         area: [_width+'px',
                             _height + 'px'],
                         content:_url,
@@ -2100,6 +2243,12 @@ if (typeof jQuery === "undefined") {
                         cancel: function(index, layero){
                             if (!opt.common.isEmpty(options.cancel)) {
                                 options.cancel(index,layero);
+                            }
+                            return true;
+                        },
+                        end: function(){
+                            if (!opt.common.isEmpty(options.end)) {
+                                options.end(index,opt.layer);
                             }
                             return true;
                         }
@@ -2253,38 +2402,38 @@ if (typeof jQuery === "undefined") {
                     },
                     success: function(result) {
                         //判断如果时删除提交且表格有记住我 需要删除记住我里面删除的数据
-                        if (result.code == opt.variable.web_status.SUCCESS && opt.table.options.type == opt.variable.table_type.bootstrapTable) {
-                            if(!opt.common.isEmpty(del) && del){
-                                if (opt.common.isNotEmpty(opt.table.options.rememberSelected) && opt.table.options.rememberSelected) {
-                                    var s = opt.common.getJsonValue(data,"ids").split(',');
-                                    var column = opt.common.isEmpty(opt.table.options.uniqueId) ? opt.table.options.columns[1].field : opt.table.options.uniqueId;
-                                    var selectedRows = opt.table.rememberSelecteds[opt.table.options.id];
-                                    var p = [];
-                                    if(opt.common.isNotEmpty(selectedRows)) {
-                                        for (var j = 0; j < selectedRows.length; j++) {
-                                            for(var i=0; i< s.length; i++){
-                                                if(opt.common.getJsonValue(selectedRows[j],column) === s[i]){
-                                                    p[p.length] = selectedRows[j];
-                                                    selectedRows.splice(j, 1);
-                                                    j = j - 1;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    var selectedIds = opt.table.rememberSelectedIds[opt.table.options.id];
-                                    if(opt.common.isNotEmpty(selectedIds)) {
-                                        for (var j = 0; j < selectedIds.length; j++) {
-                                            for(var i=0; i< p.length; i++){
-                                                if(opt.common.getJsonValue(p[i],column) === selectedIds[j]){
-                                                    selectedIds.splice(j, 1);
-                                                    j = j - 1;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        // if (result.code == opt.variable.web_status.SUCCESS && opt.table.options.type == opt.variable.table_type.bootstrapTable) {
+                        //     if(!opt.common.isEmpty(del) && del){
+                        //         if (opt.common.isNotEmpty(opt.table.options.rememberSelected) && opt.table.options.rememberSelected) {
+                        //             var s = opt.common.getJsonValue(data,"ids").split(',');
+                        //             var column = opt.common.isEmpty(opt.table.options.uniqueId) ? opt.table.options.columns[1].field : opt.table.options.uniqueId;
+                        //             var selectedRows = opt.table.rememberSelecteds[opt.table.options.id];
+                        //             var p = [];
+                        //             if(opt.common.isNotEmpty(selectedRows)) {
+                        //                 for (var j = 0; j < selectedRows.length; j++) {
+                        //                     for(var i=0; i< s.length; i++){
+                        //                         if(opt.common.getJsonValue(selectedRows[j],column) === s[i]){
+                        //                             p[p.length] = selectedRows[j];
+                        //                             selectedRows.splice(j, 1);
+                        //                             j = j - 1;
+                        //                         }
+                        //                     }
+                        //                 }
+                        //             }
+                        //             var selectedIds = opt.table.rememberSelectedIds[opt.table.options.id];
+                        //             if(opt.common.isNotEmpty(selectedIds)) {
+                        //                 for (var j = 0; j < selectedIds.length; j++) {
+                        //                     for(var i=0; i< p.length; i++){
+                        //                         if(opt.common.getJsonValue(p[i],column) === selectedIds[j]){
+                        //                             selectedIds.splice(j, 1);
+                        //                             j = j - 1;
+                        //                         }
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
 
                         if (typeof callback == "function") {
                             callback(result);
@@ -2329,12 +2478,12 @@ if (typeof jQuery === "undefined") {
                     _height = 'auto';
                 }
                 var options = {
-                    title: opt.common.isEmpty(title)?opt.table.options.modalName + "详细":title,
+                    title: opt.common.isEmpty(title)? $.i18n.text("{0}详细",opt.table.options.modalName):title,
                     width: _width,
                     height: _height,
                     url: _url,
                     //skin: 'layui-layer-gray',
-                    btn: ['关闭'],
+                    btn: [$.i18n.text("关闭")],
                     yes: function (index,layero) {
                         opt.layer.close(index) || opt.selfLayer.close(index);
                     }
@@ -2378,7 +2527,7 @@ if (typeof jQuery === "undefined") {
                         return;
                     }
                 }
-                opt.modal.confirm("确定删除该条" + opt.table.options.modalName + "信息吗？", function() {
+                opt.modal.confirm($.i18n.text("确定删除该条{0}信息吗?",opt.table.options.modalName), function() {
                     if(opt.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
                         var row = $("#" + opt.table.options.id).bootstrapTreeTable('getSelections')[0];
                         var url;
@@ -2412,7 +2561,7 @@ if (typeof jQuery === "undefined") {
                 });
             },
             // 批量删除信息
-            delAll: function(tableId) {
+            delAll: function(tableId,tip) {
 				if(opt.common.isEmpty(tableId)){
                     opt.table.set();
                 }else{
@@ -2432,12 +2581,14 @@ if (typeof jQuery === "undefined") {
                         return;
                     }
                 }
-                var rows  = opt.common.isEmpty(opt.table.options.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns(opt.table.options.uniqueId);
+                var rows  = opt.common.isEmpty(opt.table.options.uniqueId) ? 
+                		$.table.selectFirstColumns() : $.table.selectColumns(opt.table.options.uniqueId);
                 if (opt.common.isEmpty(rows)) {
                     opt.modal.error("请至少选择一条记录");
                     return;
                 }
-                opt.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function() {
+                opt.modal.confirm($.i18n.text("确认要删除选中的{0}条数据吗?",rows.length) +
+                    (opt.common.isNotEmpty(tip)?tip:""), function() {
                     var url = opt.table.options.delUrl;
                     var data = { "ids": rows.join() };
                     opt.operate.submit(url, "POST", "json", data,"",true);
@@ -2454,23 +2605,23 @@ if (typeof jQuery === "undefined") {
             // 添加信息
             add: function(id) {
                 opt.table.set();
-                opt.modal.open("添加" + opt.table.options.modalName, opt.operate.addUrl(id));
+                opt.modal.open($.i18n.text("新增{0}",opt.table.options.modalName), opt.operate.addUrl(id));
             },
             //处理信息
             exeDis: function(id,title) {
                 opt.table.set();
-                opt.modal.open("处理[" + title+"]", opt.operate.exeUrl(id));
+                opt.modal.open($.i18n.text("处理[{0}]",title), opt.operate.exeUrl(id));
             },
             // 添加信息，以tab页展现
             addTab: function (id) {
                 opt.table.set();
-                opt.modal.openTab("添加" + opt.table.options.modalName, opt.operate.addUrl(id));
+                opt.modal.openTab($.i18n.text("新增{0}",opt.table.options.modalName), opt.operate.addUrl(id));
             },
             // 添加信息 全屏
             addFull: function(id) {
                 opt.table.set();
                 var url = opt.common.isEmpty(id) ? opt.table.options.addUrl : opt.table.options.addUrl.replace("{id}", id);
-                opt.modal.openFull("添加" + opt.table.options.modalName, url);
+                opt.modal.openFull($.i18n.text("新增{0}" , opt.table.options.modalName), url);
             },
             // 添加访问地址
             addUrl: function(id) {
@@ -2523,9 +2674,9 @@ if (typeof jQuery === "undefined") {
                         return;
                     }
                     var url = opt.table.options.editUrl.replace("{id}", row[opt.table.options.uniqueId]);
-                    opt.modal.open("修改" + opt.table.options.modalName, url);
+                    opt.modal.open($.i18n.text("修改{0}",opt.table.options.modalName), url);
                 } else {
-                    opt.modal.open("修改" + opt.table.options.modalName, opt.operate.editUrl(id));
+                    opt.modal.open($.i18n.text("修改{0}",opt.table.options.modalName), opt.operate.editUrl(id));
                 }
             },
             // 查看表详情
@@ -2546,7 +2697,7 @@ if (typeof jQuery === "undefined") {
                     edit = true;
                 }
                 var url = opt.table.options.viewUrl.replace("{id}", id);
-                opt.modal.popupRight(opt.table.options.modalName + "信息详情",url,
+                opt.modal.popupRight($.i18n.text("{0}信息详情",opt.table.options.modalName),url,
                     edit,fun,id);
             },
             // 修改信息，以tab页展现
@@ -2574,7 +2725,7 @@ if (typeof jQuery === "undefined") {
                      * event 方法名称
                      * data 当前数据
                      */
-                    if(!bootTableCallback(opt.table.options.id,'edit',rows)){
+                    if(!bootTableCallback(opt.table.options.id,'editTab',rows)){
                         return;
                     }
                 }
@@ -2585,9 +2736,9 @@ if (typeof jQuery === "undefined") {
                         return;
                     }
                     var url = opt.table.options.editUrl.replace("{id}", row[opt.table.options.uniqueId]);
-                    opt.modal.openTab(opt.common.isEmpty(prefix)?"修改":prefix + opt.table.options.modalName, opt.operate.editUrl(id));
+                    opt.modal.openTab((opt.common.isEmpty(prefix)?$.i18n.text("修改{0}",opt.table.options.modalName):(prefix+opt.table.options.modalName)) , opt.operate.editUrl(id));
                 } else {
-                    opt.modal.openTab(opt.common.isEmpty(prefix)?"修改":prefix + opt.table.options.modalName, opt.operate.editUrl(id));
+                    opt.modal.openTab((opt.common.isEmpty(prefix)?$.i18n.text("修改{0}",opt.table.options.modalName):(prefix+opt.table.options.modalName)), opt.operate.editUrl(id));
                 }
             },
             // 修改信息 全屏
@@ -2600,7 +2751,7 @@ if (typeof jQuery === "undefined") {
                     var row = opt.common.isEmpty(opt.table.options.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns(opt.table.options.uniqueId);
                     url = opt.table.options.editUrl.replace("{id}", row);
                 }
-                opt.modal.openFull("修改" + opt.table.options.modalName, url);
+                opt.modal.openFull($.i18n.text("修改{0}", opt.table.options.modalName), url);
             },
             // 修改访问地址
             editUrl: function(id) {
@@ -2700,6 +2851,11 @@ if (typeof jQuery === "undefined") {
             ajaxSuccess: function (result) {
                 if (result.code == opt.variable.web_status.SUCCESS && opt.table.options.type == opt.variable.table_type.bootstrapTable) {
                     opt.success($.i18n.prop("操作成功!"))
+                    //重置清空页面记住我数据
+                    if (opt.common.isNotEmpty(opt.table.options.rememberSelected) && opt.table.options.rememberSelected) {
+                        opt.table.rememberSelecteds = {};
+                        opt.table.rememberSelectedIds = {};
+                    }
                     $.table.refresh();
                 } else if (result.code == opt.variable.web_status.SUCCESS && opt.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
                     opt.success($.i18n.prop("操作成功!"))
@@ -2730,10 +2886,14 @@ if (typeof jQuery === "undefined") {
                 if (result.code == opt.variable.web_status.SUCCESS) {
                     var parent = window.parent;
                     if (parent.opt.table.options.type == opt.variable.table_type.bootstrapTable) {
+                        //重置清空页面记住我数据
+                        if (parent.opt.common.isNotEmpty(parent.opt.table.options.rememberSelected) && parent.opt.table.options.rememberSelected) {
+                            parent.opt.table.rememberSelecteds = {};
+                            parent.opt.table.rememberSelectedIds = {};
+                        }
                         parent.$.table.refresh();
                         parent.opt.success("操作成功", parent.opt.modal.closeAll());
                         // parent.opt.modal.closeAll();
-
                     } else if (parent.opt.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
                         parent.$.treeTable.refresh();
                         parent.opt.success("操作成功",parent.opt.modal.closeAll());
@@ -2762,18 +2922,19 @@ if (typeof jQuery === "undefined") {
                         if(opt.common.isNotEmpty(currentId)){
                             var $contentWindow = $('iframe[data-id="' + currentId + '"]', topWindow)[0].contentWindow;
                             $contentWindow.opt.success($.i18n.prop("操作成功!"));
-                            // if ($contentWindow.opt.table.options.type == opt.variable.table_type.bootstrapTable) {
-                            //     $contentWindow.$.table.refresh();
-                            // } else if ($contentWindow.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
-                            //     $contentWindow.$.treeTable.refresh();
-                            // }
+                            if ($contentWindow.opt.table.options.type == opt.variable.table_type.bootstrapTable) {
+                                //重置清空页面记住我数据
+                                if ($contentWindow.opt.common.isNotEmpty($contentWindow.opt.table.options.rememberSelected)
+                                    && $contentWindow.opt.table.options.rememberSelected) {
+                                    $contentWindow.opt.table.rememberSelecteds = {};
+                                    $contentWindow.opt.table.rememberSelectedIds = {};
+                                }
+                                $contentWindow.$.table.refresh();
+                            } else if ($contentWindow.opt.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
+                                $contentWindow.$.treeTable.refresh();
+                            }
                         }else{
                             parent.opt.success($.i18n.prop("操作成功!"));
-                            // if (parent.opt.table.options.type == opt.variable.table_type.bootstrapTable) {
-                            //     parent.$.table.refresh();
-                            // } else if (parent.opt.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
-                            //     parent.$.treeTable.refresh();
-                            // }
                         }
                         opt.modal.closeTab();
                     } else if (result.code == opt.variable.web_status.WARNING) {
@@ -2793,6 +2954,11 @@ if (typeof jQuery === "undefined") {
                         var $contentWindow = $('iframe[data-id="' + currentId + '"]', topWindow)[0].contentWindow;
                         $contentWindow.opt.modal.msg($.i18n.prop("操作成功!"));
                         if ($contentWindow.opt.table.options.type == opt.variable.table_type.bootstrapTable) {
+                            //重置清空页面记住我数据
+                            if ($contentWindow.opt.common.isNotEmpty($contentWindow.opt.table.options.rememberSelected) && $contentWindow.opt.table.options.rememberSelected) {
+                                $contentWindow.opt.table.rememberSelecteds = {};
+                                $contentWindow.opt.table.rememberSelectedIds = {};
+                            }
                             $contentWindow.$.table.refresh();
                         } else if ($contentWindow.opt.table.options.type == opt.variable.table_type.bootstrapTreeTable) {
                             $contentWindow.$.treeTable.refresh();
@@ -3100,7 +3266,7 @@ if (typeof jQuery === "undefined") {
                 //     $(this).valid();
                 // })
                 if(typeof($(this).attr("multiple"))=="undefined"){
-                    $(this).select2({allowClear: false, placeholder: "请点击选择"});
+                    $(this).select2({allowClear: false, placeholder: $.i18n.text("请点击选择")});
                 }else{
                     $(this).select2({allowClear: true, placeholder: ""});
                 }
@@ -3207,6 +3373,7 @@ if (typeof jQuery === "undefined") {
                         format: format,
                         btns: newBtnArr,
                         done: function (value, data) {
+                            time.val(value);
                             if (typeof window[callback] != 'undefined'
                                 && window[callback] instanceof Function) {
                                 window[callback](value, data);
@@ -3365,11 +3532,12 @@ if (typeof jQuery === "undefined") {
                     pageSize: 50,
                     pageList: [50, 100, 150],
                     toolbar: "toolbar",
+                    showToolbar: true,
                     striped: false,
-                    escape: false,
+                    escape: true,
                     outcheckbox:true, //是否开启检测toolbar有删除按钮 就默认使表格 checkbox:true 支持选中
                     firstLoad: true,
-                    showFooter: false,
+                    subtotalShowFooter: false,
                     undefinedText:'-',
                     emptyText:'-',
                     search: false,
@@ -3488,6 +3656,7 @@ if (typeof jQuery === "undefined") {
                 }
                 opt.table.options = options;
                 opt.table.config[options.id] = options;
+                console.log(options);
                 $.table.initEvent();
                 $('#' + options.id).bootstrapTable({
                     id: options.id,                                     // 对象ID
@@ -3512,13 +3681,17 @@ if (typeof jQuery === "undefined") {
                     firstLoad: options.firstLoad,                       // 是否首次请求加载数据，对于数据较大可以配置false
                     isFixedColumn: options.isFixedColumn,               // 是否固定列宽，当列比较多时，开启水平滚动，可设置为 true
                     escape: options.escape,                             // 转义HTML字符串
-                    showFooter: options.showFooter,                     // 是否统计显示表底部尾行 配合 footerFormatter 方法使用
-                    footerStyle: options.footerStyle,                   // 表底部尾行统计样式
+                    subtotalShowFooter: options.subtotalShowFooter,     // 是否统计显示表底部尾行 配合 footerFormatter 方法使用
+                    subtotalFooterStyle: options.subtotalFooterStyle,   // 表格小计样式
+                    totalShowFooter: options.totalShowFooter,           // 合计显示
+                    totalFooterStyle: options.totalFooterStyle,         // 合计函数
                     iconSize: 'outline',                                // 图标大小：undefined默认的按钮尺寸 xs超小按钮sm小按钮lg大按钮
-                    toolbar: '#' + options.toolbar + '-'+options.id,    // 指定工作栏
+                    toolbar: options.showToolbar ? ('#' +
+                        options.toolbar + '-'+options.id) : null,        // 指定工作栏
                     sidePagination: options.sidePagination,             // server启用服务端分页client客户端分页
                     search: options.search,                             // 是否显示搜索框功能
                     showBorder: options.showBorder,                     // 是否显示表格边框
+                    showToolbar: options.showToolbar,                   // 是否显示工具类
                     searchText: options.searchText,                     // 搜索框初始显示的内容，默认为空
                     showSearch: options.showSearch,                     // 是否显示检索信息
                     showPageGo: options.showPageGo,               		// 是否显示跳转页
@@ -3945,7 +4118,11 @@ if (typeof jQuery === "undefined") {
                     return actions.join('');
                 } else {
                     _text = _value;
-                    return _text;
+                    //return _text;
+                    var actions = [];
+                    actions.push(opt.common.sprintf('<input style="opacity: 0;position: absolute;z-index:-1" type="text" value="%s"/>', _value));
+                    actions.push(opt.common.sprintf('<a href="###" class="tooltip-show" data-toggle="tooltip" data-target="%s" title="%s">%s</a>', _target, _value, _text));
+                    return actions.join('');
                 }
             },
             // 下拉按钮切换
@@ -4070,9 +4247,9 @@ if (typeof jQuery === "undefined") {
                 opt.common.downLoadFile(baseURL + "excel/download?fileName=" +fileName);
             },
             // 导入数据
-            importExcel: function(formId) {
+            importExcel: function(tplId,title,url) {
                 opt.table.set();
-                var currentId = opt.common.isEmpty(formId) ? 'importTpl' : formId;
+                var currentId = opt.common.isEmpty(tplId) ? 'importTpl' : tplId;
                 opt.layer.open({
                     type: 1,
                     area: ['580px', '200px'],
@@ -4080,11 +4257,17 @@ if (typeof jQuery === "undefined") {
                     resize: false,
                     scrollbar: true,
                     //shade: 0.3,
-                    title: '<i class="fa fa-upload"></i> 导入' + opt.table.options.modalName + '数据',
+					title: '<i class="fa fa-upload"></i> 导入' +(opt.common.isEmpty(title) ? opt.table.options.modalName : (title + '数据')),
                     content: opt.template(currentId),
                     btn: ['<i class="fa fa-check"></i> 导入', '<i class="fa fa-remove"></i> 取消'],
                     // 弹层外区域关闭
                     shadeClose: true,
+                    success: function(layero, index){
+                        //解决同一个文件二次上传无效的问题
+                        layero.find('#file').off('click').on('click',function(e){
+                            e.target.value = '';
+                        })
+                    },
                     btn1: function(index, layero){
                         var file = layero.find('#file').val();
                         if (file == '' || (!opt.common.endWith(file, '.xls') && !opt.common.endWith(file, '.xlsx'))){
@@ -4094,7 +4277,7 @@ if (typeof jQuery === "undefined") {
                         parent.opt.modal.loading();
                         var formData = new FormData(layero.find('form')[0]);
                         var config = {
-                            url: opt.table.options.importUrl,
+                            url: opt.common.isEmpty(url)?opt.table.options.importUrl:url,
                             data: formData,
                             cache: false,
                             contentType: false,
@@ -4103,16 +4286,17 @@ if (typeof jQuery === "undefined") {
                             success: function (result) {
                                 if (result.code == opt.variable.web_status.SUCCESS) {
                                     parent.opt.modal.closeLoading();
-                                    opt.error(result.msg);
+                                    opt.success(result.msg);
                                     $.table.refresh();
+                                    opt.layer.close(index);
                                 } else if (result.code == opt.variable.web_status.WARNING) {
                                     opt.error(result.msg);
                                     parent.opt.modal.closeLoading();
-                                    opt.layer.close(index);
+                                    //opt.layer.close(index);
                                 } else {
                                     opt.error(result.msg);
                                     parent.opt.modal.closeLoading();
-                                    opt.layer.close(index);
+                                    //opt.layer.close(index);
                                 }
                             },
                             error: function(xhr, textStatus) {
@@ -4232,6 +4416,14 @@ if (typeof jQuery === "undefined") {
                     rows = $.table.affectedRowIds(rows);
                 }
                 return opt.common.uniqueFn(rows);
+            },
+            //清除勾选记住数据
+            clearRememberSelected:function(tableId){
+                opt.table.set(tableId);
+                if (opt.common.isNotEmpty(opt.table.options.rememberSelected) && opt.table.options.rememberSelected) {
+                    delete opt.table.rememberSelectedIds[opt.table.options.id];
+                    delete opt.table.rememberSelecteds[opt.table.options.id];
+                }
             },
             //获取选中行对象集合
             selectAllColumnRows: function(tableId){
@@ -4498,6 +4690,21 @@ if (typeof jQuery === "undefined") {
                     });
                 }
 
+                // select2复选框事件绑定
+                if ($.fn.select2 !== undefined) {
+                    $.fn.select2.defaults.set( "theme", "bootstrap" );
+                    $("select.form-control:not(.noselect2)").each(function () {
+                        //     .on("change", function () {
+                        //     $(this).valid();
+                        // })
+                        if(typeof($(this).attr("multiple"))=="undefined"){
+                            $(this).select2({allowClear: false, placeholder: "请点击选择"});
+                        }else{
+                            $(this).select2({allowClear: true, placeholder: ""});
+                        }
+                    })
+                }
+
                 if(typeof callback == "function"){
                     callback(row);
                 }
@@ -4586,7 +4793,7 @@ if (typeof jQuery === "undefined") {
                     expandAll: options.expandAll,                       // 是否全部展开
                     expandFirst: options.expandFirst,                   // 是否默认第一级展开--expandAll为false时生效
                     columns: options.columns,                           // 显示列信息（*）
-                    onClickRow: $.treeTable.onClickRow,                                   // 单击某行事件
+                    onClickRow: $.treeTable.onClickRow,                 // 单击某行事件
                     responseHandler: $.treeTable.responseHandler        // 当所有数据被加载时触发处理函数
                 });
             },
@@ -4997,6 +5204,7 @@ if (typeof jQuery === "undefined") {
         path: baseURL + 'i18n/',//这里表示访问路径
         name: 'i18n',//文件名开头
         language: _lang,//文件名语言 例如en_US
+        tag: _i18n_tag,
         cache: true,
         mode: 'map'//默认值
     });
@@ -5369,3 +5577,351 @@ if (typeof jQuery === "undefined") {
         return serializeObj;
     };
 })(window, jQuery);
+
+
+/**
+ * 日期范围工具类
+ */
+var dateRangeUtil = (function () {
+    /***
+     * 获得当前时间
+     */
+    this.getCurrentDate = function () {
+        return new Date();
+    };
+
+    //今天
+    this.getToDay = function(){
+        //起止日期数组
+        var startStop = new Array();
+        var date = opt.common.formatDat(Date.parse(new Date()));
+        startStop.push(date);
+        startStop.push(date);
+        return startStop;
+    };
+
+    /***
+     * 获得本周起止时间
+     */
+    this.getCurrentWeek = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //返回date是一周中的某一天
+        var week = currentDate.getDay();
+        //返回date是一个月中的某一天
+        var month = currentDate.getDate();
+
+        //一天的毫秒数
+        var millisecond = 1000 * 60 * 60 * 24;
+        //减去的天数
+        var minusDay = week != 0 ? week - 1 : 6;
+        //alert(minusDay);
+        //本周 周一
+        var monday = new Date(currentDate.getTime() - (minusDay * millisecond));
+        //本周 周日
+        var sunday = new Date(monday.getTime() + (6 * millisecond));
+        //添加本周时间
+        startStop.push(monday); //本周起始时间
+        //添加本周最后一天时间
+        startStop.push(sunday); //本周终止时间
+        //返回
+        return startStop;
+    };
+
+    /***
+     * 获得本月的起止时间
+     */
+    this.getCurrentMonth = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //获得当前月份0-11
+        var currentMonth = currentDate.getMonth();
+        //获得当前年份4位年
+        var currentYear = currentDate.getFullYear();
+        //求出本月第一天
+        var firstDay = new Date(currentYear, currentMonth, 1);
+
+
+        //当为12月的时候年份需要加1
+        //月份需要更新为0 也就是下一年的第一个月
+        if (currentMonth == 11) {
+            currentYear++;
+            currentMonth = 0; //就为
+        } else {
+            //否则只是月份增加,以便求的下一月的第一天
+            currentMonth++;
+        }
+
+
+        //一天的毫秒数
+        var millisecond = 1000 * 60 * 60 * 24;
+        //下月的第一天
+        var nextMonthDayOne = new Date(currentYear, currentMonth, 1);
+        //求出上月的最后一天
+        var lastDay = new Date(nextMonthDayOne.getTime() - millisecond);
+
+        //添加至数组中返回
+        startStop.push(firstDay);
+        startStop.push(lastDay);
+        //返回
+        return startStop;
+    };
+
+    /**
+     * 得到本季度开始的月份
+     * @param month 需要计算的月份
+     ***/
+    this.getQuarterSeasonStartMonth = function (month) {
+        var quarterMonthStart = 0;
+        var spring = 0; //春
+        var summer = 3; //夏
+        var fall = 6;   //秋
+        var winter = 9; //冬
+        //月份从0-11
+        if (month < 3) {
+            return spring;
+        }
+
+        if (month < 6) {
+            return summer;
+        }
+
+        if (month < 9) {
+            return fall;
+        }
+
+        return winter;
+    };
+
+    /**
+     * 获得该月的天数
+     * @param year年份
+     * @param month月份
+     * */
+    this.getMonthDays = function (year, month) {
+        //本月第一天 1-31
+        var relativeDate = new Date(year, month, 1);
+        //获得当前月份0-11
+        var relativeMonth = relativeDate.getMonth();
+        //获得当前年份4位年
+        var relativeYear = relativeDate.getFullYear();
+
+        //当为12月的时候年份需要加1
+        //月份需要更新为0 也就是下一年的第一个月
+        if (relativeMonth == 11) {
+            relativeYear++;
+            relativeMonth = 0;
+        } else {
+            //否则只是月份增加,以便求的下一月的第一天
+            relativeMonth++;
+        }
+        //一天的毫秒数
+        var millisecond = 1000 * 60 * 60 * 24;
+        //下月的第一天
+        var nextMonthDayOne = new Date(relativeYear, relativeMonth, 1);
+        //返回得到上月的最后一天,也就是本月总天数
+        return new Date(nextMonthDayOne.getTime() - millisecond).getDate();
+    };
+
+    /**
+     * 获得本季度的起止日期
+     */
+    this.getCurrentSeason = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //获得当前月份0-11
+        var currentMonth = currentDate.getMonth();
+        //获得当前年份4位年
+        var currentYear = currentDate.getFullYear();
+        //获得本季度开始月份
+        var quarterSeasonStartMonth = this.getQuarterSeasonStartMonth(currentMonth);
+        //获得本季度结束月份
+        var quarterSeasonEndMonth = quarterSeasonStartMonth + 2;
+
+        //获得本季度开始的日期
+        var quarterSeasonStartDate = new Date(currentYear, quarterSeasonStartMonth, 1);
+        //获得本季度结束的日期
+        var quarterSeasonEndDate = new Date(currentYear, quarterSeasonEndMonth, this.getMonthDays(currentYear, quarterSeasonEndMonth));
+        //加入数组返回
+        startStop.push(quarterSeasonStartDate);
+        startStop.push(quarterSeasonEndDate);
+        //返回
+        return startStop;
+    };
+
+    /***
+     * 得到本年的起止日期
+     *
+     */
+    this.getCurrentYear = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //获得当前年份4位年
+        var currentYear = currentDate.getFullYear();
+
+        //本年第一天
+        var currentYearFirstDate = new Date(currentYear, 0, 1);
+        //本年最后一天
+        var currentYearLastDate = new Date(currentYear, 11, 31);
+        //添加至数组
+        startStop.push(currentYearFirstDate);
+        startStop.push(currentYearLastDate);
+        //返回
+        return startStop;
+    };
+
+    /**
+     * 返回上一个月的第一天Date类型
+     * @param year 年
+     * @param month 月
+     **/
+    this.getPriorMonthFirstDay = function (year, month) {
+        //年份为0代表,是本年的第一月,所以不能减
+        if (month == 0) {
+            month = 11; //月份为上年的最后月份
+            year--; //年份减1
+            return new Date(year, month, 1);
+        }
+        //否则,只减去月份
+        month--;
+        return new Date(year, month, 1); ;
+    };
+
+    /**
+     * 获得上一月的起止日期
+     * ***/
+    this.getPreviousMonth = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //获得当前月份0-11
+        var currentMonth = currentDate.getMonth();
+        //获得当前年份4位年
+        var currentYear = currentDate.getFullYear();
+        //获得上一个月的第一天
+        var priorMonthFirstDay = this.getPriorMonthFirstDay(currentYear, currentMonth);
+        //获得上一月的最后一天
+        var priorMonthLastDay = new Date(priorMonthFirstDay.getFullYear(), priorMonthFirstDay.getMonth(), this.getMonthDays(priorMonthFirstDay.getFullYear(), priorMonthFirstDay.getMonth()));
+        //添加至数组
+        startStop.push(priorMonthFirstDay);
+        startStop.push(priorMonthLastDay);
+        //返回
+        return startStop;
+    };
+
+
+    /**
+     * 获得上一周的起止日期
+     * **/
+    this.getPreviousWeek = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //返回date是一周中的某一天
+        var week = currentDate.getDay();
+        //返回date是一个月中的某一天
+        var month = currentDate.getDate();
+        //一天的毫秒数
+        var millisecond = 1000 * 60 * 60 * 24;
+        //减去的天数
+        var minusDay = week != 0 ? week - 1 : 6;
+        //获得当前周的第一天
+        var currentWeekDayOne = new Date(currentDate.getTime() - (millisecond * minusDay));
+        //上周最后一天即本周开始的前一天
+        var priorWeekLastDay = new Date(currentWeekDayOne.getTime() - millisecond);
+        //上周的第一天
+        var priorWeekFirstDay = new Date(priorWeekLastDay.getTime() - (millisecond * 6));
+
+        //添加至数组
+        startStop.push(priorWeekFirstDay);
+        startStop.push(priorWeekLastDay);
+
+        return startStop;
+    };
+
+    /**
+     * 得到上季度的起始日期
+     * year 这个年应该是运算后得到的当前本季度的年份
+     * month 这个应该是运算后得到的当前季度的开始月份
+     * */
+    this.getPriorSeasonFirstDay = function (year, month) {
+        var quarterMonthStart = 0;
+        var spring = 0; //春
+        var summer = 3; //夏
+        var fall = 6;   //秋
+        var winter = 9; //冬
+        //月份从0-11
+        switch (month) {//季度的其实月份
+            case spring:
+                //如果是第一季度则应该到去年的冬季
+                year--;
+                month = winter;
+                break;
+            case summer:
+                month = spring;
+                break;
+            case fall:
+                month = summer;
+                break;
+            case winter:
+                month = fall;
+                break;
+
+        };
+
+        return new Date(year, month, 1);
+    };
+
+    /**
+     * 得到上季度的起止日期
+     * **/
+    this.getPreviousSeason = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //获得当前月份0-11
+        var currentMonth = currentDate.getMonth();
+        //获得当前年份4位年
+        var currentYear = currentDate.getFullYear();
+        //上季度的第一天
+        var priorSeasonFirstDay = this.getPriorSeasonFirstDay(currentYear, currentMonth);
+        //上季度的最后一天
+        var priorSeasonLastDay = new Date(priorSeasonFirstDay.getFullYear(), priorSeasonFirstDay.getMonth() + 2, this.getMonthDays(priorSeasonFirstDay.getFullYear(), priorSeasonFirstDay.getMonth() + 2));
+        //添加至数组
+        startStop.push(priorSeasonFirstDay);
+        startStop.push(priorSeasonLastDay);
+        return startStop;
+    };
+
+    /**
+     * 得到去年的起止日期
+     * **/
+    this.getPreviousYear = function () {
+        //起止日期数组
+        var startStop = new Array();
+        //获取当前时间
+        var currentDate = this.getCurrentDate();
+        //获得当前年份4位年
+        var currentYear = currentDate.getFullYear();
+        currentYear--;
+        var priorYearFirstDay = new Date(currentYear, 0, 1);
+        var priorYearLastDay = new Date(currentYear, 11, 1);
+        //添加至数组
+        startStop.push(priorYearFirstDay);
+        startStop.push(priorYearLastDay);
+        return startStop;
+    };
+
+    return this;
+})();

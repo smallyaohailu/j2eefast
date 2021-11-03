@@ -159,7 +159,8 @@
 }
 .wup_container .wup_file .filetable .template-upload .btncancel {
 	width:80px!important;
-	cursor:pointer
+	cursor:pointer;
+	text-align: right;
 }
 .wup_container .wup_file .filetable .template-download .size {
 	width:200px!important;

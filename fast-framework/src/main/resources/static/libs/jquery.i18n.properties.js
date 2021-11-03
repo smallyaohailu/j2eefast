@@ -14,7 +14,8 @@
 /******************************************************************************
  *  前端JS获取国际化配置文件在之前基础上优化BUG
  *  1.修复没有配置国际化参数返回"" 空,不报出异常
- *
+ *  2.优化缓存保存本地
+ *  3.新增text方法与后台方法名一致
  *  @author J2eeFAST
  *  @Date 2020-01-21
  *
@@ -105,7 +106,6 @@
         }
 
         settings.filesLoaded = 0;
-
         files.forEach(function (file) {
 
             var defaultFileName, shortFileName, longFileName, fileNames;
@@ -130,14 +130,43 @@
         if (settings.callback && !settings.async) {
             settings.callback();
         }
+        
+        this.settings = settings;
     }; // properties
+    
+    $.i18n.text = function(key /* Add parameters as function arguments as necessary  */){
+        var args = [].slice.call(arguments);
 
+        var phvList, namespace;
+        if (args.length == 2) {
+            if ($.isArray(args[1])) {
+                // An array was passed as the second parameter, so assume it is the list of place holder values.
+                phvList = args[1];
+            } else if (typeof args[1] === 'object') {
+                // Second argument is an options object {namespace: 'mynamespace', replacements: ['egg', 'nog']}
+                namespace = args[1].namespace;
+                var replacements = args[1].replacements;
+                args.splice(-1, 1);
+                if (replacements) {
+                    Array.prototype.push.apply(args, replacements);
+                }
+            }
+        }
+
+        var value = (namespace) ? $.i18n.map[namespace][key] : $.i18n.map[key];
+
+        if (value === null) {
+            return '[' + ((namespace) ? namespace + '#' + key : key) + ']';
+        }
+
+        return getProp(key,value,args,phvList,namespace,this.settings);
+    };
     /**
      * When configured with mode: 'map', allows access to bundle values by specifying its key.
      * Eg, jQuery.i18n.prop('com.company.bundles.menu_add')
      */
     $.i18n.prop = function (key /* Add parameters as function arguments as necessary  */) {
-
+    	if (this.settings.debug) debug('prop: ' +key);
         var args = [].slice.call(arguments);
 
         var phvList, namespace;
@@ -160,8 +189,11 @@
         if (value === null) {
             return '[' + ((namespace) ? namespace + '#' + key : key) + ']';
         }
-
-        // Place holder replacement
+        return getProp(key,value,args,phvList,namespace,this.settings);
+    };
+    
+    function getProp(key,value,args,phvList,namespace,settings){
+    	// Place holder replacement
         /**
         * Tested with:
         *   test.t1=asdf ''{0}''
@@ -183,6 +215,15 @@
         *   test.t6, p1, p2, p3 ==> a p2 b p1 c
         *   test.t7 ==> a quoted \ s	tringy 		 x
         */
+
+
+        if ((typeof(value) == "undefined" || value.length === 0) && args.length == 1) {
+            return key;
+        }
+        if ((typeof(value) == "undefined" || value.length === 0)){
+            value = key;
+        }
+
 
         var i;
         if (typeof(value) == 'string') {
@@ -277,10 +318,6 @@
             }
         }
 
-        if (typeof(value) == "undefined" || value.length === 0) {
-            return key;
-        }
-
         if (value.length == 1 && typeof(value[0]) == "string") {
             return value[0];
         }
@@ -300,7 +337,7 @@
         }
 
         return str;
-    };
+    }
 
     function callbackIfComplete(settings) {
 
@@ -341,8 +378,22 @@
             debug('loadAndParseFile(\'' + filename +'\')');
             debug('totalFiles: ' + settings.totalFiles);
             debug('filesLoaded: ' + settings.filesLoaded);
+            debug('language: ' + settings.language);
+            debug('tag: ' + settings.tag);
         }
 
+        //TODO: 设置缓存 、 后台变更则更新
+        var _langData = window.localStorage.getItem("i18nLang");
+        var _tag = window.localStorage.getItem("i18nTag");
+        if (settings.debug) debug('i18nTag = ' + _tag);
+        if (settings.debug) debug('(_tag == settings.tag) =' + (_tag == settings.tag))
+        if(_langData && _tag && (_tag == settings.tag)){
+        	if (settings.debug) debug('获取缓存数据');
+            parseData(_langData, settings);
+            nextFile();
+            return
+        }
+        if (settings.debug) debug('-------------------------------------------------');
   	    if (filename !== null && typeof filename !== 'undefined') {
             $.ajax({
                 url: filename,
@@ -350,12 +401,12 @@
                 cache: settings.cache,
                 dataType: 'text',
                 success: function (data, status) {
-
                     if (settings.debug) {
                         debug('Succeeded in downloading ' + filename + '.');
                         debug(data);
                     }
-
+                    window.localStorage.setItem("i18nLang", data);
+                    window.localStorage.setItem("i18nTag", settings.tag);
                     parseData(data, settings);
                     nextFile();
                 },

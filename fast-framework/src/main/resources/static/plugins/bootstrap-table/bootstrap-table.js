@@ -20,6 +20,7 @@
  * 9.修复表格行title提示列转义显示问题
  * 10.修复页面同时多个表格属性firstLoad=false 异常情况
  * 11.优化加载样式
+ * 12.新增columns[{field:'user.name',fieldSort:'u.name'}]  fieldSort属性 支持排序名称与返回字段名称不一致
  * --------------------------------------------------
  */
 (function ($) {
@@ -355,7 +356,8 @@
         searchAlign: 'right',
         selectItemName: 'btSelectItem',
         showHeader: true,
-        showFooter: false,
+        subtotalShowFooter: false, // 小计
+        totalShowFooter: false, //合计
         showColumns: false,
         showSearch: false,
         showPageGo: false,
@@ -411,7 +413,11 @@
             return {};
         },
 
-        footerStyle: function (row, index) {
+        subtotalFooterStyle: function (row, index) {
+            return {};
+        },
+
+        totalFooterStyle: function (row, index){
             return {};
         },
 
@@ -553,13 +559,14 @@
         valign: undefined, // top, middle, bottom
         width: undefined,
         sortable: false,
-        footColspan: undefined, //底部统计列合并数量
+        subtotalFootColspan: undefined, //底部统计列合并数量
         order: 'asc', // asc, desc
         visible: true,
         switchable: true,
         clickToSelect: true,
         formatter: undefined,
-        footerFormatter: undefined,
+        subtotalFooterFormatter: undefined, //小计函数
+        totalFooterFormatter: undefined, //合计函数
         events: undefined,
         sorter: undefined,
         sortName: undefined,
@@ -631,33 +638,34 @@
     };
 
     BootstrapTable.prototype.initContainer = function () {
+        //TODO 调整加载等待动画位置适配 冻结列
         this.$container = $([
             '<div class="bootstrap-table">',
-                '<div class="fixed-table-toolbar"></div>',
-                this.options.paginationVAlign === 'top' || this.options.paginationVAlign === 'both' ?
-                    '<div class="fixed-table-pagination" style="clear: both;"></div>' :
-                    '',
-                '<div class="fixed-table-container">',
-                    '<div class="fixed-table-header"><table></table></div>',
-                    '<div class="fixed-table-body">',
-                        '<div class="fixed-table-loading">',
-                            '<span class="loading-wrap">',
-                                '<span class="loading-text" style="font-size: 13px;">',
-                                    this.options.formatLoadingMessage(),
-                                '</span>',
-                                '<span class="animation-wrap">',
-                                    '<span class="animation-dot"></span>',
-                                '</span>',
-                            '</span>',
-                        '</div>',
-                    '</div>',
-                    '<div class="fixed-table-footer">',
-                        '<table><tr></tr></table>',
-                    '</div>',
-                    this.options.paginationVAlign === 'bottom' || this.options.paginationVAlign === 'both' ?
-                        '<div class="fixed-table-pagination"></div>' :
-                        '',
-                '</div>',
+            '<div class="fixed-table-toolbar"></div>',
+            this.options.paginationVAlign === 'top' || this.options.paginationVAlign === 'both' ?
+                '<div class="fixed-table-pagination" style="clear: both;"></div>' :
+                '',
+            '<div class="fixed-table-container">',
+            '<div class="fixed-table-header"><table></table></div>',
+            '<div class="fixed-table-loading">',
+            '<span class="loading-wrap">',
+            '<span class="loading-text" style="font-size: 13px;">',
+            this.options.formatLoadingMessage(),
+            '</span>',
+            '<span class="animation-wrap">',
+            '<span class="animation-dot"></span>',
+            '</span>',
+            '</span>',
+            '</div>',
+            '<div class="fixed-table-body">',
+            '</div>',
+            '<div class="fixed-table-footer">',
+            '<table><tr></tr></table>',
+            '</div>',
+            this.options.paginationVAlign === 'bottom' || this.options.paginationVAlign === 'both' ?
+                '<div class="fixed-table-pagination"></div>' :
+                '',
+            '</div>',
             '</div>'
         ].join(''));
         this.$container.insertAfter(this.$el);
@@ -795,7 +803,8 @@
             sorters: [],
             sortNames: [],
             cellStyles: [],
-            searchables: []
+            searchables: [],
+            sorts:[]
         };
 
         //
@@ -816,6 +825,7 @@
                     class_ = sprintf(' class="%s"', column['class']),
                     order = that.options.sortOrder || column.order,
                     unitWidth = 'px',
+                    sort = '',
                     width = column.width;
 
                 //如果表格列项宽度为字符串- 则转换成百分比占比宽度
@@ -833,6 +843,7 @@
                 if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
                     pywh += column.width;
                 }
+                sort = (column.fieldSort != undefined && column.fieldSort) ? column.fieldSort : '';
                 halign = sprintf('text-align: %s; ', column.halign ? column.halign : column.align);
                 align = sprintf('text-align: %s; ', column.align);
                 //设置头部行颜色
@@ -853,6 +864,7 @@
                     that.header.sortNames[column.fieldIndex] = column.sortName;
                     that.header.cellStyles[column.fieldIndex] = column.cellStyle;
                     that.header.searchables[column.fieldIndex] = column.searchable;
+                    that.header.sorts[column.fieldIndex] = sort;
 
                     if (!column.visible) {
                         return;
@@ -875,6 +887,7 @@
                     sprintf(' rowspan="%s"', column.rowspan),
                     sprintf(' colspan="%s"', column.colspan),
                     sprintf(' data-field="%s"', column.field),
+                    sort.length > 0 ? sprintf(' data-sort="%s"', sort): '',
                     "tabindex='0'",
                     '>');
 
@@ -904,11 +917,14 @@
             html.push('</tr>');
         });
 
+        this._$pywh = pywh;
         //TODO J2eeFAST 2021年07月08日15:47:27 表格列过多,根据表头列宽固定表格宽度
         //fix: 设置了固定宽度但是宽度没有达到窗体最大值就不设置
         if(pywh!=0 && this.options.isFixedColumn){
             if(pywh > this.$tableContainer.outerWidth()){
                 this.$el.width(pywh + 'px');
+                //设置显示滚动条overflow:scroll
+                this.$tableBody.css('overflow-x','scroll');
             }
             this.$el.css('max-width', 'inherit');
         }
@@ -977,7 +993,7 @@
     };
 
     BootstrapTable.prototype.initFooter = function () {
-        if (!this.options.showFooter || this.options.cardView) {
+        if (!this.options.totalShowFooter || this.options.cardView) {
             this.$tableFooter.hide();
         } else {
             this.$tableFooter.show();
@@ -1093,7 +1109,13 @@
         if (this.options.sortName === $this.data('field')) {
             this.options.sortOrder = this.options.sortOrder === 'asc' ? 'desc' : 'asc';
         } else {
-            this.options.sortName = $this.data('field');
+            // this.options.sortName = $this.data('field');
+            // this.options.sortOrder = $this.data('order') === 'asc' ? 'desc' : 'asc';
+            if(typeof $this.data('sort') != "undefined" ){
+                this.options.sortName = $this.data('sort');
+            }else{
+                this.options.sortName = $this.data('field');
+            }
             this.options.sortOrder = $this.data('order') === 'asc' ? 'desc' : 'asc';
         }
         this.trigger('sort', this.options.sortName, this.options.sortOrder);
@@ -1127,6 +1149,11 @@
             $('body').append($(this.options.toolbar));
         }
         this.$toolbar.html('');
+
+        //TODO this.options.showToolbar false 不显示
+        if(!this.options.showToolbar){
+            return;
+        }
 
         if (typeof this.options.toolbar === 'string' || typeof this.options.toolbar === 'object') {
             $(sprintf('<div class="bs-bars pull-%s"></div>', this.options.toolbarAlign))
@@ -1727,9 +1754,13 @@
 
             style = calculateObjectValue(this.options, this.options.rowStyle, [item, i], style);
 
-            if (style && style.css) {
-                for (key in style.css) {
-                    csses.push(key + ': ' + style.css[key]);
+            if(typeof style == "undefined"){
+                style = {};
+            }else{
+                if (style && style.css) {
+                    for (key in style.css) {
+                        csses.push(key + ': ' + style.css[key]);
+                    }
                 }
             }
 
@@ -1751,9 +1782,10 @@
                     data_ += sprintf(' data-%s="%s"', k, v);
                 });
             }
-
+            var trCss = csses.length > 0 ? sprintf(' style="%s"', csses.join('; ')) : '';
             html.push('<tr',
                 sprintf(' %s', htmlAttributes.join(' ')),
+                sprintf('%s', trCss),
                 sprintf(' id="%s"', $.isArray(item) ? undefined : item._id),
                 sprintf(' class="%s"', style.classes || ($.isArray(item) ? undefined : item._class)),
                 sprintf(' data-index="%s"', i),
@@ -1796,7 +1828,9 @@
                     return;
                 }
 
-                style = sprintf('style="%s"', csses.concat(that.header.styles[j]).join('; '));
+                // style = sprintf('style="%s"', csses.concat(that.header.styles[j]).join('; '));
+                var _tt = [];
+                style = sprintf('style="%s"',  _tt.concat(that.header.styles[j]).join('; '));
 
                 // handle td's id and class
                 if (item['_' + field + '_id']) {
@@ -1817,10 +1851,10 @@
 
                 cellStyle = calculateObjectValue(that.header,
                     that.header.cellStyles[j], [value, item, i, field], cellStyle);
-                if (cellStyle.classes) {
+                if (typeof cellStyle !="undefined" && cellStyle.classes) {
                     class_ = sprintf(' class="%s"', cellStyle.classes);
                 }
-                if (cellStyle.css) {
+                if (typeof cellStyle !="undefined" && cellStyle.css) {
                     var csses_ = [];
                     for (var key in cellStyle.css) {
                         csses_.push(key + ': ' + cellStyle.css[key]);
@@ -1945,20 +1979,20 @@
             //     $("#"+that.options.id+"-left-fixed-body-columns").find('tbody').find('tr[data-index="'+$tr.data('index')+'"]')
             //         .children(".bs-checkbox").find("input[name=btSelectItem]").trigger("click");
             // }else{
-                if ($td.find('.detail-icon').length) {
-                    return;
-                }
+            if ($td.find('.detail-icon').length) {
+                return;
+            }
 
-                that.trigger(e.type === 'click' ? 'click-cell' : 'dbl-click-cell', field, value, item, $td);
-                that.trigger(e.type === 'click' ? 'click-row' : 'dbl-click-row', item, $tr, field);
+            that.trigger(e.type === 'click' ? 'click-cell' : 'dbl-click-cell', field, value, item, $td);
+            that.trigger(e.type === 'click' ? 'click-row' : 'dbl-click-row', item, $tr, field);
 
-                // if click to select - then trigger the checkbox/radio click
-                if (e.type === 'click' && that.options.clickToSelect && column.clickToSelect) {
-                    var $selectItem = $tr.find(sprintf('[name="%s"]', that.options.selectItemName));
-                    if ($selectItem.length) {
-                        $selectItem[0].click(); // #144: .trigger('click') bug
-                    }
+            // if click to select - then trigger the checkbox/radio click
+            if (e.type === 'click' && that.options.clickToSelect && column.clickToSelect) {
+                var $selectItem = $tr.find(sprintf('[name="%s"]', that.options.selectItemName));
+                if ($selectItem.length) {
+                    $selectItem[0].click(); // #144: .trigger('click') bug
                 }
+            }
             // }
         });
 
@@ -2001,7 +2035,7 @@
                 });
             }
 
-            if(that.options.rightFixedColumns){
+            if(that.options.rightFixedColumns && that.$rightfixedBody){
                 var index = $(this).data('index');
                 if (that.options.singleSelect) {
                     that.$rightfixedBody.find('tr').each(function () {
@@ -2018,6 +2052,7 @@
             }
 
             if(that.options.fixedColumns){
+                var index = $(this).data('index');
                 $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
                 that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
             }
@@ -2035,7 +2070,7 @@
             that.trigger(checked ? 'check' : 'uncheck', row, $this);
 
 
-             // 允许其他监听
+            // 允许其他监听
             //event.stopImmediatePropagation();
             //
             // var $this = $(this),
@@ -2172,12 +2207,12 @@
         //TODO 监听窗体变化重置表格大小
         this.$tableBodyResizeWidth = this.$tableBody.width();
         this.$tableBody.off('resize').on('resize',function(){
-
             if($(this).width() == 0 || that.$tableBodyResizeWidth == $(this).width()){
                 return;
             }
 
             that.$tableBodyResizeWidth = $(this).width();
+
             //重置视图
             setTimeout(that.resetView(), 100);
         });
@@ -2208,10 +2243,11 @@
                 //首次
                 var h = $("head"), borderStyle = [];
                 borderStyle.push('<style type=\'text/css\'>');
-                borderStyle.push('.fixed-table-container {border-left: 1px solid #e7eaec!important;border-top: 1px solid #e7eaec!important;}');
-                borderStyle.push('.table-striped .table, .table-striped .table, .table>thead>tr>th,');
+                borderStyle.push('.fixed-table-container {border: 1px solid #e7eaec!important;}');
+                borderStyle.push('.table>thead>tr>th,');
                 borderStyle.push('.table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td,');
                 borderStyle.push('.table>tbody>tr>td, .table>tfoot>tr>td {border-right: 1px solid #e7eaec!important;}');
+                borderStyle.push(' .fixed-table-footer .table>tbody>tr>td, .fixed-table-footer.table>tfoot>tr>td {border-right: 0px !important;}');
                 borderStyle.push('.table-striped table thead {background-color: #f5f5f6 !important;}');
                 borderStyle.push('</style>');
                 h.append(borderStyle.join(''));
@@ -2225,10 +2261,11 @@
             _isFirstLoad.push(this.options.id + "_sb");
             var h = $("head"), borderStyle = [];
             borderStyle.push('<style type=\'text/css\'>');
-            borderStyle.push('.fixed-table-container {border-left: 1px solid #e7eaec!important;border-top: 1px solid #e7eaec!important;}');
-            borderStyle.push('.table-striped .table, .table-striped .table, .table>thead>tr>th,');
+            borderStyle.push('.fixed-table-container {border: 1px solid #e7eaec!important;}');
+            borderStyle.push('.table>thead>tr>th,');
             borderStyle.push('.table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td,');
             borderStyle.push(' .table>tbody>tr>td, .table>tfoot>tr>td {border-right: 1px solid #e7eaec!important;}');
+            borderStyle.push(' .fixed-table-footer .table>tbody>tr>td, .fixed-table-footer.table>tfoot>tr>td {border-right: 0px !important;;}');
             borderStyle.push(' .table-striped table thead {background-color: #f5f5f6 !important;}');
             borderStyle.push('</style>');
             h.append(borderStyle.join(''));
@@ -2316,15 +2353,15 @@
                 that.$tableLoading.hide();
             },
             error: function (xhr, textStatus) {
-            	try{
-            		opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
+                try{
+                    opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
                     that.trigger('load-error', JSON.parse(xhr.responseText).msg || xhr.responseText, xhr);
                     that.$tableLoading.hide();
-            	}catch(e){
-            		that.trigger('load-error', '交易异常');
+                }catch(e){
+                    that.trigger('load-error', '交易异常');
                     that.$tableLoading.hide();
-            	}
-                
+                }
+
             }
         });
         if($('meta[name="csrf-token"]').attr("content")){
@@ -2356,7 +2393,9 @@
         var that = this;
 
         $.each(this.$header.find('th'), function (i, th) {
-            $(th).find('.sortable').removeClass('desc asc').addClass($(th).data('field') === that.options.sortName ? that.options.sortOrder : 'both');
+            //fix: 排序字段与查询显示字段不一致问题
+            var field = typeof $(th).data('sort') != "undefined" ? $(th).data('sort') : $(th).data('field');
+            $(th).find('.sortable').removeClass('desc asc').addClass(field === that.options.sortName ? that.options.sortOrder : 'both');
         });
     };
 
@@ -2424,9 +2463,11 @@
         }
         fixedBody = this.$tableBody.get(0);
 
+        //TODO 固定高度表头适配问题
         scrollWidth = fixedBody.scrollWidth > fixedBody.clientWidth &&
         fixedBody.scrollHeight > fixedBody.clientHeight + this.$header.outerHeight() ?
             getScrollBarWidth() : 0;
+        //scrollWidth = getScrollBarWidth();
 
         this.$el.css('margin-top', -this.$header.outerHeight());
 
@@ -2445,12 +2486,17 @@
         }
 
         this.$header_ = this.$header.clone(true, true);
-        this.$selectAll_ = this.$header_.find('[name="btSelectAll"]');
 
-        this.$tableHeader.css({
-            'margin-right': scrollWidth
-        }).find('table')
-            .css('width', this.$el.width())
+        this.$selectAll_ = this.$header_.find('[name="btSelectAll"]');
+        if(scrollWidth > 0){
+            this.$tableHeader.css({'overflow-y':'scroll'});
+        }
+        this.$tableHeader
+            //     .css({
+            //     'margin-right': scrollWidth
+            // })
+            .find('table')
+            .css('width', this.$el.outerWidth())
             .html('').attr('class', this.$el.attr('class'))
             .append(this.$header_);
 
@@ -2487,17 +2533,34 @@
 
             $th.find('.fht-cell').width($this.innerWidth());
         });
+
+
+        //TODO: fix 初始化定位问题
+        that.$tableHeader.scrollLeft(this.$tableBody.scrollLeft());
+
         // horizontal scroll event
         // TODO: it's probably better improving the layout than binding to scroll event
-        this.$tableBody.off('scroll').on('scroll', function () {
+        // TDDO: 不移除防止插件设置失效问题
+        this.$tableBody.on('scroll', function () {
+
             that.$tableHeader.scrollLeft($(this).scrollLeft());
-            //that
-            if (that.options.showFooter && !that.options.cardView) {
-                that.$tableFooter.scrollLeft($(this).scrollLeft());
+            //新增滚动样式
+            if(that.options.fixedColumns && that.$fixedBody){
+                if($(this).scrollLeft() == 0){
+                    that.$fixedBody.removeClass('shadow');
+                }else{
+                    that.$fixedBody.addClass('shadow');
+                }
             }
+            //暂时不滑动
+            // if (that.options.totalShowFooter && !that.options.cardView) {
+            //     that.$tableFooter.scrollLeft($(this).scrollLeft());
+            // }
+
         });
 
         that.trigger('post-header');
+
     };
 
     BootstrapTable.prototype.resetFooter = function () {
@@ -2508,7 +2571,8 @@
         if(data && data.length == 0){
             return;
         }
-        if (!this.options.showFooter || this.options.cardView) { //do nothing
+
+        if (this.options.cardView || (!this.options.subtotalShowFooter && !this.options.totalShowFooter)) { //do nothing
             return;
         }
 
@@ -2518,89 +2582,169 @@
         if(this.$body.find('tr:last').data('index') == '-99999'){
             return;
         }
-        //console.log(this.columns);
-        $.each(this.columns, function (i, column) {
 
-            var key,
-                falign = '', // footer align style
-                valign = '',
-                pywh = 0,
-                csses = [],
-                style = {},
-                class_ = sprintf(' class="%s"', column['class']),
-                unitWidth = 'px',
-                width = column.width;
+        if(this.options.subtotalShowFooter){
+            $.each(this.columns, function (i, column) {
 
-            //如果表格列项宽度为字符串- 则转换成百分比占比宽度
-            if (column.width !== undefined && (!that.options.cardView)) {
-                if (typeof column.width === 'string') {
-                    if (column.width.indexOf('%') !== -1) {
-                        unitWidth = '%';
+                var key,
+                    falign = '', // footer align style
+                    valign = '',
+                    pywh = 0,
+                    csses = [],
+                    style = {},
+                    class_ = sprintf(' class="%s"', column['class']),
+                    unitWidth = 'px',
+                    width = column.width;
+
+                //如果表格列项宽度为字符串- 则转换成百分比占比宽度
+                if (column.width !== undefined && (!that.options.cardView)) {
+                    if (typeof column.width === 'string') {
+                        if (column.width.indexOf('%') !== -1) {
+                            unitWidth = '%';
+                        }
                     }
                 }
-            }
-            if (column.width && typeof column.width === 'string') {
-                width = column.width.replace('%', '').replace('px', '');
-            }
-            //--------------------------------------------
-            //--------------------------------------------
-            if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
-                pywh += column.width;
-            }
-            var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
-                '36px' : (width ? width + unitWidth : undefined));
-
-            if (!column.visible) {
-                colspan++;
-                return;
-            }
-
-            if (that.options.cardView && (!column.cardVisible)) {
-                return;
-            }
-
-            falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
-            valign = sprintf('vertical-align: %s; ', column.valign);
-            style = calculateObjectValue(column, that.options.footerStyle, [column],'');
-            if (style && style.css) {
-                for (key in style.css) {
-                    csses.push(key + ': ' + style.css[key]);
+                if (column.width && typeof column.width === 'string') {
+                    width = column.width.replace('%', '').replace('px', '');
                 }
-            }
-            var flag = false;
+                //--------------------------------------------
+                //--------------------------------------------
+                if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
+                    pywh += column.width;
+                }
+                var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
+                    '36px' : (width ? width + unitWidth : undefined));
 
-            if(column.footColspan){
-                colspan = colspan + column.footColspan;
-                flag = true;
-            }
-            //console.log("i:"+i + " colspan:"+colspan);
-            if(flag){
-                html.push('<td', class_,sprintf(' title="%s"',column.title) ,sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')),sprintf('colspan="%s"',column.footColspan), '>');
-                // html.push('<div>');
-                html.push(calculateObjectValue(column, column.footerFormatter, [data], '') || '');//&nbsp;
-                // html.push('</div>');
-                //html.push('<div class="fht-cell"></div>');
-                html.push('</div>');
-                html.push('</td>');
-            }else{
-                if(i >= colspan){
-                    html.push('<td', class_,sprintf(' title="%s"',column.title), sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')), '>');
-                    // html.push('<div>');
-                    html.push(calculateObjectValue(column, column.footerFormatter, [data], '') || '');//&nbsp;
-                    // html.push('</div>');
-                    //html.push('<div class="fht-cell"></div>');
+                if (!column.visible) {
+                    colspan++;
+                    return;
+                }
+
+                if (that.options.cardView && (!column.cardVisible)) {
+                    return;
+                }
+
+                falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
+                valign = sprintf('vertical-align: %s; ', column.valign);
+                style = calculateObjectValue(column, that.options.subtotalFooterStyle, [column],'');
+                if (style && style.css) {
+                    for (key in style.css) {
+                        csses.push(key + ': ' + style.css[key]);
+                    }
+                }
+                var flag = false;
+
+                if(column.subtotalFootColspan){
+                    colspan = colspan + column.subtotalFootColspan;
+                    flag = true;
+                }
+                if(flag){
+                    html.push('<td', class_,sprintf(' title="%s"',column.title) ,sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')),sprintf('colspan="%s"',column.subtotalFootColspan), '>');
+                    html.push(calculateObjectValue(column, column.subtotalFooterFormatter, [data], '') || '');//&nbsp;
                     html.push('</div>');
                     html.push('</td>');
-                    colspan++
+                }else{
+                    if(i >= colspan){
+                        html.push('<td', class_,sprintf(' title="%s"',column.title), sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')), '>');
+                        html.push(calculateObjectValue(column, column.subtotalFooterFormatter, [data], '') || '');//&nbsp;
+                        html.push('</div>');
+                        html.push('</td>');
+                        colspan++
+                    }
                 }
-            }
-        });
-        this.$body.find('tr:last').after($('<tr data-index="-99999" style="background-color: #eaeaea;"></tr>').append(html.join('')));
-        // this.$tableFooter.find('tr').html(html.join(''));
-        // this.$tableFooter.show();
-        // clearTimeout(this.timeoutFooter_);
-        // this.timeoutFooter_ = setTimeout($.proxy(this.fitFooter, this),
-        //     this.$el.is(':hidden') ? 100 : 0);
+            });
+
+            this.$body.find('tr:last').after($('<tr data-index="-99999" class="_subtotal"></tr>').append(html.join('')));
+            this.$body.find('tr:last').after($('<tr data-index="-99999"></tr>').append('<td colspan="'+colspan+'" style="padding: 4px"></td>'));
+        }
+
+
+
+        if(this.options.totalShowFooter){
+            html = [];
+            colspan = 0;
+            $.each(this.columns, function (i, column) {
+                var key,
+                    falign = '', // footer align style
+                    valign = '',
+                    pywh = 0,
+                    csses = [],
+                    style = {},
+                    class_ = sprintf(' class="%s"', column['class']),
+                    unitWidth = 'px',
+                    width = column.width;
+                //如果表格列项宽度为字符串- 则转换成百分比占比宽度
+                if (column.width !== undefined && (!that.options.cardView)) {
+                    if (typeof column.width === 'string') {
+                        if (column.width.indexOf('%') !== -1) {
+                            unitWidth = '%';
+                        }
+                    }
+                }
+                if (column.width && typeof column.width === 'string') {
+                    width = column.width.replace('%', '').replace('px', '');
+                }
+                //--------------------------------------------
+                //--------------------------------------------
+                if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
+                    pywh += column.width;
+                }
+                var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
+                    '36px' : (width ? width + unitWidth : undefined));
+
+                if (!column.visible) {
+                    colspan++;
+                    return;
+                }
+
+                if (that.options.cardView && (!column.cardVisible)) {
+                    return;
+                }
+
+                falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
+                valign = sprintf('vertical-align: %s; ', column.valign);
+                style = calculateObjectValue(column, that.options.totalFooterStyle, [column],'');
+                if (style && style.css) {
+                    for (key in style.css) {
+                        csses.push(key + ': ' + style.css[key]);
+                    }
+                }
+                var flag = false;
+
+                if(column.totalFootColspan){
+                    colspan = colspan + column.totalFootColspan;
+                    flag = true;
+
+                }
+                if(flag){
+                    var _width = 0;
+                    that.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (k) {
+                        if( i<= k && k < colspan){
+                            var $this = $(this);
+                            _width += $this.innerWidth();
+                        }
+                    });
+                    _width = "width:" + _width + "px;"
+                    html.push('<td', class_,sprintf(' title="%s"',column.title) ,sprintf(' style="%s"', falign + valign + _width + csses.concat().join('; ')),sprintf('colspan="%s"',column.totalFootColspan), '>');
+                    html.push(calculateObjectValue(column, column.totalFooterFormatter, [data], '') || '');//&nbsp;
+                    html.push('</td>');
+                }else{
+                    if(i >= colspan){
+                        html.push('<td', class_, sprintf(' style="%s"', falign + valign  + csses.concat().join('; ')), '>');
+                        html.push(calculateObjectValue(column, column.totalFooterFormatter, [data], '') || '');//&nbsp;
+                        html.push('</td>');
+                        colspan++
+                    }
+                }
+
+            });
+
+            this.$tableFooter.find('tr').html(html.join(''));
+            this.$tableFooter.show();
+            clearTimeout(this.timeoutFooter_);
+            this.timeoutFooter_ = setTimeout($.proxy(this.fitFooter, this),
+                this.$el.is(':hidden') ? 100 : 0);
+        }
     };
 
     BootstrapTable.prototype.fitFooter = function () {
@@ -2617,17 +2761,20 @@
 
         elWidth = this.$el.css('width');
         scrollWidth = elWidth > this.$tableBody.width() ? getScrollBarWidth() : 0;
+
         this.$tableFooter.css({
             'margin-right': scrollWidth
-        }).find('table')
-            // .css('width', elWidth)
-            .attr('class', this.$el.attr('class'));
+        }).find('table').css({'width':elWidth,'max-width':'inherit','height':'35px','table-layout':'fixed'})
+            .attr('class', 'table');
 
-        // $footerTd = this.$tableFooter.find('td');
-        // this.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (i) {
-        //     var $this = $(this);
-        //     $footerTd.eq(i).find('.fht-cell').width($this.innerWidth());
-        // });
+        $footerTd = this.$tableFooter.find('td');
+
+        this.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (i) {
+            var $this = $(this);
+            $footerTd.eq(i).find('.fht-cell').width($this.innerWidth());
+        });
+
+        //this.horizontalScroll();
     };
 
     BootstrapTable.prototype.toggleColumn = function (index, checked, needUpdate) {
@@ -2724,10 +2871,11 @@
             this.trigger('post-header');
         }
 
-        if (this.options.showFooter) {
+        if (this.options.subtotalShowFooter
+            || this.options.totalShowFooter) {
             this.resetFooter();
             if (this.options.height) {
-                padding += this.$tableFooter.outerHeight() + 1;
+                padding += 35 + 1;
             }
         }
 
@@ -3134,7 +3282,7 @@
         if (this.options.showHeader && this.options.height) {
             this.fitHeader();
         }
-        if (this.options.showFooter) {
+        if (this.options.subtotalShowFooter) {
             this.fitFooter();
         }
     };

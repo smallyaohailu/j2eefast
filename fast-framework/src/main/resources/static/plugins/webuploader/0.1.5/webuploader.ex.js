@@ -29,13 +29,13 @@ if (typeof jQuery === "undefined") {
             var temp = options.tipTitle;
             //设置表头
             var html = '<thead id="'+upId+'_thead" style="display: none">' +
-                (temp !="" ?('<tr><th colspan="5">'+temp+'</th></tr>'):'') +
+                (temp !="" ?('<tr style="background-color: white"><th colspan="5">'+temp+'</th></tr>'):'') +
                 '<tr style="border-top: 1px solid rgb(221, 221, 221);">' +
-                '<th style="width: 300px;max-width: 400px; text-align: left;">文件名称</th>' +
-                '<th style="width: 100px;text-align: center">文件大小</th>' +
-                '<th style="text-align: center">上传进度</th>' +
-                '<th style="text-align: center">信息</th>' +
-                '<th style="text-align: center; width: 200px;">操作</th>' +
+                '<th style="width: 300px;max-width: 400px; text-align: left;">'+$i18n('文件名称')+'</th>' +
+                '<th style="width: 100px;text-align: center">'+$i18n('文件大小')+'</th>' +
+                '<th style="text-align: center">'+$i18n('上传进度')+'</th>' +
+                '<th style="text-align: center">'+$i18n('信息')+'</th>' +
+                '<th style="text-align: center; width: 300px;">'+$i18n('操作')+'</th>' +
                 '</tr>' +
                 '</thead>';
             $fileLists.before(html);
@@ -701,8 +701,8 @@ if (typeof jQuery === "undefined") {
                 if ("confirm" === stauts && stats.uploadFailNum){
                     html = stats.uploadFailNum + $i18n(imageFlag ? "张图片": "个文件") + $i18n("上传失败") + ', <a class="retry" href="#">' + $i18n("重新上传") + "</a>" + $i18n("或") + '<a class="ignore" href="#">' + $i18n("忽略") + "</a>";
                 } else{
-                    "confirm" === stauts || "ready" === stauts ? html = $i18n("总共") + upNum + $i18n(imageFlag ? "张图片": "个文件") +
-                        (0 >= fileSize ? "": "（" + WebUploader.formatSize(fileSize) + "）") : (html = $i18n("已上传") + upNum + $i18n(imageFlag ? "张图片": "个文件") +
+                    "confirm" === stauts || "ready" === stauts ? html =   imageFlag ? $.i18n.prop("总共{0}张图片",upNum): $.i18n.prop("总共{0}个文件",upNum) +
+                        (0 >= fileSize ? "": "（" + WebUploader.formatSize(fileSize) + "）") : (html = imageFlag ? $.i18n.prop("已上传{0}张图片",upNum): $.i18n.prop("已上传{0}个文件",upNum)+
                         (0 >= fileSize ? "": "（" + WebUploader.formatSize(fileSize) + "）"), stats.uploadFailNum && (html += ", " + $i18n("失败"+stats.uploadFailNum + "个")));
                 }
                 $info.html(html);

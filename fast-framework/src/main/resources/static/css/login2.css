@@ -229,7 +229,7 @@ body {
 .ui.form .fields>.field {
     clear: none;
     float: left;
-    padding-right: 6em;
+    padding-right: 2.2em;
 }
 .ui.custom.form .ui.labeled.input>input {
     padding-right: 1em !important;

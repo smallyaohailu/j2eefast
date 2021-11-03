@@ -38,13 +38,13 @@
     });
 
     //初始化i18n插件
-    $.i18n.properties({
-        path: baseURL + 'i18n/',//这里表示访问路径
-        name: 'i18n',//文件名开头
-        language: _lang,//文件名语言 例如en_US
-        cache: true,
-        mode: 'map'//默认值
-    });
+    // $.i18n.properties({
+    //     path: baseURL + 'i18n/',//这里表示访问路径
+    //     name: 'i18n',//文件名开头
+    //     language: _lang,//文件名语言 例如en_US
+    //     cache: true,
+    //     mode: 'map'//默认值
+    // });
 
     var Default = {
         base: 'static/js/',

@@ -235,7 +235,7 @@
 
             var $tbody = target.find("tbody");
             // 添加加载loading
-            var $loading = '<tr><td colspan="' + options.columns.length + '"><div style="display: block;text-align: center;">正在努力地加载数据中，请稍候……</div></td></tr>'
+            var $loading = '<tr><td colspan="' + options.columns.length + '"><div style="display: block;text-align: center;">'+formatLoadingMessage()+'</div></td></tr>'
             $tbody.html($loading);
             if (options.url) {
                 var config = {
@@ -385,7 +385,8 @@
                 pageTo = target.totalRows;
             }
             html.push('<div class="pull-left pagination-detail">');
-            html.push('<span class="pagination-info">第  '+pageFrom+' 条,到 '+pageTo+' 条，共  '+target.totalRows+' 条记录。</span>');
+            // html.push('<span class="pagination-info">第  '+pageFrom+' 条,到 '+pageTo+' 条，共  '+target.totalRows+' 条记录。</span>');
+            html.push('<span class="pagination-info">'+formatShowingRows(pageFrom,pageTo,target.totalRows)+'</span>');
             var pageList = false;
             $.each(options.pageList, function (i, page) {
                 if(target.totalRows > page){
@@ -393,26 +394,30 @@
                 }
             })
             if(pageList){
-                html.push('<span class="page-list">');
-                html.push('<span class="btn-group dropup">');
-                html.push('<button type="button" class="btn btn-default btn-outline dropdown-toggle" data-toggle="dropdown">');
-                html.push('<span class="page-size">'+target.pageSize+'</span>');
-                html.push('<span class="caret"></span>');
-                html.push('</button>');
-                html.push('<ul class="dropdown-menu" role="menu">');
+                var _page_list = [];
+
+                _page_list.push('<span class="page-list">');
+                _page_list.push('<span class="btn-group dropup">');
+                _page_list.push('<button type="button" class="btn btn-default btn-outline dropdown-toggle" data-toggle="dropdown">');
+                _page_list.push('<span class="page-size">'+target.pageSize+'</span>');
+                _page_list.push('<span class="caret"></span>');
+                _page_list.push('</button>');
+                _page_list.push('<ul class="dropdown-menu" role="menu">');
                 $.each(options.pageList, function (i, page) {
                     if(page == target.pageSize){
-                        html.push('<li class="active"><a href="javascript:void(0)">'+page+'</a></li>');
+                        _page_list.push('<li class="active"><a href="javascript:void(0)">'+page+'</a></li>');
                     }
                     else if(page >= target.totalRows && i === 1){
-                        html.push('<li><a href="javascript:void(0)">'+page+'</a></li>');
+                        _page_list.push('<li><a href="javascript:void(0)">'+page+'</a></li>');
                     }
                     else if(page <= target.totalRows){
-                        html.push('<li><a href="javascript:void(0)">'+page+'</a></li>');
+                        _page_list.push('<li><a href="javascript:void(0)">'+page+'</a></li>');
                     }
                 })
-                html.push('</ul>');
-                html.push('</span> 条记录每页</span>');
+                _page_list.push('</ul>');
+                _page_list.push('</span>');
+                html.push(formatRecordsPerPage(_page_list.join('')))
+                html.push('</span>');
             }
             html.push('</div>');
 
@@ -976,7 +981,7 @@
                                         data: parms,
                                         dataType: "JSON",
                                         beforeSend: function () {
-                                            var _errorMsg = '<tr id="'+row_id+'_load"><td colspan="' + options.columns.length + '"><div style="display: block;text-align: center;">'+$.i18n.prop("数据正在加载...")+'</div></td></tr>'
+                                            var _errorMsg = '<tr id="'+row_id+'_load"><td colspan="' + options.columns.length + '"><div style="display: block;text-align: center;">'+formatLoadingMessage()+'</div></td></tr>'
                                             $("#" + row_id).after(_errorMsg);
                                         },
                                         success: function(data, textStatus, jqXHR) {
@@ -1230,6 +1235,18 @@
                     'MgMCAyLjIyNyAxLjMyMyAyLjIyNyAyLjkyOHYuMDIyYzAgMS42MDUgMS4wMDUgMi45MDEgMi4yMzcgMi45MDFoMTQuNzU' +
                     'yYzEuMjMyIDAgMi4yMzctMS4zMDggMi4yMzctMi45MTN2LS4wMDd6IiBmaWxsPSIjRkFGQUZBIi8+CiAgICA8L2c+CiAgP' +
                     'C9nPgo8L3N2Zz4K" alt=""></div><p class="table-empty__desc">'+$.i18n.prop('暂无数据')+'</p></div>';
+        };
+
+        var formatLoadingMessage = function () {
+            return  $.i18n.prop('数据正在努力加载中,请稍后');
+        };
+
+        var  formatRecordsPerPage =  function (pageNumber) {
+            return $.i18n.prop('{0} 条记录每页',pageNumber);
+        };
+
+        var formatShowingRows = function (pageFrom, pageTo, totalRows) {
+            return $.i18n.prop('第 {0} 到 {1} 条，共 {2} 条记录。',pageFrom,pageTo,totalRows);
         };
         // 初始化
         init();

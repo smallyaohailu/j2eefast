@@ -7,7 +7,7 @@
  */
 (function ($) {
     'use strict';
-
+    var cachedWidth0 = null;
     /**
      * 获取冻结项数据
      * @param options 表格对象 options
@@ -147,6 +147,29 @@
         return $html;
     };
 
+    var getScrollBarWidth = function () {
+        if (cachedWidth0 === null) {
+            var inner = $('<p/>').addClass('fixed-table-scroll-inner'),
+                outer = $('<div/>').addClass('fixed-table-scroll-outer'),
+                w1, w2;
+
+            outer.append(inner);
+            $('body').append(outer);
+
+            w1 = inner[0].offsetWidth;
+            outer.css('overflow', 'scroll');
+            w2 = inner[0].offsetWidth;
+
+            if (w1 === w2) {
+                w2 = outer[0].clientWidth;
+            }
+
+            outer.remove();
+            cachedWidth0 = w1 - w2;
+        }
+        return cachedWidth0;
+    };
+
     $.extend($.fn.bootstrapTable.defaults, {
         fixedColumns: false,
         fixedNumber: 1,
@@ -176,22 +199,41 @@
             }
             return;
         }
+
+        //如果宽度不够则不显示
+        if(this.$el.outerWidth() <= this.$tableContainer.innerWidth() ){
+            if(this.options.fixedColumns){
+                if($("#"+this.options.id + "-left-fixed-table-columns")){
+                    $("#"+this.options.id + "-left-fixed-table-columns").hide();
+                }
+            }
+            if(this.options.rightFixedColumns){
+                if($("#"+this.options.id + "-right-fixed-table-columns")){
+                    $("#"+this.options.id + "-right-fixed-table-columns").hide();
+                }
+            }
+            return;
+        }
+
+        var that = this;
+
+        //左侧
         if (this.options.fixedColumns) {
             var $leftFixedHeader = this.$tableContainer.find('.left-fixed-table-columns');
             if(!$leftFixedHeader.length){
                 this.$fixedBody = $([
                     '<div id="'+this.options.id+'-left-fixed-table-columns" class="left-fixed-table-columns">',
-                        '<div class="fixed-table-header">',
-                            '<table>',
-                                '<thead></thead>',
-                            '</table>',
-                        '</div>',
-                        '<div class="fixed-table-body">',
-                            '<table>',
-                                // '<thead></thead>',
-                                '<tbody style="background-color: #fff"></tbody>',
-                            '</table>',
-                        '</div>',
+                    '<div class="fixed-table-header">',
+                    '<table>',
+                    '<thead></thead>',
+                    '</table>',
+                    '</div>',
+                    '<div class="fixed-table-body">',
+                    '<table>',
+                    // '<thead></thead>',
+                    '<tbody style="background-color: #fff"></tbody>',
+                    '</table>',
+                    '</div>',
                     '</div>'].join(''));
 
                 this.$fixedBody.find('table').attr('class', this.$el.attr('class'));
@@ -201,7 +243,26 @@
             }else{
                 $("#"+this.options.id + "-left-fixed-table-columns").show();
             }
+
+            var $ltr = getFixedColimns(that.options,that,that.options.fixedNumber,true);
+            that.$fixedHeaderColumns.html('').append($ltr);
+            that.$selectAll = $ltr.find('[name="btSelectAll"]');
+            that.$selectAll.on('click', function () {
+                var checked = $(this).prop('checked');
+                that.$fixedBodyColumns.find("input[name=btSelectItem]").filter(':enabled').prop('checked', checked);
+                that.$fixedBodyColumns.find("input[name=btSelectItem]").closest('tr')[checked ? 'addClass' : 'removeClass']('selected');
+                if (that.options.rightFixedColumns) {
+                    that.$rightfixedBody.find('tr').each(function () {
+                        if($(this).data('index') != '-99999'){
+                            checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                        }
+                    })
+                }
+            });
+
         }
+
+        //右侧
         if (this.options.rightFixedColumns) {
             var $rightFixedHeader = this.$tableContainer.find('.right-fixed-table-columns');
             if(!$rightFixedHeader.length){
@@ -229,9 +290,15 @@
             }else{
                 $("#"+this.options.id + "-right-fixed-table-columns").show();
             }
+
+            that.$rightfixedHeaderColumns.html('').
+            append(getFixedColimns(that.options,that,that.options.rightFixedNumber,false));
         }
     };
 
+    /**
+     * 初始化表头信息
+     */
     BootstrapTable.prototype.initHeader = function () {
 
         _initHeader.apply(this, Array.prototype.slice.apply(arguments));
@@ -246,36 +313,11 @@
             return;
         }
 
-        var that = this;
-
-        //右边列冻结
-        if (that.options.rightFixedColumns) {
-            that.$rightfixedHeaderColumns.html('').
-            append(getFixedColimns(that.options,that,that.options.rightFixedNumber,false));
-        }
-
-
-        //左边列冻结
-        if (that.options.fixedColumns) {
-            var $ltr = getFixedColimns(that.options,that,that.options.fixedNumber,true);
-            that.$fixedHeaderColumns.html('').append($ltr);
-            that.$selectAll = $ltr.find('[name="btSelectAll"]');
-            that.$selectAll.on('click', function () {
-                var checked = $(this).prop('checked');
-                that.$fixedBodyColumns.find("input[name=btSelectItem]").filter(':enabled').prop('checked', checked);
-                that.$fixedBodyColumns.find("input[name=btSelectItem]").closest('tr')[checked ? 'addClass' : 'removeClass']('selected');
-                if (that.options.rightFixedColumns) {
-                    that.$rightfixedBody.find('tr').each(function () {
-                        if($(this).data('index') != '-99999'){
-                            checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
-                        }
-                    })
-                }
-            });
-        }
-
     };
 
+    /**
+     * 初始化Body 内容
+     */
     BootstrapTable.prototype.initBody = function () {
 
         _initBody.apply(this, Array.prototype.slice.apply(arguments));
@@ -285,6 +327,21 @@
         }
 
         if(this.options.cardView){
+            return;
+        }
+
+
+        if(this.$el.outerWidth() <= this.$tableContainer.innerWidth() ){
+            if(this.options.fixedColumns){
+                if($("#"+this.options.id + "-left-fixed-table-columns")){
+                    $("#"+this.options.id + "-left-fixed-table-columns").hide();
+                }
+            }
+            if(this.options.rightFixedColumns){
+                if($("#"+this.options.id + "-right-fixed-table-columns")){
+                    $("#"+this.options.id + "-right-fixed-table-columns").hide();
+                }
+            }
             return;
         }
 
@@ -330,13 +387,11 @@
                 //     $tds = $tr.clone(true).find('td'), //列
                 //     $thisTds =  $thisTr.find('td');
                 // $tr.html('');
-
+                var height = $(this).innerHeight();
                 var $that = $(this).find('td');
                 var $tr = $(this).clone(true),
                     $tds = $tr.clone(true).find('td');
                 $tr.html('');
-
-
                 // 判断body 行中的列是否有合并如果有合并就减少冻结数量
                 var ll = 0, nn = 0;
                 for (var i = 0; i < that.options.rightFixedNumber; i++) {
@@ -355,7 +410,8 @@
                     var indexTd = $that.length - nn + i;
                     var fixTd = $tds.eq(indexTd).clone(true);
                     $tr.append(fixTd);
-                    $that.eq(indexTd).css("visibility" ,"hidden");
+                    $that.eq(indexTd).css("visibility" ,"hidden")
+                        .empty().append('<div style="height:'+(height-16 -1)+'px; width:'+fixTd.outerWidth()+'px"></div>');
                 }
                 that.$rightfixedBodyColumns.append($tr);
             });
@@ -376,6 +432,11 @@
             return;
         }
 
+        //如果宽度不够
+        if(this.$el.outerWidth() <= this.$tableContainer.innerWidth() ){
+            return;
+        }
+
         clearTimeout(this.timeoutHeaderColumns_);
         this.timeoutHeaderColumns_ = setTimeout($.proxy(this.fitHeaderColumns, this), this.$el.is(':hidden') ? 1000 : 100);
 
@@ -384,6 +445,7 @@
     };
 
     BootstrapTable.prototype.fitHeaderColumns = function () {
+
         var that = this,
             headerWidth = 0;
         if (that.options.fixedColumns) {
@@ -413,10 +475,12 @@
             if(totalLength == 1){
                 this.$rightfixedBody.hide();
             }else{
+                var index = 0
                 this.$body.find('tr:eq(0)').find('td').each(function (i) {
                     for(var k=0; k<that.options.rightFixedNumber; k++){
                         if(i == (totalLength -k -1)){
                             headerWidth += parseInt($(this).outerWidth(),10);
+                            index ++;
                         }
                     }
                 });
@@ -431,22 +495,21 @@
                 this.$header.find('tr:eq(0)').find('th').each(function(i){
                     for(var k=0; k<that.options.rightFixedNumber; k++){
                         if(i == (totalLength -k -1)){
-                            var width = $(this).innerWidth();
+                            var width = $(this).outerWidth();
                             var field  = $(this).data('field');
 
                             var $th = that.$rightfixedHeaderColumns.find('th[data-field="'+field+'"]');
                             if( i == (totalLength -1)){
-                                $th.find('.fht-cell').width(width + 5);
+                                $th.find('.fht-cell').width(width + (k == (that.options.rightFixedNumber -1 ))?(getScrollBarWidth() / index):0);
                             }else{
-                                $th.find('.fht-cell').width(width);
+                                $th.find('.fht-cell').width(width + (k == (that.options.rightFixedNumber -1 ))?(getScrollBarWidth() / index):0);
                             }
                         }
                     }
                 });
 
-                this.$rightfixedBody.width(headerWidth + 5).show();
+                this.$rightfixedBody.width(headerWidth + 10).show();
             }
-
         }
     };
 
@@ -455,25 +518,31 @@
             height = this.$tableBody.height(),
             width = 0;
 
-
         //添加行事件
         this.$body.find('> tr[data-index]').off('hover').hover(
-        function () {
-            var index = $(this).data('index');
-            if(index != '-99999'){
-                if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
-                if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
-            }
-        },
-        function () {
-            var index = $(this).data('index');
-            if(index != '-99999') {
-                if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
-                if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
-            }
-        });
+            function () {
+                var index = $(this).data('index');
+                if(index != '-99999'){
+                    if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                    if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass('hover');
+                }
+            },
+            function () {
+                var index = $(this).data('index');
+                if(index != '-99999') {
+                    if (that.options.fixedColumns) that.$fixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                    if (that.options.rightFixedColumns) that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass('hover');
+                }
+            });
 
         if (that.options.fixedColumns) {
+
+            if(that._$pywh!=0 && that.options.isFixedColumn){
+                if(that._$pywh > that.$tableContainer.outerWidth()){
+                    //设置显示滚动条overflow:scroll
+                    this.$fixedBody.find('.fixed-table-body').css('overflow-x','scroll');
+                }
+            }
 
             var visibleFields = that.getVisibleFields();
 
@@ -513,8 +582,14 @@
                 }
             });
 
+
+
+            this.$header.find('> tr').each(function (i) {
+                that.$fixedHeaderColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
+            });
+
             this.$body.find('> tr').each(function (i) {
-                that.$fixedBody.find('tr:eq(' + i + ')').height($(this).outerHeight());
+                that.$fixedBodyColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
             });
 
             this.$fixedBody.find('tr[data-index]').off('hover').hover(function () {
@@ -550,18 +625,37 @@
 
         }
 
-
-
         if (that.options.rightFixedColumns) {
+
+
+            if(that._$pywh!=0 && that.options.isFixedColumn){
+                if(that._$pywh > that.$tableContainer.outerWidth()){
+                    //设置显示滚动条overflow:scroll
+                    this.$rightfixedBody.find('.fixed-table-body').css('overflow-x','scroll');
+                }
+            }
+            if(this.$rightfixedBody.find('.fixed-table-body').outerHeight() < this.$rightfixedBodyColumns.outerHeight()){
+                this.$rightfixedBody.find('.fixed-table-header').css({
+                    'overflow-y': 'scroll'
+                });
+            }else{
+                this.$rightfixedBody.find('.fixed-table-header').css('overflow-y','');
+            }
 
             if (!this.$body.find('> tr[data-index]').length) {
                 this.$rightfixedBody.hide();
                 return;
             }
 
-            this.$body.find('> tr').each(function (i) {
-                that.$rightfixedBody.find('tbody tr:eq(' + i + ')').height($(this).height());
+            this.$header.find('> tr').each(function (i) {
+                that.$rightfixedHeaderColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
             });
+
+            this.$body.find('> tr').each(function (i) {
+                that.$rightfixedBodyColumns.find('tr:eq(' + i + ')').height($(this).height());
+            });
+
+
 
             this.$rightfixedBody.find('tr[data-index]').off('hover').hover(function () {
                 var index = $(this).data('index');
@@ -652,14 +746,12 @@
                 if (that.options.rightFixedColumns) that.$rightfixedBody.find('.fixed-table-body').scrollTop($(this).scrollTop());
                 if (that.options.fixedColumns) that.$fixedBody.find('.fixed-table-body').scrollTop($(this).scrollTop());
             });
-
             if (that.options.rightFixedColumns){
                 this.$rightfixedBody.find('.fixed-table-body').off('scroll').on('scroll', function () {
                     that.$tableBody.scrollTop($(this).scrollTop());
                 })
             }
         }
-
     };
 
 

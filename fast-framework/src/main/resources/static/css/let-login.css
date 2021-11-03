@@ -75,6 +75,10 @@ body.hold-transition{
     margin-bottom: 20px;
 }
 
+.login-page .form-group .col-xs-6{
+    padding-right: 0px;
+}
+
 .login-page .has-feedback .form-control {
     height: 34px;
     padding: 4px 10px;
@@ -291,7 +295,7 @@ body.hold-transition{
     font-weight: 500;
     font-size: 22px;
     text-align: center;
-    letter-spacing: 4px;
+    /* letter-spacing: 4px; */
     min-width: 100px;
 }
 .form-tenant{
@@ -609,4 +613,39 @@ body.hold-transition{
 .callout.callout-warning {
     background-color: #f39c12 !important;
     border-color: #c87f0a;
+}
+.input-group .form-control:first-child{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-group-btn:last-child>.btn{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-group .input-group .input-group-btn input {
+    background: transparent;
+    /*border: 1px solid #fe7300;*/
+    border: 1px solid #e4eaec;
+    color: #fe7300 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    outline: medium !important;
+    max-width: 140px;
+    overflow: hidden; /*自动隐藏文字*/
+	text-overflow: ellipsis;/*文字隐藏后添加省略号*/
+	white-space: nowrap;
+}
+
+.form-group .input-group .input-group-btn input:hover {
+    background: rgba(252, 252, 252, 0.9);
+}
+
+.form-group .input-group input[type="text"] {
+    background: #fff8f8;
+    border-color: #e4eaec;
+    color: #d95c5c;
+    /* border-radius: 0em 0.2857rem 0.2857rem 0em; */
+    -webkit-box-shadow: 2px 0em 0em 0em #ff0000 inset;
+    box-shadow: 2px 0em 0em 0em #ff0000 inset;
 }

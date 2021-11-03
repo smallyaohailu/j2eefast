@@ -1560,8 +1560,8 @@ $.extend( $.validator, {
 				validator, data, optionDataString;
 
 			var flag = false;
-			if (!this.settings.messages || !this.settings.messages[ element.name ] ) {
-				this.settings.messages[ element.name ] = {};
+			if (!this.settings.messages || !this.settings.messages[ element.name ] || this.settings.messages[ element.name ][ "ATG" ] ) {
+				if(!this.settings.messages[ element.name ]) this.settings.messages[ element.name ] = {};
 				flag = true;
 			}
 			previous.originalMessage = previous.originalMessage || this.settings.messages[ element.name ][ method ];
@@ -1588,6 +1588,7 @@ $.extend( $.validator, {
 				data: data,
 				context: validator.currentForm,
 				success: function( response ) {
+					console.log(response);
 					var valid = response === true || response === "true",
 						errors, message, submitted;
 
