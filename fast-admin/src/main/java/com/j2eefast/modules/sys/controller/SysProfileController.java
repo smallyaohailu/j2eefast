@@ -14,7 +14,6 @@ import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.sys.service.*;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import com.j2eefast.framework.utils.UserUtils;
 import cn.hutool.core.util.ReUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -145,10 +144,10 @@ public class SysProfileController extends BaseController {
     @GetMapping("/checkPassword")
     @ResponseBody
     public ResponseData checkPassword(String password){
-        LoginUserEntity loginUser = UserUtils.getUserInfo();
+        SysUserEntity user = sysUserService.getById(UserUtils.getUserId());
         // 原密码
-        password = UserUtils.sha256(password, loginUser.getSalt());
-        if (password.equals(loginUser.getPassword())){
+        password = UserUtils.sha256(password, user.getSalt());
+        if (password.equals(user.getPassword())){
             return success();
         }
         return error("不匹配!");
@@ -161,9 +160,10 @@ public class SysProfileController extends BaseController {
     @RepeatSubmit
     public ResponseData resetPwd(String oldPassword, String newPassword){
         LoginUserEntity loginUser = UserUtils.getUserInfo();
+        SysUserEntity user = sysUserService.getById(loginUser.getId());
         if(ToolUtil.isNotEmpty(oldPassword) && ToolUtil.isNotEmpty(newPassword)){
-            oldPassword = UserUtils.sha256(oldPassword, loginUser.getSalt());
-            if (oldPassword.equals(loginUser.getPassword())){
+            oldPassword = UserUtils.sha256(oldPassword, user.getSalt());
+            if (oldPassword.equals(user.getPassword())){
                 String salt = UserUtils.randomSalt();
                 String pwdSecurityLevel = CheckPassWord.getPwdSecurityLevel(newPassword).getValue();
                 // 新密码
@@ -175,8 +175,6 @@ public class SysProfileController extends BaseController {
                     return error(ToolUtil.message("sys.user.oldPasswordError"));
                 }else{
                     //更新Shiro
-                    loginUser.setSalt(salt);
-                    loginUser.setPassword(newPassword);
                     loginUser.setPwdSecurityLevel(pwdSecurityLevel);
                     UserUtils.reloadUser(loginUser);
                     return success();

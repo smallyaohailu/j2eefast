@@ -7,8 +7,6 @@ package com.j2eefast.modules.sys.controller;
 
 import java.io.File;
 import java.util.*;
-
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -22,9 +20,7 @@ import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.log.service.SysLoginInfoSerice;
 import com.j2eefast.framework.sys.entity.*;
 import com.j2eefast.framework.sys.service.*;
-import com.j2eefast.framework.utils.Global;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -221,10 +217,12 @@ public class SysUserController extends BaseController {
 	public ResponseData password(String oldPassword, String newPassword) {
 		ToolUtil.isBlank(newPassword, ToolUtil.message("sys.user.newpassw.tips"));
 		LoginUserEntity loginUser = UserUtils.getUserInfo();
-		// 原密码
-		oldPassword = UserUtils.sha256(oldPassword, loginUser.getSalt());
 
-		if(!oldPassword.equals(loginUser.getPassword())){
+		SysUserEntity user = sysUserService.getById(loginUser.getId());
+		// 原密码
+		oldPassword = UserUtils.sha256(oldPassword, user.getSalt());
+
+		if(!oldPassword.equals(user.getPassword())){
 			return error(ToolUtil.message("sys.user.oldPasswordError"));
 		}
 
@@ -242,8 +240,6 @@ public class SysUserController extends BaseController {
 		}
 
 		loginUser.setPwdSecurityLevel(pwdSecurityLevel);
-		loginUser.setPassword(newPassword);
-		loginUser.setSalt(salt);
 		UserUtils.reloadUser(loginUser);
 		return success();
 	}
@@ -287,8 +283,6 @@ public class SysUserController extends BaseController {
 		}
 		if (loginUser.getId().equals(user.getId())){
 			loginUser.setPwdSecurityLevel(user.getPwdSecurityLevel());
-			loginUser.setPassword(newPassword);
-			loginUser.setSalt(salt);
 			UserUtils.reloadUser(loginUser);
 		}
 		return success();
