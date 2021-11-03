@@ -17,11 +17,26 @@
 		fast 服务入口
 	</description>
 
+	<developers>  
+		<developer>
+			<id>J2eeFAST</id>
+			<name>ZHOUZHOU</name>
+			<email>loveingowp at 163.com</email>
+			<url>http://www.j2eefast.com</url>
+		</developer>
+	</developers>
+	
+	<licenses>
+	    <license>
+	      <name>Apache-2.0</name>
+	      <url>https://gitee.com/zhouhuanOGP/J2EEFAST/blob/master/LICENSE</url>
+	    </license>
+	</licenses>
+	
 	<!-- 打包编码, 版本号, 日期-->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version>2.5.0</version>
-		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
 	</properties>
 
 	<dependencies>
@@ -42,18 +57,39 @@
 		<dependency>
 			<groupId>com.j2eefast</groupId>
 			<artifactId>fast-flowable</artifactId>
-		</dependency>-->
+		</dependency> -->
 
 <!--		<dependency>-->
 <!--		  <groupId>p6spy</groupId>-->
 <!--		  <artifactId>p6spy</artifactId>-->
 <!--		</dependency>-->
+
 	</dependencies>
 
 	<build>
-		<!--打包后的项目名称  -->
-		<finalName>fast-v${version}-${maven.build.timestamp}</finalName>
+	
+		<!--打包后的项目名称 -->
+		<finalName>fast-v${version}-${build.time}</finalName>
+
         <plugins>
+        	<!-- 生成打包时间使用GMT+8 -->
+        	<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>build-helper-maven-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>timestamp-property</id>
+			            <goals>
+			                <goal>timestamp-property</goal>
+			            </goals>
+			            <configuration>
+			                <name>build.time</name>
+			                <pattern>yyyyMMdd</pattern>
+			                <timeZone>GMT+8</timeZone>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
 			<!-- 跳过单元测试-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -66,6 +102,7 @@
 					</includes>
 					<excludes>
 						<exclude>**/test/Encode*.java</exclude>
+						<exclude>**/test/Init*.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -118,7 +155,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<!-- 需要打成完整gz包放开注解
+			
+			<!-- 需要打成完整gz包放开注解  -->
 			<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<configuration>
@@ -137,7 +175,6 @@
 						</execution>
 					</executions>
 			 </plugin>
-			-->
 			</plugins>
     </build>
 </project>
