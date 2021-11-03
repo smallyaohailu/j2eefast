@@ -1,18 +1,15 @@
 # 设置项目访问路径
 #server:
 #    servlet:
-#        context-path: /fast
+#        context-path: /
 
 spring:
     # 启动环境 Dev|Test|Prod
     profiles:
         active: Dev
-#    freemarker:
-         #模板引擎缓存
-#        cache: true
-#    messages:
-#        #国际化默认语言（2.0.3+）
-#        defaultLocale: zh_CN
+    freemarker:
+        #模板引擎缓存
+        cache: true
 
 #登录安全验证基本配置
 aj:
@@ -34,33 +31,18 @@ shiro:
 #        expireTime: 30
 #        #设置session失效的扫描时间, 清理用户直接关闭浏览器造成的孤立会话 (默认设置5分钟)
 #        validationTime: 5
-#    rememberMe:
-#        # 是否开启记住我
-#        enabled: false
-#        # 若开启记住我请设置记住我密钥 可以在 com.j2eefast.test.EncondeTest 测试类 执行getShiroDeskey单元测试方法 获取项目唯一密钥
-#        # 若不设置，则每次启动系统后自动随机生成一个新秘钥，这样会导致每次重启后，客户端记录的用户信息将失效。
-#        cipherKey: ~
+    rememberMe:
+         # 是否开启记住我
+         enabled: true
+         # 若开启记住我请设置记住我密钥 可以在 com.j2eefast.test.EncondeTest 测试类 执行getShiroDeskey单元测试方法 获取项目唯一密钥
+         # 若不设置，则每次启动系统后自动随机生成一个新秘钥，这样会导致每次重启后，客户端记录的用户信息将失效。
+         cipherKey: 6OLU0Aarr/mQ4tkxEzMZ5A==
     #custome url filter Map(系统权限拦截配置)   
     filterMap: "{
            '/login': 'anon',
-           '/static/**': 'anon',
-           '/swagger/**': 'anon',
-           '/swagger-ui/**': 'anon',
-           '/swagger-resources/**': 'anon',
-           '/webjars/**': 'anon',
-           '/api/trade.receive/**': 'anon',
-           '/v3/api-docs': 'anon',
-           '/profile/fileUeditor/upload/image/**': 'anon',
-           '/sys/comm/download/**': 'anon',
            '/auth/**': 'anon',
            '/404.html': 'anon',
-           '/upbw/**': 'anon',
-           '/sys/login': 'anon',
-           '/favicon.ico': 'anon',
-           '/captcha.gif': 'anon',
-           '/tenant/list': 'anon',
-           '/captcha/**': 'anon',
-           '/**': 'kickout,user'
+           '/upbw/**': 'anon'
            }"
 
 #mybatis 配置
@@ -72,3 +54,9 @@ mybatis-plus:
 #    file:
 #        name: fast
 #        path: logs/
+
+logging:
+  pattern:
+    console: "%date{HH:mm:ss.SSS} %-5level %-30.30logger{29} : %msg%n"
+  level:
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
