@@ -1,5 +1,5 @@
 <#include "/common/defaultEngine.html">
-<@pageTheme mark=true>
+<@pageTheme mark=false>
 <@header title="${config.getTitle()}" isPAS=false >
 <#-- Font Awesome -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/font-awesome.min.css"/>
@@ -20,8 +20,8 @@
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/layui/css/layui.css"/>
 <link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.min.css?V=${config.getDvVersion()}"/>
 <#--<link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.css?V=${config.getDvVersion()}"/>-->
-<#--<link rel="stylesheet" href="${ctxStatic}/static/css/index.css?V=${config.getDvVersion()}"/>-->
-<link rel="stylesheet" href="${ctxStatic}/static/css/index.min.css?V=${config.getDvVersion()}"/>
+<link rel="stylesheet" href="${ctxStatic}/static/css/index.css?V=${config.getDvVersion()}"/>
+<#--<link rel="stylesheet" href="${ctxStatic}/static/css/index.min.css?V=${config.getDvVersion()}"/>-->
 <!-- jQuery toast 提示框  -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/jquery.toast.min.css"/>
 <#-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -36,9 +36,7 @@
 	/*	height: calc(100% - 116px);*/
 	/*}*/
 </style>
-</head>
-<script>var baseURL = "${ctxStatic}/" , _username = "<@shiro.principal property="username"/>",_lang = "${config.getSysLang()}"
-,_userId = "<@shiro.principal property="id"/>", _unlock="${_unlock?default("0")}" , LockScreen = ${config.getKey('SYS_LOCK_SCEREEN')}; function imgUserError(){var img=event.srcElement;img.src=baseURL+"static/img/user2-160x160.jpg"; img.onerror=null;}</script>
+<script>var  _unlock="${_unlock?default("0")}"</script>
 </@header>
 <body class="fixed hold-transition ${config.getKey('SYS_INDEX_SKINNAME','skin-blue')} sidebar-mini">
 <#include "/common/notice.html">
@@ -86,19 +84,19 @@
 <div id="passwordLayer" style="display: none;">
 	<form class="layui-form" action="" id="form-user-updatePass">
 		<div class="layui-form-item">
-	    	<label class="layui-form-label"><@ctx.i18n text = "账号"/></label>
+	    	<label class="layui-form-label">${i18n("账号")}</label>
 	    	<label class="laber-account">${user.username}</label>
 		</div>
 		<div class="layui-form-item">
-	    	<label class="layui-form-label"><@ctx.i18n text = "旧密码"/></label>
+	    	<label class="layui-form-label">${i18n("旧密码")}</label>
 	    	<div class="layui-input-inline">
-	    		<input type="password"  name="oldPassword" placeholder="<@ctx.i18n text = "旧密码"/>" autocomplete="off" class="form-control">
+	    		<input type="password"  name="oldPassword" placeholder="${i18n("旧密码")}" autocomplete="off" class="form-control">
 	    	</div>
 		</div>
 		<div class="layui-form-item">
-	    	<label class="layui-form-label"><@ctx.i18n text = "新密码"/></label>
+	    	<label class="layui-form-label">${i18n("新密码")}</label>
 	    	<div class="layui-input-inline">
-	    		<input type="password"  id="newPassword" name="newPassword" placeholder="<@ctx.i18n text = "新密码"/>" autocomplete="off" class="form-control">
+	    		<input type="password"  id="newPassword" name="newPassword" placeholder="${i18n("新密码")}" autocomplete="off" class="form-control">
 	    	</div>
 		</div>
 	</form>
@@ -118,13 +116,13 @@
 <!-- jQuery toast 提示框  -->
 <script src="${ctxStatic}/static/libs/jquery.toast.min.js"></script>
 <!-- 全屏显示-->
-<#--<script type="text/javascript" src="${ctxStatic}/static/js/fastJS.js?V=${config.getDvVersion()}"></script>-->
-<script type="text/javascript" src="${ctxStatic}/static/js/fastJS.min.js?V=${config.getDvVersion()}"></script>
+<script type="text/javascript" src="${ctxStatic}/static/js/fastJS.js?V=${config.getDvVersion()}"></script>
+<#--<script type="text/javascript" src="${ctxStatic}/static/js/fastJS.min.js?V=${config.getDvVersion()}"></script>-->
 <#-- jquery-validate 表单验证插件 -->
 <script src="${ctxStatic}/static/plugins/validate/jquery.validate.min.js"></script>
 <script src="${ctxStatic}/static/plugins/validate/jquery.validate.extend.min.js"></script>
-<#--<script type="text/javascript" src="${ctxStatic}/static/js/index.js?V=${config.getDvVersion()}"></script>-->
-<script type="text/javascript" src="${ctxStatic}/static/js/index.min.js?V=${config.getDvVersion()}"></script>
+<script type="text/javascript" src="${ctxStatic}/static/js/index.js?V=${config.getDvVersion()}"></script>
+<#--<script type="text/javascript" src="${ctxStatic}/static/js/index.min.js?V=${config.getDvVersion()}"></script>-->
 <script type="text/javascript" src="${ctxStatic}/static/plugins/fullscreen/jquery.fullscreen.min.js"></script>
 </body>
 </html>

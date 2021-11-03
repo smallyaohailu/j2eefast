@@ -13,13 +13,13 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 </@header>
 <body>
 <div class="header">
-	<h1><@ctx.i18n text = "sys.error.page"/></h1>
+	<h1>${i18n("sys.error.page")}</h1>
 </div>
 <div class="w3-main">
 	<div class="agile-info">
 		<h2>404</h2>
-		<h3><@ctx.i18n text = "sys.error"/>!</h3>
-		<p><@ctx.i18n text = "sys.error.info"/></p>
+		<h3>${i18n("sys.error")}!</h3>
+		<p>${i18n("sys.error.info")}</p>
 			<div class="social">
 				<ul>
 					<li><a href="#" class="link facebook" target="_parent"><span class="fa fa-facebook-square"></span></a></li>
@@ -28,7 +28,7 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 					<div class="clear"></div>
 				</ul>
 			</div>
-		<a href="index.html"><@ctx.i18n text = "sys.return"/></a>
+		<a href="index.html">${i18n("sys.return")}</a>
 	</div>
 </div>
 <div class="footer-w3l">

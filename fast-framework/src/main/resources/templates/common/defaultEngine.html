@@ -17,15 +17,15 @@
 		<#nested>
 	</#if>
 <@compress single_line=true>
-<script>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?d7168b0cef9904be9b675a22e48c5721";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-</script>
+<#--<script>-->
+<#--    var _hmt = _hmt || [];-->
+<#--    (function() {-->
+<#--      var hm = document.createElement("script");-->
+<#--      hm.src = "https://hm.baidu.com/hm.js?d7168b0cef9904be9b675a22e48c5721";-->
+<#--      var s = document.getElementsByTagName("script")[0];-->
+<#--      s.parentNode.insertBefore(hm, s);-->
+<#--    })();-->
+<#--</script>-->
 </@compress>
 <#assign jscssLib="">
 <#assign animationTag=true>
@@ -43,20 +43,20 @@
                 >
 <#assign jscssLib=libs>
 <#assign animationTag=isAnimation>
+<#import "springctx.ftl" as ctx>
 <!DOCTYPE html>
 <html>
 <head>
 <#-- 其他地方代码都可以改,未获得作者许可此信息(以下信息到END结束)请不要修改。请尊重作者劳动成果! ™否则作者有权收回软件使用权ø -->
 <#-- 软著编号: 2020SR1589493 -->
-<title>${title} - Powered By J2eeFast</title>
+<title>${i18n("${title}")} - Powered By J2eeFast</title>
 <meta content='on' http-equiv='x-dns-prefetch-control'>
-<#import "springctx.ftl" as ctx>
 <meta charset="utf-8">
 <meta content='always' name='referrer'>
 <meta content='J2eeFAST' property='og:site_name'>
 <meta content='Object' property='og:type'>
 <meta content='http://www.j2eefast.com/' property='og:url'>
-<meta content='${title} - Powered By J2eeFast' itemprop='name' property='og:title'>
+<meta content='${i18n("${title}")} - Powered By J2eeFast' itemprop='name' property='og:title'>
 <meta content="PoweredByJ2eeFAST、J2eeFAST" naTme="keywords">
 <meta content="PoweredByJ2eeFAST、J2eeFAST" itemprop='description' name='Description'>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -70,16 +70,11 @@
 <link rel="shortcut icon" href="${ctxStatic}/static/img/favicon.ico"/>
 <script src="${ctxStatic}/static/libs/jquery.min.js"></script>
 <script src="${ctxStatic}/static/libs/jquery-migrate.min.js"></script>
+<script src="${ctxStatic}/static/config.js"></script>
 <#if isPAS>
-<script>
-var baseURL = "${ctxStatic}/", _lang = "${config.getSysLang()}",  _username = "<@shiro.principal property="username"/>"  ,
-_userId = "<@shiro.principal property="id"/>",
-LockScreen = ${config.getKey('SYS_LOCK_SCEREEN')}; function imgUserError(){var img=event.srcElement;img.src=baseURL+"static/img/user2-160x160.jpg"; img.onerror=null;}
-</script>
 <@cssLibs.css Libs = libs/>
 <#-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <#-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -129,6 +124,11 @@ LockScreen = ${config.getKey('SYS_LOCK_SCEREEN')}; function imgUserError(){var i
     </#if>
 </#macro>
 
+<#-- 国际化-->
+<#function i18n text args=[]>
+    <#assign tt="${springMacroRequestContext.getMessage(text,args,text)}">
+    <#return tt>
+</#function>
 <#-- 引入控件组件-->
 <#import "jslibs.html" as jsLibs>
 <#import "csslibs.html" as cssLibs>

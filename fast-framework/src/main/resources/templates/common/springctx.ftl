@@ -23,11 +23,15 @@
  -->
 
 <#--
- * message
- *
+ * i18n
+ * 前端页面国际化获取
+ * 使用方法 
+ * text: 语言编码 Key 值 必填
+ * args: 针对 密码错误{0}次  参数传入
+ * <@ctx.i18n text="sys.msg.rangelength" args=["2","3"]/>
  * Macro to translate a message code into a message.
  -->
-<#macro i18n text>${springMacroRequestContext.getMessage(text,text)}</#macro>
+<#macro i18n text args=[]>${springMacroRequestContext.getMessage(text,args,text)}</#macro>
 
 <#--
  * messageText
@@ -373,7 +377,6 @@ ${stringStatusValue}</textarea>
     </#list>
     <#return false>
 </#function>
-
 <#--
  * closeTag
  *

@@ -80,73 +80,74 @@
 			},
 			{
 				field: 'id',
-				title: '<@ctx.i18n text = "编号"/>',
+				title: '${i18n("编号")}',
 				visible: false
 			},
 			{
-				title: "<@ctx.i18n text = "序号"/>",
+				title: "${i18n("序号")}",
 				formatter: function (value, row, index) {
 					return $.table.serialNumber(index);
 				}
 			},
 			 {
 				field: 'dbName',
-				title: '<@ctx.i18n text = "数据源(库)"/>',
+				title: '${i18n("数据源(库)")}',
 				sortable: true
 			},
 			{
 				field: 'tableName',
-				title: '<@ctx.i18n text = "表名"/>',
+				title: '${i18n("表名")}',
 				sortable: true
 			},
 			{
 				field: 'tableComment',
-				title: '<@ctx.i18n text = "表描述"/>'
+				title: '${i18n("表描述")}'
 			},
 			{
 				field: 'tplCategory',
-				title: '<@ctx.i18n text = "模板名称"/>',
+				title: '${i18n("模板名称")}',
 				formatter: function(value, row, index) {
 					return $.table.selectDictLabel(genType, value)
 				}
 			},
 			{
 				field: 'className',
-				title: '<@ctx.i18n text = "实体类名称"/>',
+				title: '${i18n("实体类名称")}',
 				sortable: true
 			},
 			{
 				field: 'createTime',
-				title: "<@ctx.i18n text = "创建时间"/>",
+				title: "${i18n("创建时间")}",
 				sortable: true
 			},
 			{
 				field: 'updateTime',
-				title: "<@ctx.i18n text = "更新时间"/>",
+				title: "${i18n("更新时间")}",
 				sortable: true
 			},
 			{
-				title:"<@ctx.i18n text = "操作"/>",
+				title:"${i18n("操作")}",
 				align: 'left',
 				width: 120,
 				class:'action',
 				formatter: function(value, row, index) {
 					/*var actions = [];
 					actions.push('<a class="btn btn-info btn-xs ' + previewFlag + '" href="javascript:void(0)" onclick="preview(\'' + row.id + '\')"><i class="fa fa-search"></i>预览</a> ');
-					actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i><@ctx.i18n text = "编辑"/></a> ');
+					actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i>${i18n("编辑")}</a> ');
 					actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a> ');
 					actions.push('<a class="btn btn-primary btn-xs ' + codeFlag + '" href="javascript:void(0)" onclick="genCode(\'' + row.id + '\')"><i class="fa fa-bug"></i>生成代码</a> ');
 					return actions.join('');*/
 					var actions = [];
 					if(row.tplCategory != "child"){
-						actions.push('<a class="' + previewFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "预览"/>" onclick="preview(\'' + row.id + '\')"><i class="fa fa-search"></i></a> ');
+						actions.push('<a class="' + previewFlag + '" href="javascript:void(0)" title="${i18n("预览")}" onclick="preview(\'' + row.id + '\')"><i class="fa fa-search"></i></a> ');
 					}
-					actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "编辑"/>" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
-					actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "删除"/>" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
+					actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="${i18n("编辑")}" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
+					actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
 					if(row.tplCategory != "child"){
-						var info = "<a  class='btn btn-default btn-xs "+codeFlag+"' onclick=codeDownload(\'" + row.tableName + "\');><i class='fa icon-cloud-download'></i> <@ctx.i18n text = "下载代码"/></a>&nbsp;";
-						info += "<a  class='btn btn-default btn-xs "+codeFlag+"' onclick=genCode(\'"+row.tableName+"\',\'" + row.id + "\',\'"+row.isCover+"\');><i class='fa fa-bug'></i> <@ctx.i18n text = "生成代码"/></a>&nbsp;";
-						actions.push('<a tabindex="0"  role="button" data-container="body" data-placement="left" data-toggle="popover" data-html="true" data-trigger="hover" data-content="'+info+'"><i class="fa fa-chevron-circle-right" title="<@ctx.i18n text = "更多操作"/>"></i></a>');
+						var info = "<a  class='btn btn-default btn-xs "+codeFlag+"' onclick=editCode(\'" + row.id + "\');><i class='fa icon-cloud-download'></i> ${i18n("在线编辑")}</a>&nbsp;";
+						info += "<a  class='btn btn-default btn-xs "+codeFlag+"' onclick=codeDownload(\'" + row.tableName + "\');><i class='fa icon-cloud-download'></i> ${i18n("下载代码")}</a>&nbsp;";
+						info += "<a  class='btn btn-default btn-xs "+codeFlag+"' title='生成代码将直接生成到指定目录,如果在线编辑你设计了数据则已在线编辑数据为准' onclick=genCode(\'"+row.tableName+"\',\'" + row.id + "\',\'"+row.isCover+"\');><i class='fa fa-bug' style='color: red;'></i> ${i18n("生成代码")}</a>&nbsp;";
+						actions.push('<a tabindex="0"  role="button" data-container="body" data-placement="left" data-toggle="popover" data-html="true" data-trigger="hover" data-content="'+info+'"><i class="fa fa-chevron-circle-right" title="${i18n("更多操作")}"></i></a>');
 					}
 					return actions.join('');
 				}
@@ -163,6 +164,12 @@
 			btn:['<i class="fa fa-close"></i> '+$.i18n.prop("取消")],
 		};
 		opt.modal.openMainWin(options);
+		// opt.modal.openTab('预览代码',prefix + "/preview/" + id);
+	}
+
+	/* 在线编辑*/
+	function editCode(id) {
+		opt.modal.openTab('在线编辑',prefix + "/editCode/" + id);
 	}
 
 	/*生成代码*/
@@ -178,7 +185,7 @@
 		if(isCover === "Y"){
 			c+=",<span style='color: red;font-weight: bold'>覆盖替换原有文件</span>"
 		}
-		opt.modal.confirm(c+"吗?", function() {
+		opt.modal.confirm(c+"吗? <span style='color: red;font-weight: bold'>前端页面、后台业务代码都会清空,之前单独设计的也会清空、请慎重!</span>", function() {
 			var data = {'tableId':id};
 			var url = prefix + "/genCode";
 			opt.operate.post(url,data);
