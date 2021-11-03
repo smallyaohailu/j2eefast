@@ -86,4 +86,13 @@ public class SysLoginInfoSerice extends ServiceImpl<SysLoginInfoMapper, SysLogin
 		 this.baseMapper.cleanLog();
 		 return true;
 	}
+
+	/**
+	 * 插入
+	 * @param loginInfoEntity
+	 * @return
+	 */
+	public boolean insertLogininfor(SysLoginInfoEntity loginInfoEntity){
+		return this.baseMapper.insertLogininfor(loginInfoEntity) > 0;
+	}
 }

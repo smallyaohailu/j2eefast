@@ -12,7 +12,7 @@ import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.j2eefast.common.core.utils.HttpContextUtil;
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
@@ -155,7 +155,7 @@ public class FileUploadUtils {
      */
 	@Deprecated
     public static String getAvatarImg(String imgName){
-        HttpServletRequest request = HttpContextUtil.getRequest();
+        HttpServletRequest request = ServletUtil.getRequest();
         String imgBase64 = request.getParameter(imgName);
         return saveImgBase64(imgBase64);
     }

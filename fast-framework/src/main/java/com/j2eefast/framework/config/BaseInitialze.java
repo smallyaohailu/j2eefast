@@ -8,10 +8,14 @@ package com.j2eefast.framework.config;
 import cn.hutool.core.comparator.ComparableComparator;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
+import com.bstek.ureport.console.ServletAction;
+import com.bstek.ureport.definition.datasource.BuildinDatasource;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.RedisUtil;
+import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
 import com.j2eefast.common.db.utils.SqlExe;
@@ -25,12 +29,14 @@ import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -59,6 +65,9 @@ public class BaseInitialze  implements ApplicationRunner {
      */
     @Value("#{ @environment['fast.updateDb.auto'] ?: false }")
     private boolean auto;
+
+    @Value("#{ @environment['fast.ureport.enabled'] ?: false }")
+    private boolean enabled;
 
     @SuppressWarnings({ "unchecked"})
 	@Override
@@ -139,7 +148,7 @@ public class BaseInitialze  implements ApplicationRunner {
 		scheduler.clear();
 
         //设置系统版本号
-        redisUtil.set(ConfigConstant.CONFIG_KEY, PropertiesUtils.getInstance().getProperty(ConfigConstant.SYS_VERSION,"1.0.1"));
+        redisUtil.set(ConfigConstant.CONFIG_KEY, PropertiesUtils.getInstance().getProperty(ConfigConstant.SYS_VERSION,"1.0.1"),RedisUtil.NOT_EXPIRE);
 
         /**
          * 检测定时任务
@@ -150,6 +159,16 @@ public class BaseInitialze  implements ApplicationRunner {
     			ScheduleUtils.createScheduleJob(scheduler, sysJob);
         	}
         }
-        
+
+        /**
+         * 检测是否加载ureport2 报表
+         */
+        if(enabled){
+            //卸载系统自带
+            SpringUtil.unregisterBean("ureport.exportExcelServletAction");
+            SpringUtil.unregisterBean("ureport.datasourceServletAction");
+            SpringUtil.unregisterBean("ureport.htmlPreviewServletAction");
+            SpringUtil.unregisterBean("ureport.designerServletAction");
+        }
     }
 }

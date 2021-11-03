@@ -78,7 +78,7 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 		}
 	}
 
-	public int countDictDataByType(String dictType) {
+	public long countDictDataByType(String dictType) {
 		return this.count(new QueryWrapper<SysDictDataEntity>().eq("dict_type",dictType));
 	}
 
@@ -92,7 +92,7 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 
 	public boolean deleteBatchByIds(Long[] ids) {
 		SysDictDataEntity dict = this.getById(ids[0]);
-		boolean r = this.baseMapper.deleteDictDataByIds(ids) > 1;
+		boolean r = this.baseMapper.deleteDictDataByIds(ids) > 0;
 		List<SysDictDataEntity>  list = this.list(new QueryWrapper<SysDictDataEntity>().eq("dict_type",dict.getDictType()).
 				eq("status","0").orderBy(true, true, "dict_sort"));
 		if(ToolUtil.isEmpty(list)){

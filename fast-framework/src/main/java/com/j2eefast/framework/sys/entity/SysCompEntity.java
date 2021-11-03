@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j2eefast.common.core.base.entity.BaseEntity;
-import com.j2eefast.common.core.base.entity.annotaion.JsonListFiledIgnore;
 import lombok.Data;
 
 /**

@@ -6,8 +6,9 @@
 package com.j2eefast.framework.sys.controller;
 
 import cn.hutool.core.io.FileUtil;
+
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.framework.utils.Global;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,7 @@ public class SysDownloadContorller {
 
 
 	@RequestMapping("/excel/download")
-	@RequiresPermissions("*:export")
+	@RequiresPermissions("excel:download:export")
 	public void download(HttpServletRequest request,
 						 HttpServletResponse response, @RequestParam("fileName") String fileName) {
 		try {
@@ -72,7 +73,7 @@ public class SysDownloadContorller {
 					sos.close();
 					log.info("==============================下载完成![" + path +"]   ========================");
 					//删除
-					FileUtil.del(path);
+					//FileUtil.del(path);
 					return;
 				}else{
 					log.error("文件不存在");

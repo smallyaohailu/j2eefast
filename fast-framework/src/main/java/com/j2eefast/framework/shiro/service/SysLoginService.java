@@ -4,35 +4,46 @@
  */
 package com.j2eefast.framework.shiro.service;
 
-import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
-import com.j2eefast.common.core.utils.ToolUtil;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
+
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.j2eefast.common.core.enums.LogType;
+import com.j2eefast.common.core.enums.LoginType;
 import com.j2eefast.common.core.auth.AuthService;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.crypto.SoftEncryption;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
-import com.j2eefast.framework.sys.entity.SysModuleEntity;
-import com.j2eefast.framework.sys.entity.SysRoleEntity;
-import com.j2eefast.framework.sys.entity.SysTenantEntity;
+import com.j2eefast.framework.sys.entity.*;
 import com.j2eefast.framework.sys.factory.UserFactory;
-import com.j2eefast.framework.sys.mapper.SysMenuMapper;
-import com.j2eefast.framework.sys.mapper.SysModuleMapper;
-import com.j2eefast.framework.sys.mapper.SysTenantMapper;
-import com.j2eefast.framework.sys.mapper.SysUserMapper;
+import com.j2eefast.framework.sys.mapper.*;
 import com.j2eefast.framework.utils.UserUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.exception.ServiceException;
 import com.j2eefast.common.core.manager.AsyncManager;
+import com.j2eefast.common.core.shiro.RedisSessionDAO;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
-import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import com.j2eefast.framework.utils.RedisKeys;
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -44,8 +55,12 @@ import java.util.*;
  *
  */
 @Component
+@Slf4j
 public class SysLoginService implements AuthService {
 
+	public static final String DEFAULT_KICKOUT_CACHE_KEY_PREFIX = "shiro:cache:kickout:";
+    private String keyPrefix = DEFAULT_KICKOUT_CACHE_KEY_PREFIX;
+    
 	@Resource
 	private RedisUtil redisUtil;
 
@@ -53,18 +68,28 @@ public class SysLoginService implements AuthService {
 	private SysUserMapper sysUserMapper;
 
 	@Resource
-	private SysModuleMapper sysModuleMapper;
+	private SysRoleMapper sysRoleMapper;
 
 	@Resource
 	private SysMenuMapper sysMenuMapper;
 
 	@Resource
 	private SysTenantMapper sysTenantMapper;
+	
+	@Resource
+	private CaptchaService captchaService;
+	
+    @Resource
+    private RedisSessionDAO sessionDAO;
+	
 	/**
 	 * 系统是否开启多租户模式
 	 */
 	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
 	private boolean enabled;
+	
+	@Value("#{ @environment['shiro.session.kickoutAfter'] ?: false }")
+	private boolean kickoutAfter;
 
 	@Override
 	public Integer loginBeforeVerify(String username, String password) {
@@ -121,11 +146,55 @@ public class SysLoginService implements AuthService {
 	 * @return
 	 */
 	@Override
-	public LoginUserEntity loginVerify(String username, String password) {
+	public LoginUserEntity loginVerify(UsernamePasswordToken taken) {
 
-
+		//前端传入账号密码
+		String username = taken.getUsername();
+		String password = new String(taken.getPassword());
+		
+		if(ToolUtil.isEmpty(username) || ToolUtil.isEmpty(password)) {
+			throw new RxcException("账号密码不能为空!", "50001");
+		}
+		
+		//建议图形验证码
+		if(Global.getDbKey(ConfigConstant.SYS_LOGIN_VERIFICATION,Constant.SYS_DEFAULT_VALUE_ONE)
+				.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
+			//后台二次认证 图形验证码
+			CaptchaVO captchaVO = new CaptchaVO();
+			captchaVO.setCaptchaVerification(ServletUtil.getRequest().getParameter("__captchaVerification"));
+			if(!captchaService.verification(captchaVO).isSuccess()){
+				throw new RxcException("图形验证码不正确!","50004");
+			}
+		}
+		
+		//解密数据
+		String kg4 = ServletUtil.getRequest().getParameter("kg4");
+		log.debug("kg4:{}",kg4);
+		String sign =ServletUtil.getRequest().getParameter("sign");
+		log.debug("sign:{}",sign);
+		
+		//校验签名
+		String _sign = SoftEncryption.genSM3Keys((kg4 + username + password).getBytes()).getStr("b64") ;
+		if(!_sign.equals(sign)){
+			//校验签名失败
+			throw new ServiceException("E0XA00011");
+		}
+		
+		//获得明文kg4
+		kg4 = SoftEncryption.decryptBySM2(Base64.decode(kg4),
+				ConfigConstant.PRIVKEY).getStr("hex");
+		
+		//前端账号密码解密
+		username =new String(SoftEncryption.decryptBySM4(Base64.decode(username),
+				HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
+		password =new String(SoftEncryption.decryptBySM4(Base64.decode(password),
+				HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
+		
+		//赋值回去
+		taken.setPassword(password.toCharArray());
+		
 		Integer number = this.loginBeforeVerify(username,password);
-
+		
 		//获取请求租户号
 		String tenantId = StrUtil.EMPTY;
 		if(enabled){
@@ -157,8 +226,6 @@ public class SysLoginService implements AuthService {
 		}
 
 		//多租户模式判断租户是否正常
-
-
 		//判断密码是否正确
 		if(!UserUtils.sha256(password, user.getSalt()).equals(user.getPassword())) {
 			if(number == null) {
@@ -182,11 +249,17 @@ public class SysLoginService implements AuthService {
 		//转换成用户登录信息
 		LoginUserEntity loginUser = UserFactory.createLoginUser(user);
 
+		//检测是否排挤登录
+		this.excludeLogin(loginUser);
+		
 		//设置授权
 		this.authorization(loginUser,user.getId());
 
 		//设置登陆
-		this.setLoginDetails(loginUser,user.getId(),"sys");
+		this.setLoginDetails(loginUser,user.getId(),LogType.SYS.getVlaue());
+
+		//设置登录方式
+		loginUser.setLoginType(LoginType.USERNAME);
 
 		return loginUser;
 	}
@@ -197,15 +270,10 @@ public class SysLoginService implements AuthService {
 	 * @return
 	 */
 	@Override
-	public LoginUserEntity freeLoginVerify(String openId) {
-		//获取请求租户号
-		String tenantId = StrUtil.EMPTY;
-		if(enabled){
-			tenantId  = StrUtil.blankToDefault(ServletUtil.getRequest()
-					.getParameter(Constant.TENANT_PARAMETER),StrUtil.EMPTY);
-		}
+	public LoginUserEntity freeLoginVerify(String openId, String tenantId) {
+		
 		//检查第三方账号是否有绑定用户ID
-		SysUserEntity user = this.sysUserMapper.findUserByUserName(openId,tenantId);
+		SysUserEntity user = this.sysUserMapper.findAuthByUuid(openId,tenantId);
 
 		if(ToolUtil.isEmpty(user)){
 			AsyncManager.me().execute(AsyncFactory.recordLogininfor(openId,-1L,-1L, "60001","第三方授权登录,系统没有绑定用户."));
@@ -227,6 +295,9 @@ public class SysLoginService implements AuthService {
 		//转换成用户登录信息
 		LoginUserEntity loginUser = UserFactory.createLoginUser(user);
 
+		//检测是否排挤登录
+		this.excludeLogin(loginUser);
+				
 		//设置授权
 		this.authorization(loginUser,user.getId());
 
@@ -234,90 +305,98 @@ public class SysLoginService implements AuthService {
 		//设置登陆
 		this.setLoginDetails(loginUser,user.getId(),user.getSource());
 
+		//设置登录方式
+		loginUser.setLoginType(LoginType.OTHER);
+
+		return loginUser;
+	}
+	
+	/**
+	 * 手机验证码登录
+	 */
+	@Override
+	public LoginUserEntity valideCodeLoginVerify(String mobile,String valideCode) {
+		
+		//获取请求租户号
+		String tenantId = StrUtil.EMPTY;
+		if(enabled){
+			tenantId  = StrUtil.blankToDefault(ServletUtil.getRequest()
+					.getParameter(Constant.TENANT_PARAMETER),StrUtil.EMPTY);
+		}
+
+		//校验 手机号码 与 验证码是否匹配
+		String sysValidCode = redisUtil.get(RedisKeys.getLoginValidKey(mobile),String.class);
+		
+		if(ToolUtil.isEmpty(valideCode) || !StrUtil.equals(sysValidCode, valideCode)) {
+			AsyncManager.me().execute(AsyncFactory.recordLogininfor(mobile,-1L,-1L, "60002","验证码错误."));
+			throw new RxcException("验证码错误!","60002");
+		}
+
+		//校验通过删除验证码
+		redisUtil.del(RedisKeys.getLoginValidKey(mobile));
+
+		//通过手机获取用户信息
+		SysUserEntity user = this.sysUserMapper.findUserByMobile(mobile, tenantId);
+		
+		if(ToolUtil.isEmpty(user)){
+			AsyncManager.me().execute(AsyncFactory.recordLogininfor(mobile,-1L,-1L, "60003","手机验证码登录失败,手机号码不存在系统."));
+			throw new RxcException("手机验证码登录失败,手机号码不存在系统","60001");
+		}
+		
+		//转换成用户登录信息
+		LoginUserEntity loginUser = UserFactory.createLoginUser(user);
+		
+		//检测是否排挤登录
+		this.excludeLogin(loginUser);
+		
+		//设置授权
+		this.authorization(loginUser,user.getId());
+				
+		//设置登陆
+		this.setLoginDetails(loginUser,user.getId(),LogType.MOBILE.getVlaue());
+
+		//设置登录方式
+		loginUser.setLoginType(LoginType.MOBILE);
+
 		return loginUser;
 	}
 
 
 	@Override
-	public List<String> findPermissionsByRoleId(Long roleId) {
-		return this.sysMenuMapper.findPermsByRoleId(roleId);
-	}
-
-	@Override
 	public void authorization(LoginUserEntity loginUser, Long userId) {
+
+		//登录清理缓存
+		ConstantFactory.me().clearUser(loginUser.getId());
 
 		if(!userId.equals(Constant.SUPER_ADMIN)){
 			//获取用户角色列表
-			List<Long> roleList = ConstantFactory.me().getRoleIds(userId);
-			List<String> roleNameList = new ArrayList<>();
-			List<String> roleKeyList = new ArrayList<>();
-
-			//根居角色ID获取模块列表
-			List<SysModuleEntity> modules = this.sysModuleMapper.findModuleByRoleIds(roleList);
-			List<Map<String, Object>>  results = new ArrayList<>(modules.size());
-			modules.forEach(module->{
-				Map<String, Object> map = BeanUtil.beanToMap(module);
-				results.add(map);
+			List<SysRoleEntity> roleList = ConstantFactory.me().getRoles(userId);
+			List<Object> reles = new ArrayList<>();
+			roleList.forEach(r->{
+				reles.add(r);
 			});
-			loginUser.setModules(results);
-			//设置权限列表
-			Set<String> permissionSet = new HashSet<>();
-			List<Map<Object,Object>> xzz = new ArrayList<>(roleList.size());
-
-			for (Long roleId : roleList) {
-				SysRoleEntity role = ConstantFactory.me().getRoleById(roleId);
-				List<String> permissions = this.findPermissionsByRoleId(roleId);
-				if (permissions != null) {
-					Map<Object, Object> map = new HashMap<>();
-					Set<String> tempSet = new HashSet<>();
-					for (String permission : permissions) {
-						if (ToolUtil.isNotEmpty(permission)) {
-							String[] perm = StrUtil.splitToArray(permission,",");
-							for(String s: perm){
-								permissionSet.add(s);
-								tempSet.add(s);
-							}
-						}
-					}
-					map.put(role,tempSet);
-					xzz.add(map);
-				}
-				roleNameList.add(role.getRoleName());
-				roleKeyList.add(role.getRoleKey());
-			}
-
-			loginUser.setRoleList(roleList);
-			loginUser.setRoleNames(roleNameList);
-			loginUser.setRoleKey(roleKeyList);
-			loginUser.setRolePerm(xzz);
-			loginUser.setPermissions(permissionSet);
-		}else{
+			loginUser.setRoles(reles);
+		}
+		else{
 			//根居角色ID获取模块列表
-			List<SysModuleEntity> modules = this.sysModuleMapper.findModules();
-			List<Map<String, Object>>  results = new ArrayList<>(modules.size());
-			modules.forEach(module->{
-				Map<String, Object> map = BeanUtil.beanToMap(module);
-				results.add(map);
-			});
-			loginUser.setModules(results);
-			List<String> roleNameList = new ArrayList<>();
-			roleNameList.add("超级管理员");
-			loginUser.setRoleNames(roleNameList);
-			List<String> roleKeyList = new ArrayList<>();
-			roleKeyList.add("ADMIN");
-			loginUser.setRoleKey(roleKeyList);
-			//设置权限列表
-			Set<String> permissionSet = new HashSet<>();
-			permissionSet.add("*:*:*");
-			loginUser.setPermissions(permissionSet);
-//			loginUser.setDataScope("1");
+			SysRoleEntity role = sysRoleMapper.selectOne(new QueryWrapper<SysRoleEntity>()
+					.eq("role_key",Constant.SU_ADMIN));
+			List<Object> reles = new ArrayList<>();
+			reles.add(role);
+			loginUser.setRoles(reles);
+		}
+
+		//获取用户模块
+		List<Map<String, Object>> modules = ConstantFactory.me().getModules(loginUser.getId());
+		for(Map<String, Object> s: modules){
+			ConstantFactory.me().getMenuByUserIdModuleCode(loginUser.getId(),
+					(String) s.get("moduleCode"),loginUser);
 		}
 
 		//多租户模式设置
 		if(enabled){
 			//如果是最大管理员租户且为ADMIN则多租户显示标志为true
-			if(loginUser.getTenantId().equals(Constant.SUPER_TENANT)
-					&& loginUser.getRoleKey().contains(Constant.SU_ADMIN)){
+			if(loginUser.getId().equals(Constant.SUPER_ADMIN)){
 				loginUser.setSuperTenant(true);
 			}
 		}else{
@@ -335,17 +414,59 @@ public class SysLoginService implements AuthService {
 		//上次登陆时间
 		loginUser.setLoginTime(loginInfo.getLoginTime());
 
-		//登陆IP
-		loginUser.setLoginIp(ServletUtil.getIp());
-
-		//设置登陆时间
-		loginUser.setNowLoginTime(DateUtil.date());
-
 		//插入登陆表
 		AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginUser.getUsername(),
 				loginUser.getCompId(),loginUser.getDeptId(), "00000","登陆成功!",
-				loginUser.getNowLoginTime(),
+				DateUtil.date(),
 				source));
 
+	}
+	
+	private String getRedisKickoutKey(String username) {
+	    return this.keyPrefix + username;
+	}
+
+	@Override
+	public void excludeLogin(LoginUserEntity loginUser) {
+		//判断是否登录排挤
+		int maxSession = -1;
+		//获取系统配置参数
+		try{
+			 maxSession = Integer.parseInt(Global.getDbKey(ConfigConstant.SYS_IS_LOGIN));
+		}catch (Exception e){
+			log.error("error getting system parameter [SYS_IS_LOGIN]",e);
+		}
+
+		if(maxSession != -1 && kickoutAfter) {
+			Deque<Serializable> deque = (Deque<Serializable>) redisUtil.getSession(getRedisKickoutKey(loginUser.getUsername()));
+			if(deque.size() == maxSession) {
+				int tmepNum = deque.size();
+				//检测之前用户是否为登录状态
+				for(Serializable s :deque) {
+					try{
+						Session session = sessionDAO.readSession(s);
+						if(ToolUtil.isEmpty(session)) {
+							deque.removeLast();
+						}else {
+							PrincipalCollection existingPrincipals =
+									(PrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+							if(existingPrincipals == null){
+							   deque.removeLast();
+							}
+						}
+					}catch (Exception e){
+						deque.removeLast();
+					}
+				}
+				if(tmepNum != deque.size()) {
+					redisUtil.setSession(getRedisKickoutKey(loginUser.getUsername()), deque);
+				}
+			}
+			if(deque.size() == maxSession) {
+				AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginUser.getUsername(),loginUser.getCompId(),loginUser.getDeptId(), "50006","用户已经登录,禁止登录"));
+				throw new RxcException(ToolUtil.message("用户已经登录,禁止登录"),"50006");
+			}
+		}
+		
 	}
 }

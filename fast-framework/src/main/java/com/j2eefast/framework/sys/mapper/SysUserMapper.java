@@ -33,6 +33,7 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
                                  @Param("deptId") String deptId,
                                  @Param("name") String name,
                                  @Param("roleKey") String roleKey,
+                                 @Param("noId") String noId,
                                  @Param("sql_filter") String sql_filter);
 
 
@@ -115,6 +116,13 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 
 
     /**
+     * 彻底清除用户信息
+     * @param userId
+     * @return
+     */
+    int cleanUser(@Param("id") Long userId);
+
+    /**
      * 通过用户账号获取用户信息
      * @param userName
      * @return
@@ -124,14 +132,25 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
                                     @Param("tenantId") String tenantId);
 
     /**
+     * 通过用户账号获取用户信息包含已删除数据
+     * @param userName
+     * @return
+     */
+    SysUserEntity findUserByUserNameNoDel(@Param("userName") String userName);
+
+    /**
      * 免密登录通过第三方授权id查询用户情况
      * @param username
      * @return
      */
     SysUserEntity findAuthByUserName(@Param("username") String username);
 
-
-    SysUserEntity findAuthByUuid(@Param("uuid") String uuid);
+    
+    
+    @InterceptorIgnore(tenantLine = "true")
+	SysUserEntity findAuthByUuid(@Param("uuid") String uuid,
+								 @Param("tenantId") String tenantId);
+    
     /**
      * 手机号码获取用户信息
      * @param mobile
@@ -153,11 +172,43 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 
 
     /**
+     * 通过部门ID 角色获取手机号码
+     * @date 2021-09-23
+     * @param deptId
+     * @param roleKey
+     * @return
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    List<String> findMobilesByUserId(@Param("deptId") Long deptId,
+                                     @Param("roleKey") String roleKey);
+
+    /**
+     * 查询手机号码是否存在
+     * @date 2021-09-23
+     * @param mobile
+     * @param tenantId
+     * @return
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    int findIsMobile(@Param("mobile") String mobile,
+    				 @Param("tenantId") String tenantId);
+
+    /**
      * 通过用户ID获取所属公司
      * @param id
      * @return
      */
     String findCompNameByUserId(@Param("id") Long id);
+    
+    
+    /**
+     * 通过用户ID获取部门名称
+     * @author ZhouZhou
+     * @date 2021-09-18 23:08
+     * @param id
+     * @return
+     */
+    String findDeptNameByUserId(@Param("id") Long id);
 
 
     /**

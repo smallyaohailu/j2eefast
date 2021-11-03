@@ -64,7 +64,6 @@ public class SysMsgPushController extends BaseController{
     }
 
 
-    @RequiresPermissions("sys:userMsg:view")
     @GetMapping("/userMsg")
     public String userMsg(){
         return prefix + "/userMsg";
@@ -76,7 +75,6 @@ public class SysMsgPushController extends BaseController{
      * @param sysMsgPushEntity
      * @return
      */
-    @RequiresPermissions("sys:msg:list")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @ResponseBody
     public ResponseData list(@RequestParam Map<String, Object> params,SysMsgPushEntity sysMsgPushEntity) {
@@ -85,7 +83,6 @@ public class SysMsgPushController extends BaseController{
 		return success(page);
     }
 
-    @RequiresPermissions("sys:userMsg:list")
     @RequestMapping(value = "/userList", method = RequestMethod.POST)
     @ResponseBody
     public ResponseData userList(@RequestParam Map<String, Object> params,SysMsgPushEntity sysMsgPushEntity) {
@@ -151,7 +148,6 @@ public class SysMsgPushController extends BaseController{
     /**
      * 查看发送的消息
      */
-    @RequiresPermissions("sys:msg:view")
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") Long id, ModelMap mmap){
         SysMsgPushEntity sysMsgPush = sysMsgPushService.findSysMsgPushById(id);

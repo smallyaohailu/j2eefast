@@ -21,7 +21,6 @@ import com.j2eefast.common.core.license.creat.LicenseCreatorParam;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import lombok.extern.log4j.Log4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;

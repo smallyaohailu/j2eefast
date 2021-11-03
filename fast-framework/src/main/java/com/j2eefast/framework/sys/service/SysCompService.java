@@ -83,7 +83,7 @@ public class SysCompService extends ServiceImpl<SysCompMapper,SysCompEntity>  {
 		return SpringUtil.getAopProxy(this).getDeptList(params);
 	}
 
-	@DataFilter(compAlias="c",deptAlias = "c")
+	@DataFilter(compAlias="c",deptAlias = "c", isDeptTable = true)
 	public List<SysCompEntity> getDeptList(Map<String, Object> params){
 		String name = (String)params.get("name");
 		String type = (String)params.get("type");

@@ -16,6 +16,7 @@ import com.j2eefast.framework.sys.entity.SysMsgPushEntity;
 import com.j2eefast.framework.sys.service.SysMenuService;
 import com.j2eefast.framework.sys.service.SysModuleService;
 import com.j2eefast.framework.sys.service.SysMsgPushService;
+import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +57,7 @@ public class SystemController extends BaseController {
 	@GetMapping(value = { "/", "/index","/index.html" })
 	public String index(ModelMap mmap) {
 		LoginUserEntity user = UserUtils.getUserInfo();
-		List<Map<String, Object>> modules = user.getModules();
+		List<Map<String, Object>> modules = ConstantFactory.me().getModules(user.getId());
 		Map<String, List<SysMenuEntity>> menuList = new HashMap<>();
 		for(Map<String, Object> s: modules){
 			List<SysMenuEntity> menu = ConstantFactory.me().getMenuByUserIdModuleCode(user.getId(),
@@ -111,7 +112,7 @@ public class SystemController extends BaseController {
 			for(String key:roleMainMap.keySet()){
 				//key
 				if(key.indexOf("|") > 0){
-					if(UserUtils.getUserInfo().getRoleKey().size() > 1){
+					if(UserUtils.getRoleKeys().size() > 1){
 						continue;
 					}
 					String[] keys = key.split("\\|");
@@ -121,7 +122,7 @@ public class SystemController extends BaseController {
 					}
 				}else if(key.indexOf("&") > 0){
 					String[] keys = key.split("&");
-					if(keys.length == UserUtils.getUserInfo().getRoleKey().size()){
+					if(keys.length == UserUtils.getRoleKeys().size()){
 						if(UserUtils.hasAnyRoleKeys(keys)){
 							url = roleMainMap.get(key);
 							break;
@@ -138,7 +139,7 @@ public class SystemController extends BaseController {
 
 		mmap.put("compId",UserUtils.getUserInfo().getCompId());
 		mmap.put("user",UserUtils.getUserInfo());
-		mmap.put("compName",UserUtils.getUserInfo().getCompName());
+		mmap.put("compName",ConstantFactory.me().getCompName(UserUtils.getUserId()));
 
 		return url;
 	}

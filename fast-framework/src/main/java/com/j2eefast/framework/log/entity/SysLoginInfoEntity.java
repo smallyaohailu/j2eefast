@@ -101,4 +101,7 @@ public class SysLoginInfoEntity implements Serializable {
 	@TableField(exist = false)
 	private String compName;
 
+
+	private String tenantId;
+
 }

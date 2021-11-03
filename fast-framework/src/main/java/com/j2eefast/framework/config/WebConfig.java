@@ -14,10 +14,10 @@ import com.j2eefast.common.core.adapter.SecurityKeyInterceptorAdapter;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.license.interceptor.LicenseCheckInterceptor;
 import com.j2eefast.common.core.utils.CookieUtil;
+import com.j2eefast.common.core.utils.Global;
+import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.framework.interceptor.RepeatSubmitInterceptor;
-import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
@@ -43,8 +43,9 @@ import com.j2eefast.common.core.utils.ToolUtil;
 public class WebConfig implements WebMvcConfigurer {
 
 
-	@Value("#{ @environment['spring.messages.defaultLocale'] ?: 'zh_CN' }")
+	@Value("#{ @environment['fast.messages.defaultLocale'] ?: 'zh_CN' }")
 	private String defaultLocale;
+
 	@Value("#{${web.adapter.registry} ?: null}")
 	private LinkedHashMap<String, String> adapterRegistry ;
 
@@ -63,8 +64,8 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-
-	    registry.addResourceHandler("/i18n/**").addResourceLocations("classpath:/i18n/");
+		//TODO 2.5.1 版本去除
+	    //registry.addResourceHandler("/i18n/**").addResourceLocations("classpath:/i18n/");
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
         /**工作流资源拦截 若不用可以屏蔽*/
 		registry.addResourceHandler("/flowable/**").addResourceLocations("classpath:/flowable/");
@@ -75,7 +76,6 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
-
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -137,18 +137,22 @@ public class WebConfig implements WebMvcConfigurer {
         @Override
         public Locale resolveLocale(HttpServletRequest request) {
 			String language = request.getParameter(ConfigConstant.LANGUAGE);
+			String cookie_language = CookieUtil.getCookie(request,ConfigConstant.LANGUAGE);
 			Locale locale = null;
 			if(ToolUtil.isNotEmpty(language)){
 				String[] split = language.split("_");
 				locale = new Locale(split[0],split[1]);
+				if(!language.equals(cookie_language)) {
+					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,language,60*60*24*7);
+				}
 			}else {
-				language = CookieUtil.getCookie(request,ConfigConstant.LANGUAGE);
-				if(ToolUtil.isNotEmpty(language)){
-					String[] split = language.split("_");
+				if(ToolUtil.isNotEmpty(cookie_language)){
+					String[] split = cookie_language.split("_");
 					locale = new Locale(split[0],split[1]);
 				}else{
 					String[] split = defaultLocale.split("_");
 					locale = new Locale(split[0],split[1]);
+					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,defaultLocale,60*60*24*7);
 				}
 			}
 			return locale;

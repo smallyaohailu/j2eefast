@@ -17,11 +17,14 @@ package com.j2eefast.framework.sys.constant.factory;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
+import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.service.SysFileService;
 import com.j2eefast.framework.sys.service.SysFileUploadService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>常量生产接口</p>
@@ -58,6 +61,21 @@ public interface IConstantFactory {
 	 */
 	List<Long> getRoleIds(Long userId);
 
+
+	/**
+	 * 通过用户ID获取角色ids
+	 * @param userId
+	 * @return
+	 */
+	List<SysRoleEntity> getRoles(Long userId);
+
+	/**
+	 * 通过用户ID获取模块
+	 * @param userId
+	 * @return
+	 */
+	List<Map<String, Object>> getModules(Long userId);
+
 //	/**
 //	 * 通过角色id获取角色名称
 //	 */
@@ -74,10 +92,12 @@ public interface IConstantFactory {
 	SysRoleEntity getRoleById(Long roleId);
 
 
+	Set<String> findPermissionsByUserId(Long userId);
+
 	/**
-	 * 获取部门名称
+	 * 通过用户ID获取对应部门名称
 	 */
-	String getDeptName(Long deptId);
+	String getDeptName(Long userId);
 
 
 	/**
@@ -135,10 +155,35 @@ public interface IConstantFactory {
 	 */
 	void clearMenu();
 
+	void clearMenu(Long userId);
+
 	/**
 	 * 清理权限缓存
 	 */
 	void clearRole();
+
+	
+	void clearRole(Long userId);
+
+	
+	void clearCompName(Long userId);
+
+	
+	void clearDeptName(Long userId);
+	
+	/**
+	 * 清理模块缓存
+	 */
+	void clearModules();
+
+	void clearModules(Long userId);
+
+	/**
+	 * 清除用户信息
+	 * @param userId
+	 */
+	void clearUser(Long userId);
+
 
 	SysLoginInfoEntity getFirstLoginInfo(String username);
 

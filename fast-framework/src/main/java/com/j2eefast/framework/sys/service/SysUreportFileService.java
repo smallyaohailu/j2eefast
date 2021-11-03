@@ -104,7 +104,7 @@ public class SysUreportFileService extends ServiceImpl<SysUreportFileMapper,SysU
 	 * @return
 	 */
 	public  SysUreportFileEntity getUreportFileByFileName(String fileName){
-		return this.getOne(new QueryWrapper<SysUreportFileEntity>().eq("name",fileName));
+		return this.sysUreportFileMapper.getUreportFileByFileName(fileName);
 	}
 
 	/**

@@ -13,17 +13,22 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.constants.Cache;
+import com.j2eefast.common.core.page.Query;
+import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.mapper.SysMenuMapper;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.utils.Constant;
+import com.j2eefast.framework.utils.UserUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -50,7 +55,7 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	 */
 	public List<SysMenuEntity> findMenuList(SysMenuEntity menu, LoginUserEntity user) {
 		List<SysMenuEntity> menuList = null;
-		if (user.getId().equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)){
+		if (user.getId().equals(Constant.SUPER_ADMIN)){
 			menuList = sysMenuMapper.findMenuList(menu);
 		}
 		else{
@@ -206,7 +211,8 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 		List<Ztree> ztrees = new ArrayList<Ztree>();
 		String modules = StrUtil.EMPTY;
 		if(ToolUtil.isEmpty(role.getModuleCodes())){
-			for(Map<String, Object> s: user.getModules()){
+			List<Map<String, Object>> tempLsit  = ConstantFactory.me().getModules(user.getId());
+			for(Map<String, Object> s: tempLsit){
 				modules = modules+s.get("moduleCode")+StrUtil.COMMA;
 			}
 			modules = modules.substring(0,modules.length()-1);
@@ -226,7 +232,7 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 
 	public List<SysMenuEntity> selectModuleMenuAll(LoginUserEntity user, String moduleCodes) {
 		List<SysMenuEntity> menuList = null;
-		if (user.getId().equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)) {
+		if (user.getId().equals(Constant.SUPER_ADMIN) || UserUtils.isContains(user.getRoles(),Constant.SU_ADMIN)) {
 			menuList = this.sysMenuMapper.findModuleMenuAll(moduleCodes);
 		}
 		else {
@@ -280,6 +286,7 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	 * @return
 	 */
 	public boolean clearMenuRedis(){
+		redisUtil.deletes(Cache.MODULES_CONSTANT+"*");
 		return  redisUtil.deletes(Cache.MENU_CONSTANT+"*");
 	}
 
@@ -351,7 +358,8 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 
 	public List<SysMenuEntity> selectMenuAll(LoginUserEntity user){
 		List<SysMenuEntity> menuList = null;
-		if (user.getId().equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)){
+		if (user.getId().equals(Constant.SUPER_ADMIN) ||
+				UserUtils.isContains(user.getRoles(),Constant.SU_ADMIN)){
 			menuList = this.list(new QueryWrapper<SysMenuEntity>().
 					orderByAsc("parent_id","order_num"));
 		}

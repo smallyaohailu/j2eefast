@@ -6,16 +6,18 @@
 package com.j2eefast.framework.shiro.realm;
 
 import java.util.*;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
+import java.util.concurrent.ConcurrentMap;
+
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import com.j2eefast.common.core.enums.LogType;
+import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
-import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
-import com.j2eefast.framework.sys.mapper.SysMenuMapper;
-import com.j2eefast.framework.sys.mapper.SysModuleMapper;
+import com.j2eefast.framework.sys.entity.SysUserEntity;
+import com.j2eefast.framework.sys.service.SysUserService;
 import com.j2eefast.framework.utils.UserUtils;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -31,14 +33,18 @@ import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.manager.AsyncManager;
+import com.j2eefast.common.core.shiro.RedisCacheManager;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.manager.factory.AsyncFactory;
 import com.j2eefast.framework.shiro.service.SysLoginService;
 import com.j2eefast.framework.utils.Constant;
-
 
 /**
  * 自定义的指定Shiro验证用户登录的类 认证
@@ -46,8 +52,7 @@ import com.j2eefast.framework.utils.Constant;
  * @date 2020-03-12 20:57
  */
 @Slf4j
-public class UserRealm extends AuthorizingRealm {
-
+public class UserNameRealm extends AuthorizingRealm {
 
 	/**
 	 * 授权(验证权限时调用)
@@ -55,15 +60,18 @@ public class UserRealm extends AuthorizingRealm {
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		LoginUserEntity user = (LoginUserEntity) principals.getPrimaryPrincipal();
+		log.info("------->>>授权(验证权限时调用)");
 		Long userId = user.getId();
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		// 系统管理员，拥有最高权限
-		if (userId.equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)){
+		if (userId.equals(Constant.SUPER_ADMIN)){
 			info.addRole("ADMIN");
 			info.addStringPermission("*:*:*");
 		} else {
-			info.addRoles(user.getRoleKey());
-			info.setStringPermissions(user.getPermissions());
+			info.addRoles(UserUtils.getRoleKey(user.getRoles()));
+			//获取菜单权限
+			info.setStringPermissions(ConstantFactory.me()
+					.findPermissionsByUserId(userId));
 		}
 		return info;
 	}
@@ -75,15 +83,10 @@ public class UserRealm extends AuthorizingRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken)
 			throws AuthenticationException {
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
-		String username = token.getUsername();
-		String password = "";
-		if (ToolUtil.isNotEmpty(token.getPassword())){
-			password = new String(token.getPassword());
-        }
 		// 查询用户信息
-		LoginUserEntity user = new LoginUserEntity();
+		LoginUserEntity authenUser = new LoginUserEntity();
 		try {
-			user = SpringUtil.getBean(SysLoginService.class).loginVerify(username, password);
+			authenUser = SpringUtil.getBean(SysLoginService.class).loginVerify(token);
 		}catch (RxcException e) {
 			//不同异常不同抛出
 			if(e.getCode().equals("50001")) {
@@ -96,13 +99,16 @@ public class UserRealm extends AuthorizingRealm {
 				throw new IncorrectCredentialsException(e.getMessage(), e);
 			}else if(e.getCode().equals("50004")) {
 				throw new UnknownAccountException(e.getMessage(), e);
+			}else if(e.getCode().equals("50006")) {
+				throw new UnknownAccountException(e.getMessage(), e);
 			}
 		}catch (Exception e){
-			log.error("对用户[" + username + "]进行登录验证..验证未通过:{}", e.getMessage());
+			log.error("对用户[" + authenUser.getUsername() + "]进行登录验证..验证未通过:{}", e.getMessage());
             throw new AuthenticationException(e.getMessage(), e);
         }
-		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, user.getPassword(),
-				ByteSource.Util.bytes(user.getSalt()), getName());
+		SysUserEntity sysUser = SpringUtil.getBean(SysUserService.class).getById(authenUser.getId());
+		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(authenUser, sysUser.getPassword(),
+				ByteSource.Util.bytes(sysUser.getSalt()), getName());
 		return info;
 	}
 
@@ -114,6 +120,30 @@ public class UserRealm extends AuthorizingRealm {
 		shaCredentialsMatcher.setStoredCredentialsHexEncoded(true);
 		super.setCredentialsMatcher(shaCredentialsMatcher);
 	}
+	
+	/**
+	 * 区分登录认证Realm
+	 */
+	@Override
+	public boolean supports(AuthenticationToken token) {
+		return token instanceof UsernamePasswordToken;
+	}
+	
+	/**
+	 * 退出系统
+	 */
+	@Override
+	public void onLogout(PrincipalCollection principals) {
+		super.onLogout(principals);
+		LoginUserEntity user = (LoginUserEntity) principals.getPrimaryPrincipal();
+		//记录退出
+		AsyncManager.me().execute(AsyncFactory.outLoginInfor(user.getUsername(),
+				user.getCompId(),user.getDeptId(), "00000","退出系统!",
+				DateUtil.date(),
+				LogType.SYS.getVlaue(),user.getTenantId()));
+
+        //super.onLogout(principals);
+    }
 
 	/**
 	 * 清理缓存权限
@@ -125,75 +155,26 @@ public class UserRealm extends AuthorizingRealm {
 		//清理缓存
 		ConstantFactory.me().clearMenu();
 		ConstantFactory.me().clearRole();
-		if(!loginUser.getId().equals(Constant.SUPER_ADMIN) || !loginUser.getRoleKey().contains(Constant.SU_ADMIN)){
+		ConstantFactory.me().clearModules();
+		
+		//清除本身业务权限
+		if(!loginUser.getId().equals(Constant.SUPER_ADMIN)){
 
 			//获取用户角色列表
-			List<Long> roleList = ConstantFactory.me().getRoleIds(loginUser.getId());
-			List<String> roleNameList = new ArrayList<>();
-			List<String> roleKeyList = new ArrayList<>();
-//			List<String> datalist = new ArrayList<>();
-//			int dataScope = -1;
-//			for (Long roleId : roleList) {
-//				SysRoleEntity role = ConstantFactory.me().getRoleById(roleId);
-//				int temp = Integer.parseInt(role.getDataScope());
-//				if(temp == 5){
-//					datalist.add(String.valueOf(temp));
-//				}else{
-//					if(dataScope < temp){
-//						dataScope = temp;
-//					}
-//				}
-//				roleNameList.add(role.getRoleName());
-//				roleKeyList.add(role.getRoleKey());
-//			}
-//			if(dataScope == 6){
-//				datalist.clear();
-//			}
-//			loginUser.setRoleList(roleList);
-//			loginUser.setRoleNames(roleNameList);
-//			loginUser.setRoleKey(roleKeyList);
-
-			// 根居角色ID获取模块列表
-			List<SysModuleEntity> modules = SpringUtil.getBean(SysModuleMapper.class).findModuleByRoleIds(roleList);
-			List<Map<String, Object>>  results = new ArrayList<>(modules.size());
-			modules.forEach(module->{
-				Map<String, Object> map = BeanUtil.beanToMap(module);
-				results.add(map);
+			List<SysRoleEntity> roleList = ConstantFactory.me().getRoles(loginUser.getId());
+			List<Object> reles = new ArrayList<>();
+			roleList.forEach(r->{
+				reles.add(r);
 			});
-			loginUser.setModules(results);
-			//设置权限列表
-			Set<String> permissionSet = new HashSet<>();
-			List<Map<Object,Object>> xzz = new ArrayList<>(roleList.size());
-			for (Long roleId : roleList) {
-				SysRoleEntity role = ConstantFactory.me().getRoleById(roleId);
-				List<String> permissions = SpringUtil.getBean(SysMenuMapper.class).findPermsByRoleId(roleId);
-				if (permissions != null) {
-					Map<Object, Object> map = new HashMap<>();
-					Set<String> tempSet = new HashSet<>();
-					for (String permission : permissions) {
-						if (ToolUtil.isNotEmpty(permission)) {
-							String[] perm = StrUtil.splitToArray(permission,",");
-							for(String s: perm){
-								permissionSet.add(s);
-								tempSet.add(s);
-							}
-						}
-					}
-					map.put(role,tempSet);
-					xzz.add(map);
-				}
-				roleNameList.add(role.getRoleName());
-				roleKeyList.add(role.getRoleKey());
-			}
-			loginUser.setRoleList(roleList);
-			loginUser.setRoleNames(roleNameList);
-			loginUser.setRoleKey(roleKeyList);
-			loginUser.setRolePerm(xzz);
-			loginUser.setPermissions(permissionSet);
 
+			loginUser.setRoles(reles);
 			//刷新用户
 			UserUtils.reloadUser(loginUser);
 		}
+		
 		this.clearCachedAuthorizationInfo(SecurityUtils.getSubject().getPrincipals());
+		
+		SpringUtil.getBean(RedisUtil.class).deletes(RedisCacheManager.DEFAULT_CACHE_KEY_PREFIX+"*");
+		
 	}
 }

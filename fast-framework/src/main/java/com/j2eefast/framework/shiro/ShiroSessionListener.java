@@ -6,8 +6,15 @@
 package com.j2eefast.framework.shiro;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.shiro.RedisSessionDAO;
+import com.j2eefast.common.core.utils.RedisUtil;
+import com.j2eefast.common.core.utils.SpringUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * 
@@ -53,8 +60,8 @@ public class ShiroSessionListener implements SessionListener {
 	@Override
 	public void onExpiration(Session session) {
 		System.out.println("-------------------------会话过期,:session:" + session.getId());
-//		redisUtil.set("sys:session:" + session.getId(), "00001", redisUtil.MINUTE);
 		// 会话过期,在线人数减一
+		//SpringUtil.getBean(RedisUtil.class).delSession(ConfigConstant.SHIRO_SESSION_ID + session.getId());
 		sessionCount.decrementAndGet();
 	}
 

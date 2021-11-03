@@ -2,18 +2,21 @@ package com.j2eefast.framework.shiro;
 
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,18 +104,19 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         }catch (Exception e){
             log.error("error getting system parameter [SYS_IS_LOGIN]",e);
         }
-        //如果有登录,判断是否访问的为静态资源，如果是游客允许访问的静态资源,直接返回true
-        HttpServletRequest httpServletRequest = (HttpServletRequest)request;
-        String path = httpServletRequest.getServletPath();
+
         Subject subject = getSubject(request, response);
         //检查是否已经登录
-        if(!subject.isAuthenticated() && !subject.isRemembered()) {
+        if(!subject.isAuthenticated() && !subject.isRemembered()){
+            //检测是否创建会话
+            subject.getSession(true);
             //如果没有登录，直接进行之后的流程
             return true;
         }
+
         //如果有登录,判断是否访问的为静态资源，如果是游客允许访问的静态资源,直接返回true
-//        HttpServletRequest httpServletRequest = (HttpServletRequest)request;
-//        String path = httpServletRequest.getServletPath();
+        HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+        String path = httpServletRequest.getServletPath();
         // 如果是静态文件，则返回true
         if (isStaticFile(path)){
             return true;
@@ -147,8 +151,12 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         Serializable sessionId = session.getId();
         // 初始化用户的队列放到缓存里
         Deque<Serializable> deque = (Deque<Serializable>) redisUtil.getSession(getRedisKickoutKey(username));
+        boolean flag = false;
+        int firstNum = 0;
         if(deque == null || deque.size()==0) {
-            deque = new LinkedList<Serializable>();
+            deque = new LinkedList<>();
+        }else{
+            firstNum = deque.size();
         }
 
         //如果队列里没有此sessionId，且用户没有被踢出；放入队列
@@ -159,27 +167,45 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         //如果队列里的sessionId数超出最大会话数，开始踢人
         while(deque.size() > maxSession) {
             Serializable kickoutSessionId = null;
+            flag = true;
             //如果踢出后者
             if(kickoutAfter) {
-                kickoutSessionId = deque.removeFirst();
+                // 判断前者是否还是登录状态 如果是登录状态就提出后者否则登录
+                Serializable sId = deque.getLast();
+                try{
+                    Session tempSession = sessionManager.getSession(new DefaultSessionKey(sId));
+                    PrincipalCollection existingPrincipals =
+                            (PrincipalCollection) tempSession.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+                    if(existingPrincipals == null){
+                        kickoutSessionId = deque.removeLast();
+                    }else{
+                        kickoutSessionId = deque.removeFirst();
+                    }
+                }catch (Exception e){
+                    kickoutSessionId = deque.removeLast();
+                }
             } else {
                 //否则踢出前者
                 kickoutSessionId = deque.removeLast();
             }
             try {
-                Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
-                if(kickoutSession != null) {
-                    //设置会话的kickout属性表示踢出了
-                    kickoutSession.setAttribute("kickout", true);
-                }
+            	if(kickoutSessionId != null) {
+            		Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
+                    if(kickoutSession != null) {
+                        //设置会话的kickout属性表示踢出了
+                        kickoutSession.setAttribute("kickout", true);
+                    }
+            	}
             } catch (Exception e) {
                 //获取session异常
                 log.debug("UnknownSessionException: There is no session with id: {}", kickoutSessionId);
             }
         }
 
-        //报错session 会到redis
-        redisUtil.setSession(getRedisKickoutKey(username), deque);
+        if(flag || firstNum != deque.size()){
+            //有踢人更新缓存
+            redisUtil.setSession(getRedisKickoutKey(username), deque);
+        }
 
         //如果被踢出了，直接退出，重定向到踢出后的地址
         if (session.getAttribute("kickout") != null) {

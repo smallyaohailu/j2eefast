@@ -8,10 +8,20 @@ package com.j2eefast.framework.shiro;
 import lombok.Data;
 import org.apache.shiro.authc.UsernamePasswordToken;
 
+/*
+ * 启用
+ * 2021-09-24
+ */
+@Deprecated
 @Data
 public class UserToken  extends UsernamePasswordToken {
 
-    private String loginType;
+    /**s
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String loginType;
 
     public UserToken() {
     }

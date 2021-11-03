@@ -13,7 +13,6 @@ import com.j2eefast.common.db.entity.SysDatabaseEntity;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.sys.service.SysDatabaseService;
 import com.j2eefast.framework.utils.Constant;
-import lombok.extern.log4j.Log4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import java.util.Map;
  * @web: http://www.j2eefast.com
  * @version: 1.0.1
  */
-@Log4j
 @Controller
 @RequestMapping("/sys/database")
 public class SysDatabaseController  extends BaseController {

@@ -34,6 +34,9 @@ public interface SysUreportFileMapper extends BaseMapper<SysUreportFileEntity> {
      * @return
      */
     SysUreportFileEntity findSysUreportFileById(@Param("id") Long id);
+    
+    
+    SysUreportFileEntity getUreportFileByFileName(@Param("name") String name);
 
     /**
      * 查询列表

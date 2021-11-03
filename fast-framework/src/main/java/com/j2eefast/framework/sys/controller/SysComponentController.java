@@ -98,7 +98,7 @@ public class SysComponentController extends BaseController {
 				TableZtreeEntity ztreeEntity = new TableZtreeEntity();
 				ztreeEntity.setClear(ztree.getBool("isClear",true));
 				ztreeEntity.setUrl(ztree.getStr("url",""));
-				ztreeEntity.setName(ztree.getStr("name",t.getTitle()));
+				ztreeEntity.setName(ztree.getStr("name",t.getField()));
 				ztreeEntity.setKeyId(ztree.getStr("keyId","id"));
 				ztreeEntity.setExpandLevel(ztree.getBool("expandLevel",false));
 				ztreeEntity.setSelectParent(ztree.getBool("isSelectParent",false));

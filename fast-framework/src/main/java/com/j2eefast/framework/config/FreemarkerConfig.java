@@ -15,6 +15,7 @@ import freemarker.template.TemplateException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 /**
  * Freemarker 模板引擎配置
@@ -30,7 +31,7 @@ public class FreemarkerConfig {
 			 										 throws IOException, TemplateException {
 		FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
 		configurer.setTemplateLoaderPath("classpath:/templates");
-		Map<String, Object> variables = new HashMap<>(1);
+		Map<String, Object> variables = new HashMap<>(3);
 		variables.put("config", sysconfig);
 		variables.put("dict",dict);
 		variables.put("permission",permission);
@@ -47,5 +48,4 @@ public class FreemarkerConfig {
 		configurer.setConfiguration(configuration);
 		return configurer;
 	}
-
 }

@@ -18,6 +18,8 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.j2eefast.common.core.exception.RxcException;
 import freemarker.core.InvalidReferenceException;
 
@@ -33,7 +35,7 @@ public class RxcExceptionHandler {
 	 * 处理自定义异常
 	 */
 	@ExceptionHandler(RxcException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public ResponseData handleRxcException(RxcException e) {
 		logger.error("异常 代码[{}] 异常信息[{}]",e.getCode(),e.getMessage());
 		ResponseData r = new ResponseData();
@@ -86,6 +88,21 @@ public class RxcExceptionHandler {
 		logger.error(e.getMessage(),e);
 		if(ToolUtil.isEmpty(e.getMessage())){
 			return ResponseData.error("服务器异常!");
+		}
+		return ResponseData.error(e.getMessage());
+	}
+	
+	/**
+	 * 阿里报表异常捕获
+	 * @date 2021-09-30 15:14
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(ExcelAnalysisException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseData ResponseExcelAnalysisException(Exception e) {
+		if(e.getCause() instanceof  RxcException){
+			return ResponseData.error(((RxcException) e.getCause()).getCode(),((RxcException) e.getCause()).getMsg());
 		}
 		return ResponseData.error(e.getMessage());
 	}

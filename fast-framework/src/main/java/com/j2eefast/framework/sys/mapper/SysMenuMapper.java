@@ -6,6 +6,8 @@
 package com.j2eefast.framework.sys.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
 import org.apache.ibatis.annotations.Param;
 
@@ -82,6 +84,16 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	 */
 	List<SysMenuEntity> findListmoduleParentId(@Param("parentId") Long parentId,
 												@Param("modules") String modules);
+
+
+	/**
+	 * 分页查询
+	 * @param page
+	 * @param menu
+	 * @return
+	 */
+	Page<SysMenuEntity> findPage(IPage<SysMenuEntity> page,
+								 @Param("menu") SysMenuEntity menu);
 
 	/**
 	 * 查询所有菜单
