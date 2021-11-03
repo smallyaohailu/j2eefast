@@ -13,8 +13,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.utils.Constant;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import javax.annotation.Resource;
@@ -30,7 +28,7 @@ import com.j2eefast.common.core.utils.MapUtil;
 /**
  * 测试异步树Service接口
  * @author: ZhouZhou
- * @date 2020-12-21 11:03:28
+ * @date 2021-10-20 11:43:20
  */
 @Service
 public class ExampleAsyncTreeService extends ServiceImpl<ExampleAsyncTreeMapper,ExampleAsyncTreeEntity> {

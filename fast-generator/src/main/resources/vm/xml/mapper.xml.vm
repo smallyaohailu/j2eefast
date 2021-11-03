@@ -68,7 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 #if($jion == "1")
         <include refid="${className}Joins"/>
 #end
-		WHERE a.${pkColumn.columnName} = '${${pkColumn.javaField}}'
+		WHERE a.${pkColumn.columnName} = #{${pkColumn.javaField}}
     </select>
 #if($table.tree)
 #if($async == '0')

@@ -1,0 +1,155 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="代码预览"  libs=["code"]>
+    <style>
+        .nav-tabs-custom{margin-bottom:0 !important;box-shadow:none !important;border-radius:0 !important;}
+    </style>
+</@header>
+    <div class="wrapper">
+        <div class="nav-tabs-custom pt5">
+            <ul class="nav nav-tabs">
+                <#list gen_code as cdoeKey>
+                    <#if cdoeKey_index == 0>
+                        <li class="active"><a href="#tab_1_${cdoeKey.id}" data-id="${cdoeKey.id}" data-toggle="tab" data-type="${cdoeKey.suffix}">${cdoeKey.name}</a></li>
+                    <#else>
+                        <li><a  href="#tab_1_${cdoeKey.id}" data-toggle="tab" data-id="${cdoeKey.id}"  data-type="${cdoeKey.suffix}">${cdoeKey.name}</a></li>
+                    </#if>
+                </#list>
+            </ul>
+            <div class="tab-content">
+                <#list gen_code as cdoeKey>
+                    <#if cdoeKey_index == 0>
+                        <div class="tab-pane active" id="tab_1_${cdoeKey.id}">
+                            <pre  id="code_${cdoeKey.id}" data-id="${cdoeKey.id}" class="editor">${cdoeKey.templateValue?html}</pre>
+                            <div id="code_${cdoeKey.id}_toolBar" class="ace_tip_search right">
+                                <button type="button" class="btn btn-info btn-xs" data-id="${cdoeKey.id}" id="saveCode_${cdoeKey.id}">保存生成到项目</button>
+                            </div>
+                            <script>
+                                $(function() {
+                                    aceCreadEditor('code_${cdoeKey.id}','${cdoeKey.suffix}');
+                                    var value = $('#code_${cdoeKey.id}').aceEditor('getValue');
+                                    $('#saveCode_${cdoeKey.id}').on('click',function(){
+                                        $('#code_${cdoeKey.id}').css({
+                                            'height': $(window).outerHeight() - 10,
+                                            'font-size': '14px',
+                                            'top': '10px',
+                                            'position': 'static',
+                                            'width': '100%'
+                                        })
+                                        $('#code_${cdoeKey.id}').aceEditor('resize');
+                                    });
+                                })
+                            </script>
+                        </div>
+                    <#else>
+                        <div class="tab-pane" id="tab_1_${cdoeKey.id}">
+                            <pre  id="code_${cdoeKey.id}" data-id="${cdoeKey.id}" class="editor">${cdoeKey.templateValue?html}</pre>
+                            <div id="code_${cdoeKey.id}_toolBar" class="ace_tip_search right">
+                                <button type="button" class="btn btn-info btn-xs" data-id="${cdoeKey.id}" id="saveCode_${cdoeKey.id}">保存生成到项目</button>
+                            </div>
+                            <script>
+                                $(function() {
+                                    aceCreadEditor('code_${cdoeKey.id}', '${cdoeKey.suffix}');
+                                    var value = $('#code_${cdoeKey.id}').aceEditor('getValue');
+                                    $('#saveCode_${cdoeKey.id}').on('click', function () {
+                                        //
+                                        var options = {
+                                            title: false,
+                                            type: 1,
+                                            shadeClose: false,
+                                            url: $('#code' + $(this).data('id'))
+                                        }
+                                        opt.modal.openOptions(options);
+                                    });
+                                })
+                            </script>
+                        </div>
+                    </#if>
+                </#list>
+            </div>
+            <div class="box-footer">
+                <div class="row">
+                    <div class="col-sm-offset-5 col-sm-10 mb20">
+                        <button type="button" id="viewBut" class="btn btn-sm btn-info hide" title="保存信息此时代码信息并未生成到目录" onclick="viewFun()"><i class="fa fa-eye"></i> 预览当前页面</button>&nbsp;
+                        <button type="button" class="btn btn-sm btn-primary" title="保存信息此时代码信息并未生成到目录" onclick="opt.form.submit()"><i class="fa fa-check"></i> 保存当前信息</button>&nbsp;
+                        <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>关 闭 </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<@footer>
+<script src="${ctxStatic}/static/libs/base64.js"></script>
+<script type="text/javascript">
+
+    function aceCreadEditor(id,suffix){
+        var  lang = suffix;
+        if (lang == 'html'){ lang = 'ftl'; }
+        $('#' + id).aceEditor({
+            id: id,
+            readOnly: false,
+            height: $(window).height() -$('.nav-tabs').outerHeight()  - $('.box-footer').outerHeight() - 70,
+            lang: lang,
+            fontSize: 14,
+            saveAceCallback: saveAceCallback,
+            top: 0
+        })
+    }
+
+    var index;
+
+    function saveAceCallback(id, event){
+        console.log(id);
+        var data = {"id":$('#' + id).data('id'),"templateValue": Base64.encode(event.getValue())};
+        var config = {
+            url: baseURL + 'gen/view/updateView',
+            type: "POST",
+            dataType: "JSON",
+            data: data,
+            success: function(result) {
+                if(result.code == opt.variable.web_status.SUCCESS){
+                    opt.success('保存成功,还未生成!');
+                }else{
+                    opt.error(result.msg);
+                }
+            }
+        }
+        opt.common.sendAjax(config);
+    }
+
+    function viewFun(){
+        var value = $('#code_' + index).aceEditor('getValue');
+        console.log($(top.window?top.window:window).outerWidth());
+        var options = {
+            title: '页面在线预览',
+            url: baseURL + "gen/view",
+            width: ($(top.window?top.window:window).outerWidth() - 100),
+            height: ($(top.window?top.window:window).outerHeight() - 100),
+            <#-- POST提交组件控制类参数-->
+            fromData:{
+                edit: Base64.encode(value)
+            }
+        }
+        opt.modal.openMainWin(options);
+    }
+
+    //切换回调
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        //e.target // newly activated tab
+        //e.relatedTarget // previous active tab
+        //如果是html 页面则显示预览按钮
+        if($(e.target).data("type") == 'html'){
+            $('#viewBut').removeClass('hide');
+            index = $(e.target).data("id");
+        }else{
+            $('#viewBut').addClass('hide');
+        }
+    })
+
+    $(window).resize(function(){
+        var tabHeight = $('.nav-tabs').outerHeight();
+        $('.editor').height($(window).height() - tabHeight - $('.box-footer').outerHeight() - 70);
+    }).resize();
+</script>
+</@footer>
+</@pageTheme>

@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         <include refid="exampleSynchTreeColumns"/>
 		FROM  example_tree a
-		WHERE a.id = '${id}'
+		WHERE a.id = #{id}
     </select>
 
     <!-- 查询树表所有数据List集合 -->

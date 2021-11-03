@@ -1,0 +1,55 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+    <@header title="代码预览"  libs=["prism"]>
+        <style>
+            body{
+                font-size: 15px !important;
+            }
+            .nav-tabs-custom{margin-bottom:0 !important;box-shadow:none !important;border-radius:0 !important;}
+        </style>
+    </@header>
+    <div class="wrapper">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <#list gen_code?keys as cdoeKey>
+                    <#if cdoeKey_index == 0>
+                        <li class="active"><a href="#tab_1_${cdoeKey_index}" data-toggle="tab">${cdoeKey}</a></li>
+                    <#else>
+                        <li><a  href="#tab_1_${cdoeKey_index}" data-toggle="tab">${cdoeKey}</a></li>
+                    </#if>
+                </#list>
+            </ul>
+            <div class="tab-content">
+                <#list gen_code?keys as cdoeKey>
+                    <#if cdoeKey_index == 0>
+                        <div class="tab-pane active" id="tab_1_${cdoeKey_index}">
+                             <pre class="line-numbers">
+                                 <code id="code_${cdoeKey_index}" class="language-${cdoeKey[(cdoeKey?index_of(".")+1)..]}">
+                                    ${gen_code["${cdoeKey}"]?html}
+                                 </code>
+                             </pre>
+                        </div>
+                    <#else>
+                        <div class="tab-pane" id="tab_1_${cdoeKey_index}">
+                             <pre class="line-numbers">
+                                 <code id="code_${cdoeKey_index}" class="language-${cdoeKey[(cdoeKey?index_of(".")+1)..]}">
+                                        ${gen_code["${cdoeKey}"]?html}
+                                 </code>
+                             </pre>
+                        </div>
+                    </#if>
+                </#list>
+            </div>
+        </div>
+    </div>
+    <@footer>
+        <script type="text/javascript">
+
+            function onLoadSuccess() {
+
+                opt.modal.msg("数据正在加载...请稍后");
+            }
+
+        </script>
+    </@footer>
+</@pageTheme>

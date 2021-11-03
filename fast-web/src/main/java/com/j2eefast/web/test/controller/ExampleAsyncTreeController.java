@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 测试异步树页面控制器
  * @author ZhouZhou
- * @date 2020-12-21 11:03:28
+ * @date 2021-10-20 11:43:20
  */
 @Controller
 @RequestMapping("/demo/asyncTree")
@@ -140,7 +140,7 @@ public class ExampleAsyncTreeController extends BaseController{
 		ValidatorUtil.validateEntity(exampleAsyncTree);
         return exampleAsyncTreeService.updateExampleAsyncTreeById(exampleAsyncTree)? success(): error("修改失败!");
     }
-    
+
     /**
      * 删除
      */

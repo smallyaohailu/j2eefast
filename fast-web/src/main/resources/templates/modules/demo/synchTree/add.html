@@ -7,7 +7,7 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">
             <span style="color: red; ">* </span>
-            <@ctx.i18n text = "父级ID"/>：
+            ${i18n("父级ID")}：
         </label>
         <div class="col-sm-8">
             <@f.treeselect id="parentId" name="parentId" boxTitle="选择父级ID" url="demo/synchTree/treeData"
@@ -18,7 +18,7 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">
             <span style="color: red; ">* </span>
-            <@ctx.i18n text = "节点名称"/>：
+            ${i18n("节点名称")}：
         </label>
         <div class="col-sm-8">
             <@f.input name="name"  required=true />
@@ -26,7 +26,7 @@
     </div>
     <div class="form-group">
         <label class="col-sm-3 control-label">
-            <@ctx.i18n text = "节点全称"/>：
+            ${i18n("节点全称")}：
         </label>
         <div class="col-sm-8">
             <@f.input name="fullName"  />
@@ -34,7 +34,7 @@
     </div>
     <div class="form-group">
         <label class="col-sm-3 control-label">
-            <@ctx.i18n text = "状态"/>：
+            ${i18n("状态")}：
         </label>
         <div class="col-sm-8">
             <@f.radio name="status" dictType="sys_status"  />
@@ -42,7 +42,7 @@
     </div>
     <div class="form-group">
         <label class="col-sm-3 control-label">
-            <@ctx.i18n text = "备注信息"/>：
+            ${i18n("备注信息")}：
         </label>
         <div class="col-sm-8">
             <@f.textarea name="remark" />

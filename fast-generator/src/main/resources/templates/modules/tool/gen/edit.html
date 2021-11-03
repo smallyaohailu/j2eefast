@@ -1,49 +1,28 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
 <@header title="修改生成信息" bodyClass="gray-bg animated fadeInRight" isAnimation=false libs=["table","zTree","tableReorder","selectPage"]>
-<style type="text/css">
-	.select-table table{table-layout:fixed;}.table>thead>tr>th{text-align:center;}
-	.select-table .table td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-	.icheckbox-blue{top:0px !important;}
-	.form-control.select2-hidden-accessible{position:static!important;}
-	.select-table table label.error{position: inherit;}select + label.error{z-index:1;right:40px;}
-	.table{
-		table-layout: fixed;
-	}
-	.fixed-table-body {
-		overflow-x: auto;
-		overflow-y: auto;
-		height: 90%;
-	}
-	th {
-		font-weight:normal;
-	}
-	.table-striped .table>thead>tr>th, .table-striped .table>tbody>tr>th {
-		border-bottom: 1px solid #ccc!important;
-		border-right: 1px solid #ccc!important;
-		border-top: 1px!important;
-	}
-	.table-striped .table, .table-striped .table, .table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
-		border-bottom: 1px solid #e7eaec!important;
-		background-color: transparent;
-		border-right: 1px solid #e7eaec!important;
-	}
-	.fixed-table-container thead th .th-inner {
-		padding: 7px 0 5px 2px;
-	}
-	.bootstrap-table .table:not(.table-condensed)>tbody>tr>td{
-		padding: 3px 6px;
-	}
-	.select2-container--bootstrap .select2-selection--single {
-		height: 30px;
-	}
-	.check-box{
-		margin: 0px;
-		padding: 0!important;
-		width: 18px;
-		height: 18px;
-		border: 0;
-	}
+<style>
+.fixed-table-container thead th .th-inner {
+	padding: 7px 0 5px 2px;
+}
+.bootstrap-table .table:not(.table-condensed)>tbody>tr>td {
+	padding: 3px 6px;
+}
+.form-control.select2-hidden-accessible{position:static!important;}
+.select-table table label.error{position: inherit;}select + label.error{z-index:1;right:40px;}
+.select2-container--bootstrap .select2-selection--single {
+	height: 30px;
+}
+.check-box{
+	margin: 0px;
+	padding: 0!important;
+	width: 18px;
+	height: 18px;
+	border: 0;
+}
+.section-content{
+	overflow: hidden;
+}
 </style>
 </@header>
     <section class="section-content">
@@ -122,10 +101,17 @@
                             
                             <!-- 字段信息 -->
                             <div class="tab-pane animated fadeInUp" id="tab-field">
-								<button type="button" class="btn btn-sm btn-primary" onclick="refreshTableColumn()"><i class="fa fa-refresh"></i>从库中更新表栏位</button>
+								<div class="btn-group-sm" id="toolbar-bootstrap-table" role="group">
+									<a class="btn btn-primary" onclick="refreshTableColumn()"><i class="fa fa-refresh"></i>&nbsp;${i18n("从库中更新表栏位")}</a>
+								</div>
+<#--								<button type="button" class="btn btn-sm btn-primary" onclick="refreshTableColumn()"><i class="fa fa-refresh"></i>从库中更新表栏位</button>-->
                                 <div class="select-table table-striped" style="margin-top: 0px;padding-top: 0px;padding-bottom: 0px;">
 								    <table id="bootstrap-table" data-use-row-attr-func="true" data-reorderable-rows="true"></table>
 								</div>
+<#--								<div class="btn-group-sm" id="toolbar-bootstrap-table" role="group">-->
+<#--									<a class="btn btn-primary" onclick="refreshTableColumn()"><i class="fa fa-refresh"></i>&nbsp;${i18n("从库中更新表栏位"/></a>-->
+<#--								</div>-->
+<#--								<@table id="bootstrap-table" isNative = true/>-->
                             </div>
                             
                             <!-- 生成信息 -->
@@ -212,7 +198,7 @@
 															<input type="radio" name="isCover" value="${d.dictValue}"
 																   <#if (d.isDefault =='Y' && gen_table.isCover == "") ||
 																   (gen_table.isCover ==d.dictValue ) >checked</#if>>
-															<label><@ctx.i18n text = "${d.dictLabel}"/></label>
+															<label>${i18n("${d.dictLabel}")}</label>
 														</div>
 													</#items>
 												</#list>
@@ -316,7 +302,7 @@
 																<input type="radio" name="isDel" value="${d.dictValue}"
 																	   <#if (d.isDefault =='Y' && gen_table.isDel == "") ||
 																	   (gen_table.isDel ==d.dictValue ) >checked</#if>>
-																<label><@ctx.i18n text = "${d.dictLabel}"/></label>
+																<label>${i18n("${d.dictLabel}")}</label>
 															</div>
 														</#items>
 													</#list>
@@ -417,9 +403,11 @@
                         </form>
                     </div>
                 </div>
-               <div class="box-footer">
-			       <div class="col-sm-offset-5 col-sm-6 mb10">
-			           <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+				<div class="hr-line-dashed"></div>
+               <div class="row">
+				   <div class="col-sm-offset-5 col-sm-10 mb20">
+<#--			           <button type="button" class="btn btn-sm badge-danger" onclick="opt.form.submit()"><i class="fa fa-bug"></i> 保存生成更新Java类</button>&nbsp;-->
+					   <button type="button" class="btn btn-sm btn-primary" title="保存信息此时代码信息并未生成到目录" onclick="opt.form.submit()"><i class="fa fa-check"></i> 保存信息</button>&nbsp;
 			           <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>关 闭 </button>
 			       </div>
            	   </div>
@@ -457,7 +445,7 @@
 	    }
 
 	    function selectMenu() {
-			opt.modal.open("<@ctx.i18n text = "设置菜单"/>",prefix + "/selectMenu/" +  $('input[name="id"]').val(),'','',doSubmitMenu)
+			opt.modal.open("${i18n("设置菜单")}",prefix + "/selectMenu/" +  $('input[name="id"]').val(),'','',doSubmitMenu)
         }
 
 		function doSubmitMenu(index, layero,_layer){
@@ -496,39 +484,62 @@
 		        showRefresh: false,
 		        showToggle: false,
 		        showColumns: false,
+				isFixedColumn: true,
+				showBorder: true,
 				firstLoad: false,
 		        onReorderRow: onReorderRow,
-				// fixedColumns: true,
-				// fixedNumber: 4,
-		        columns:
-								[
-									{
-										title: $.i18n.prop("序号"),
-										width: "32",
-										align: 'center',
-										formatter: function (value, row, index) {
-											/*编号隐藏域*/
-											var idHtml = opt.common.sprintf("<input type='hidden' name='columns[%s].id' value='%s'>", index, row.id);
-											/*排序隐藏域*/
-											var sortHtml = opt.common.sprintf("<input type='hidden' name='columns[%s].sort' value='%s' id='columns_sort_%s'>", index, row.sort, row.id);
-											return idHtml + sortHtml +$.table.serialNumber(index);
-										}
-									},
-				{
-					title: '<i class="fa fa-arrows" style="color:#aaa"></i>'
-							+ "<a tabindex='0' role='button' data-toggle='popover' data-trigger='focus' " +
-							"data-placement='right' data-html='true' data-content='<span style=\"color:red\">拖拽排序使生成展示页面表格显示顺序!<span>'><i class='fa fa-question-circle-o' style='color: orange'></i></a>",
-					width: "32",
-					align: 'center',
-					class: "drag",
-					formatter: function (value, row, index) {
-						return '<i class="fa fa-arrows" style="color:#aaa"></i>';
+		        columns:[
+				[
+					{
+						title: $.i18n.prop("序号"),
+						width: 32,
+						rowspan: 2, //合并行
+						align: 'center',
+						formatter: function (value, row, index) {
+							/*编号隐藏域*/
+							var idHtml = opt.common.sprintf("<input type='hidden' name='columns[%s].id' value='%s'>", index, row.id);
+							/*排序隐藏域*/
+							var sortHtml = opt.common.sprintf("<input type='hidden' name='columns[%s].sort' value='%s' id='columns_sort_%s'>", index, row.sort, row.id);
+							return idHtml + sortHtml +$.table.serialNumber(index);
+						}
+					},
+					{
+						rowspan: 2, //合并行
+						title: '<i class="fa fa-arrows" style="color:#aaa"></i>'
+								+ "<a tabindex='0' role='button' data-toggle='popover' data-trigger='focus' " +
+								"data-placement='right' data-html='true' data-content='<span style=\"color:red\">拖拽排序使生成展示页面表格显示顺序!<span>'><i class='fa fa-question-circle-o' style='color: orange'></i></a>",
+						width: 32,
+						align: 'center',
+						class: "drag",
+						formatter: function (value, row, index) {
+							return '<i class="fa fa-arrows" style="color:#aaa"></i>';
+						}
+					},
+					{
+						title : '字段信息',
+						align : 'center',
+						style: 'color: #000;',
+						colspan : 5
+					},
+					{
+						title : '查询信息',
+						align : 'center',
+						style: 'color: #000;',
+						// style:'background-color:#e8ce62',
+						colspan : 5
+					},
+					{
+						title : '编辑信息',
+						align : 'center',
+						style: 'color: #000;',
+						colspan : 8
 					}
-				},
+				],
+			[
 		        {
 		            field: 'columnName',
 		            title: '字段列名',
-		            width: "100",
+		            width: 100,
 					formatter: function (value, row, index) {
 						return $.table.tooltip(value,8);
 					}
@@ -536,7 +547,7 @@
 		        {
 		            field: 'columnComment',
 		            title: '字段描述',
-		            width: "150",
+		            width: 150,
 		            formatter: function (value, row, index) {
 		            	var html = opt.common.sprintf("<input class='form-control' type='text' name='columns[%s].columnComment' value='%s'>", index, value);
 		        		return html;
@@ -545,12 +556,12 @@
 		        {
 		            field: 'columnType',
 		            title: '物理类型',
-		            width: "100"
+		            width: 100
 		        },
 		        {
 		            field: 'javaType',
 		            title: 'Java类型',
-		            width: "100",
+		            width: 100,
 		            formatter: function (value, row, index) {
 		        		var data = { "index": index, "javaType": value };
 		                return opt.template('javaTypeTpl',data);
@@ -559,7 +570,7 @@
 		        {
 		            field: 'javaField',
 		            title: 'Java属性',
-		            width: "100",
+		            width: 100,
 		            formatter: function (value, row, index) {
 		        		var html = opt.common.sprintf("<input class='form-control' type='text' name='columns[%s].javaField' value='%s' required>", index, value);
 		        		return html;
@@ -568,9 +579,8 @@
 		         {
 		            field: 'isPk',
 		            title: "主键",
-					style:'background-color:#e8ce62',
 					titleTooltip:'请勿修改',
-		            width: "32",
+		            width: 32,
 		            formatter: function (value, row, index) {
 		            	var isCheck = value == 1 ? 'checked' : '';
 		            	var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isPk' value='1' %s></label>", index, isCheck);
@@ -582,8 +592,7 @@
 						field: 'isList',
 						title: '列表',
 						titleTooltip:'数据展示页面表格列表',
-						width: "32",
-						style:'background-color:#e8ce62',
+						width: 32,
 						formatter: function (value, row, index) {
 							var isCheck = value == 1 ? 'checked' : '';
 							var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isList' value='1' %s></label>", index, isCheck);
@@ -593,8 +602,7 @@
 					{
 						field: 'isQuery',
 						title: '查询',
-						style:'background-color:#e8ce62',
-						width: "32",
+						width: 32,
 						formatter: function (value, row, index) {
 							var isCheck = value == 1 ? 'checked' : '';
 							var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isQuery' value='1' %s></label>", index, isCheck);
@@ -605,8 +613,7 @@
 						field: 'queryType',
 						title: "查询方式"+ "<a tabindex='0' role='button' data-toggle='popover' data-trigger='focus' " +
 								"data-placement='right' data-html='true' data-content='<span style=\"color:red\">展示页面列表需要检索字段的查询方式!<span>'><i class='fa fa-question-circle-o' style='color: orange'></i></a>",
-						style:'background-color:#e8ce62',
-						width: "120",
+						width: 120,
 						formatter: function (value, row, index) {
 							var data = { "index": index, "queryType": value };
 							return opt.template('queryTypeTpl',data);
@@ -616,8 +623,7 @@
 						field: 'isTableSort',
 						title: "排序",
 						titleTooltip:'表格按照此字段排序展示!',
-						style:'background-color:#e8ce62',
-						width: "32",
+						width: 32,
 						formatter: function (value, row, index) {
 							var isCheck = value == 1 ? 'checked' : '';
 							var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isTableSort' value='1' %s></label>", index, isCheck);
@@ -627,9 +633,8 @@
 		        {
 		            field: 'isInsert',
 		            title: '插入',
-					style:'background-color:#afcb7c',
 					titleTooltip:'插入为新增页面需要客户录入的字段',
-		            width: "32",
+		            width: 32,
 		            formatter: function (value, row, index) {
 		            	var isCheck = value == 1 ? 'checked' : '';
 		            	var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isInsert' value='1' %s></label>", index, isCheck);
@@ -639,8 +644,7 @@
 		        {
 					field: 'isEdit',
 					title: '编辑',
-					style:'background-color:#afcb7c',
-					width: "32",
+					width: 32,
 					formatter: function (value, row, index) {
 						var isCheck = value == 1 ? 'checked' : '';
 						var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isEdit' value='1' %s></label>", index, isCheck);
@@ -651,8 +655,7 @@
 					{
 						field: 'htmlType',
 						title: '显示类型',
-						width: "120",
-						style:'background-color:#afcb7c',
+						width: 120,
 						formatter: function (value, row, index) {
 							var data = { "index": index, "htmlType": value };
 							return opt.template('htmlTypeTpl',data);
@@ -662,8 +665,7 @@
 						field: 'circleType',
 						title: '字段说明样式',
 						titleTooltip:'字段说明样式',
-						width: "120",
-						style:'background-color:#afcb7c',
+						width: 120,
 						formatter: function (value, row, index) {
 							var data = { "index": index, "circleType": value };
 							return opt.template('circleTypeTpl',data);
@@ -672,8 +674,7 @@
 					{
 						field: 'editInfo',
 						title: '字段说明',
-						width: "190",
-						style:'background-color:#afcb7c',
+						width: 190,
 						formatter: function (value, row, index) {
 							var html = opt.common.sprintf("<input class='form-control' type='text' name='columns[%s].editInfo' value='%s' id='columns_edit_info_%s'>", index, opt.common.nullToStr(value,""), row.id);
 							return "<div class='input-group'>" + html + "<span class='input-group-btn'><a  href='javascript:;' onclick='selectinputEdit(\"" + row.id +"\", this)'><i class='fa fa-fw fa-edit'></i></a></span>";
@@ -682,8 +683,7 @@
 					{
 						field: 'dictType',
 						title: '字典类型',
-						width: "170",
-						style:'background-color:#afcb7c',
+						width: 170,
 						formatter: function (value, row, index) {
 							//var html = opt.common.sprintf("<input class='form-control' type='text' name='columns[%s].dictType' value='%s' id='columns_dict_%s'>", index, value, row.id);
 							//return "<div class='input-group'>" + html + "<span class='input-group-btn'><a  href='javascript:;' onclick='selectDictTree(\""+ row.id+"\", this)'><i class='fa fa-fw fa-search'></i></a></span>";
@@ -694,8 +694,7 @@
 					{
 						field: 'isRequired',
 						title: '必填',
-						style:'background-color:#afcb7c',
-						width: "32",
+						width: 32,
 						formatter: function (value, row, index) {
 							var isCheck = value == 1 ? 'checked' : '';
 							var html = opt.common.sprintf("<label class='check-box'><input type='checkbox' name='columns[%s].isRequired' value='1' %s></label>", index, isCheck);
@@ -705,15 +704,14 @@
 					{
 						field: 'validation',
 						title: '字段验证',
-						style:'background-color:#afcb7c',
-						width: "250",
+						width: 250,
 						formatter: function (value, row, index) {
 							var temp = opt.common.isEmpty(value)?[]:value.split(',');
 							var data = { "index": index, "validation": temp};
 							return opt.template('validationTypeTpl',data);
 						}
 					}
-		        ]
+		        ]]
 		    };
 		    $.table.init(options);
 
