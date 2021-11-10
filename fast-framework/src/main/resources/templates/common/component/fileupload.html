@@ -12,13 +12,14 @@
                     downloadUrl = "sys/comm/download" <#--文件下载路径 -->
                     isLazy = true <#-- -->
                     readonly = false
+                    required = false
                     preview = ""
                     tipTitle = "" <#--文件上传表格头显示 -->
                     maxUploadNum = "300"
                     >
     <div id="<#if id == "">${name}<#else>${id}</#if>_wup" class="wup_container ">
         <input id="<#if id == "">${name}<#else>${id}</#if>" name="<#if bizType == "">${name}<#else>${bizType}</#if>" value="" class="wup_input ${uploadType}"
-               data-msg-required="${i18n("请上传图片")}"/>
+               data-msg-required="${i18n("请上传图片")}"<#if required> required </#if>/>
         <input id="<#if id == "">${name}<#else>${id}</#if>__del" name="<#if bizType == "">${name}<#else>${bizType}</#if>__del" value="" type="hidden"/>
         <div class="area">
             <div id="<#if id == "">${name}<#else>${id}</#if>_Uploader" class="wup_<#if uploadType=="image">img<#else>file</#if>">
