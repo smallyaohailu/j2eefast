@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +27,7 @@ import java.util.Map;
  * @date 2020/1/18 12:25
  */
 @Component
-public class LockHandlerInterceptorAdapter extends HandlerInterceptorAdapter {
+public class LockHandlerInterceptorAdapter implements HandlerInterceptor {
 
 	@Autowired
 	@Lazy
@@ -57,7 +58,7 @@ public class LockHandlerInterceptorAdapter extends HandlerInterceptorAdapter {
 					String value = filterMap.get(key).toString();
 					PathMatcher matcher = new AntPathMatcher();
 					if(value.equals("anon") && matcher.match(key,requestUrl)){
-						return super.preHandle(request,response,handler);
+						return true;
 					}
 				}
 				if(ToolUtil.isNotEmpty(loginUser.getLoginStatus()) && 
@@ -66,9 +67,9 @@ public class LockHandlerInterceptorAdapter extends HandlerInterceptorAdapter {
 					return false;
 				}
 			}
-			return super.preHandle(request,response,handler);
+			return true;
 		}catch (Exception e){
-			return super.preHandle(request,response,handler);
+			return true;
 		}
     }
 }

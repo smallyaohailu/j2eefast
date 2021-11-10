@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author zhouzhou
  */
 @Component
-public class SecurityKeyInterceptorAdapter extends HandlerInterceptorAdapter{
+public class SecurityKeyInterceptorAdapter implements HandlerInterceptor{
 
 	/**
 	 * 系统是否允许嵌入到外部网站iframe中
@@ -69,6 +70,7 @@ public class SecurityKeyInterceptorAdapter extends HandlerInterceptorAdapter{
 			}
 		}
 		request.setAttribute(ConfigConstant.SECRETKEY, _secretKey);
+		
 		String scheme = request.getScheme();
         String serverName = request.getServerName();
         int port = request.getServerPort();
@@ -82,7 +84,7 @@ public class SecurityKeyInterceptorAdapter extends HandlerInterceptorAdapter{
 		if(!enabled) {
 			response.addHeader(X_FRAME_OPTIONS, Mode.SAMEORIGIN.name());
 		}
-        return super.preHandle(request,response,handler);
+        return true;
 	}
 
 	
