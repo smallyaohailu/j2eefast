@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.j2eefast.common.core.ureport;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bstek.ureport.build.ReportBuilder;
 import com.bstek.ureport.console.BaseServletAction;
 import com.bstek.ureport.console.cache.TempObjectCache;
@@ -28,11 +26,9 @@ import com.bstek.ureport.export.ExportConfigureImpl;
 import com.bstek.ureport.export.ExportManager;
 import com.bstek.ureport.export.excel.high.ExcelProducer;
 import com.bstek.ureport.model.Report;
-import com.bstek.ureport.provider.report.ReportProvider;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -42,8 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Map;
 
 /**

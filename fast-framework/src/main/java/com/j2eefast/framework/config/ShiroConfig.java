@@ -117,7 +117,7 @@ public class ShiroConfig {
 	private boolean enabled;
 
 	/**
-	 * Shiro授权认证配置
+	 * Shiro授权认证配置 系统YML文件配置信息
 	 */
 	@Value("#{${shiro.filterMap}}")
 	private LinkedHashMap<String, String> filterMap ;
@@ -137,6 +137,7 @@ public class ShiroConfig {
 		return redisCacheManager;
 	}
 
+	//-----------------------------  登录Realm ------------------
 	/**
 	 * 账号密码登录 Realm
 	 */
@@ -169,8 +170,7 @@ public class ShiroConfig {
 		valideCodeRealm.setCacheManager(getRedisCacheManager());
 		return valideCodeRealm;
 	}
-	
-	
+	//-------------------------------------------------------
 
 	/**
 	 * SessionDAO的作用是为Session提供CRUD并进行持久化的一个shiro组件
@@ -211,7 +211,7 @@ public class ShiroConfig {
 	}
 
 	/**
-	 *
+	 * session 管理
 	 * @return
 	 */
 	@Bean("sessionManager")
@@ -221,6 +221,7 @@ public class ShiroConfig {
 		Collection<SessionListener> listeners = new ArrayList<>();
 		// 配置监听
 		listeners.add(sessionListener());
+		
 		sessionManager.setSessionListeners(listeners);
 
 		sessionManager.setSessionIdCookieEnabled(true);
@@ -333,7 +334,7 @@ public class ShiroConfig {
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
         
-        // 判断yml文件是否配置密钥没有则随机生成 确保系统安全
+        // 判断yml文件是否配置密钥没有则随机生成 确保系统安全、禁止使用默认密钥Key
 		if(ToolUtil.isEmpty(cipherKey)){
 			cookieRememberMeManager.setCipherKey(ToolUtil.generateNewKey());
 		}else{
@@ -352,13 +353,14 @@ public class ShiroConfig {
 		shiroFilter.setLoginUrl("/login");
 		//这里的/index是后台的接口名,非页面,登录成功后要跳转的链接
 		shiroFilter.setSuccessUrl("/index");
-		//自定义拦截器限制并发人数,参考博客：
+		//自定义拦截器限制并发人数
 		LinkedHashMap<String, Filter> filtersMap = new LinkedHashMap<>();
 		//限制同一帐号同时在线的个数
 		filtersMap.put("kickout", kickoutSessionControlFilter());
 		shiroFilter.setFilters(filtersMap);
 		// 权限认证失败，则跳转到指定页面
 		shiroFilter.setUnauthorizedUrl("/");
+		// ------------------- 系统必须默认
         filterMap.put("/static/**", "anon");
 		filterMap.put("/swagger/**'", "anon");
 		filterMap.put("/swagger-ui/**", "anon");
@@ -377,6 +379,7 @@ public class ShiroConfig {
 		}
 		filterMap.put("/captcha/**", "anon");
 		filterMap.put("/**", "kickout,user");
+		//--------------------------------------
 		//授权认证配置
 		if (null !=filterMap && filterMap.size() != 0) {			
 			  shiroFilter.setFilterChainDefinitionMap(filterMap);

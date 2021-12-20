@@ -6,6 +6,7 @@
 package com.j2eefast.common.core.base.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 树对象
@@ -45,6 +46,15 @@ public class Ztree implements Serializable{
     /** 设置节点的 checkbox / radio 是否禁用*/
     private boolean chkDisabled = false;
 
+    private List<Ztree> children;
+
+    public List<Ztree> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Ztree> children) {
+        this.children = children;
+    }
 
     public boolean isChkDisabled() {
         return chkDisabled;

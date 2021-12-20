@@ -52,6 +52,10 @@ public class BaseController {
         return StrUtil.nullToDefault(ServletUtil.getRequest().getParameter(name),default1);
     }
 
+    protected String getHeader(String name){
+        return StrUtil.nullToDefault(getHttpServletRequest().getHeader(name),StrUtil.EMPTY);
+    }
+
     protected void setAttr(String name, Object value) {
         Objects.requireNonNull(ServletUtil.getRequest()).setAttribute(name, value);
     }

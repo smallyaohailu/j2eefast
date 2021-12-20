@@ -114,6 +114,10 @@ public class SysCompEntity extends BaseEntity {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Boolean isParent;
 
+	/**是否有节点*/
+	@TableField(exist = false)
+	private Integer isTreeLeaf;
+
 	/**
 	 * 地区名称
 	 */

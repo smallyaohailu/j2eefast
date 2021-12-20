@@ -9,6 +9,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.i18n.MessageSource;
@@ -19,6 +20,7 @@ import com.j2eefast.common.core.utils.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,16 +38,17 @@ import java.util.zip.GZIPOutputStream;
  */
 @Slf4j
 public class ResourceLoaderServlet extends HttpServlet {
-	
+
+	//__ajax=json
 	private static final long serialVersionUID = 1L;
 	private static String I18N = "/i18n";
 	private static String PROPERTIES = ".properties";
 	private static String LANG = "lang";
-	private static String AJAX = "ajax";
+	private static String AJAX = "json";
 	
 	@Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-		String _p = req.getParameter("_p");
+		String __ajax = req.getParameter("__ajax");
 		String url = req.getServletPath();
 		byte[] outBytes = StrUtil.EMPTY.getBytes();
 		// 前端JS国际化文件请求
@@ -86,11 +89,11 @@ public class ResourceLoaderServlet extends HttpServlet {
 				
 			}else if(StrUtil.endWith(pathInfo,LANG)) {
 				// 不同参数处理
-				if(_p != null) {
+				if(__ajax != null) {
 					resp.setContentType("application/json; charset=utf-8");
 					resp.setCharacterEncoding("UTF-8");
 					JSONObject paramIn = new JSONObject();
-					Map<String, String> map = SpringUtil.getBean(MessageSource.class).getLocaleMap(_p);
+					Map<String, String> map = SpringUtil.getBean(MessageSource.class).getLocaleMap(__ajax);
 					if(map != null) {
 						map.forEach((k,v)->{
 							paramIn.set(k, v);
@@ -112,9 +115,9 @@ public class ResourceLoaderServlet extends HttpServlet {
 			String userName = loginUserEntity == null? "":loginUserEntity.getUsername();
 			String userId = loginUserEntity == null? "":Convert.toStr(loginUserEntity.getId());
 			// 不同参数处理
-			if(_p != null) {
+			if(__ajax != null) {
 				// AJAX返回JSON
-				if(AJAX.equals(_p)) {
+				if(AJAX.equals(__ajax)) {
 					resp.setContentType("application/json; charset=utf-8");
 					resp.setCharacterEncoding("UTF-8");
 					JSONObject paramIn = new JSONObject();
@@ -127,6 +130,11 @@ public class ResourceLoaderServlet extends HttpServlet {
 					paramIn.set("_secretkey", ConfigConstant.PUBKEY);
 					paramIn.set("_i18n_tag", ConfigConstant.I18N_ATG);
 					paramIn.set("_VERSION", PropertiesUtils.getInstance().get("version"));
+					paramIn.set("title", Global.getConfig("SYS_CONFIG_TITLE"));
+					paramIn.set("sysConfig", JSONUtil.parseObj(Global.getConfig(ConfigConstant.SYS_CONFIG_KEY)));
+					paramIn.set("tenantModel",PropertiesUtils.getInstance().get("fast.tenantModel.enabled"));
+					paramIn.set("valideLogin",Global.isValidCode());
+					paramIn.set("isValidationCode",Global.isValidationCode());
 					outBytes = paramIn.toString().getBytes();
 				}
 			}else {

@@ -6,15 +6,18 @@
 package com.j2eefast.modules.sys.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import cn.hutool.core.util.StrUtil;
+import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.framework.annotation.RepeatSubmit;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.service.SysModuleService;
@@ -52,6 +55,25 @@ public class SysMenuController extends BaseController {
 	@GetMapping()
 	public String menu(){
 		return urlPrefix + "/menu";
+	}
+
+
+	/**
+	 * 获取用户登录菜单信息
+	 * @return
+	 */
+	@GetMapping("getRouters")
+	@ResponseBody
+	public ResponseData getRouters(){
+		LoginUserEntity user = UserUtils.getUserInfo();
+		List<Map<String, Object>> modules = ConstantFactory.me().getModules(user.getId());
+		Map<String, List<SysMenuEntity>> menuList = new HashMap<>();
+		for(Map<String, Object> s: modules){
+			List<SysMenuEntity> menu = ConstantFactory.me().getMenuByUserIdModuleCode(user.getId(),
+					(String) s.get("moduleCode"),user);
+			menuList.put((String) s.get("moduleCode"),menu);
+		}
+		return success().put("modules",modules).put("menu",menuList);
 	}
 
 	/**

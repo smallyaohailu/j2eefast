@@ -85,6 +85,19 @@ public class SysProfileController extends BaseController {
         mmap.put("user", user);
         return urlPrefix + "/avatar";
     }
+    
+    /**
+     * 获取用户信息
+     * @author ZhouZhou
+     * @date 2021-11-10 14:50
+     * @return
+     */
+    @GetMapping("/getInfo")
+    @ResponseBody
+    public ResponseData getInfo() {
+    	LoginUserEntity user = UserUtils.getUserInfo();
+    	return success(user);
+    }
 
     /**
      * 保存头像

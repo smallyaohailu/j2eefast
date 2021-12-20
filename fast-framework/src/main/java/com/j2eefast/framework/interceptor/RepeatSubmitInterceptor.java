@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,16 +30,14 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 @Component
-public abstract class RepeatSubmitInterceptor extends HandlerInterceptorAdapter {
+public abstract class RepeatSubmitInterceptor implements HandlerInterceptor {
 
     protected final Logger logger = LoggerFactory.getLogger(RepeatSubmitInterceptor.class);
 
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
-    {
-        if (handler instanceof HandlerMethod)
-        {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception{
+        if (handler instanceof HandlerMethod){
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Method method = handlerMethod.getMethod();
             RepeatSubmit annotation = method.getAnnotation(RepeatSubmit.class);
@@ -52,9 +50,8 @@ public abstract class RepeatSubmitInterceptor extends HandlerInterceptorAdapter 
             }
             return true;
         }
-        else
-        {
-            return super.preHandle(request, response, handler);
+        else{
+        	return true;
         }
     }
 

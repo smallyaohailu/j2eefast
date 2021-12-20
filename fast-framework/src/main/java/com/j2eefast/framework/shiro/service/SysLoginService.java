@@ -439,6 +439,9 @@ public class SysLoginService implements AuthService {
 
 		if(maxSession != -1 && kickoutAfter) {
 			Deque<Serializable> deque = (Deque<Serializable>) redisUtil.getSession(getRedisKickoutKey(loginUser.getUsername()));
+			if(deque == null){
+				return;
+			}
 			if(deque.size() == maxSession) {
 				int tmepNum = deque.size();
 				//检测之前用户是否为登录状态

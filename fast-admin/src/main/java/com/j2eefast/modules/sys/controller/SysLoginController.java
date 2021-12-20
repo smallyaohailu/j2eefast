@@ -5,13 +5,18 @@
  */
 package com.j2eefast.modules.sys.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.codec.Base64Encoder;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
 import com.j2eefast.common.core.base.entity.LoginTenantEntity;
@@ -33,10 +38,12 @@ import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.base.Captcha;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -102,31 +109,63 @@ public class SysLoginController extends BaseController {
 	 */
 	@RequestMapping(value = "captcha.gif", method = RequestMethod.GET)
 	public void captcha(HttpServletResponse response) throws IOException {
-		response.setHeader("Cache-Control", "no-store, no-cache");
-		response.setContentType(MimeType.IMAGE_GIF);
-		if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
-				.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
-			ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
-			// 几位数运算，默认是两位
-			gifCaptcha.setLen(3);
-			// 获取运算的公式：3+2=?
-			gifCaptcha.getArithmeticString();
-			// 获取运算的结果：5
-			String result =  gifCaptcha.text();
-			UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
-			gifCaptcha.out(response.getOutputStream());
-			return;
-		}else if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
-				.equals(Constant.SYS_DEFAULT_VALUE_TWO)){
-			int rd= Math.random()>0.5?1:0;
-			if(rd == 1){
+		String __ajax =  super.getPara("__ajax");
+		if(__ajax != null && __ajax.equals("json")) {
+			response.setContentType("application/json; charset=utf-8");
+			response.setCharacterEncoding("UTF-8");
+			JSONObject paramIn = new JSONObject();
+			if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
+				ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
+				// 几位数运算，默认是两位
+				gifCaptcha.setLen(3);
+				// 获取运算的公式：3+2=?
+				gifCaptcha.getArithmeticString();
+				// 获取运算的结果：5
+				String result =  gifCaptcha.text();
+				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+				paramIn.set("img",gifCaptcha.toBase64());
+			}else if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_TWO)){
+				int rd= Math.random()>0.5?1:0;
+				if(rd == 1){
+					GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
+					gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
+					String result = gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					paramIn.set("img",gifCaptcha.toBase64());
+				}else{
+					ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
+					// 几位数运算，默认是两位
+					gifCaptcha.setLen(3);
+					// 获取运算的公式：3+2=?
+					gifCaptcha.getArithmeticString();
+					// 获取运算的结果：5
+					String result =  gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					paramIn.set("img",gifCaptcha.toBase64());
+				}
+			}else{
 				GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
 				gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
 				String result = gifCaptcha.text();
 				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
-				gifCaptcha.out(response.getOutputStream());
-				return;
-			}else{
+				paramIn.set("img",gifCaptcha.toBase64());
+			}
+			paramIn.set("uuid", "");
+			InputStream input= new ByteArrayInputStream(paramIn.toString().getBytes());
+			OutputStream output=response.getOutputStream();
+			try{
+				IoUtil.copy(input,output);
+			}finally{
+				IoUtil.close(input);
+				IoUtil.close(output);
+			}
+		}else {
+			response.setHeader("Cache-Control", "no-store, no-cache");
+			response.setContentType(MimeType.IMAGE_GIF);
+			if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
 				ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
 				// 几位数运算，默认是两位
 				gifCaptcha.setLen(3);
@@ -137,14 +176,36 @@ public class SysLoginController extends BaseController {
 				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
 				gifCaptcha.out(response.getOutputStream());
 				return;
+			}else if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_TWO)){
+				int rd= Math.random()>0.5?1:0;
+				if(rd == 1){
+					GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
+					gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
+					String result = gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					gifCaptcha.out(response.getOutputStream());
+					return;
+				}else{
+					ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
+					// 几位数运算，默认是两位
+					gifCaptcha.setLen(3);
+					// 获取运算的公式：3+2=?
+					gifCaptcha.getArithmeticString();
+					// 获取运算的结果：5
+					String result =  gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					gifCaptcha.out(response.getOutputStream());
+					return;
+				}
+			}else{
+				GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
+				gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
+				String result = gifCaptcha.text();
+				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+				gifCaptcha.out(response.getOutputStream());
+				return;
 			}
-		}else{
-			GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
-			gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
-			String result = gifCaptcha.text();
-			UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
-			gifCaptcha.out(response.getOutputStream());
-			return;
 		}
 	}
 	
@@ -308,7 +369,14 @@ public class SysLoginController extends BaseController {
 			}
 			return error(msg);
 		}
-		return success("登录成功!");
+		if(super.getHeader("__ajax").equals("json")){
+			return success("登录成功!")
+					.put("sId",UserUtils.getSession().getId())
+					.put("token", Base64Encoder.encode(UserUtils.getUserInfo().getCsrfToken()))
+					.put("expires_in",UserUtils.getSession().getTimeout() / (1000 * 60));
+		}else{
+			return success("登录成功!");
+		}
 	}
 	
 	//@FastLicense(vertifys = {"online","detection"})

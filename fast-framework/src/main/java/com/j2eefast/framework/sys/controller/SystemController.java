@@ -148,4 +148,13 @@ public class SystemController extends BaseController {
 	public String notFound() {
 		return "404";
 	}
+
+	@RequestMapping(value = "/sys/loginOut", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseData loginOut(){
+		UserUtils.getSession().stop();
+		UserUtils.logout();
+		return success();
+	}
+
 }

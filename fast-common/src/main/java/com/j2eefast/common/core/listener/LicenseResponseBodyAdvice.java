@@ -1,5 +1,5 @@
 /*
- * All content copyright http://www.j2eefast.com, unless 
+ * All content copyright http://www.j2eefast.com, unless
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
@@ -204,6 +204,8 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                        }
                        body = JSONObject.parseObject(c.toString());
                    }
+               }else{
+                   body = JSONUtil.parse(rd);
                }
             }catch (Exception e){
                 log.error("转换输出数据异常:",e);

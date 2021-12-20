@@ -257,7 +257,7 @@
             AND l.role_key = #{roleKey}
         </if>
         <if test = "noId !=null and noId !=''">
-            AND u.id = #{noId}
+            AND u.id != #{noId}
         </if>
         <if test="compId != null and compId !=''">
             <if test="_databaseId == 'mysql'">AND (FIND_IN_SET(#{compId},d.parent_ids)</if>

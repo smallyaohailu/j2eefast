@@ -77,6 +77,9 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
 
+	/**
+	 * 注册系统拦截器
+	 */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(LicenseCheckInterceptor).addPathPatterns("/**");

@@ -18,6 +18,7 @@ import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.log.service.SysLoginInfoSerice;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.*;
 import com.j2eefast.framework.sys.service.*;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -179,11 +180,26 @@ public class SysUserController extends BaseController {
 	/**
 	 * 获取登录的用户信息
 	 */
-	@RequestMapping("/info")
+	@RequestMapping("/authInfo")
 	@ResponseBody
-	public ResponseData info() {
+	public ResponseData authInfo() {
 		LoginUserEntity loginUser = UserUtils.getUserInfo();
-		return success().put("user", loginUser);
+		ResponseData responseData = success();
+		responseData.put("user", loginUser);
+		// 系统管理员，拥有最高权限
+		if (loginUser.getId().equals(Constant.SUPER_ADMIN)){
+			Set<String> perms = new HashSet<String>();
+			perms.add("*:*:*");
+			Set<String> roles = new HashSet<String>();
+			roles.add("admin");
+			responseData.put("roles",roles);
+			responseData.put("permissions",perms);
+		} else {
+			responseData.put("roles",UserUtils.getRoleKey(loginUser.getRoles()));
+			responseData.put("permissions",ConstantFactory.me()
+					.findPermissionsByUserId(loginUser.getId()));
+		}
+		return responseData;
 	}
 	
 	@RequestMapping("/info/login/msg/{username}")
