@@ -78,7 +78,7 @@ var vm = new Vue({
                 return that.errrInfo(PHONETIP);
             }
 			
-			if(VERIFICATION){
+			if(ISVALIDATIONCODE){
             	$("#verfyImg").find(".mask").css("display","block");
             }else{
 				var data = {"mobile":vm.phoneNo,
@@ -255,6 +255,8 @@ var vm = new Vue({
                         vm.captcha = '';
                         vm.password = '';
                         vm.refreshCode();
+                    }else if(result.code == '99998'){
+                        location.href = baseURL +'authInsu';
                     }
                     else{
                         if(flag){$(window).unblock()};
