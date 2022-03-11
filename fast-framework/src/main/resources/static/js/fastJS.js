@@ -187,14 +187,21 @@ if (typeof jQuery === "undefined") {
         error: function (msg,callback) {
             opt.modal.enable(); //显示提交按钮
             if(opt.toast){
+                var position = {
+                    right: 7,
+                    bottom: 32
+                }
+                if(top.location == self.location){
+                    position = {
+                        right: 7,
+                        bottom: 5
+                    }
+                }
                 opt.toast({
                     heading: $.i18n.prop('警告'),
                     text: msg,
                     hideAfter:8000,
-                    position: {
-                        right: 7,
-                        bottom: 32
-                    },
+                    position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
                         if(typeof(callback) === "function"){
@@ -212,14 +219,21 @@ if (typeof jQuery === "undefined") {
 
         info: function(msg,callback){
             if(opt.toast){
+                var position = {
+                    right: 7,
+                    bottom: 32
+                }
+                if(top.location == self.location){
+                    position = {
+                        right: 7,
+                        bottom: 5
+                    }
+                }
                 opt.toast({
                     heading: $.i18n.prop('提示'),
                     text: msg,
                     hideAfter:4000,
-                    position: {
-                        right: 7,
-                        bottom: 32
-                    },
+                    position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
                         if(typeof(callback) === "function"){
@@ -238,14 +252,21 @@ if (typeof jQuery === "undefined") {
 
         success: function (msg,callback) {
             if(opt.toast){
+                var position = {
+                    right: 7,
+                    bottom: 32
+                }
+                if(top.location == self.location){
+                    position = {
+                        right: 7,
+                        bottom: 5
+                    }
+                }
                 opt.toast({
                     heading: $.i18n.prop('成功'),
                     text: msg,
                     hideAfter:4000,
-                    position: {
-                        right: 7,
-                        bottom: 32
-                    },
+                    position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
                         if(typeof(callback) === "function"){
@@ -271,14 +292,21 @@ if (typeof jQuery === "undefined") {
 
         warning:function(text,callback){
             if(opt.toast){
+                var position = {
+                    right: 7,
+                    bottom: 32
+                }
+                if(top.location == self.location){
+                    position = {
+                        right: 7,
+                        bottom: 5
+                    }
+                }
                 opt.toast({
                     heading: $.i18n.prop('警告'),
                     text: text,
                     hideAfter:4000,
-                    position: {
-                        right: 7,
-                        bottom: 32
-                    },
+                    position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
                         if(typeof(callback) === "function"){
@@ -1002,7 +1030,7 @@ if (typeof jQuery === "undefined") {
              * @param text
              */
             copy:function(text){
-                var oInput = document.createElement('input');
+                var oInput = document.createElement('textarea');
                 oInput.value = text;
                 $(oInput).css({opacity:'0'})
                 $(oInput).attr({name:"__copy_secukey"})
@@ -1010,7 +1038,7 @@ if (typeof jQuery === "undefined") {
                 oInput.select(); // 选择对象
                 document.execCommand("Copy"); // 执行浏览器复制命令
                 oInput.className = 'oInput';
-                $("input[name='__copy_secukey']").remove()
+                $("textarea[name='__copy_secukey']").remove()
             },
             /**
              * 获取 Checkbox 值 已,隔开
@@ -3531,6 +3559,7 @@ if (typeof jQuery === "undefined") {
                     pagination: true,
                     pageSize: 50,
                     pageList: [50, 100, 150],
+                    showCheckNumber: false, //勾选显示总数
                     toolbar: "toolbar",
                     showToolbar: true,
                     striped: false,
@@ -3678,6 +3707,7 @@ if (typeof jQuery === "undefined") {
                     pageNumber: 1,                                      // 初始化加载第一页，默认第一页
                     pageSize: options.pageSize,                         // 每页的记录行数（*）
                     pageList: options.pageList,                         // 可供选择的每页的行数（*）
+                    showCheckNumber: options.showCheckNumber,           // 勾选显示勾选的总数
                     firstLoad: options.firstLoad,                       // 是否首次请求加载数据，对于数据较大可以配置false
                     isFixedColumn: options.isFixedColumn,               // 是否固定列宽，当列比较多时，开启水平滚动，可设置为 true
                     escape: options.escape,                             // 转义HTML字符串
@@ -3880,6 +3910,9 @@ if (typeof jQuery === "undefined") {
                             } else {
                                 opt.table.rememberSelecteds[opt.table.options.id] = _['union']([], _trows,column);
                             }
+                            if (opt.table.options.showCheckNumber) {
+                                $("#" + opt.table.options.id).bootstrapTable('setCheckNumer',opt.table.rememberSelectedIds[opt.table.options.id].length);
+                            }
                         }else{
                             opt.table.rememberSelecteds[opt.table.options.id] = _['union']([], _trows,opt.table.options.uniqueId);
                             opt.table.rememberSelectedIds[opt.table.options.id] = _['union']([],  $.table.affectedRowIds(_trows),opt.table.options.uniqueId);
@@ -3937,6 +3970,12 @@ if (typeof jQuery === "undefined") {
 
                 if (typeof opt.table.get(this.id).onLoadSuccess == "function") {
                     opt.table.get(this.id).onLoadSuccess(data);
+                }
+
+                if (opt.common.isNotEmpty(opt.table.options.rememberSelected) &&
+                    opt.table.options.rememberSelected && opt.table.options.showCheckNumber) {
+                    $("#" + this.id).bootstrapTable('setCheckNumer', opt.table.rememberSelectedIds[opt.table.options.id] ?
+                        opt.table.rememberSelectedIds[opt.table.options.id].length : 0);
                 }
 
                 // 浮动提示框特效
