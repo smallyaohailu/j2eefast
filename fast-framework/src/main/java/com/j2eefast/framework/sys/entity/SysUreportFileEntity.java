@@ -65,9 +65,35 @@ public class SysUreportFileEntity implements Serializable {
      */
     private String func;
 
+//    /**
+//     * 是否分页
+//     */
+//    private String page;
+//
+//    /**
+//     * 分页大小
+//     */
+//    private int pageSize;
+//
+//    /**
+//     * 源对象多个,分割
+//     */
+//    private String objName;
+
     /**
      * 报表描述
      */
     private String remark;
+
+    private String code;
+
+    private String share;
+
+    private String pass;
+
+    private int time;
+//
+//    private Date time;
+//    private String watermark;
 
 }

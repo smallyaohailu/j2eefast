@@ -172,12 +172,15 @@ public class SysLoginService implements AuthService {
 		log.debug("kg4:{}",kg4);
 		String sign =ServletUtil.getRequest().getParameter("sign");
 		log.debug("sign:{}",sign);
-		
+
+		if(ToolUtil.isEmpty(kg4) || ToolUtil.isEmpty(sign)){
+			throw new RxcException("登录确实必要参数kg4/sing","50002");
+		}
 		//校验签名
 		String _sign = SoftEncryption.genSM3Keys((kg4 + username + password).getBytes()).getStr("b64") ;
 		if(!_sign.equals(sign)){
 			//校验签名失败
-			throw new ServiceException("E0XA00011");
+			throw new RxcException("加密校验失败","50001");
 		}
 		
 		//获得明文kg4

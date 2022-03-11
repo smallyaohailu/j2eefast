@@ -125,7 +125,7 @@ public class UserUtils {
 	 * @return
 	 */
 	public static Long getUserId() {
-		return getUserInfo().getId();
+		return ToolUtil.isEmpty(getUserInfo())?-1L:getUserInfo().getId();
 	}
 
 	public static String getUserIdToStr() {

@@ -184,22 +184,37 @@ public class SysUserController extends BaseController {
 	@ResponseBody
 	public ResponseData authInfo() {
 		LoginUserEntity loginUser = UserUtils.getUserInfo();
-		ResponseData responseData = success();
-		responseData.put("user", loginUser);
+		Map<String,Object> ref = new HashMap<>();
+		ref.put("user", loginUser);
 		// 系统管理员，拥有最高权限
 		if (loginUser.getId().equals(Constant.SUPER_ADMIN)){
 			Set<String> perms = new HashSet<String>();
 			perms.add("*:*:*");
 			Set<String> roles = new HashSet<String>();
 			roles.add("admin");
-			responseData.put("roles",roles);
-			responseData.put("permissions",perms);
+			ref.put("roles",roles);
+			ref.put("permissions",perms);
 		} else {
-			responseData.put("roles",UserUtils.getRoleKey(loginUser.getRoles()));
-			responseData.put("permissions",ConstantFactory.me()
+			ref.put("roles",UserUtils.getRoleKey(loginUser.getRoles()));
+			ref.put("permissions",ConstantFactory.me()
 					.findPermissionsByUserId(loginUser.getId()));
 		}
-		return responseData;
+		return success(ref);
+	}
+
+	@RequestMapping("/getPermCode")
+	@ResponseBody
+	public ResponseData getPermCode() {
+		LoginUserEntity loginUser = UserUtils.getUserInfo();
+		Set<String> perms = new HashSet<String>();
+		// 系统管理员，拥有最高权限
+		if (loginUser.getId().equals(Constant.SUPER_ADMIN)){
+			perms.add("*:*:*");
+		} else {
+			perms = ConstantFactory.me()
+					.findPermissionsByUserId(loginUser.getId());
+		}
+		return success(perms);
 	}
 	
 	@RequestMapping("/info/login/msg/{username}")

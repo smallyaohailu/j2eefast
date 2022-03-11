@@ -9,8 +9,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -153,6 +156,7 @@ public class SysLoginController extends BaseController {
 				paramIn.set("img",gifCaptcha.toBase64());
 			}
 			paramIn.set("uuid", "");
+			paramIn.set("code", "0");
 			InputStream input= new ByteArrayInputStream(paramIn.toString().getBytes());
 			OutputStream output=response.getOutputStream();
 			try{
@@ -370,10 +374,9 @@ public class SysLoginController extends BaseController {
 			return error(msg);
 		}
 		if(super.getHeader("__ajax").equals("json")){
-			return success("登录成功!")
-					.put("sId",UserUtils.getSession().getId())
-					.put("token", Base64Encoder.encode(UserUtils.getUserInfo().getCsrfToken()))
-					.put("expires_in",UserUtils.getSession().getTimeout() / (1000 * 60));
+			return success("登录成功!").put("sId",UserUtils.getSession().getId())
+			.put("token", Base64Encoder.encode(UserUtils.getUserInfo().getCsrfToken()))
+			.put("expires_in",UserUtils.getSession().getTimeout() / (1000 * 60));
 		}else{
 			return success("登录成功!");
 		}
@@ -508,6 +511,14 @@ public class SysLoginController extends BaseController {
 		UserUtils.getSession().stop();
 		UserUtils.logout();
 		return REDIRECT+"login";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "logout",method = RequestMethod.POST)
+	public ResponseData loginOut() {
+		UserUtils.getSession().stop();
+		UserUtils.logout();
+		return success("退出成功");
 	}
 
 }

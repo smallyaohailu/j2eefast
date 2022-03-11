@@ -22,6 +22,7 @@ import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.utils.Constant;
 import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ import java.util.List;
  * @web: http://www.j2eefast.com
  * @version: 1.0.1
  */
-@Log4j
+@Slf4j
 @Controller
 @RequestMapping("/sys/license")
 public class SysLicenseController extends BaseController {

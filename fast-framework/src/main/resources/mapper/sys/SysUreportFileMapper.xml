@@ -12,7 +12,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          a.content AS "content" ,
          a.create_time AS "createTime" ,
          a.update_time AS "updateTime" ,
-         a.remark AS "remark"
+         a.remark AS "remark",
+         a.code AS "code",
+         a.share AS "share",
+         a.pass AS "pass",
+         a.time AS "time"
     </sql>
 
     <!--  根据主键获取实体   -->
@@ -27,7 +31,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         a.id AS "id" ,
         a.name AS "name" ,
-        a.content AS "content"
+        a.content AS "content",
+        a.code AS "code",
+        a.share AS "share",
+        a.pass AS "pass",
+         a.time AS "time"
 		FROM  sys_ureport_file a
 		WHERE a.name = #{name}
     </select>
