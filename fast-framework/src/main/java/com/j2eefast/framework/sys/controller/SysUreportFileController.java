@@ -5,7 +5,9 @@
  */
 package com.j2eefast.framework.sys.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.common.core.utils.*;
@@ -104,7 +106,49 @@ public class SysUreportFileController extends BaseController{
         mmap.put("sysFile", sysFile);
         return prefix + "/edit";
     }
-    
+
+    /**
+     * 分享取消
+     * @param code
+     * @return
+     */
+    @RequiresPermissions("sys:ureport:cancel")
+    @PostMapping("/cancelShare")
+    @ResponseBody
+    public ResponseData cancelShare(String code){
+        redisUtil.del(code);
+        return  sysUreportFileService.update(new UpdateWrapper<SysUreportFileEntity>()
+                .eq("code",code).set("share","N"))? success(): error("取消失败!");
+    }
+
+    @RequiresPermissions("sys:ureport:getShare")
+    @PostMapping("/getShare")
+    @ResponseBody
+    public ResponseData getShare(String code){
+       String __code = redisUtil.get(code);
+        if(ToolUtil.isNotEmpty(__code)){
+            return success();
+        }else{
+            return error("不存在");
+        }
+    }
+
+
+    @RequiresPermissions("sys:ureport:create")
+    @PostMapping("/createShare")
+    @ResponseBody
+    public ResponseData createShare(Long id, int time){
+        String code = RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 22);
+        String pass = RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 4);
+        if(sysUreportFileService.update(new UpdateWrapper<SysUreportFileEntity>()
+                .eq("id",id).set("share","Y").set("code",code).set("pass",pass).set("time",time))){
+            if(time != 0){
+                redisUtil.set(code, code + "#" + pass,time * 24 * 60 * 60L);
+            }
+        }
+        return success().put("__surl",code).put("pass",pass).put("time",time);
+    }
+
     /**
      * 修改保存公告
      */
