@@ -15,6 +15,8 @@ import com.j2eefast.common.core.shiro.ShiroSessionFactory;
 import com.j2eefast.common.core.shiro.ShiroSessionManager;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.shiro.KickoutSessionControlFilter;
+import com.j2eefast.framework.shiro.RestLogoutFilter;
+import com.j2eefast.framework.shiro.RestAuthorizationFilter;
 import com.j2eefast.framework.shiro.auth.UserModularRealmAuthorizer;
 import com.j2eefast.framework.shiro.realm.OtherRealm;
 import com.j2eefast.framework.shiro.realm.UserNameRealm;
@@ -115,6 +117,13 @@ public class ShiroConfig {
 	 */
 	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
 	private boolean enabled;
+
+
+	/**
+	 * 前端端分离
+	 */
+	@Value("#{ @environment['fast.distributed.enabled'] ?: false }")
+	private boolean distributed;
 
 	/**
 	 * Shiro授权认证配置 系统YML文件配置信息
@@ -355,11 +364,7 @@ public class ShiroConfig {
 		shiroFilter.setSuccessUrl("/index");
 		//自定义拦截器限制并发人数
 		LinkedHashMap<String, Filter> filtersMap = new LinkedHashMap<>();
-		//限制同一帐号同时在线的个数
-		filtersMap.put("kickout", kickoutSessionControlFilter());
-		shiroFilter.setFilters(filtersMap);
-		// 权限认证失败，则跳转到指定页面
-		shiroFilter.setUnauthorizedUrl("/");
+
 		// ------------------- 系统必须默认
         filterMap.put("/static/**", "anon");
 		filterMap.put("/swagger/**'", "anon");
@@ -369,6 +374,10 @@ public class ShiroConfig {
 		filterMap.put("/api/trade.receive/**", "anon");
 		filterMap.put("/profile/fileUeditor/upload/image/**", "anon");
 		filterMap.put("/sys/comm/download/**", "anon");
+		filterMap.put("/authInsu", "anon");
+		filterMap.put("/authInsu/uploadLic", "anon");
+		filterMap.put("/ureport/res/**", "anon");
+		filterMap.put("/ureport/shareview/**", "anon");
 		filterMap.put("/v3/api-docs", "anon");
         filterMap.put("/favicon.ico", "anon");
 		filterMap.put("/captcha.gif", "anon");
@@ -378,8 +387,26 @@ public class ShiroConfig {
 			filterMap.put("/tenant/list", "anon");
 		}
 		filterMap.put("/captcha/**", "anon");
-		filterMap.put("/**", "kickout,user");
-		//--------------------------------------
+		if(distributed){
+			//--------------------------------------
+			//自定义过滤器   解决前后台分离的问题
+			filterMap.put("/**", "authc");
+			filtersMap.put("authc", new RestAuthorizationFilter());
+		}else{
+			filterMap.put("/**", "kickout,user");
+		}
+
+		//限制同一帐号同时在线的个数
+		filtersMap.put("kickout", kickoutSessionControlFilter());
+
+		RestLogoutFilter logoutFilter = new RestLogoutFilter();
+
+		filtersMap.put("logout", logoutFilter);
+
+		shiroFilter.setFilters(filtersMap);
+		// 权限认证失败，则跳转到指定页面
+		shiroFilter.setUnauthorizedUrl("/");
+
 		//授权认证配置
 		if (null !=filterMap && filterMap.size() != 0) {			
 			  shiroFilter.setFilterChainDefinitionMap(filterMap);

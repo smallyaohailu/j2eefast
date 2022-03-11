@@ -5,10 +5,8 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -23,12 +21,15 @@ import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
+import com.j2eefast.framework.sys.entity.MetaEntity;
+import com.j2eefast.framework.sys.entity.RouterEntity;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.mapper.SysMenuMapper;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -86,6 +87,36 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	 */
 	public SysMenuEntity selectMenuByMenId(Long menuId){
 		return sysMenuMapper.selectMenuByMenId(menuId);
+	}
+
+	/**
+	 * 菜单转换前端路由
+	 * @return
+	 */
+	public List<RouterEntity> buildMenus(List<SysMenuEntity> menuList){
+		List<RouterEntity> routers = new LinkedList<RouterEntity>();
+		for(SysMenuEntity menu: menuList){
+			RouterEntity router = new RouterEntity();
+			router.setName(menu.getName());
+			if(menu.getType() == 0){
+				router.setPath("/" + menu.getId());
+			}else{
+				router.setPath(menu.getUrl().startsWith("/")?menu.getUrl():("/" + menu.getUrl()));
+			}
+			router.setComponent(menu.getComponent());
+			router.setMeta(new MetaEntity(menu.getName(), menu.getIcon(), menu.getHide() == 1));
+			List<SysMenuEntity> cMenus = menu.getChildren();
+			if (!cMenus.isEmpty() && cMenus.size() > 0 && menu.getType() == 0){
+				if(cMenus.get(0).getType() == 0){
+					router.setRedirect("/" + cMenus.get(0).getId());
+				}else{
+					router.setRedirect(cMenus.get(0).getUrl().startsWith("/")?cMenus.get(0).getUrl():("/" + cMenus.get(0).getUrl()));
+				}
+				router.setChildren(buildMenus(cMenus));
+			}
+			routers.add(router);
+		}
+		return routers;
 	}
 
 	public List<SysMenuEntity> findUserMenuList(Long userId) {
