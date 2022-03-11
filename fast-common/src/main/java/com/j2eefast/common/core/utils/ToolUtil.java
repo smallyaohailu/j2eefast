@@ -10,8 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.extra.ftp.Ftp;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.system.SystemUtil;
 import cn.hutool.system.oshi.OshiUtil;
@@ -23,7 +21,6 @@ import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.exception.AuthException;
 import me.zhyd.oauth.request.*;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.servlet.ServletOutputStream;
@@ -31,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;

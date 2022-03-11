@@ -233,7 +233,8 @@ public class EnctryptTools {
                 temp[j] = secdata[i * 16 + j];
                 temp[j] ^= res[j];
             }
-            SM4.GMSM4(temp, temp.length, keyValue, res, SM4.ENCRYPT);
+            //SM4.GMSM4(temp, temp.length, keyValue, res, SM4.ENCRYPT);
+			res = SM4.encryptData_ECB(temp,keyValue);
         }
         return HexUtil.bytesToHexStr(res, 0, 4).toUpperCase().getBytes();
     }
@@ -268,7 +269,8 @@ public class EnctryptTools {
 				temp[j] = secdata[i * 16 + j];
 				temp[j] ^= res[j];
 			}
-			SM4.GMSM4(temp, temp.length, keyValue, res, SM4.ENCRYPT);
+//			SM4.GMSM4(temp, temp.length, keyValue, res, SM4.ENCRYPT);
+			res = SM4.encryptData_ECB(temp,keyValue);
 		}
 		return HexUtil.convertByteArrayToHexStr(res);
 	}
@@ -357,7 +359,8 @@ public class EnctryptTools {
                 temp[j] = secdata[i * 16 + j];
                 temp[j] ^= res[j];
             }
-            SM4.GMSM4(temp, temp.length, keyValue, res, SM4.ENCRYPT);
+            //SM4.GMSM4(temp, temp.length, keyValue, res, SM4.ENCRYPT);
+			res = SM4.encryptData_ECB(temp,keyValue);
         }
         return HexUtil.bytesToHexStr(res, 0, 8).toUpperCase();
     }
@@ -378,7 +381,8 @@ public class EnctryptTools {
 	public static byte[] encryptSM4Pass(byte[] key, String cardNo, String PIN){
 		byte[] pinBlok = EncryptUtil.formatSM4Pinblock(cardNo.getBytes(), PIN.getBytes());
 		byte[] out = new byte[16];
-		SM4.GMSM4(pinBlok, pinBlok.length, key, out, SM4.ENCRYPT);
+		//SM4.GMSM4(pinBlok, pinBlok.length, key, out, SM4.ENCRYPT);
+		out = SM4.encryptData_ECB(pinBlok,key);
 		return out; 
 	}
 	
@@ -396,7 +400,8 @@ public class EnctryptTools {
 	public static String decryptSM4Pass(byte[] key, String cardNo, String PIN){
 		byte[] hexPin = HexUtil.convertHexStrToByteArray(PIN);
 		byte[] out = new byte[16];
-		SM4.GMSM4(hexPin, hexPin.length, key, out, SM4.DECRYPT);
+//		SM4.GMSM4(hexPin, hexPin.length, key, out, SM4.DECRYPT);
+		out = SM4.decryptData_ECB(hexPin,key);
 		return HexUtil.convertByteArrayToHexStr(EncryptUtil.PinblockSM4Pin(cardNo.getBytes(),out)).toUpperCase().substring(2, 8); 
 	}
 	
@@ -496,7 +501,8 @@ public class EnctryptTools {
 		byte[] send = new byte[rd.length + (16 -rd.length % 16)%16];
 		System.arraycopy(rd, 0, send, 0, rd.length);
 		byte[] value = new byte[send.length];
-		SM4.GMSM4(send, send.length, temp, value, SM4.DECRYPT);
+		//SM4.GMSM4(send, send.length, temp, value, );
+		value = SM4.decryptData_ECB(send,temp);
 		value = HexUtil.trimLast0x00(value);
 		return new String(value);
 	}
@@ -568,7 +574,8 @@ public class EnctryptTools {
 		System.arraycopy(txtb, 0, send, 0, txtb.length);
 
 		byte[] value = new byte[send.length];
-		SM4.GMSM4(send, send.length, temp, value, SM4.ENCRYPT);
+		//SM4.GMSM4(send, send.length, temp, value, SM4.ENCRYPT);
+		value = SM4.encryptData_ECB(send,temp);
 		return Base64.encode(value);
 	}
 

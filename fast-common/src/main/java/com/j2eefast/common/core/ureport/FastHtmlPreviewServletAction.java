@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.j2eefast.common.core.ureport;
 
+import cn.hutool.core.util.StrUtil;
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.build.ReportBuilder;
 import com.bstek.ureport.build.paging.Page;
@@ -37,6 +38,7 @@ import com.bstek.ureport.model.Report;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -69,6 +71,7 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
     private ReportBuilder reportBuilder;
     private ReportRender reportRender;
     private HtmlProducer htmlProducer=new HtmlProducer();
+
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method=retriveMethod(req);
@@ -126,7 +129,9 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                 context.put("pageIndex", htmlReport.getPageIndex());
                 context.put("chartDatas", convertJson(htmlReport.getChartDatas()));
                 context.put("error", false);
+                context.put("pageAll", htmlReport.isPage());
                 context.put("file", req.getParameter("_u"));
+                context.put("__f", StrUtil.nullToDefault(req.getParameter("__f"),""));
                 context.put("intervalRefreshValue",htmlReport.getHtmlIntervalRefreshValue());
                 String customParameters=buildCustomParameters(req);
                 context.put("customParameters", customParameters);
@@ -142,6 +147,7 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                     file=decode(file);
                     if(file.equals(PREVIEW_KEY)){
                         tools=new Tools(true);
+                        file = StrUtil.nullToDefault(req.getParameter("__f"),file);
                     }else{
                         tools=new Tools(false);
                         tools.doInit("1");
@@ -162,31 +168,13 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                             tools.doInit("3");
                         }
                     }
-
-//                    String toolsInfo=req.getParameter("_t");
-//                    if(StringUtils.isNotBlank(toolsInfo)){
-//                        tools=new Tools(false);
-//                        if(toolsInfo.equals("0")){
-//                            tools.setShow(false);
-//                        }else{
-//                            String[] infos=toolsInfo.split(",");
-//                            for(String name:infos){
-//                                tools.doInit(name);
-//                            }
-//                        }
-//                        context.put("_t", toolsInfo);
-//                        context.put("hasTools", true);
-//                    }else{
-//                        tools=new Tools(true);
-//                    }
-
+                    context.put("watermark", StrUtil.nullToDefault(htmlReport.getWatermark(),""));
                 }
                 context.put("tools", tools);
             }
             context.put("contextPath", req.getContextPath());
             resp.setContentType("text/html");
             resp.setCharacterEncoding("utf-8");
-
             VelocityEngine veTemp = new VelocityEngine();
             veTemp.setProperty(Velocity.RESOURCE_LOADER, "class");
             veTemp.setProperty("class.resource.loader.class","org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
@@ -235,61 +223,266 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
         writeObjectToJson(resp, htmlReport);
     }
 
+    /**
+     * 在线打印
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
     public void loadPrintPages(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        long start=System.currentTimeMillis();
         String file=req.getParameter("_u");
+        String fpage = req.getParameter("_i");
+        String f = req.getParameter("__f");
+        // 是否打印所有  0 当前  1所有
+        String all = req.getParameter("__a");
         file=decode(file);
         if(StringUtils.isBlank(file)){
             throw new ReportComputeException("Report file can not be null.");
         }
+
         Map<String, Object> parameters = buildParameters(req);
         // J2eeFAST 整合系统 支持多租户模式
         parameters.put("tenantId",((LoginUserEntity) SecurityUtils.getSubject()
                 .getPrincipal()).getTenantId());
+        //操作用户
+        parameters.put("__userName",((LoginUserEntity) SecurityUtils.getSubject()
+                .getPrincipal()).getName());
+
         ReportDefinition reportDefinition=null;
+
+
+        String _file= file;
         if(file.equals(PREVIEW_KEY)){
-            reportDefinition=(ReportDefinition) TempObjectCache.getObject(PREVIEW_KEY);
-            if(reportDefinition==null){
-                throw new ReportDesignException("Report data has expired,can not do export excel.");
+            _file=req.getParameter("__f");
+            _file=decode(_file);
+        }
+
+        //分页 当前页
+        if(ToolUtil.isNotEmpty(fpage) &&
+                ToolUtil.isNotEmpty(all)
+                && all.equals("0")){
+//            Map<String, Object> mapLsit = UreportUtils.isLimit(_file);
+//            if((Boolean) mapLsit.get("isLimit")){
+//                //当前页
+//                parameters.put("__page", Integer.parseInt(fpage));
+//                parameters.put("__paging", true);
+//                // 分页大小
+//                parameters.put("__pageSize", mapLsit.get("pageSize"));
+//                // 需要分页的对象
+//                parameters.put("__objList", mapLsit.get("ObjList"));
+//            }
+            parameters.put("__page", Integer.parseInt(fpage));
+
+            if(file.equals(PREVIEW_KEY)){
+                reportDefinition=(ReportDefinition) TempObjectCache.getObject(PREVIEW_KEY);
+                if(reportDefinition==null){
+                    throw new ReportDesignException("Report data has expired,can not do export excel.");
+                }
+            }else{
+                reportDefinition=reportRender.getReportDefinition(file);
             }
-        }else{
-            reportDefinition=reportRender.getReportDefinition(file);
-        }
-        Report report=reportBuilder.buildReport(reportDefinition, parameters);
-        Map<String, ChartData> chartMap=report.getContext().getChartDataMap();
-        if(chartMap.size()>0){
-            CacheUtils.storeChartDataMap(chartMap);
-        }
-        FullPageData pageData= PageBuilder.buildFullPageData(report);
-        StringBuilder sb=new StringBuilder();
-        List<List<Page>> list=pageData.getPageList();
-        Context context=report.getContext();
-        if(list.size()>0){
-            for(int i=0;i<list.size();i++){
-                List<Page> columnPages=list.get(i);
-                if(i==0){
-                    String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
-                    sb.append(html);
-                }else{
-                    String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
-                    sb.append(html);
+
+
+            Report report=reportBuilder.buildReport(reportDefinition, parameters);
+            Map<String, ChartData> chartMap=report.getContext().getChartDataMap();
+            if(chartMap.size()>0){
+                CacheUtils.storeChartDataMap(chartMap);
+            }
+            FullPageData pageData= PageBuilder.buildFullPageData(report);
+            StringBuilder sb=new StringBuilder();
+            List<List<Page>> list=pageData.getPageList();
+            Context context=report.getContext();
+            if(list.size()>0){
+                for(int i=0;i<list.size();i++){
+                    List<Page> columnPages=list.get(i);
+                    if(i==0){
+                        String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                        sb.append(html);
+                    }else{
+                        String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                        sb.append(html);
+                    }
+                }
+            }else{
+                List<Page> pages=report.getPages();
+                for(int i=0;i<pages.size();i++){
+                    Page page=pages.get(i);
+                    if(i==0){
+                        String html=htmlProducer.produce(context,page, false);
+                        sb.append(html);
+                    }else{
+                        String html=htmlProducer.produce(context,page, true);
+                        sb.append(html);
+                        break;
+                    }
                 }
             }
+            Map<String,String> map=new HashMap<String,String>();
+            map.put("html", sb.toString());
+            map.put("watermark", reportDefinition.getPaper().getWatermark());
+            writeObjectToJson(resp, map);
         }else{
-            List<Page> pages=report.getPages();
-            for(int i=0;i<pages.size();i++){
-                Page page=pages.get(i);
-                if(i==0){
-                    String html=htmlProducer.produce(context,page, false);
-                    sb.append(html);
+
+            if(ToolUtil.isNotEmpty(fpage) &&
+                    ToolUtil.isNotEmpty(all)
+                    && all.equals("1")){
+//                Map<String, Object> mapLsit = UreportUtils.isLimit(_file);
+//
+//                if((Boolean) mapLsit.get("isLimit")){
+//                    //当前页
+//                    parameters.put("__page", 1);
+//                    parameters.put("__paging", true);
+//                    // 分页大小
+//                    parameters.put("__pageSize", mapLsit.get("pageSize"));
+//                    // 需要分页的对象
+//                    parameters.put("__objList", mapLsit.get("ObjList"));
+//                }
+                //当前页
+                parameters.put("__page", 1);
+                if(file.equals(PREVIEW_KEY)){
+                    reportDefinition=(ReportDefinition) TempObjectCache.getObject(PREVIEW_KEY);
+                    if(reportDefinition==null){
+                        throw new ReportDesignException("Report data has expired,can not do export excel.");
+                    }
                 }else{
-                    String html=htmlProducer.produce(context,page, true);
-                    sb.append(html);
+                    reportDefinition=reportRender.getReportDefinition(file);
                 }
+                Report report=reportBuilder.buildReport(reportDefinition, parameters);
+                Map<String, ChartData> chartMap=report.getContext().getChartDataMap();
+                if(chartMap.size()>0){
+                    CacheUtils.storeChartDataMap(chartMap);
+                }
+                FullPageData pageData= PageBuilder.buildFullPageData(report);
+                StringBuilder sb=new StringBuilder();
+                List<List<Page>> list=pageData.getPageList();
+                Context context=report.getContext();
+                if(list.size()>0){
+                    for(int i=0;i<list.size();i++){
+                        List<Page> columnPages=list.get(i);
+                        if(i==0){
+                            String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                            sb.append(html);
+                        }else{
+                            String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                            sb.append(html);
+                        }
+                    }
+                }else{
+                    List<Page> pages=report.getPages();
+                    for(int i=0;i<pages.size();i++){
+                        Page page=pages.get(i);
+                        String html=htmlProducer.produce(context,page, false);
+                        sb.append(html);
+                        break;
+                    }
+                }
+
+                long __totalPage = (long) parameters.get("__totalPage");
+
+                for(int k=2; k<=__totalPage;k++){
+                    //当前页
+                    parameters.put("__page", k);
+                    if(file.equals(PREVIEW_KEY)){
+                        reportDefinition=(ReportDefinition) TempObjectCache.getObject(PREVIEW_KEY);
+                        if(reportDefinition==null){
+                            throw new ReportDesignException("Report data has expired,can not do export excel.");
+                        }
+                    }else{
+                        reportDefinition=reportRender.getReportDefinition(file);
+                    }
+                    report=reportBuilder.buildReport(reportDefinition, parameters);
+                    chartMap=report.getContext().getChartDataMap();
+                    if(chartMap.size()>0){
+                        CacheUtils.storeChartDataMap(chartMap);
+                    }
+                    pageData= PageBuilder.buildFullPageData(report);
+                    list=pageData.getPageList();
+                    context=report.getContext();
+                    if(list.size()>0){
+                        for(int i=0;i<list.size();i++){
+                            List<Page> columnPages=list.get(i);
+                            if(i==0){
+                                String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                                sb.append(html);
+                            }else{
+                                String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                                sb.append(html);
+                            }
+                        }
+                    }else{
+                        List<Page> pages=report.getPages();
+                        for(int i=0;i<pages.size();i++){
+                            Page page=pages.get(i);
+                            if(i==0){
+                                String html=htmlProducer.produce(context,page, true);
+                                sb.append(html);
+                            }else{
+                                String html=htmlProducer.produce(context,page, true);
+                                sb.append(html);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                Map<String,String> map=new HashMap<String,String>();
+                map.put("html", sb.toString());
+                map.put("watermark", reportDefinition.getPaper().getWatermark());
+                writeObjectToJson(resp, map);
+            }else{
+                if(file.equals(PREVIEW_KEY)){
+                    reportDefinition=(ReportDefinition) TempObjectCache.getObject(PREVIEW_KEY);
+                    if(reportDefinition==null){
+                        throw new ReportDesignException("Report data has expired,can not do export excel.");
+                    }
+                }else{
+                    reportDefinition=reportRender.getReportDefinition(file);
+                }
+                Report report=reportBuilder.buildReport(reportDefinition, parameters);
+                Map<String, ChartData> chartMap=report.getContext().getChartDataMap();
+                if(chartMap.size()>0){
+                    CacheUtils.storeChartDataMap(chartMap);
+                }
+                FullPageData pageData= PageBuilder.buildFullPageData(report);
+                StringBuilder sb=new StringBuilder();
+                List<List<Page>> list=pageData.getPageList();
+                Context context=report.getContext();
+                if(list.size()>0){
+                    for(int i=0;i<list.size();i++){
+                        List<Page> columnPages=list.get(i);
+                        if(i==0){
+                            String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                            sb.append(html);
+                        }else{
+                            String html=htmlProducer.produce(context,columnPages,pageData.getColumnMargin(),false);
+                            sb.append(html);
+                        }
+                    }
+                }else{
+                    List<Page> pages=report.getPages();
+                    for(int i=0;i<pages.size();i++){
+                        Page page=pages.get(i);
+                        if(i==0){
+                            String html=htmlProducer.produce(context,page, false);
+                            sb.append(html);
+                        }else{
+                            String html=htmlProducer.produce(context,page, true);
+                            sb.append(html);
+                            break;
+                        }
+                    }
+                }
+                Map<String,String> map=new HashMap<String,String>();
+                map.put("html", sb.toString());
+                map.put("watermark", reportDefinition.getPaper().getWatermark());
+                writeObjectToJson(resp, map);
             }
         }
-        Map<String,String> map=new HashMap<String,String>();
-        map.put("html", sb.toString());
-        writeObjectToJson(resp, map);
+        long end=System.currentTimeMillis();
+        String msg="~~~ 打印传输数据总耗时:"+(end-start)+"ms";
+        log.info(msg);
     }
 
     public void loadPagePaper(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -313,33 +506,65 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
 
     private HtmlReport loadReport(HttpServletRequest req) {
         Map<String, Object> parameters = buildParameters(req);
-
+        String pageIndex=req.getParameter("_i");
         Subject subject = SecurityUtils.getSubject();
         LoginUserEntity loginUserEntity = (LoginUserEntity) subject
                 .getPrincipal();
         // J2eeFAST 整合系统 支持多租户模式
         parameters.put("tenantId",loginUserEntity.getTenantId());
 
+        //操作用户
+        parameters.put("__userName",loginUserEntity.getName());
+
         HtmlReport htmlReport=null;
         String file=req.getParameter("_u");
         file=decode(file);
-        String pageIndex=req.getParameter("_i");
         if(StringUtils.isBlank(file)){
             //throw new ReportComputeException("Report file can not be null.");
             throw new RxcException("链接有误,请确认访问链接!","A00003");
         }
+        String _file= file;
+        if(file.equals(PREVIEW_KEY)){
+             _file=req.getParameter("__f");
+            _file=decode(_file);
+        }
+        //分页 当前页
+        if(ToolUtil.isNotEmpty(pageIndex)){
+//            Map<String, Object> map = UreportUtils.isLimit(_file);
+//            if((Boolean) map.get("isLimit")){
+//                //当前页
+//                parameters.put("__page", Integer.parseInt(pageIndex));
+//                parameters.put("__paging", true);
+//                // 分页大小
+//                parameters.put("__pageSize", map.get("pageSize"));
+//                // 需要分页的对象
+//                parameters.put("__objList", map.get("ObjList"));
+//            }
+            //当前页
+            parameters.put("__page", Integer.parseInt(pageIndex));
+        }
+
+        if(!UreportUtils.isFunc(_file,"preview")){
+            throw new RxcException("未开放此功能!","A00002");
+        }
+
+        //已经设计完成
+        if(!UreportUtils.isPermissions(_file)){
+            throw new RxcException("无权限访问!","A00001");
+        }
+
+        //数据权限
+        parameters.put(ConfigConstant.SQLFILTER,UreportUtils.getSQLFilter(_file));
+
+
         //在线设计查看 -- 使用会话内存数据-- 不做数据权限拦截
         if(file.equals(PREVIEW_KEY)){
-
-            if(!loginUserEntity.getId().equals(1L)){
-                throw new RxcException("您无权限访问,请联系技术人员!","A00003");
-            }
 
             ReportDefinition reportDefinition=(ReportDefinition)TempObjectCache.getObject(PREVIEW_KEY);
             if(reportDefinition==null){
                 throw new ReportDesignException("Report data has expired,can not do preview.");
             }
-            Report report=reportBuilder.buildReport(reportDefinition, parameters);
+            Report report = reportBuilder.buildReport(reportDefinition, parameters);
             Map<String, ChartData> chartMap=report.getContext().getChartDataMap();
             if(chartMap.size()>0){
                 CacheUtils.storeChartDataMap(chartMap);
@@ -365,6 +590,7 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             if(report.getPaper().isColumnEnabled()){
                 htmlReport.setColumn(report.getPaper().getColumnCount());
             }
+            htmlReport.setWatermark(reportDefinition.getPaper().getWatermark());
             htmlReport.setChartDatas(report.getContext().getChartDataMap().values());
             htmlReport.setContent(html);
             htmlReport.setTotalPage(report.getPages().size());
@@ -373,18 +599,6 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             htmlReport.setReportAlign(report.getPaper().getHtmlReportAlign().name());
             htmlReport.setHtmlIntervalRefreshValue(report.getPaper().getHtmlIntervalRefreshValue());
         }else{
-
-            if(!UreportUtils.isFunc(file,"preview")){
-                throw new RxcException("未开放此功能!","A00002");
-            }
-
-            //已经设计完成
-            if(!UreportUtils.isPermissions(file)){
-               throw new RxcException("无权限访问!","A00001");
-            }
-            
-            //数据权限
-            parameters.put(ConfigConstant.SQLFILTER,UreportUtils.getSQLFilter(file));
 
             TempObjectCache.removeObject(PREVIEW_KEY);
             if(StringUtils.isNotBlank(pageIndex) && !pageIndex.equals("0")){

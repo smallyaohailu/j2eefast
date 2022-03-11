@@ -1,23 +1,85 @@
 package com.j2eefast.common.core.shiro;
 
+import com.j2eefast.common.core.utils.ToolUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
+import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionKey;
+import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
+import org.apache.shiro.web.util.WebUtils;
+
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 
 /**
  * @author: wangsaichao/J2eeFAST
  * @description: 解决单次请求需要多次访问redis, 降低Session更新的频率
  */
+@Slf4j
 public class ShiroSessionManager extends DefaultWebSessionManager {
 
     private static final long DEFAULT_SESSION_IN_MEMORY_TIMEOUT = 1000L * 60 * 3;
+    private static final String HEADER_SESSION_NAME = "auth-token";
+    private static final String HEADER_TAG = "__ajax";
+    private static final String HEADER_JSON = "json";
+
+    private boolean sessionIdCookieEnabled;
 
     public ShiroSessionManager(){
+        sessionIdCookieEnabled = true;
+    }
+
+    @Override
+    protected Session createExposedSession(Session session, SessionContext context) {
+        return super.createExposedSession(session, context);
+    }
+
+    @Override
+    protected Session createExposedSession(Session session, SessionKey key) {
+        return super.createExposedSession(session, key);
+    }
+
+
+    @Override
+    public Serializable getSessionId(SessionKey key) {
+        ServletRequest servletRequest = WebUtils.getRequest(key);
+        String tag  = ((HttpServletRequest) servletRequest).getHeader(HEADER_TAG);
+        if(ToolUtil.isNotEmpty(tag) && tag.equals(HEADER_JSON)){
+            ServletResponse response = WebUtils.getResponse(key);
+            Serializable id = getHeaderSessionId(servletRequest, response);
+            if(id == null){
+                id = super.getSessionId(key);
+            }
+            return id;
+        }
+        Serializable id = super.getSessionId(key);
+        return id;
+    }
+
+    protected Serializable getHeaderSessionId(ServletRequest request, ServletResponse response) {
+        String id= getHeaderSessionId((HttpServletRequest)request);
+        if (id != null) {
+            request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID, id);
+            request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_IS_VALID, Boolean.TRUE);
+        }
+        request.setAttribute(ShiroHttpServletRequest.SESSION_ID_URL_REWRITING_ENABLED, isSessionIdUrlRewritingEnabled());
+        return id;
+    }
+
+    /**
+     * 获取请求的token
+     */
+    private String getHeaderSessionId(HttpServletRequest httpRequest){
+        //从header中获取session
+        String sessionId = httpRequest.getHeader(HEADER_SESSION_NAME);
+        return sessionId;
     }
 
     /**

@@ -16,9 +16,11 @@
 package com.j2eefast.common.core.ureport;
 
 import cn.hutool.core.util.StrUtil;
+import com.bstek.ureport.build.Dataset;
 import com.bstek.ureport.build.paging.Page;
 import com.bstek.ureport.cache.CacheUtils;
 import com.bstek.ureport.chart.ChartData;
+import com.bstek.ureport.definition.PagingMode;
 import com.bstek.ureport.definition.ReportDefinition;
 import com.bstek.ureport.definition.dataset.DatasetDefinition;
 import com.bstek.ureport.definition.dataset.Parameter;
@@ -79,7 +81,9 @@ public class FastExportManagerImpl implements ExportManager {
         if(reportDefinition.getPaper().isColumnEnabled()){
             htmlReport.setColumn(reportDefinition.getPaper().getColumnCount());
         }
+        htmlReport.setWatermark(reportDefinition.getPaper().getWatermark());
         htmlReport.setStyle(reportDefinition.getStyle());
+        htmlReport.setPage(reportDefinition.getPaper().getPagingMode().equals(PagingMode.fixrows));
         htmlReport.setSearchFormData(reportDefinition.buildSearchFormData(report.getContext().getDatasetMap(),parameters));
         htmlReport.setReportAlign(report.getPaper().getHtmlReportAlign().name());
         htmlReport.setChartDatas(report.getContext().getChartDataMap().values());
@@ -93,13 +97,24 @@ public class FastExportManagerImpl implements ExportManager {
         //J2eeFAST 修改支持 数据过滤注入
         setSqlFilter(reportDefinition,parameters);
         //---------------------
-        Report report=reportRender.render(reportDefinition, parameters);
+        Report report= reportRender.render(reportDefinition, parameters);
         Map<String, ChartData> chartMap=report.getContext().getChartDataMap();
+
         if(chartMap.size()>0){
             CacheUtils.storeChartDataMap(chartMap);
         }
-        SinglePageData pageData= PageBuilder.buildSinglePageData(pageIndex, report);
+
+        int __page = pageIndex;
+        int totalPages = 0;
+        if(ToolUtil.isNotEmpty(parameters.get("__paging")) &&
+                (boolean)parameters.get("__paging")){
+            __page = 1;
+        }
+
+        SinglePageData pageData= PageBuilder.buildSinglePageData(__page, report);
+
         List<Page> pages=pageData.getPages();
+
         String content=null;
         if(pages.size()==1){
             content=htmlProducer.produce(report.getContext(),pages.get(0),false);
@@ -111,15 +126,28 @@ public class FastExportManagerImpl implements ExportManager {
         if(reportDefinition.getPaper().isColumnEnabled()){
             htmlReport.setColumn(reportDefinition.getPaper().getColumnCount());
         }
+        htmlReport.setWatermark(reportDefinition.getPaper().getWatermark());
         htmlReport.setStyle(reportDefinition.getStyle());
         htmlReport.setSearchFormData(reportDefinition.buildSearchFormData(report.getContext().getDatasetMap(),parameters));
         htmlReport.setPageIndex(pageIndex);
-        htmlReport.setTotalPage(pageData.getTotalPages());
+        htmlReport.setPage(reportDefinition.getPaper().getPagingMode().equals(PagingMode.fixrows));
+        if(ToolUtil.isNotEmpty(parameters.get("__paging")) &&
+                (boolean)parameters.get("__paging")){
+            Dataset value= report.getContext().getDatasetMap().entrySet().iterator().next().getValue();
+            totalPages = value.getCount();
+            int pageSzie = value.getPageSize();
+            totalPages = totalPages / pageSzie;
+            totalPages = totalPages % pageSzie > 0 ? (totalPages + 1) : totalPages;
+        }else {
+            totalPages = pageData.getTotalPages();
+        }
+        htmlReport.setTotalPage(totalPages);
         htmlReport.setReportAlign(report.getPaper().getHtmlReportAlign().name());
         htmlReport.setChartDatas(report.getContext().getChartDataMap().values());
         htmlReport.setHtmlIntervalRefreshValue(report.getPaper().getHtmlIntervalRefreshValue());
         return htmlReport;
     }
+
     @Override
     public void exportPdf(ExportConfigure config) {
         String file=config.getFile();

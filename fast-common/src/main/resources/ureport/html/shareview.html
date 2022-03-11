@@ -18,8 +18,7 @@
     <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript" src="${contextPath}/ureport/res/ureport/js/preview.bundle.js"></script>
 </head>
-<body style="margin:5px">
-${upSearchFormHtml}
+<body style="margin:5px;">
 #if($tools.show)
 <div style="border:solid 1px #ddd;border-radius:5px;height:35px;width:100%;margin-bottom:5px;background:#f8f8f8">
     <div style="text-align:${reportAlign}">
@@ -69,30 +68,6 @@ ${upSearchFormHtml}
         </button>
         #end
         #if($tools.paging)
-        <div class="btn-group">
-            <!-- 屏蔽
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="background:#f8f8f8;border:none;color:#337ab7">
-                #if($pageIndex>0)
-                分页预览
-                #else
-                预览所以
-                #end
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-                #if($hasTools)
-                <li><a href="${contextPath}/ureport/preview?_u=${file}&__f=${__f}&_t=${_t}&${customParameters}" style="color:#337ab7">预览</a></li>
-                #else
-                <li><a href="${contextPath}/ureport/preview?_u=${file}&__f=${__f}&${customParameters}" style="color:#337ab7">预览</a></li>
-                #end
-                #if($hasTools)
-                <li><a href="${contextPath}/ureport/preview?_u=${file}&__f=${__f}&_i=1&_t=${_t}&${customParameters}" style="color:#337ab7">分页预览</a></li>
-                #else
-                <li><a href="${contextPath}/ureport/preview?_u=${file}&__f=${__f}&_i=1&${customParameters}" style="color:#337ab7">分页预览</a></li>
-                #end
-            </ul>
-            -->
-        </div>
         #end
         #if($pageIndex>0)
         <span id='pagingContainer' style="font-size:14px;margin-left:1px;color:#337ab7">
@@ -108,7 +83,6 @@ ${upSearchFormHtml}
     </div>
 </div>
 #end
-${downSearchFormHtml}
 <div id="_ureport_table" style="float:${reportAlign}">
     ${content}
 </div>
@@ -121,10 +95,10 @@ ${downSearchFormHtml}
         var totalPageWithCol = 0;
         var pageIndex = 0;
         #if( $totalPageWithCol)
-            totalPageWithCol = ${totalPageWithCol};
+        totalPageWithCol = ${totalPageWithCol};
         #end
         #if( $pageIndex)
-            pageIndex = ${pageIndex};
+        pageIndex = ${pageIndex};
         #end
 
         buildPaging(pageIndex,totalPageWithCol);
@@ -134,9 +108,12 @@ ${downSearchFormHtml}
         #end
 
         #if( $chartDatas)
-            _buildChartDatas(${chartDatas});
+        _buildChartDatas(${chartDatas});
         #end
 
+        #if( $error)
+        __clearLockhost();
+        #end
 
         ${searchFormJs}
         #if( $file)
@@ -149,7 +126,6 @@ ${downSearchFormHtml}
         _watermark(window,{"watermark_txt":"${watermark}"})
         #end
     });
-
 </script>
 </body>
 </html>

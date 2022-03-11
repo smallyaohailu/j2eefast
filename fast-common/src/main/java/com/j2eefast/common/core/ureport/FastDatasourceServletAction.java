@@ -31,6 +31,7 @@ import com.bstek.ureport.utils.ProcedureUtils;
 import com.j2eefast.common.core.utils.SpringUtil;
 
 import cn.hutool.db.meta.MetaUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -179,6 +180,15 @@ public class FastDatasourceServletAction extends RenderPageServletAction {
      */
     public void buildFields(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String sql=req.getParameter("sql");
+        ///isPage
+        String isPage =req.getParameter("isPage");
+
+        if(ToolUtil.isNotEmpty(isPage) && isPage.equals("true")){
+            String pagesize = req.getParameter("pagesize");
+            if(ToolUtil.isEmpty(pagesize)){
+                throw new ReportDesignException(new Exception("分页大小设置不能为空!"));
+            }
+        }
         String parameters=req.getParameter("parameters");
         Connection conn=null;
         final List<Field> fields=new ArrayList<Field>();
@@ -191,6 +201,7 @@ public class FastDatasourceServletAction extends RenderPageServletAction {
                 List<Field> fieldsList = ProcedureUtils.procedureColumnsQuery(sql, map, conn);
                 fields.addAll(fieldsList);
             }else{
+
                 DataSource dataSource=new SingleConnectionDataSource(conn,false);
                 NamedParameterJdbcTemplate jdbc=new NamedParameterJdbcTemplate(dataSource);
                 PreparedStatementCreator statementCreator=getPreparedStatementCreator(sql,new MapSqlParameterSource(map));
@@ -254,9 +265,11 @@ public class FastDatasourceServletAction extends RenderPageServletAction {
             if(ProcedureUtils.isProcedure(sql)){
                 list=ProcedureUtils.procedureQuery(sql, map, conn);
             }else{
+                // 只取前50条数据,防止数据过大导致过慢问题  PaginationInnerInterceptor 后期优化支持多数据库分页语句 目前只支持mysql
+                StringBuilder limitSql = new StringBuilder(sql).append(" LIMIT ").append("50");
                 DataSource dataSource=new SingleConnectionDataSource(conn,false);
                 NamedParameterJdbcTemplate jdbc=new NamedParameterJdbcTemplate(dataSource);
-                list=jdbc.queryForList(sql, map);
+                list=jdbc.queryForList(limitSql.toString(), map);
             }
             int size=list.size();
             int currentTotal=size;

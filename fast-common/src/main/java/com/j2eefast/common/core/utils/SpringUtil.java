@@ -306,7 +306,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
 			factory.removeBeanDefinition(beanName);
 		}catch (Exception e){
 			log.error("注销Bean失败!",e);
-			throw new UtilException("Can not unregister bean, the factory is not a DefaultSingletonBeanRegistry!");
+			//throw new UtilException("Can not unregister bean, the factory is not a DefaultSingletonBeanRegistry!");
 		}
 	}
 	

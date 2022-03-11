@@ -4,12 +4,14 @@
  */
 package com.j2eefast.common.core.license.interceptor;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import com.j2eefast.common.core.config.LicenseCheckListener;
 import com.j2eefast.common.core.license.LicenseVerify;
 import com.j2eefast.common.core.license.annotation.FastLicense;
 import com.j2eefast.common.core.shiro.RedisSessionDAO;
 import com.j2eefast.common.core.utils.ResponseData;
+import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

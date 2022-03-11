@@ -10,16 +10,26 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import cn.hutool.db.DbUtil;
 import cn.hutool.db.handler.RsHandler;
 import cn.hutool.db.sql.SqlExecutor;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.extension.toolkit.SqlParserUtils;
 import com.j2eefast.common.core.config.properties.DruidProperties;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
 import com.j2eefast.common.db.context.SqlSessionFactoryContext;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.select.*;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -125,4 +135,5 @@ public class SqlExe {
             DbUtil.close(conn);
         }
     }
+
 }

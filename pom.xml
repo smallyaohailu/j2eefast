@@ -6,7 +6,7 @@
     <!-- 整个系统的名称 -->
     <groupId>com.j2eefast</groupId>
     <artifactId>fast</artifactId>
-    <version>2.5.0</version>
+    <version>2.6.0</version>
 
     <!-- 打包类型 -->
     <packaging>pom</packaging>
@@ -24,7 +24,7 @@
 
     <!-- 用户可以在maven中定义一些属性，然后在其他地方用${xxx}进行引用 -->
     <properties>
-        <fast.version>2.5.0</fast.version>
+        <fast.version>2.6.0</fast.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -230,6 +230,12 @@
                 <groupId>net.mingsoft</groupId>
                 <artifactId>shiro-freemarker-tags</artifactId>
                 <version>0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- lisence验证 -->
@@ -287,7 +293,8 @@
         <module>fast-framework</module><!-- 核心框架 -->
         <module>fast-generator</module><!-- 代码生成器模块 -->
         <module>fast-common</module><!-- 公共模块 -->
-        <module>fast-flowable</module><!-- 工作流模块 -->
+        <module>fast-flowable</module>
+        <module>fast-ureport2</module>
     </modules>
 
     <build>

@@ -11,6 +11,8 @@ import com.j2eefast.common.core.utils.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Ureport2表报扩展工具类
@@ -88,6 +90,58 @@ public class UreportUtils {
         }
         return flag;
     }
+
+    public static Map<String, Object> isShare(String code){
+        Map<String,Object> map = new HashMap<>();
+        Collection<ReportProvider> reportProviders = SpringUtil.getBeansOfType(ReportProvider.class).values();
+        for(ReportProvider provider:reportProviders){
+            if(code.startsWith(provider.getPrefix())){
+                try{
+                    Method method= provider.getClass().getMethod("isShare", new Class<?>[]{String.class});
+                    map = (Map<String, Object>) method.invoke(provider, new Object[]{code});
+                    break;
+                }catch (Exception e){
+                    log.error("获取分页数据失败!",e);
+                }
+            }
+        }
+        return map;
+    }
+
+//    public static String isWatermark(String fileName){
+//        String flag = "";
+//        Collection<ReportProvider> reportProviders = SpringUtil.getBeansOfType(ReportProvider.class).values();
+//        for(ReportProvider provider:reportProviders){
+//            if(fileName.startsWith(provider.getPrefix())){
+//                try{
+//                    Method method= provider.getClass().getMethod("isWatermark", new Class<?>[]{String.class});
+//                    flag = (String) method.invoke(provider, new Object[]{fileName});
+//                    break;
+//                }catch (Exception e){
+//                    log.error("获取默认下载文件名失败!",e);
+//                }
+//            }
+//        }
+//        return flag;
+//    }
+
+//    public static Map<String, Object> isLimit(String fileName){
+//        Map<String,Object> map = new HashMap<>();
+//        Collection<ReportProvider> reportProviders = SpringUtil.getBeansOfType(ReportProvider.class).values();
+//        for(ReportProvider provider:reportProviders){
+//            if(fileName.startsWith(provider.getPrefix())){
+//                try{
+//                    Method method= provider.getClass().getMethod("isLimit", new Class<?>[]{String.class});
+//                    map = (Map<String, Object>) method.invoke(provider, new Object[]{fileName});
+//                    break;
+//                }catch (Exception e){
+//                    log.error("获取分页数据失败!",e);
+//                }
+//            }
+//        }
+//        return map;
+//    }
+
 
     /**
      * 获取数据过滤SQL

@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>fast</artifactId>
 		<groupId>com.j2eefast</groupId>
-		<version>2.5.0</version>
+		<version>2.6.0</version>
 	</parent>
 
 	<packaging>jar</packaging>
@@ -156,7 +156,7 @@
 				</configuration>
 			</plugin>
 			
-			<!-- 需要打成完整gz包放开注解  -->
+			<!-- 需要打成完整gz包放开注解
 			<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<configuration>
@@ -175,6 +175,7 @@
 						</execution>
 					</executions>
 			 </plugin>
+			 -->
 			</plugins>
     </build>
 </project>

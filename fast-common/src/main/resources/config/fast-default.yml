@@ -77,6 +77,14 @@ spring:
         acknowledge-mode: manual
         #限流（海量数据，同时只能过来一条）
         prefetch: 1
+  # 定时任务是否自动建表配置 如果想自己收到创建 请找到 org.quartz.impl.jdbcjobstore 包下(quartz-**.jar 定时任务JAR包) 有对应的数据库 sql 文件自行手动创建
+  quartz:
+    #数据库方式
+    job-store-type: jdbc
+    jdbc:
+      #initialize-schema: always 初始化删除 qrtz_ 表 重新创建
+      #initialize-schema: never 初始化不创建
+      initialize-schema: never
 
 #登录安全验证基本配置
 aj:
@@ -133,7 +141,7 @@ shiro:
     #是否开启跨域访问
     enabled: false
     #设置允许跨域的路径
-    urlPatterns: ~
+    urlPatterns: /*
     #设置允许跨域请求的域名 * 所有域名都可以访问
     allowedOrigins: "*"
     #设置允许的方法
@@ -252,7 +260,9 @@ fast:
     basename: i18n/
     #默认语言（2.0.3+）
     defaultLocale: zh_CN
-
+  #前后端分离模式
+  distributed:
+     enabled: false
 #web页面相关
 web:
    view:

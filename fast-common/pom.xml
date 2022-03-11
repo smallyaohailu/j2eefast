@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.j2eefast</groupId>
         <artifactId>fast</artifactId>
-        <version>2.5.0</version>
+        <version>2.6.0</version>
     </parent>
 
     <artifactId>fast-common</artifactId>
@@ -285,7 +285,28 @@
               </exclusions>
           </dependency>
 
-        <!--U2报表 导入表报建议使用! -->
+        <!-- 导入JU报表-->
+        <dependency>
+            <groupId>com.j2eefast</groupId>
+            <artifactId>ureport2-consol</artifactId>
+            <version>2.6.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--U2报表 导入表报建议使用!
         <dependency>
             <groupId>com.bstek.ureport</groupId>
             <artifactId>ureport2-console</artifactId>
@@ -304,7 +325,7 @@
                     <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
 
          <!-- 阿里报表工具导入数据建议使用! -->
          <dependency>

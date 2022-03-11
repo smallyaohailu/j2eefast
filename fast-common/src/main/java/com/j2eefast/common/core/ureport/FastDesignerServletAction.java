@@ -158,6 +158,7 @@ public class FastDesignerServletAction extends RenderPageServletAction {
         result.put("datasetName", datasetName);
         writeObjectToJson(resp, result);
     }
+
     public void savePreviewData(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String content=req.getParameter("content");
         content=decodeContent(content);
@@ -230,7 +231,7 @@ public class FastDesignerServletAction extends RenderPageServletAction {
             throw new ReportDesignException("File ["+file+"] have been in existence.");
         }
 
-        InputStream inputStream=IOUtils.toInputStream(content,"utf-8");
+        InputStream inputStream= IOUtils.toInputStream(content,"utf-8");
         ReportDefinition reportDef=reportParser.parse(inputStream, file);
         reportRender.rebuildReportDefinition(reportDef);
         CacheUtils.cacheReportDefinition(file, reportDef);
