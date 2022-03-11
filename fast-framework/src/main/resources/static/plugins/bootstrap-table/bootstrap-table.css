@@ -219,7 +219,9 @@
 .fixed-table-pagination .page-list {
     display: inline-block;
 }
-
+.fixed-table-pagination .check-numer {
+    margin-left: 10px;
+}
 .fixed-table-toolbar .columns-left {
     margin-right: 5px;
 }

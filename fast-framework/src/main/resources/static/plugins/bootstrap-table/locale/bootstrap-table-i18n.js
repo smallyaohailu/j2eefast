@@ -14,6 +14,9 @@
         formatSearch: function () {
             return  $.i18n.prop('查询');
         },
+        formatCheckNumber: function (number) {
+            return $.i18n.prop('勾选总数:{0}',number);
+        },
         formatPageGo: function () {
             return $.i18n.prop('跳转');
         },

@@ -21,6 +21,7 @@
  * 10.修复页面同时多个表格属性firstLoad=false 异常情况
  * 11.优化加载样式
  * 12.新增columns[{field:'user.name',fieldSort:'u.name'}]  fieldSort属性 支持排序名称与返回字段名称不一致
+ * 13.新增showCheckNumber 属性是否显示多选勾选总数
  * --------------------------------------------------
  */
 (function ($) {
@@ -340,6 +341,7 @@
         firstLoad: true,
         isFixedColumn: false,
         onlyInfoPagination: false,
+        showCheckNumber: false, //显示表格勾选数量
         sidePagination: 'client', // client or server
         totalRows: 0, // server side need to set
         pageNumber: 1,
@@ -518,6 +520,9 @@
         },
         formatDetailPagination: function (totalRows) {
             return sprintf('Showing %s rows', totalRows);
+        },
+        formatCheckNumber: function (number) {
+            return sprintf('Total number of checks :%s', number);
         },
         formatSearch: function () {
             return 'Search';
@@ -1521,6 +1526,10 @@
             pageNumber.push('</ul></span>');
 
             html.push(this.options.formatRecordsPerPage(pageNumber.join('')));
+            //显示勾选总记录数量
+            if(this.options.showCheckNumber){
+                html.push('<span class="check-numer"></span>')
+            }
             html.push('</span>');
 
             html.push('</div>',
@@ -2800,6 +2809,11 @@
         }
     };
 
+    //TODO: 新增多选勾选显示总数方法
+    BootstrapTable.prototype.setCheckNumer = function(num){
+        this.$pagination.find('.check-numer').empty().append(this.options.formatCheckNumber(num));
+    }
+
     BootstrapTable.prototype.toggleRow = function (index, uniqueId, visible) {
         if (index === -1) {
             return;
@@ -3501,7 +3515,7 @@
         'check', 'uncheck',
         'checkBy', 'uncheckBy',
         'refresh',
-        'resetView',
+        'resetView','setCheckNumer',
         'resetWidth',
         'destroy',
         'showLoading', 'hideLoading',
