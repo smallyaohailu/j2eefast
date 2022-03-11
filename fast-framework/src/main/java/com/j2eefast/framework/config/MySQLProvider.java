@@ -1,15 +1,14 @@
 package com.j2eefast.framework.config;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bstek.ureport.provider.report.ReportFile;
 import com.bstek.ureport.provider.report.ReportProvider;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.utils.RedisUtil;
-import com.j2eefast.common.core.utils.ServletUtil;
-import com.j2eefast.common.core.utils.SpringUtil;
-import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.bussiness.aop.DataFilterAspect;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.entity.SysUreportFileEntity;
@@ -18,20 +17,20 @@ import com.j2eefast.framework.sys.service.SysUreportFileService;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.ServerUtil;
 import com.j2eefast.framework.utils.UserUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 定制化设置权限
  */
 @Component
 @ConfigurationProperties(prefix = "fast.ureport.mysql.provider")
+@Slf4j
 public class MySQLProvider implements ReportProvider {
 
     private static final String NAME = "Msyql数据库存储";
@@ -96,6 +95,27 @@ public class MySQLProvider implements ReportProvider {
         }
     }
 
+//    /**
+//     * 是否需要分页 等参数
+//     * @param _u
+//     * @return
+//     */
+//    public Map<String,Object> isLimit(String _u){
+//        Map<String,Object> map = new HashMap<>();
+//        String name = StrUtil.replace(_u,prefix,"");
+//        SysUreportFileEntity sysUreportFileEntity = sysUreportFileService.getOne(new
+//                QueryWrapper<SysUreportFileEntity>().eq("name",name).select("page","page_size","obj_name"));
+//        if("Y".equals(sysUreportFileEntity.getPage())){
+//            map.put("isLimit",true);
+//            map.put("pageSize",sysUreportFileEntity.getPageSize());
+//            map.put("ObjList",StrUtil.split(sysUreportFileEntity.getObjName(),","));
+//            return map;
+//        }else{
+//            map.put("isLimit",false);
+//            return map;
+//        }
+//    }
+
     public List<SysRoleEntity> getSysRoles(){
         return sysRoleService.getRolesAll();
     }
@@ -139,6 +159,31 @@ public class MySQLProvider implements ReportProvider {
     }
 
     /**
+     * 是否分享
+     * @param code
+     * @return
+     */
+    public Map<String,Object> isShare(String code){
+        code = StrUtil.replace(code,prefix,"");
+        Map<String,Object> map = new HashMap<>();
+        SysUreportFileEntity ureportFile = sysUreportFileService
+                .getOne(new QueryWrapper<SysUreportFileEntity>().eq("code",code).
+                        select("share","name","pass","time"));
+        if(ToolUtil.isNotEmpty(ureportFile)
+                && ToolUtil.isNotEmpty(ureportFile.getShare())
+                && "Y".equals(ureportFile.getShare())){
+            map.put("isShare",true);
+            map.put("file",prefix + ureportFile.getName());
+            map.put("pass",ureportFile.getPass());
+            map.put("time",ureportFile.getTime());
+            return map;
+        }else{
+            map.put("isShare",false);
+            return map;
+        }
+    }
+
+    /**
      * 判断开放功能
      * @param _u
      * @param func
@@ -146,8 +191,8 @@ public class MySQLProvider implements ReportProvider {
      */
     public boolean isFuncs(String _u,String func){
         //超级管理员直接跳过检验
-        if(UserUtils.isSupAdmin() ||
-                UserUtils.getUserId().equals(1L)){
+        if(ToolUtil.isNotEmpty(UserUtils.getUserId()) && (UserUtils.isSupAdmin() ||
+                UserUtils.getUserId().equals(1L))){
             return true;
         }
         String name = StrUtil.replace(_u,prefix,"");
@@ -170,6 +215,13 @@ public class MySQLProvider implements ReportProvider {
         List<String> funcLsit =  StrUtil.split(funcs,",");
         return funcLsit.contains(func);
     }
+//
+//    public String isWatermark(String fileName){
+//        String name = StrUtil.replace(fileName,prefix,"");
+//        SysUreportFileEntity sysUreportFileEntity = sysUreportFileService.getOne(new
+//                QueryWrapper<SysUreportFileEntity>().eq("name",name).select("watermark"));
+//        return ToolUtil.isEmpty(sysUreportFileEntity) ? "" :sysUreportFileEntity.getWatermark();
+//    }
 
     /**
      * 加载
@@ -181,9 +233,19 @@ public class MySQLProvider implements ReportProvider {
         SysUreportFileEntity ureportFile = sysUreportFileService
                 .getUreportFileByFileName(getCorrectName(file));
         byte[] content = ureportFile.getContent();
+        log.info(new String(content));
         ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
         return inputStream;
     }
+
+//    @Override
+//    public InputStream loadReportCode(String code) {
+//        SysUreportFileEntity ureportFile = sysUreportFileService
+//                .getOne(new QueryWrapper<SysUreportFileEntity>().eq("code",code).select("content"));
+//        byte[] content = ureportFile.getContent();
+//        ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
+//        return inputStream;
+//    }
 
     /**
      * 删除
@@ -228,6 +290,7 @@ public class MySQLProvider implements ReportProvider {
         if(ureportFileEntity == null && status.equals("save")){
             ureportFileEntity = new SysUreportFileEntity();
             ureportFileEntity.setName(file);
+            ureportFileEntity.setCode(RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 22));
             ureportFileEntity.setFileName(_downFileName);
             ureportFileEntity.setRoleKeys(_roleKeys);
             ureportFileEntity.setFunc(func);
@@ -236,6 +299,9 @@ public class MySQLProvider implements ReportProvider {
             redisUtil.set(redisPrefix + "func:"+file,func);
             redisUtil.set(redisPrefix + "role:"+file,_roleKeys);
         }else if(ToolUtil.isNotEmpty(ureportFileEntity) && status.equals("update")){
+            if(ToolUtil.isEmpty(ureportFileEntity.getCode())){
+                ureportFileEntity.setCode(RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 22));
+            }
             ureportFileEntity.setContent(content.getBytes());
         }else{
             throw new RxcException("报表名称已经存在请确保唯一性!","A00002");
