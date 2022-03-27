@@ -57,10 +57,14 @@ public class BussinessLogAop {
 
 	private static final Logger					LOG 					= LoggerFactory.getLogger(BussinessLogAop.class);
 
-	// 排除敏感参数
+	/**
+	 * 排除敏感参数
+	 */
     public static final String[] EXCLUDE_PARAMETER = { "password", "oldPassword", "newPassword", "confirmPassword" };
-    
-	//计算请求时间
+
+	/**
+	 * 计算请求时间
+	 */
 	private static final ThreadLocal<Long>     STARTTIMETHREADLOCAL     = new NamedThreadLocal<Long>("BussinessLogAop StartTime");
 	
 	/**
@@ -70,7 +74,6 @@ public class BussinessLogAop {
 	 */
 	@Pointcut("@annotation(com.j2eefast.common.core.business.annotaion.BussinessLog)")
 	public void logCut() {
-		
 	}
 
 	

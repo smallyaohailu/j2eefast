@@ -181,7 +181,7 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 	public boolean add(SysUserEntity user) {
 
 		//检查密码安全级别
-		if(user.getPassword().equals(Global.getDbKey("sys.user.initPassword"))){
+		if(user.getPassword().equals(Global.getDbKey("SYS_USER_INITPASSWORD"))){
 			user.setPwdSecurityLevel("0");
 		}else{
 			user.setPwdSecurityLevel(CheckPassWord.getPwdSecurityLevel(user.getPassword()).getValue());
