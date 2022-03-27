@@ -297,7 +297,7 @@ public class SysUserController extends BaseController {
 		sysUserService.checkDataScope(user.getId());
 		
 		LoginUserEntity loginUser = UserUtils.getUserInfo();
-		if(user.getPassword().equals(Global.getDbKey("sys.user.initPassword"))){
+		if(user.getPassword().equals(Global.getDbKey("SYS_USER_INITPASSWORD"))){
 			user.setPwdSecurityLevel("0");
 		}else{
 			user.setPwdSecurityLevel(CheckPassWord.getPwdSecurityLevel(user.getPassword()).getValue());
