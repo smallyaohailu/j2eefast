@@ -822,7 +822,7 @@
 
     CommentsData.DEFAULTS = {
         id: '',                    // 加载容器id
-        userId: userId,           // 当前评论用户id
+        userId: __USERID__,        // 当前评论用户id
         msgId: '',                 //消息ID
         locale: 'zh-CN',           //
         sortName: "createTime",    // 排序字段

@@ -24,7 +24,7 @@ if (typeof jQuery === "undefined") {
             // 默认加载提示名人名言 如果不用 false
             loadTip:true,
             // 是否开启水印
-            isWatermark:true,
+            isWatermark:false,
             // 表格类型
             table_type : {
                 bootstrapTable: 0,
@@ -214,7 +214,6 @@ if (typeof jQuery === "undefined") {
             }else{
                 opt.modal.alertError(msg);
             }
-
         },
 
         info: function(msg,callback){
@@ -593,21 +592,21 @@ if (typeof jQuery === "undefined") {
                 if(typeof tag !== 'undefined'&& tag == 0){
                     window.localStorage.setItem(key, value);
                 }else{
-                    window.localStorage.setItem(_username+key, value);
+                    window.localStorage.setItem(__USERNAME__+key, value);
                 }
             },
             get: function(key,tag) {
                 if(typeof tag !== 'undefined'&& tag == 0){
                     return window.localStorage.getItem(key);
                 }else {
-                    return window.localStorage.getItem(_username+key);
+                    return window.localStorage.getItem(__USERNAME__+key);
                 }
             },
             remove: function(key,tag) {
                 if(typeof tag !== 'undefined'&& tag == 0){
                     window.localStorage.removeItem(key);
                 }else{
-                    window.localStorage.removeItem(_username+key);
+                    window.localStorage.removeItem(__USERNAME__+key);
                 }
             },
             clear: function() {
@@ -5243,7 +5242,7 @@ if (typeof jQuery === "undefined") {
         path: baseURL + 'i18n/',//这里表示访问路径
         name: 'i18n',//文件名开头
         language: _lang,//文件名语言 例如en_US
-        tag: _i18n_tag,
+        tag: __I18NTAG__,
         cache: true,
         mode: 'map'//默认值
     });
@@ -5265,7 +5264,7 @@ if (typeof jQuery === "undefined") {
     /*$(document).ajaxError(function(e,xhr,opt){
         if(xhr.statusText == "parsererror"){//被踢下线,或者被挤下线
             window.opt.wclearInterval();
-            $.getJSON("sys/user/info/login/msg/"+_username+"?V=" + $.now(), function (r) {
+            $.getJSON("sys/user/info/login/msg/"+__USERNAME__+"?V=" + $.now(), function (r) {
                 if(r.code == "00000"){
                     var m = r.msg.split("#");
                     window.opt.outLogin(m[0]+"</br>" + m[1],$.i18n.prop('sys.login.out.info'));
@@ -5413,6 +5412,7 @@ if (typeof jQuery === "undefined") {
         return laytpl
     }) : "undefined" != typeof exports ? module.exports = laytpl : window.laytpl = laytpl
 }();
+
 
 /* BoxWidget()
  * ======
@@ -5615,9 +5615,71 @@ if (typeof jQuery === "undefined") {
             });
         return serializeObj;
     };
+
 })(window, jQuery);
 
 
+/*重写Jquery中的ajax 封装壳*/
+$(function () {
+    (function ($) {
+        //首先备份下jquery的ajax方法
+        var _ajax = $.ajax;
+
+        //重写jquery的ajax方法
+        $.ajax = function (opt) {
+            //备份opt中error和success方法
+            var fn = {
+                beforeSend: function (XHR) { },
+                error: function (XMLHttpRequest, textStatus, errorThrown) { },
+                success: function (data, textStatus) { },
+                complete: function (XHR, TS) { }
+            }
+
+            if (opt.beforeSend) {
+                fn.beforeSend = opt.beforeSend;
+            }
+            if (opt.error) {
+                fn.error = opt.error;
+            }
+            if (opt.success) {
+                fn.success = opt.success;
+            }
+            if (opt.complete) {
+                fn.complete = opt.complete;
+            }
+
+            //扩展增强处理
+            var _opt = $.extend(opt, {
+                //全局允许跨域
+                xhrFields: {
+                    withCredentials: true
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //错误方法增强处理
+                    fn.error(XMLHttpRequest, textStatus, errorThrown);
+                },
+                success: function (data, textStatus) {
+                    //成功回调方法增强处理
+                    fn.success(data, textStatus);
+                },
+                beforeSend: function (XHR) {
+                    //提交前回调方法
+                    fn.beforeSend(XHR);
+                },
+                complete: function (XHR, TS) {
+                    //请求完成后回调函数 (请求成功或失败之后均调用)。
+                    fn.complete(XHR, TS);
+                }
+            });
+            if (opt.xhrFields) {
+                _opt.xhrFields = opt.xhrFields;
+            }
+
+            //调用native ajax 方法
+            return _ajax(_opt);
+        };
+    })(jQuery);
+});
 /**
  * 日期范围工具类
  */

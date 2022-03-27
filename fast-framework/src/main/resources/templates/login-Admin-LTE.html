@@ -34,11 +34,11 @@
 <![endif]-->
 <#-- Vue单页面刷新闪烁标签{{}}问题解决-->
 <style>[v-cloak]{display:none !important;}
-    <#-- .login-page {-->
-    <#--     background-image: url(${ctxStatic}/static/img/login/bg15.jpg);-->
-    <#--     background-repeat: no-repeat;-->
-    <#--     background-size:100% 100%;-->
-    <#-- }-->
+     <#--.login-page {-->
+     <#--    background-image: url(${ctxStatic}/static/img/login/bg.png);-->
+     <#--    background-repeat: no-repeat;-->
+     <#--    background-size:100% 100%;-->
+     <#--}-->
     <#-- .animated {-->
     <#--   -webkit-animation-duration: 2.6s;-->
     <#--   animation-duration: 2.6s;-->
@@ -82,9 +82,9 @@
 </div>
 <div id="verfyImg">
 </div>
-<div class="login-box animated fadeInLeft" id="app" v-cloak>
+<div class="login-box animated fadeInLeft" id="__app" v-cloak>
   <div class="login-logo">
-    <a href="#">${config.getTitle()}<small>V${config.getVersion()}</small></a>
+    <a href="#">${config.getTitle()}</a><small>V${config.getVersion()}</small>
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">
@@ -220,7 +220,7 @@
 <div class="help-block text-center">
 <#-- Enter your password to retrieve your session -->
 </div>
-<div class="login-footer animated fadeInLeft">
+<div class="login__footer __copyright animated fadeInLeft">
     <span class="footer-item">
       Copyright &copy; 2018-${config.getCopyrightYear()} ${config.getCompany()}
     </span>
@@ -237,7 +237,7 @@
         </#items>
     </#list>
 </div>
-<div class="login-footer animated fadeInLeft" >
+<div class="login__footer animated fadeInLeft" >
         <span class="footer-item">
             <a href="http://www.beian.miit.gov.cn/" class="text-black" target="_blank">${config.getIPC()}</a>
         </span>
@@ -247,8 +247,8 @@
 <#if tenantModel>
 <script src="${ctxStatic}/static/plugins/select2/select2.min.js"></script>
 </#if>
-<#--<script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>-->
-<script src="${ctxStatic}/static/plugins/sm/crypto/crypto-SM.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
+<#--<script src="${ctxStatic}/static/plugins/sm/crypto/crypto-SM.js?V=${config.getDvVersion()}"></script>-->
 <#-- iCheck -->
 <script src="${ctxStatic}/static/libs/icheck.min.js"></script>
 <#-- 全局遮罩-->

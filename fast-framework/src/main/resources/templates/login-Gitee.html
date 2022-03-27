@@ -250,7 +250,6 @@
 <#else>
 <script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.min.js"></script>
 </#if>
-<script>var ctx = "${ctxStatic}/", _secretKey = "${_secretKey}";</script>
 <script>
     var vm = new Vue({
         el:'#app',
@@ -273,7 +272,7 @@
         },
         methods: {
             refreshCode: function(){ /*刷新验证码*/
-                this.src = 'background: url("'+ctx+"captcha.gif?t=" + $.now()+'") !important';
+                this.src = 'background: url("'+ctx+"/captcha.gif?t=" + $.now()+'") !important';
             },
             _onkeydown : function(e){
                 var that = this;
@@ -338,12 +337,12 @@
                         return unescape(document.cookie.substring(c_start,c_end))
                     }
                 };
-                return _secretKey;
+                return __SECRETKEY__;
             },
             postLogin: function(data,flag){
                 $.ajax({
                     type: "POST",
-                    url: ctx+"login",
+                    url: ctx+"/login",
                     data: data,
                     dataType: "json",
                     success: function(result){
@@ -356,7 +355,7 @@
                             };
                             setTimeout(
                                 function () {
-                                    location.href = ctx + 'index';
+                                    location.href = ctx + '/index';
                                 }
                                 , 100);
                         }else if(result.code == '50004' || result.code == '50006'){

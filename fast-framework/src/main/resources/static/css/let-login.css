@@ -50,7 +50,9 @@ body.hold-transition{
 
 .login-logo a{
     color: #444;
+    font-family: Arial, "Microsoft YaHei";
 }
+
 .login-logo small {
     font-size: 16px;
 }
@@ -270,19 +272,35 @@ body.hold-transition{
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Liberation Sans","PingFang SC","Microsoft YaHei","Hiragino Sans GB","Wenquanyi Micro Hei","WenQuanYi Zen Hei","ST Heiti",SimHei,SimSun,"WenQuanYi Zen Hei Sharp",sans-serif;
 }
 /**********/
+.__copyright{
+    margin: 1.7% auto;
+}
+.login__footer{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Liberation Sans", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, SimSun, "WenQuanYi Zen Hei Sharp", sans-serif;
+    font-size: 13px;
+    line-height: 1.33;
+    width: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 7px;
+}
+.footer-item{
+    margin-left: 8px;
+}
 
-@media (min-width: 768px) {
-    .login-footer {
-        margin: 2% auto;
-        text-align: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Liberation Sans", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, SimSun, "WenQuanYi Zen Hei Sharp", sans-serif;
-        font-size: 13px;
-        line-height: 1.33;
-    }
-    .footer-item{
-        margin-left: 8px;
+@media(max-height: 900px){
+    .login__footer {
+        display: none!important;
     }
 }
+@media (max-width: 868px){
+    .login__footer {
+        display: none!important;
+    }
+}
+
 
 .text-black {
     color: #111 !important;
@@ -295,8 +313,9 @@ body.hold-transition{
     font-weight: 500;
     font-size: 22px;
     text-align: center;
-    /* letter-spacing: 4px; */
+    letter-spacing: 4px;
     min-width: 100px;
+    margin-left: 10px;
 }
 .form-tenant{
     display: inline-block;

@@ -7,6 +7,8 @@ package com.j2eefast.common.core.config;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.text.UnicodeUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -71,7 +73,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 				});
 				resp.setContentType("application/octet-stream");
 				// 转unicode输出
-				//byte[] outBytes = UnicodeUtil.toUnicode(sb.toString()).getBytes();
+				//outBytes = UnicodeUtil.toUnicode(sb.toString()).getBytes();
 				outBytes = sb.toString().getBytes();
 				log.debug("压缩前:{}" ,outBytes.length);
 				//用GZIPOutputStream压缩
@@ -143,6 +145,22 @@ public class ResourceLoaderServlet extends HttpServlet {
 						.append(StrUtil.format(",basePath='{}';",basePath));
 				// 无头像设置默认
 				_default.append("function imgUserError(){var img=event.srcElement;img.src=baseURL+\"static/img/user2-160x160.jpg\"; img.onerror=null;};");
+				if(ConfigConstant.LIC_TAG.equals("NULL")){
+					_default.append(";$(function() {" +
+							"let lic = $('<div id=\""+ RandomUtil.randomString(5) +"\" style=\"position: fixed;right: 100px;overflow: hidden;z-index: 19920219;" +
+							"pointer-events: none;opacity: 0.2;font-size: 14px;font-family: 微软雅黑;color: rgb(255 0 0);" +
+							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">(J2eeFAST)</span></div>');" +
+							"if(!(self.frameElement && self.frameElement.tagName == \"IFRAME\")){" +
+							"if($('.wrapper > footer').length == 0){" +
+							"lic.css('bottom','');"+
+							"lic.css('top','10px');"+
+							"lic.css('right','10px');"+
+							"}"+
+							"$('body').append(lic);" +
+							"}"+
+							"});");
+				}
+				//outBytes = UnicodeUtil.toUnicode(_default.toString()).getBytes();
 				outBytes = _default.toString().getBytes();
 				log.debug("压缩前:{}", outBytes.length);
 				// 用GZIPOutputStream压缩
@@ -183,12 +201,13 @@ public class ResourceLoaderServlet extends HttpServlet {
 				" * @author ZhouZhou\n" + 
 				" * @date 2021-09-02\n" + 
 				" */\n");
-		sb.append(StrUtil.format("var baseURL='{}/',ctx='{}',_lang='{}',", baseURL,baseURL,lang));
-		sb.append(StrUtil.format("_username='{}',userId='{}',", _username,userId));
-		sb.append(StrUtil.format("_secretkey='{}',", ConfigConstant.PUBKEY));
-		sb.append(StrUtil.format("LockScreen='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
-		sb.append(StrUtil.format("_i18n_tag='{}',", ConfigConstant.I18N_ATG));
-		sb.append(StrUtil.format("_VERSION='{}'", PropertiesUtils.getInstance().get("version")));
+		sb.append(StrUtil.format("var baseURL='{}/',ctx='{}',__LANG__='{}',", baseURL,baseURL,
+				lang));
+		sb.append(StrUtil.format("__USERNAME__='{}',__USERID__='{}',", _username,userId));
+		sb.append(StrUtil.format("__SECRETKEY__='{}',", ConfigConstant.PUBKEY));
+		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
+		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));
+		sb.append(StrUtil.format("__VERSION__='{}'", PropertiesUtils.getInstance().get("version")));
 		return sb;
 	}
 	

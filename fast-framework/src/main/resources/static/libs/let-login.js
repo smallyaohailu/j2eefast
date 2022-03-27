@@ -6,7 +6,7 @@
  * @version 1.0.0
  */
 var vm = new Vue({
-    el:'#app',
+    el:'#__app',
     data:{
         username: '',
         password: '',
@@ -228,7 +228,7 @@ var vm = new Vue({
                     return unescape(document.cookie.substring(c_start,c_end))
                 }
             };
-            return _secretkey;
+            return __SECRETKEY__;
         },
         postLogin: function(data,flag){
             $.ajax({

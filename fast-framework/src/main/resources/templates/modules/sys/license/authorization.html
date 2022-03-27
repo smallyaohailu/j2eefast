@@ -61,7 +61,7 @@
                         return false;
                     }
                     var s4 = SoftEncryption.loginSM2Encry(layero.find('#name').val(),
-                        layero.find('#password').val(),_secretkey);
+                        layero.find('#password').val(),__SECRETKEY__);
                     var formdata = new FormData();
                     var file = layero.find('#f')[0].files[0];
                     formdata.append("licfile", file);
