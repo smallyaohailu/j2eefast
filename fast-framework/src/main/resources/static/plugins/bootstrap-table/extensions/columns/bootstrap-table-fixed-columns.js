@@ -180,7 +180,8 @@
     var BootstrapTable = $.fn.bootstrapTable.Constructor,
         _initHeader = BootstrapTable.prototype.initHeader,
         _initBody = BootstrapTable.prototype.initBody,
-        _resetView = BootstrapTable.prototype.resetView;
+        _resetView = BootstrapTable.prototype.resetView,
+        _getCaret = BootstrapTable.prototype.getCaret;
 
     BootstrapTable.prototype.initFixedColumns = function () {
         this.timeoutHeaderColumns_ = 0;
@@ -634,13 +635,6 @@
                     this.$rightfixedBody.find('.fixed-table-body').css('overflow-x','scroll');
                 }
             }
-            if(this.$rightfixedBody.find('.fixed-table-body').outerHeight() < this.$rightfixedBodyColumns.outerHeight()){
-                this.$rightfixedBody.find('.fixed-table-header').css({
-                    'overflow-y': 'scroll'
-                });
-            }else{
-                this.$rightfixedBody.find('.fixed-table-header').css('overflow-y','');
-            }
 
             if (!this.$body.find('> tr[data-index]').length) {
                 this.$rightfixedBody.hide();
@@ -655,7 +649,14 @@
                 that.$rightfixedBodyColumns.find('tr:eq(' + i + ')').height($(this).height());
             });
 
-
+            if(this.$rightfixedBody.find('.fixed-table-body').outerHeight(true) <
+                this.$rightfixedBody.find('.fixed-table-body').find('table.table').outerHeight(true)){
+                this.$rightfixedBody.find('.fixed-table-header').css({
+                    'overflow-y': 'scroll'
+                });
+            }else{
+                this.$rightfixedBody.find('.fixed-table-header').css('overflow-y','');
+            }
 
             this.$rightfixedBody.find('tr[data-index]').off('hover').hover(function () {
                 var index = $(this).data('index');
@@ -754,5 +755,32 @@
         }
     };
 
+    BootstrapTable.prototype.getCaret  = function(){
+        var that = this;
+
+        _getCaret.apply(that, Array.prototype.slice.apply(arguments));
+
+        if (!this.options.fixedColumns && !this.options.rightFixedColumns) {
+            return;
+        }
+
+        if(this.options.cardView){
+            return;
+        }
+        if (that.options.fixedColumns && that.$fixedHeaderColumns) {
+           $.each(that.$fixedHeaderColumns.find('th'), function (i, th) {
+                //fix: 排序字段与查询显示字段不一致问题
+                var field = typeof $(th).data('sort') != "undefined" ? $(th).data('sort') : $(th).data('field');
+                $(th).find('.sortable').removeClass('desc asc').addClass(field === that.options.sortName ? that.options.sortOrder : 'both');
+           });
+        }
+        if (that.options.rightFixedColumns && that.$rightfixedHeaderColumns) {
+            $.each(that.$rightfixedHeaderColumns.find('th'), function (i, th) {
+                //fix: 排序字段与查询显示字段不一致问题
+                var field = typeof $(th).data('sort') != "undefined" ? $(th).data('sort') : $(th).data('field');
+                $(th).find('.sortable').removeClass('desc asc').addClass(field === that.options.sortName ? that.options.sortOrder : 'both');
+            });
+        }
+    }
 
 })(jQuery);

@@ -982,7 +982,7 @@
             that[checked ? 'checkAll' : 'uncheckAll']();
 
             //TODO fix: 冻结左边全选显示异常问题
-            if (that.options.rightFixedColumns) {
+            if (that.options.rightFixedColumns && that.$rightfixedBody) {
                 that.$rightfixedBody.find('tr').each(function () {
                     if($(this).data('index') != '-99999'){
                         checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
@@ -2811,7 +2811,7 @@
 
     //TODO: 新增多选勾选显示总数方法
     BootstrapTable.prototype.setCheckNumer = function(num){
-        this.$pagination.find('.check-numer').empty().append(this.options.formatCheckNumber(num));
+        this.$pagination.find('.check-numer').empty().append('<span style="font-weight: bold">'+this.options.formatCheckNumber(' '+num)+'</span>');
     }
 
     BootstrapTable.prototype.toggleRow = function (index, uniqueId, visible) {
