@@ -50,6 +50,7 @@ public final class ConfigConstant {
 	public static byte[]                  		PRIVKEY								= HexUtil.decodeHex("a1ab63f9b726482d47d7529b4bdb57fbdd68c492d19cf8e3f1140fb68d193f7b");
 	public static String                  		PUBKEY								= "QTwb20ZMEftb9jFnjgRBCULM7+LmKW+x/3wpuIOuVLTeHTkivKZVX8QNBGeexn5EDeymBaWbEgU/IGAyqofN3w==";
 	public static String						I18N_ATG							= "";
+	public static String 						LIC_TAG								= "NULL";
 	
 	/**
 	 *  系统多租户忽略添加租户ID的表
