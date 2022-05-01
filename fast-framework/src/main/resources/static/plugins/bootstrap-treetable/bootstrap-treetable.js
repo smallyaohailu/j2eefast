@@ -100,7 +100,7 @@
         var initToolbar = function() {
             var $toolbar = $("<div class='treetable-bars'></div>");
             if (options.toolbar) {
-                $(options.toolbar).addClass('tool-left');
+                $(options.toolbar).addClass('tool-left').css('display','');;
                 $toolbar.append($(options.toolbar));
             }
             var $rightToolbar = $('<div class="btn-group tool-right">');
@@ -767,7 +767,16 @@
                     }
                     $tr.append($td);
                 } else {
-                    var $td = $('<td '+(column.class?(' class="'+column.field + '_cls ' + column.class + '"'): ' class="'+column.field + '_cls"')+'></td>');
+                    var _t__ = '';
+                    var __cc = column.class;
+                    if(__cc){
+                        _t__ =  ' class="'+column.field + '_cls ' + __cc + '"';
+                    }else{
+                        _t__ = ' class="'+column.field + '_cls"';
+                    }
+
+                    var $td = $('<td '+_t__+'></td>');
+
                     if(column.width){
                         $td.css("width",column.width);
                     }
@@ -837,7 +846,7 @@
                                 $td.prepend('<span class="treetable-expander ' + _icon + '"></span>');
                             }
                         }
-                        for (var int = 0; int < (lv - options.expandColumn); int++) {
+                        for (var __int = 0; __int < (lv - options.expandColumn); __int++) {
                             $td.prepend('<span class="treetable-indent"></span>')
                         }
                     }

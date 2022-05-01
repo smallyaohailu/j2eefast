@@ -25,7 +25,8 @@
             <#assign select2=1 />
             <link rel="stylesheet" href="${ctxStatic}/static/plugins/select2/select2-bootstrap.css"/>
             </#if>
-            <link rel="stylesheet" href="${ctxStatic}/static/plugins/bootstrap-table/bootstrap-table.css"/>
+<#--            <link rel="stylesheet" href="${ctxStatic}/static/plugins/bootstrap-table/bootstrap-table.css"/>-->
+            <link rel="stylesheet" href="${ctxStatic}/static/plugins/bootstrap-table/bootstrap-table.min.css"/>
         </#if>
         <#if x == "table">
             <link rel="stylesheet" href="${ctxStatic}/static/css/jquery.contextMenu.min.css" />
@@ -68,8 +69,7 @@
             <link rel="stylesheet" href="${ctxStatic}/static/plugins/jquery-layout/jquery.layout-latest.css"/>
         </#if>
         <#if x == "fileupload">
-<#--          	<link rel="stylesheet" href="${ctxStatic}/static/plugins/webuploader/0.1.5/webuploader.ex.min.css?V=${config.getDvVersion()}"/>-->
-          	<link rel="stylesheet" href="${ctxStatic}/static/plugins/webuploader/0.1.5/webuploader.ex.css?V=${config.getDvVersion()}"/>
+          	<link rel="stylesheet" href="${ctxStatic}/static/plugins/webuploader/0.1.5/webuploader.ex.min.css?V=${config.getDvVersion()}"/>
         </#if>
         <#if x == "tokenfield">
             <link rel="stylesheet" href="${ctxStatic}/static/plugins/tokenfield/css/tokenfield-typeahead.css"/>
@@ -82,7 +82,10 @@
             <link rel="stylesheet" href="${ctxStatic}/static/plugins/wizard/css/smart_wizard_all.css"/>
         </#if>
         <#if x == "comments">
-            <link rel="stylesheet" href="${ctxStatic}/static/plugins/comments/comments.css"/>
+            <link rel="stylesheet" href="${ctxStatic}/static/plugins/comments/comments.min.css"/>
+        </#if>
+        <#if x == "intro">
+            <link rel="stylesheet" href="${ctxStatic}/static/plugins/intro/introjs.css"/>
         </#if>
     </#list>
 </#if>
@@ -90,7 +93,7 @@
 <link rel="stylesheet" href="${ctxStatic}/static/css/all-skins.min.css?V=${config.getDvVersion()}" />
 <#-- iCheck -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/iCheck/all.css" />
-<#--<link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.min.css?V=${config.getDvVersion()}"/>-->
-<link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.css?V=${config.getDvVersion()}" />
+<link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.min.css?V=${config.getDvVersion()}"/>
+<#--<link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.css?V=${config.getDvVersion()}" />-->
 </#compress>
 </#macro>

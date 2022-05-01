@@ -251,14 +251,18 @@
             that.$selectAll.on('click', function () {
                 var checked = $(this).prop('checked');
                 that.$fixedBodyColumns.find("input[name=btSelectItem]").filter(':enabled').prop('checked', checked);
-                that.$fixedBodyColumns.find("input[name=btSelectItem]").closest('tr')[checked ? 'addClass' : 'removeClass']('selected');
-                if (that.options.rightFixedColumns) {
-                    that.$rightfixedBody.find('tr').each(function () {
-                        if($(this).data('index') != '-99999'){
-                            checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
-                        }
-                    })
-                }
+                that.$fixedBodyColumns.find("input[name=btSelectItem]").each(function () {
+                    if($(this).attr('disabled') != 'disabled'){
+                        $(this).closest('tr')[checked ? 'addClass' : 'removeClass']('selected');
+                    }
+                })
+                // if (that.options.rightFixedColumns) {
+                //     that.$rightfixedBody.find('tr').each(function () {
+                //         if($(this).data('index') != '-99999'){
+                //             checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                //         }
+                //     })
+                // }
             });
 
         }
@@ -331,6 +335,13 @@
             return;
         }
 
+        if(this.options.fixedColumns && this.$fixedBodyColumns == undefined){
+            return;
+        }
+
+        if(this.options.rightFixedColumns && this.$rightfixedBody == undefined){
+            return;
+        }
 
         if(this.$el.outerWidth() <= this.$tableContainer.innerWidth() ){
             if(this.options.fixedColumns){
@@ -365,7 +376,7 @@
                     }
                     if(hs == that.options.fixedNumber){
                         $tr.append($ftd);
-                        $that.eq(i).css("visibility" ,"hidden");
+                        //$that.eq(i).css("visibility" ,"hidden");
                         break;
                     }
                     if(hs > that.options.fixedNumber){
@@ -373,7 +384,7 @@
                         break;
                     }else{
                         $tr.append($ftd);
-                        $that.eq(i).css("visibility" ,"hidden");
+                        //$that.eq(i).css("visibility" ,"hidden");
                     }
                 }
                 that.$fixedBodyColumns.append($tr);
@@ -411,8 +422,7 @@
                     var indexTd = $that.length - nn + i;
                     var fixTd = $tds.eq(indexTd).clone(true);
                     $tr.append(fixTd);
-                    $that.eq(indexTd).css("visibility" ,"hidden")
-                        .empty().append('<div style="height:'+(height-16 -1)+'px; width:'+fixTd.outerWidth()+'px"></div>');
+                    //$that.eq(indexTd).css("visibility" ,"hidden").empty().append('<div style="height:'+(height-16 -1)+'px; width:'+fixTd.outerWidth()+'px"></div>');
                 }
                 that.$rightfixedBodyColumns.append($tr);
             });
@@ -430,6 +440,17 @@
         if(this.options.cardView){
             // $("#"  + that.options.id).removeAttr("style");
             // console.log("--->>"+$("#"  + that.options.id).attr("style"))
+            return;
+        }
+
+        //console.log(this.options.fixedColumns );
+        //console.log(this.$fixedBodyColumns );
+
+        if(this.options.fixedColumns && this.$fixedBodyColumns == undefined){
+            return;
+        }
+
+        if(this.options.rightFixedColumns && this.$rightfixedBody == undefined){
             return;
         }
 
@@ -574,9 +595,9 @@
                     index = i;
                 for (var k = 0; k < that.options.fixedNumber; k++) {
                     if(i == k){
-                        var width = $this.innerWidth();
+                        var width = $this.outerWidth();
                         var $th = that.$fixedHeaderColumns.find('th[data-field="'+visibleFields[index]+'"]');
-                        $th.find('.fht-cell').width(width);
+                        $th.find('.fht-cell').width(width-1);
                         that.$fixedBodyColumns.find('tr:eq(0)').find('td:eq('+k+')').css({width:width});
                         break;
                     }
@@ -650,12 +671,14 @@
             });
 
             if(this.$rightfixedBody.find('.fixed-table-body').outerHeight(true) <
-                this.$rightfixedBody.find('.fixed-table-body').find('table.table').outerHeight(true)){
-                this.$rightfixedBody.find('.fixed-table-header').css({
-                    'overflow-y': 'scroll'
-                });
+                this.$rightfixedBody.find('.fixed-table-body').find('table > tbody').outerHeight(true)){
+                // this.$rightfixedBody.find('.fixed-table-header').css({
+                //     'overflow-y': 'scroll'
+                // });
+                this.$rightfixedBody.find('.fixed-table-header').css({'margin-right':'10px'});
             }else{
-                this.$rightfixedBody.find('.fixed-table-header').css('overflow-y','');
+                // this.$rightfixedBody.find('.fixed-table-header').css('overflow-y','');
+                this.$rightfixedBody.find('.fixed-table-header').css({'margin-right':''});
             }
 
             this.$rightfixedBody.find('tr[data-index]').off('hover').hover(function () {
@@ -676,16 +699,36 @@
 
         // //是否点击选择行
         if(this.options.clickToSelect){
-            this.$body.find('> tr[data-index] > td').off('click dblclick').on('click dblclick', function (e) {
+            this.$body.find('> tr[data-index] > td').on('click dblclick', function (e) {
                 var $td = $(this),
                     $tr = $td.parent();
                 var index = $tr.data('index');
+                console.log('-->>>>index:',index);
                 if (e.type === 'click') {
                     if(that.options.fixedColumns){
                         var tr = that.$fixedBody.find('tr[data-index="' + index + '"] >td')
                         var $selectItem = tr.find('[name="'+that.options.selectItemName+'"]');
                         if ($selectItem.length) {
                             $selectItem[0].click(); // #144: .trigger('click') bug
+                        }else{
+                            if(that.options.singleSelect){
+                                that.$fixedBodyColumns.find('> tr[data-index]').each(function(){
+                                    if($(this).data('index') == index){
+                                        $(this).addClass('selected');
+                                    }else{
+                                        $(this).removeClass('selected');
+                                    }
+                                })
+                                if (that.options.rightFixedColumns){
+                                    that.$rightfixedBody.find('tr[data-index]').each(function(){
+                                        if($(this).data('index') == index){
+                                            $(this).addClass('selected');
+                                        }else{
+                                            $(this).removeClass('selected');
+                                        }
+                                    })
+                                }
+                            }
                         }
                     }else{
                         if (that.options.rightFixedColumns){
@@ -705,21 +748,42 @@
             })
 
             if(that.options.fixedColumns){
-                this.$fixedBody.find('tr[data-index]').off('click dblclick').on('click dblclick', function (e) {
-                    var index = $(this).data('index');
-                    var th = $(this);
-                    if (that.options.rightFixedColumns){
-                        if(th.hasClass('selected')){
-                            that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass("selected");
-                        }else{
-                            that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass("selected");
+                this.$fixedBody.find('tr[data-index]').on('click dblclick', function (e) {
+                    var index = $(this).data('index')
+                        , $tr = $(this);
+                    var $selectItem = $tr.find('[name="'+that.options.selectItemName+'"]');
+                    if (!$selectItem.length) {
+                        if(that.options.singleSelect){
+                            that.$fixedBodyColumns.find('> tr[data-index]').each(function(){
+                                if($(this).data('index') == index){
+                                    $(this).addClass('selected');
+                                }else{
+                                    $(this).removeClass('selected');
+                                }
+                            })
+                            if (that.options.rightFixedColumns){
+                                that.$rightfixedBody.find('tr[data-index]').each(function(){
+                                    if($(this).data('index') == index){
+                                        $(this).addClass('selected');
+                                    }else{
+                                        $(this).removeClass('selected');
+                                    }
+                                })
+                            }
                         }
                     }
+                    // if (that.options.rightFixedColumns){
+                    //     if(th.hasClass('selected')){
+                    //         that.$rightfixedBody.find('tr[data-index="' + index + '"]').addClass("selected");
+                    //     }else{
+                    //         that.$rightfixedBody.find('tr[data-index="' + index + '"]').removeClass("selected");
+                    //     }
+                    // }
                 })
             }
 
             if(that.options.rightFixedColumns){
-                this.$rightfixedBody.find('tr[data-index]').off('click dblclick').on('click dblclick', function (e) {
+                this.$rightfixedBody.find('tr[data-index]').on('click dblclick', function (e) {
 
                     var index = $(this).data('index');
                     var tr = that.$body.find('tr[data-index="' + index + '"]')
@@ -733,9 +797,28 @@
                         var $selectItem = tr.find('[name="'+that.options.selectItemName+'"]');
                         if ($selectItem.length) {
                             $selectItem[0].click(); // #144: .trigger('click') bug
+                        }else{
+                            if(that.options.singleSelect){
+
+                                that.$rightfixedBody.find('tr[data-index]').each(function(){
+                                    if($(this).data('index') == index){
+                                        $(this).addClass('selected');
+                                    }else{
+                                        $(this).removeClass('selected');
+                                    }
+                                })
+                                if(that.options.fixedColumns){
+                                    that.$fixedBodyColumns.find('> tr[data-index]').each(function(){
+                                        if($(this).data('index') == index){
+                                            $(this).addClass('selected');
+                                        }else{
+                                            $(this).removeClass('selected');
+                                        }
+                                    })
+                                }
+                            }
                         }
                     }
-
                 })
             }
         }
@@ -768,11 +851,11 @@
             return;
         }
         if (that.options.fixedColumns && that.$fixedHeaderColumns) {
-           $.each(that.$fixedHeaderColumns.find('th'), function (i, th) {
+            $.each(that.$fixedHeaderColumns.find('th'), function (i, th) {
                 //fix: 排序字段与查询显示字段不一致问题
                 var field = typeof $(th).data('sort') != "undefined" ? $(th).data('sort') : $(th).data('field');
                 $(th).find('.sortable').removeClass('desc asc').addClass(field === that.options.sortName ? that.options.sortOrder : 'both');
-           });
+            });
         }
         if (that.options.rightFixedColumns && that.$rightfixedHeaderColumns) {
             $.each(that.$rightfixedHeaderColumns.find('th'), function (i, th) {

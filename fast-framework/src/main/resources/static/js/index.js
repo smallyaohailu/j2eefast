@@ -53,7 +53,7 @@
     };
 
     var ClassName = {
-        classType: '.sidebar-menu',
+        classType: '.sidebar-menu, .sidebar-top-menu',
         treeview: '.treeview'
     };
 
@@ -73,7 +73,7 @@
             module: '_main',
             id: '0'
         };
-        
+
         //var data =  opt.getLeftFirstMenuConig();
         opt.navTabAdd(data);
     };
@@ -595,11 +595,15 @@ function scrollTabRight(){
 //设置监听事件
 $(function () {
 
-    /*$(window).on("load",function () {
-        setTimeout(function(){
-            //opt.unblock(window)
-        }, 50);
-    });*/
+    //判断窗口大小收缩菜单栏
+    var w = window.innerWidth
+        || document.documentElement.clientWidth
+        || document.body.clientWidth;
+    if( w < 1024){
+        window.setTimeout(function () {
+            $('[data-toggle="push-menu"]').click();
+        },200)
+    }
 
     //$("#mian-tab-menu").disableSelection();
     //校验修改密码
@@ -632,8 +636,8 @@ $(function () {
     //主题
     $('#switchSkin').on('click', function () {
         var area = ['autopx','autopx'];
-        if($(window).width() > 530){
-            area = ["530px", "426px"];
+        if($(window).width() > 560){
+            area = ["560px", "406px"];
         }
         opt.layer.open({
             type : 2,
@@ -727,6 +731,7 @@ $(function () {
         };
         opt.navTabAdd(data);
     });
+
 
     // 右键菜单实现
     $.contextMenu({
@@ -839,6 +844,13 @@ $(function () {
         }
     });
 
+    //菜单拖拽
+    dragula([document.getElementById('mian-tab-menu')])
+        .on("drop",function(el, target, source, sibling){
+        });
+
+
+
     //便签 - 左侧弹出
     $('#sticky').on('click', function (e) {
         layer.open({
@@ -857,8 +869,8 @@ $(function () {
             area: ['336px', ''],
             content: opt.template('noteTemp'),
             success: function(layero, index){
-               // $(layero).css('height','');
-               // $(layero).css('width','336');
+                // $(layero).css('height','');
+                // $(layero).css('width','336');
             }
         });
     });
@@ -935,6 +947,7 @@ $(function () {
     //////////////////////////////////////////////////////////////////
 
 });
+
 +function ($) {
     'use strict';
 
@@ -1015,9 +1028,9 @@ $(function () {
             //hide top navBar menu
             $('#top-navbar-menu').children('li').each(function () {
                 if(!($(this).hasClass('tasks-menu') || $(this).hasClass('user-menu'))){
-                   if(!$(this).hasClass('hide')){
-                       $(this).addClass('hide');
-                   }
+                    if(!$(this).hasClass('hide')){
+                        $(this).addClass('hide');
+                    }
                 }
             });
         }else{
@@ -1092,7 +1105,7 @@ $(function () {
 
                 // Add slimscroll
                 $(Selector.sidebar).slimScroll({
-                     height: ($(window).height() - $(Selector.mainHeader).height()) + 'px',
+                    height: ($(window).height() - $(Selector.mainHeader).height()) + 'px',
                     opacity: .4, //滚动条透明度
                 });
             }
@@ -1453,6 +1466,7 @@ $(function () {
         Plugin.call($(Selector.button));
     });
 }(jQuery);
+//菜单
 +function ($) {
     'use strict';
 
@@ -1495,6 +1509,9 @@ $(function () {
 
         $(Selector.treeview + Selector.active, this.element).addClass(ClassName.open);
 
+        //悬停事件
+        this.isHover = "true" === $(this.element).attr("data-hover");
+
         this._setUpListeners();
     };
 
@@ -1516,6 +1533,11 @@ $(function () {
         } else {
             this.expand(treeviewMenu, parentLi);
         }
+        // if( 0 === treeviewMenu.children().length){
+        //     //
+        //     this.isHover || parentLi.parents(".treeview:not(.active)").addClass("menu-open active")
+        // }
+
     };
 
     Tree.prototype.expand = function (tree, parent) {
@@ -1533,26 +1555,70 @@ $(function () {
         tree.slideDown(this.options.animationSpeed, function () {
             $(this.element).trigger(expandedEvent);
         }.bind(this));
+
+        //悬停设置偏移数据
+        this.isHover && !parent.parent().hasClass("tree") && (openMenuLi = parent.parent(), tree.css({
+            left: openMenuLi.width(),
+            top: parent.offset().top - openMenuLi.offset().top
+        }))
     };
 
     Tree.prototype.collapse = function (tree, parentLi) {
         var collapsedEvent = $.Event(Event.collapsed);
 
-        //tree.find(Selector.open).removeClass(ClassName.open);
+        tree.find(Selector.open).removeClass(ClassName.open);
         parentLi.removeClass(ClassName.open);
-        tree.slideUp(this.options.animationSpeed, function () {
-            //tree.find(Selector.open + ' > ' + Selector.treeview).slideUp();
-            $(this.element).trigger(collapsedEvent);
-        }.bind(this));
+
+        if(this.isHover){
+            tree.slideUp(50, function () {
+                tree.find(Selector.open + ' > ' + Selector.treeview).slideUp();
+                $(this.element).trigger(collapsedEvent);
+            }.bind(this));
+        }else{
+            tree.slideUp(this.options.animationSpeed, function () {
+                tree.find(Selector.open + ' > ' + Selector.treeview).slideUp();
+                $(this.element).trigger(collapsedEvent);
+            }.bind(this));
+        }
     };
 
     // Private
 
     Tree.prototype._setUpListeners = function () {
+
         var that = this;
-        $(this.element).on('click', this.options.trigger, function (event) {
-            that.toggle($(this), event);
-        });
+
+        if(that.isHover){
+            var __index;
+            //当鼠标指针穿过元素时
+            $(this.element).on("mouseenter", this.options.trigger,
+                function(e) {
+                    var b = $(this);
+                    e = b.next(".treeview-menu");
+                    b = b.parent();
+                    that.expand(e, b);
+                    window.clearTimeout(__index)
+                });
+            //当鼠标指针离开元素时
+            $(this.element).on("mouseleave", ">li,.treeview-menu",
+                function(b) {
+                    window.clearTimeout(__index);
+                    __index = window.setTimeout(function() {
+                            $(that.element).find(".treeview-menu").hide()
+                        },
+                        500);
+                });
+            $(this.element).on("click", this.options.trigger,
+                function(b) {
+                    b = $(this).data("href");
+                    "" != b && "blank" != b && $(that.element).find(".treeview-menu").hide();
+                    $(this).trigger("mouseenter")
+            })
+        }else{
+            $(this.element).on('click', this.options.trigger, function (event) {
+                that.toggle($(this), event);
+            });
+        }
     };
 
     // Plugin Definition

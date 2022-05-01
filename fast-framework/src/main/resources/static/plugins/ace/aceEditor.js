@@ -79,7 +79,9 @@ if (typeof jQuery === "undefined") {
         //if(typeof  $('#'+that.options.id) === "undefined"){
         //     this.editor = ace.edit(that.$el);
         // }else{
-            this.editor = ace.edit(that.options.id);
+        //获取初始值
+        var __per = $('#'+that.options.id).html();
+        this.editor = ace.edit(that.options.id);
         // }
 
 
@@ -112,13 +114,21 @@ if (typeof jQuery === "undefined") {
 
         this.editor.commands.addCommand(
             { name: 'myCommand',
-            bindKey: {win: 'Ctrl-S', mac: 'Command-S'},
-                    exec: function(editor) {
-                        if (typeof  that.options.saveAceCallback == "function"){
-                            that.options.saveAceCallback(that.options.id,editor);
-                        }
-                    }, readOnly: true // 如果不需要使用只读模式，这里设置false
-                    });
+                bindKey: {win: 'Ctrl-S', mac: 'Command-S'},
+                exec: function(editor) {
+                    if (typeof  that.options.saveAceCallback == "function"){
+                        that.options.saveAceCallback(that.options.id,editor);
+                    }
+                }, readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+
+        if(that.options.hiddenId != ''){
+            $('#'+that.options.hiddenId).val(that.options.base46?Base64.toBase64(__per):__per);
+            this.editor.session.on("change", function() {
+                var value = that.editor.getValue();
+                $('#'+that.options.hiddenId).val(that.options.base46?Base64.toBase64(value):value);
+            });
+        }
 
         // var addCompleter = this.editor.autoCompleter();
         // addCompleter.save(that.data);
@@ -183,7 +193,7 @@ if (typeof jQuery === "undefined") {
      */
     AceEditorData.prototype.setLang = function (lang) {
         return lang && (lang == 'java' || lang == 'ftl' || lang == 'html')
-        && this.editor.session.setMode('ace/mode/'+lang);
+            && this.editor.session.setMode('ace/mode/'+lang);
     }
 
     /**
@@ -271,13 +281,15 @@ if (typeof jQuery === "undefined") {
 
     AceEditorData.DEFAULTS = {
         id: 'aceEdit',             // 加载容器id
-        theme: 'chrome',          // 设置编辑器界面风格 默认eclipse、terminal、chrome
+        theme: 'eclipse',          // 设置编辑器界面风格 默认eclipse、terminal、chrome
         lang: 'ftl',               // 编辑器设别语音
         keywordsData: [],          // 默认关键字
         fontSize: 12,              // 默认字体大小
         readOnly: true,            // 是否只读
         height: undefined,         // 高度
-        top: undefined             //
+        top: undefined,            //
+        hiddenId: '',              // 隐藏域ID
+        base46: true               // 隐藏域值是否base64转换安全提交
     }
 
     var allowedMethods = [
