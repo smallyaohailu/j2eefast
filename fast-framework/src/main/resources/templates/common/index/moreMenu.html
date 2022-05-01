@@ -1,0 +1,32 @@
+<#--顶部多模块菜单 -->
+<#if modules?? && (modules?size >= 2)>
+<div class="navbar-custom-menu pull-left">
+    <ul class="nav navbar-nav tree sidebar-top-menu" data-widget="tree" data-hover="true">
+        <li class="treeview menu-open"><a href="javascript:" title="${i18n("顶部更多模块")}">
+            <i class="fa-fw fa fa-list"></i> <span class="hidden-xs">${i18n("更多模块")}</span></a>
+            <ul class="treeview-menu" style="display: none;">
+                <#if modules?? && (modules?size > 0)>
+                    <#list modules as c>
+                        <li class="treeview">
+                            <a href="javascript:;" title="${c['moduleName']}" data-code="${c['moduleCode']}">
+                                <i class="${c['icon']}"></i>
+                                <span>${i18n("${c['moduleName']}")}</span>
+                                <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                            </a>
+                            <#if menuList?? && (menuList?size > 0) >
+                                <#list menuList?keys as key>
+                                        <#if c['moduleCode'] == key>
+                                            <ul class="treeview-menu" style="display: none">
+                                                <@showMenu menuList[key], key ,true/>
+                                            </ul>
+                                        </#if>
+                                </#list>
+                            </#if>
+                        </li>
+                    </#list>
+                </#if>
+            </ul>
+        </li>
+    </ul>
+</div>
+</#if>

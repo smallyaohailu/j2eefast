@@ -91,7 +91,7 @@
 				title: '${i18n("操作类型")}',
 				align: 'center',
 				formatter: function(value, row, index) {
-					return $.table.selectDictLabel(datas, value);
+					return opt.common.selectDictLabel(datas, value);
 				}
 			},
 			{
@@ -111,7 +111,7 @@
 				field: 'operLocation',
 				title: '${i18n("操作地点")}',
 				formatter: function (value, row, index) {
-					return $.table.tooltip(value,10);
+					return opt.common.tooltip(value,10);
 				}
 			},
 			{

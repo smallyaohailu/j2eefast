@@ -66,7 +66,7 @@
                 ,{field : 'name',title : '<@ctx.i18n text="节点名称"/>',align: "left",halign:"left"}
                 ,{field : 'fullName',title : '<@ctx.i18n text="节点全称"/>'}
                 ,{field : 'status',title : '<@ctx.i18n text="状态"/>',formatter: function(value, row, index) {
-                    return $.table.selectDictLabel(statusDatas, value);
+                    return opt.common.selectDictLabel(statusDatas, value);
                 }}
                 ,{field : 'createTime',title : '<@ctx.i18n text="创建时间"/>'}
                 ,{field : 'remark',title : '<@ctx.i18n text="备注信息"/>'}

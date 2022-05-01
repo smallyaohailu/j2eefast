@@ -84,16 +84,16 @@
                         {title: "${i18n("请求地址")}", field: 'url', width: '15%'},
                         {title: "${i18n("目标")}", field: 'target', width: '15%', formatter: function(value, row, index) {
                                 if(row.type === 1){
-                                    return $.table.selectDictLabel(datas_target, value);
+                                    return opt.common.selectDictLabel(datas_target, value);
                                 }
                             }
                         },
                         {title: "${i18n("类型")}", field: 'type', width: '10%', formatter: function(value, row, index) {
-                                return $.table.selectDictLabel(datas_type, value);
+                                return opt.common.selectDictLabel(datas_type, value);
                             }
                         },
                         {field: 'hide',title: "${i18n("可见")}", width: '10%', formatter: function(value, row, index) {
-                                return $.table.selectDictLabel(datas, value);}
+                                return opt.common.selectDictLabel(datas, value);}
                         },
                         {field: 'perms', title: "${i18n("权限标识")}", width: '15%'},
                         {title: "${i18n("操作")}", width: '20%', class:'action', formatter: function(value, row, index) {

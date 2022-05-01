@@ -541,7 +541,7 @@
 		            title: '字段列名',
 		            width: 100,
 					formatter: function (value, row, index) {
-						return $.table.tooltip(value,8);
+						return opt.common.tooltip(value,8);
 					}
 		        },
 		        {
@@ -1009,77 +1009,77 @@
 <script id="validationTypeTpl" type="text/template">//<!--
 <select class="form-control" multiple=true  name="columns[{{d.index}}].validation">
 	<option value="P"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'P') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>手机号码</option>
 	<option value="V"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'V') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>唯一判断</option>
 	<option value="N"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'N') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>整正数字</option>
 	<option value="R"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'R') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>日期</option>
 	<option value="Y"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'Y') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>邮箱</option>
 	<option value="Z"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'Z') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>字母数字下划线</option>
 	<option value="J"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'J') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>金额精确到分</option>
 	<option value="I"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'I') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>IP地址</option>
 	<option value="H"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'H') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>只能汉字字符</option>
 	<option value="S"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'S') { }}
 		selected
 	{{# }; }}
 	{{# });  }}
 	>身份证</option>
 	<option value="A"
-	{{# layui.each(d.validation, function(index, item){     }}
+	{{# $.each(d.validation, function(index, item){     }}
 	{{# if(item === 'A') { }}
 		selected
 	{{# }; }}

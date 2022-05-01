@@ -90,7 +90,7 @@
                      /*{checkbox: true},*/
                     {field: 'id', title: "${i18n("字典编码")}", sortable: true},
                     {field: 'dictValue', title: "${i18n("字典键值")}",formatter:function (value) {
-                            return $.table.tooltip(value,20);
+                            return opt.common.tooltip(value,20);
                     }},
                     {field: 'dictLabel', title: "${i18n("字典标签")}", formatter: function(value, row, index) {
 
@@ -119,22 +119,22 @@
                                     value));
                                 return actions.join('');
                             }else{
-                                return $.table.tooltip(value,20);
+                                return opt.common.tooltip(value,20);
                             }
 
                         }},
                     {field: 'dictSort', title: "${i18n("排序")}",sortable: true},
                     {field: 'status', title: "${i18n("状态")}", align: 'center', formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(datas, value);
+                            return opt.common.selectDictLabel(datas, value);
                         }},
                     {field: 'remark', title: "${i18n("备注")}"},
                     {field: 'createTime', title: "${i18n("创建时间")}", sortable: true},
                     {field: 'isDefault', title: "${i18n("系统默认")}", formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(isSysDatas, value);
+                            return opt.common.selectDictLabel(isSysDatas, value);
                         }
                     },
                     {field: 'isSys', title: "${i18n("系统内置")}", formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(isSysDatas, value);
+                            return opt.common.selectDictLabel(isSysDatas, value);
                         }
                     },
                     {title:"${i18n("操作")}", align: 'center', formatter: function(value, row, index) {

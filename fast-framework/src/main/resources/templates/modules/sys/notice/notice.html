@@ -83,21 +83,21 @@ sys:notice:del,sys:notice:add")?string('true', 'false')};
                         field : 'noticeTipTitle'
                         ,title : '${i18n("公告提示栏")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.tooltip(value,35);
+                            return opt.common.tooltip(value,35);
                         }
                     }
                     ,{
                         field : 'noticeType'
                         ,title : '${i18n("公告类型")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(typeDatas, value);
+                            return opt.common.selectDictLabel(typeDatas, value);
                         }
                     }
                     ,{
                         field : 'noticeLevel'
                         ,title : '${i18n("等级")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(levelDatas, value);
+                            return opt.common.selectDictLabel(levelDatas, value);
                         }
                     }
                     ,{
@@ -112,7 +112,7 @@ sys:notice:del,sys:notice:add")?string('true', 'false')};
                         field : 'status'
                         ,title : '${i18n("状态")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(statusDatas, value);
+                            return opt.common.selectDictLabel(statusDatas, value);
                         }
                     }
                     ,{

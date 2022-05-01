@@ -377,7 +377,7 @@
 						}
 						<#list tableInfo as table>
 						,{field: '${table.field}', title: "${i18n("${table.title}")}"<#if table.sortable>,sortable: true</#if><#if table.dict!="">,formatter: function (value, row, index) {
-								return $.table.selectDictLabel(${table.field?replace(".","_")}_dict, value);
+								return opt.common.selectDictLabel(${table.field?replace(".","_")}_dict, value);
 							}</#if>}
 						</#list>
 					]

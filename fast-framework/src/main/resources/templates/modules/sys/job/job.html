@@ -85,14 +85,14 @@
 		            field: 'jobGroup',
 		            title: '${i18n("任务分组")}',
 		            formatter: function(value, row, index) {
-		            	return $.table.selectDictLabel(datas, value);
+		            	return opt.common.selectDictLabel(datas, value);
 		            }
 		        },
 				{
 					field: 'invokeTarget',
 					title: '${i18n("调用目标字符串")}',
 					formatter: function(value, row, index) {
-						return $.table.tooltip(value);
+						return opt.common.tooltip(value);
 					}
 				},
 		        {

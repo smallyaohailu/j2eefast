@@ -78,42 +78,42 @@ sys:database:del,sys:database:add")?string('true', 'false')};
                         field : 'jdbcUrl'
                         ,title : '${i18n("URL")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.tooltip(value,35);
+                            return opt.common.tooltip(value,35);
                         }
                     }
                     ,{
                         field : 'userName'
                         ,title : '${i18n("账号")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.tooltip(value,10);
+                            return opt.common.tooltip(value,10);
                         }
                     }
                     ,{
                         field : 'password'
                         ,title : '${i18n("密码")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.tooltip(value,10);
+                            return opt.common.tooltip(value,10);
                         }
                     }
                     ,{
                         field : 'encType'
                         ,title : '${i18n("加密类型")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(typeDatas, value);
+                            return opt.common.selectDictLabel(typeDatas, value);
                         }
                     }
                     ,{
                         field : 'status'
                         ,title : '${i18n("状态")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(statusDatas, value);
+                            return opt.common.selectDictLabel(statusDatas, value);
                         }
                     }
                     ,{
                         field : 'remark'
                         ,title : '${i18n("备注")}'
                         ,formatter: function(value, row, index) {
-                            return $.table.tooltip(value,10);
+                            return opt.common.tooltip(value,10);
                         }
                     }
                     ,{
@@ -127,7 +127,7 @@ sys:database:del,sys:database:add")?string('true', 'false')};
                                 //actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="${i18n("编辑")}" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
                                 actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
                             }else{
-                                actions.push($.table.tooltip('${i18n("禁止操作")}!',3));
+                                actions.push(opt.common.tooltip('${i18n("禁止操作")}!',3));
                             }
                             return actions.join('');
                         }

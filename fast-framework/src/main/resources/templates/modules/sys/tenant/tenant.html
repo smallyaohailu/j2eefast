@@ -86,7 +86,7 @@
                 ,{field : 'link',title : '${i18n("联系电话")}'}
                 ,{field : 'address',title : '${i18n("联系地址")}'}
                 ,{field : 'status',title : '${i18n("状态")}',formatter: function(value, row, index) {
-                    return $.table.selectDictLabels(statusDatas, value);
+                    return opt.common.selectDictLabels(statusDatas, value);
                 }}
                 ,{title:"${i18n("操作")}",align: 'center',visible:visible,class:'action',formatter: function(value, row, index) {
                     var actions = [];

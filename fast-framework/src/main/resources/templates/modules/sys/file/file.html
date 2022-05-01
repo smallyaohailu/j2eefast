@@ -64,21 +64,21 @@
                 }}
               ,{field : 'id',title : '${i18n("文件主键ID")}',visible: false}
               ,{field : 'fileName',title : '${i18n("文件名称")}' ,formatter: function(value, row, index) {
-                            return $.table.tooltip(value,10);
+                            return opt.common.tooltip(value,10);
                         }}
               ,{field : 'type',title : '${i18n("文件类型")}',formatter: function(value,row, index){
                         return opt.common.getExt(row.fileName);
                }}
              ,{field : 'classify',title : '${i18n("文件归类")}' ,formatter: function(value, row, index) {
-                        return $.table.selectDictLabel(classify, value);
+                        return opt.common.selectDictLabel(classify, value);
                 }}
               ,{field : 'fileUpload.bizType',title : '${i18n("业务类型")}'}
               ,{field : 'fileUpload.bizId',title : '${i18n("业务ID")}',visible: false}
               ,{field : 'ossType',title : '${i18n("对象存储OSS类型")}',formatter: function (value, row, index) {
-                        return $.table.selectDictLabels(ossTypeDict, value);
+                        return opt.common.selectDictLabels(ossTypeDict, value);
                }}
               ,{field : 'filePath',title : '${i18n("相对路径")}' ,formatter: function(value, row, index) {
-                        return $.table.tooltip(value,20);
+                        return opt.common.tooltip(value,20);
                     }}
               ,{field : 'fileSize',title : '${i18n("文件大小")}',formatter: function(value, row, index) {
                         return opt.common.bytesToSize(value);
@@ -86,7 +86,7 @@
               ,{field : 'createBy',title : '${i18n("创建者")}'}
               ,{field : 'createTime',title : '${i18n("创建时间")}'}
               ,{field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
-                        return $.table.selectDictLabel(datas, value);
+                        return opt.common.selectDictLabel(datas, value);
                     }
                 }
                  ,{title:"${i18n("操作")}",align: 'center',visible:visible,formatter: function(value, row, index) {

@@ -1,32 +1,3 @@
-<#--使用宏递归输出菜单-->
-<#macro showMenu menuList, key>
-    <#list menuList as m>
-        <#if m.type == 1> <#--菜单 -->
-            <li>
-                <a href="javascript:;" data-url="${m.url}" data-module="<#if m.name == "首页">_main<#else>${key}</#if>" data-target="${m.target?default("")}" data-id="<#if m.name == "首页">0<#else>${m.MId}</#if>" title="${i18n("${m.name}")}">
-<#--                    <#if m.icon??><i class="${m.icon}" data-icon="${m.icon}"></i></#if>-->
-                    <#if m.icon??><#if m.icon?starts_with("http")><img src="${m.icon}" height="13" width="20"><#else><i class="${m.icon}" data-icon="${m.icon}"></i></#if></#if>
-                    <span>${i18n("${m.name}")}</span>
-                    <#if m.MNew><span class="pull-right-container"><small data-index="_new" class="label pull-right bg-red">${i18n("新")}</small></span></#if>
-                </a>
-            </li>
-        </#if>
-        <#if m.type == 0> <#--目录 -->
-            <li class="treeview">
-                <a href="javascript:;" title="${i18n("${m.name}")}">
-                    <#if m.icon??><#if m.icon?starts_with("http")><img src="${m.icon}" height="14" width="20"><#else><i class="${m.icon}"></i></#if></#if>
-                    <span>${i18n("${m.name}")}</span>
-                    <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
-                </a>
-                <ul class="treeview-menu">
-                    <#if m.children?? && (m.children?size>0)>
-                        <@showMenu m.children, key />
-                    </#if>
-                </ul>
-            </li>
-        </#if>
-    </#list>
-</#macro>
 <div id="leftMenu" class="tab-content">
  <#if menuList?? && (menuList?size > 0) >
     <#list menuList?keys as key>

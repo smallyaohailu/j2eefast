@@ -75,6 +75,7 @@
 			sortOrder: "desc",
 			showExport: true,
 			modalName: "生成配置",
+			height: function(){ return $(window).height() - 114},
 			columns: [{
 				checkbox: true
 			},
@@ -107,7 +108,7 @@
 				field: 'tplCategory',
 				title: '${i18n("模板名称")}',
 				formatter: function(value, row, index) {
-					return $.table.selectDictLabel(genType, value)
+					return opt.common.selectDictLabel(genType, value)
 				}
 			},
 			{

@@ -73,7 +73,7 @@
                 {field: 'mobile', title:  "${i18n("手机")}"},
                 {
                     field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
-                        return $.table.selectDictLabel(datas, value);
+                        return opt.common.selectDictLabel(datas, value);
                     }
                 },
                 {field: 'createTime', title: "${i18n("创建时间")}", sortable: true}

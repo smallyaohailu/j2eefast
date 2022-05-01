@@ -59,10 +59,10 @@
                         ,{field : 'id',title : '${i18n("编号")}',visible: false}
                         ,{field : 'msgTitle',title : '${i18n("消息标题")}'}
                         ,{field : 'msgLevel',title : '${i18n("消息等级")}',formatter: function(value, row, index) {
-                                return $.table.selectDictLabels(msgLevelDatas, value);
+                                return opt.common.selectDictLabels(msgLevelDatas, value);
                             }}
                         ,{field : 'isComments',title : '${i18n("是否开放评论")}',formatter: function(value, row, index) {
-                                return $.table.selectDictLabels(isCommentsDatas, value);
+                                return opt.common.selectDictLabels(isCommentsDatas, value);
                             }}
                         ,{field : 'isRead',title : '${i18n("是否阅读")}',formatter: function(value, row, index) {
                                 return $.i18n.text(value == "0" ? '未阅读' : '已阅读');

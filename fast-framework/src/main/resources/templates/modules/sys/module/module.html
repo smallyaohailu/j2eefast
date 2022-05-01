@@ -99,7 +99,7 @@ sys:module:del,sys:module:add")?string('true', 'false')};
                     field : 'status'
                     ,title : '${i18n("状态")}'
                     ,formatter: function(value, row, index) {
-                        return $.table.selectDictLabel(statusDatas, value);
+                        return opt.common.selectDictLabel(statusDatas, value);
                     }
                 }
                 ,{
@@ -114,7 +114,7 @@ sys:module:del,sys:module:add")?string('true', 'false')};
                             actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("停用")}" onclick="disable(\'' + row.id + '\')"><i class="glyphicon glyphicon-ban-circle"></i></a> ');
                         }
                         if(row.moduleCode == 'core'){
-                            actions.push("  "+$.table.tooltip('${i18n("禁止删除操作!")}',5));
+                            actions.push("  "+opt.common.tooltip('${i18n("禁止删除操作!")}',5));
                         }else{
                             actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
                         }

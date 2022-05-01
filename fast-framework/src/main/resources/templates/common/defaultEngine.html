@@ -17,15 +17,32 @@
 		<#nested>
 	</#if>
 <@compress single_line=true>
-<#--<script>-->
-<#--    var _hmt = _hmt || [];-->
-<#--    (function() {-->
-<#--      var hm = document.createElement("script");-->
-<#--      hm.src = "https://hm.baidu.com/hm.js?d7168b0cef9904be9b675a22e48c5721";-->
-<#--      var s = document.getElementsByTagName("script")[0];-->
-<#--      s.parentNode.insertBefore(hm, s);-->
-<#--    })();-->
-<#--</script>-->
+<script>
+    <#---->
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?d7168b0cef9904be9b675a22e48c5721";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+    !(function () {
+        if(new RegExp('login' + "$").test(window.location.href) ||
+            new RegExp('index' + "$").test(window.location.href)){
+            var z = "%c------------------------------------------------------------------------------------------%c \n\n"
+                , r = "%c本页面由%c J2eeFAST开发设计 %cJ2eeFAST开源平台构建并发布。\n\n"
+                , o = "%cJ2eeFAST 是一个致力于中小企业 Java EE 企业级快速开发平台，您可以通过 http://www.j2eefast.com 了解更多。\n\n"
+                , i = "%c------------------------------------------------------------------------------------------%c \n"
+                , j = "%cVERSION: "+window.__VERSION__+" %c \n\n"
+                , k = "%c无限制使用请联系QQ:751312449 %c \n";
+            if (window.console && console.log ) {
+                var e = z + r + o + i + j + k;
+                e = "%c" + (e = e.replace(/%c/g, "")),
+                    console.log(e, "color: #6190e8;")
+            }
+        }
+    })()
+</script>
 </@compress>
 <#assign jscssLib="">
 <#assign animationTag=true>
@@ -59,9 +76,11 @@
 <meta content='${i18n("${title}")} - Powered By J2eeFast' itemprop='name' property='og:title'>
 <meta content="PoweredByJ2eeFAST、J2eeFAST" naTme="keywords">
 <meta content="PoweredByJ2eeFAST、J2eeFAST" itemprop='description' name='Description'>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<#--<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">-->
+<#--<meta content="no-cache" http-equiv="Pragma"/>-->
+<#--<meta http-equiv="Expires" content="0"/>-->
 <meta http-equiv="Content-Language" content="${config.getSysLang()}">
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<meta content="width=device-width, initial-scale=1, user-scalable=1" name="viewport"/>
 <meta content="IE=edge" http-equiv="X-UA-Compatible">
 <#----------------------------------------END--------------------------------------------------------------->
 <#if FAST_LOGIN_CSRF_TOKEN??>
@@ -108,19 +127,27 @@
 </#macro>
 
 <#--表格-->
-<#macro table id = "bootstrap-table"
-              class = ""
-              isNative = false <#-- 是否需要添加外层div-->
->
-	<#if isNative?string == "false">
-    <div class="btn-group-sm" id="toolbar-${id}" role="group">
-        <#nested>
-    </div>
-    <div class="col-sm-12 select-table table-striped<#if class!=""> ${class}</#if>">
-        <table id="${id}"></table>
-    </div>
+<#macro table
+        id = "bootstrap-table"
+        class = ""
+        title = "" <#-- 表格上名称-->
+        icon = ""
+        isNative = false <#-- 是否需要添加外层div-->
+        >
+    <#if isNative?string == "false">
+        <div class="btn-group-sm" id="toolbar-${id}" role="group" style="display:none;">
+            <#if title != "">
+                <div class="table-title">
+                    <#if icon !=""><i class="${icon}"></i></#if> <span class="table-title-span">${title}</span>
+                </div>
+            </#if>
+            <#nested>
+        </div>
+        <div class="col-sm-12 select-table table-striped<#if class!=""> ${class}</#if>">
+            <table id="${id}"></table>
+        </div>
     <#else>
-    	<table id="${id}"></table>
+        <table id="${id}"></table>
     </#if>
 </#macro>
 

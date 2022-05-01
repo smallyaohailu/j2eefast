@@ -99,7 +99,7 @@
                 }}
                 ,{field : 'phone',title : '${i18n("电话")}'}
                 ,{field : 'sex',title : '${i18n("性别")}',formatter: function(value, row, index) {
-                    return $.table.selectDictLabels(sexDatas, value);
+                    return opt.common.selectDictLabels(sexDatas, value);
                 }}
                 ,{field : 'age',title : '${i18n("年龄")}'}
                 ,{field : 'joinDate',title : '${i18n("入职日期")}'}

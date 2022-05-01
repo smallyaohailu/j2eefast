@@ -87,14 +87,14 @@
                             return '<a class="tb-view" href="javascript:void(0)" onclick="_vm.detail(\'' + row.id + '\')">' + value + '</a>';
                     }},
                     {field: 'status', title: $.i18n.prop("${i18n("状态")}"), align: 'center', formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(statusDatas, value);
+                            return opt.common.selectDictLabel(statusDatas, value);
                     }},
                     {field: 'remark', title: $.i18n.text("备注"),formatter: function(value, row, index) {
-                            return $.table.tooltip(value,8);
+                            return opt.common.tooltip(value,8);
                     }},
                     {field: 'createTime', title: $.i18n.text("创建时间"), sortable: true},
                     {field: 'isSys', title: '${i18n("系统内置")}', formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(isSysDatas, value);
+                            return opt.common.selectDictLabel(isSysDatas, value);
                     }},
                     {title:"${i18n("操作")}", align: 'center',visible:visible, formatter: function(value, row, index) {
                             var actions = [];

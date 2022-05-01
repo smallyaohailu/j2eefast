@@ -71,7 +71,7 @@
                 ,{field : 'id',title : '${i18n("主键")}',visible: false}
                 ,{field : 'langCode',title : '${i18n("语言编码")}'}
                 ,{field : 'langType',title : '${i18n("语言类型")}',formatter: function(value, row, index) {
-                    return $.table.selectDictLabels(langTypeDatas, value);
+                    return opt.common.selectDictLabels(langTypeDatas, value);
                 }}
                 ,{field : 'langText',title : '${i18n("语言译文")}'}
                 ,{field : 'moduleName',title : '${i18n("模块名称")}'}

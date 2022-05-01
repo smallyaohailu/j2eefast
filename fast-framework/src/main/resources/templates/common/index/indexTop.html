@@ -1,3 +1,32 @@
+<#--使用宏递归输出菜单-->
+<#macro showMenu menuList, key, topMenu = false>
+    <#list menuList as m>
+        <#if m.type == 1> <#--菜单 -->
+            <li>
+                <a href="javascript:;" data-url="${m.url}" data-module="<#if m.name == "首页">_main<#else>${key}</#if>" data-target="${m.target?default("")}" data-id="<#if m.name == "首页">0<#else>${m.MId}</#if>" title="${i18n("${m.name}")}">
+                    <#--                    <#if m.icon??><i class="${m.icon}" data-icon="${m.icon}"></i></#if>-->
+                    <#if m.icon??><#if m.icon?starts_with("http")><img src="${m.icon}" height="13" width="20"><#else><i class="${m.icon}" data-icon="${m.icon}"></i></#if></#if>
+                    <span>${i18n("${m.name}")}</span>
+                    <#if m.MNew><span class="pull-right-container"><small data-index="_new" class="label pull-right bg-red">${i18n("新")}</small></span></#if>
+                </a>
+            </li>
+        </#if>
+        <#if m.type == 0> <#--目录 -->
+            <li class="treeview">
+                <a href="javascript:;" title="${i18n("${m.name}")}">
+                    <#if m.icon??><#if m.icon?starts_with("http")><img src="${m.icon}" height="14" width="20"><#else><i class="${m.icon}"></i></#if></#if>
+                    <span>${i18n("${m.name}")}</span>
+                    <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                </a>
+                <ul class="treeview-menu" <#if topMenu>style="display: none;"</#if>>
+                    <#if m.children?? && (m.children?size>0)>
+                        <@showMenu m.children, key, topMenu/>
+                    </#if>
+                </ul>
+            </li>
+        </#if>
+    </#list>
+</#macro>
 <header class="main-header">
     <!-- Logo -->
     <a href="javascript:void(0);" class="logo">
@@ -14,7 +43,9 @@
             <ul class="nav navbar-nav" id="topMenu">
                 <#if modules?? && (modules?size > 0)>
                     <#list modules as c>
+                        <#if c?index <= 1>
                             <li class="treeview"><a href="javascript:" class="addTabPage" title="${c['moduleName']}" data-code="${c['moduleCode']}"><i class="fa-fw ${c['icon']}"></i> <span class="hidden-xs">${i18n("${c['moduleName']}")}</span></a></li>
+                        </#if>
                     </#list>
                 </#if>
             </ul>
@@ -51,6 +82,8 @@
                 })
             </script>
         </div>
+        <!-- 顶部多模块菜单-->
+        <#include "/common/index/moreMenu.html"/>
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav" id="top-navbar-menu">
                 <#--租户选择 -->
@@ -177,6 +210,8 @@
                             <h4>${i18n("上次登陆时间")} :
                                 <#if user.loginTime?exists>
                                     ${user.loginTime?string('yyyy-MM-dd HH:mm:ss')}
+                                <#else>
+                                	首次登录    
                                 </#if>
                                 </h4>
                             <small>${i18n("上次登陆地点")}:${user.loginLocation?default("/")}</small>

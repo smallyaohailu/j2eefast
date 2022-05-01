@@ -59,22 +59,22 @@
 	 		/* {checkbox: true}, */
 					{field: 'id', title: "${i18n("参数主键")}"},
 					{field: 'paramName', title: "${i18n("参数名称")}", formatter: function(value, row, index) {
-				                	return $.table.tooltip(value,10);}
+				                	return opt.common.tooltip(value,10);}
 				                },
 					{field: 'paramKey', title: "${i18n("参数键名")}"/*, formatter: function(value, row, index) {
-				                	return $.table.tooltip(value,10);
+				                	return opt.common.tooltip(value,10);
 				                	}*/
 				    },
 					{field: 'paramValue', title: "${i18n("参数键值")}", formatter: function(value, row, index) {
-						return $.table.tooltip(value,20);
+						return opt.common.tooltip(value,20);
 						}
 					},
 					{field: 'configType', title: "${i18n("系统内置")}", formatter: function(value, row, index) {
-							return $.table.selectDictLabel(datas, value);
+							return opt.common.selectDictLabel(datas, value);
 						}
 					},
 					{field: 'remark', title: "${i18n("备注")}", align: 'center', formatter: function(value, row, index) {
-							return $.table.tooltip(value,5);
+							return opt.common.tooltip(value,5);
 						}
 				                },
 					{field: 'createTime', title: "${i18n("创建时间")}"},
