@@ -217,7 +217,7 @@
                         $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val(opt.form.selectSelects("__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt"));
                         /* 选择框回调事件*/
                         if(typeof selectCallback == 'function'){
-                            var data = $("#__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt").select2("data");
+                            var data = opt.form.selectSelects("__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>slt");
                             selectCallback('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'change', data);
                         }
                     })
