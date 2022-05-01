@@ -5,7 +5,7 @@
 * @version 2021-07-24
 -->
 <#include "/common/defaultEngine.html">
-<@pageTheme mark=false>
+<@pageTheme mark=true>
 <@header title="登 录" isPAS=false>
 <#-- Bootstrap 3.3.7 -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/bootstrap.min.css">
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/select2/select2.min.css"/>
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/select2/select2-bootstrap.css"/>
 </#if>
-<link rel="stylesheet" href="${ctxStatic}/static/css/let-login.css?V=${config.getDvVersion()}">
+<link rel="stylesheet" href="${ctxStatic}/static/css/let-login.min.css?V=${config.getDvVersion()}">
 <#--<link rel="stylesheet" href="${ctxStatic}/static/css/let-login.css?V=${config.getDvVersion()}">-->
 <#if verification || isValidationCode>
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/captcha/css/verify.min.css">
@@ -84,10 +84,14 @@
 </div>
 <div class="login-box animated fadeInLeft" id="__app" v-cloak>
   <div class="login-logo">
-    <a href="#">${config.getTitle()}</a><small>V${config.getVersion()}</small>
+    <a href="#">${config.getTitle()}</a>
+<#--<small>V${config.getVersion()}</small>-->
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">
+      <nav class="login-tabs">
+          <span class="tab-bg">v${config.getVersion()}</span>
+      </nav>
       <p class="login-box-msg">${i18n("欢迎登录")}</p>
       <form action="#" method="post">
       <#if tenantModel>
@@ -264,7 +268,7 @@
 <script src="${ctxStatic}/static/plugins/captcha/ase.min.js"></script>
 <script src="${ctxStatic}/static/plugins/captcha/verify.min.js"></script>
 </#if>
-<script src="${ctxStatic}/static/libs/let-login.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/libs/let-login.min.js?V=${config.getDvVersion()}"></script>
 </body>
 </html>
 </@pageTheme>

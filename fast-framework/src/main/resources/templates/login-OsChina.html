@@ -7,17 +7,13 @@
 <link rel="stylesheet" href="${ctxStatic}/static/css/font-awesome.min.css">
 <#-- Ionicons -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/Ionicons/css/ionicons.min.css">
-<#-- Theme style -->
-<link rel="stylesheet" href="${ctxStatic}/static/css/AdminLTE.min.css?V=${config.getDvVersion()}">
 <#--animate 样式-->
 <link rel="stylesheet" href="${ctxStatic}/static/css/animate.min.css"/>
 <#-- iCheck -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/iCheck/all.css">
 <#-- jQuery toast 提示框  -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/jquery.toast.min.css">
-<link rel="stylesheet" href="${ctxStatic}/static/js/fast-ui.min.css?V=${config.getDvVersion()}">
-<link rel="stylesheet" href="${ctxStatic}/static/css/index.min.css?V=${config.getDvVersion()}">
-<link type="text/css" rel="stylesheet" href="${ctxStatic}/static/css/oschina/oschina.css">
+<link type="text/css" rel="stylesheet" href="${ctxStatic}/static/css/login3.min.css">
 <#if verification>
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/captcha/css/verify.min.css">
 </#if>
@@ -29,12 +25,13 @@
 <div id="verfyImg">
 </div>
 <header class="home-header">
-    <a href="#"><span class="logo">${config.getTitle()}</span> <span style="font-size: 12px;color: white">V${config.getVersion()}</span></a>
+    <a href="#"><span class="logo">${config.getTitle()}</span></a>
 </header>
 <section class="box vertical home-wrapper">
     <div class=" login-body" id="app" v-cloak>
         <nav class="login-tabs">
             <span class="tab-bg"></span>
+            <span class="version">V${config.getVersion()}</span>
         </nav>
         <div class="text-center login-title">
             ${i18n("欢迎登录")}

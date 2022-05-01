@@ -64,7 +64,57 @@ body.hold-transition{
     color: #666;
     box-shadow: 0 2px 6px #999;
     border-radius: 5px;
+    position: relative;
 }
+
+.login-box-body .login-tabs {
+    position: relative;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    overflow: hidden;
+    width: 53px;
+    height: 53px;
+    margin-top: -20px;
+    margin-right: -20px;
+    z-index: 10000;
+    float: right;
+    border-top-right-radius: 5px;
+}
+
+.login-box .login-tabs:before {
+    content: '';
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 52px solid #1890ff;
+    border-left: 53px solid transparent;
+}
+.login-box-body .login-tabs .tab-bg {
+    color: #fff;
+    width: 40px;
+    height: 25px;
+    content: '';
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    position: absolute;
+    top: 10px;
+    left: 15px;
+}
+/*.login-box-body .login-tabs .tab-bg {*/
+/*    display: inline-block;*/
+/*    width: 103px;*/
+/*    height: 103px;*/
+/*    margin: -55px 0 0 17px;*/
+/*    content: '';*/
+/*    !* -webkit-transform: rotate(45deg); *!*/
+/*    -ms-transform: rotate(45deg);*/
+/*    transform: rotate(45deg);*/
+/*    background: #1890ff;*/
+/*}*/
 
 .login-box-msg {
     margin: 0;
