@@ -90,11 +90,11 @@ ${pageTheme}
     var listFlag = "<$>{permission.hasPermi("${permissionPrefix}:add")}";
     var delFlag = "<$>{permission.hasPermi("${permissionPrefix}:del")}";
     var visible = <$>{permission.isPermitteds("${permissionPrefix}:edit,${permissionPrefix}:del,${permissionPrefix}:add")?string('true', 'false')};
-#foreach($column in $columns)
-#if(${column.dictType} && ${column.dictType} != '')
-    var ${column.javaField}Datas = <$>{dict.getDictListJson('${column.dictType}')};
-#end
-#end
+###foreach($column in $columns)
+###if(${column.dictType} && ${column.dictType} != '')
+##    var ${column.javaField}Datas = <$>{dict.getDictListJson('${column.dictType}')};
+###end
+###end
     var prefix = baseURL + "${moduleName}/${businessName}";
 
     $(function() {
@@ -133,7 +133,7 @@ ${pageTheme}
 #if($column.pk)
 #elseif($column.list && $dictType && "" != $dictType)
                 ,{field : '${javaField}',title : '<$>{i18n("${comment}")}'#if($javaField == $treeName),align: "left",halign:"left"#end,formatter: function(value, row, index) {
-                    return $.table.selectDictLabel(${javaField}Datas, value);
+                    return opt.common.selectDictLabel('${dictType}', value);
                 }}
 #set($dictType="")
 #elseif($column.list && "" != $javaField)

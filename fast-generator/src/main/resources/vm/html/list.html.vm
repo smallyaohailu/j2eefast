@@ -167,11 +167,11 @@ ${pageTheme}
     var delFlag = "<$>{permission.hasPermi("${permissionPrefix}:del")}";
     var visible = <$>{permission.isPermitteds("${permissionPrefix}:del")?string('true', 'false')};
 #end
-#foreach($column in $columns)
-#if(${column.dictType} && ${column.dictType} != '')
-    var ${column.javaField}Datas = <$>{dict.getDictListJson('${column.dictType}')};
-#end
-#end
+###foreach($column in $columns)
+###if(${column.dictType} && ${column.dictType} != '')
+##    var ${column.javaField}Datas = <$>{dict.getDictListJson('${column.dictType}')};
+###end
+###end
     var prefix = baseURL + "${moduleName}/${businessName}";
 
     $(function() {
@@ -216,7 +216,8 @@ ${pageTheme}
 #if($c.list)
 #if($c.list && $c.dictType &&"" != $c.dictType)
                 ,{field : '${c.javaField}',title : '<$>{i18n("${com}")}'#if($c.tableSort),sortable: true#end,formatter: function(value, row, index) {
-                    return $.table.selectDictLabels(${c.javaField}Datas, value);
+                    ##return opt.common.selectDictLabels(${c.javaField}Datas, value);
+                    return opt.common.selectDictLabels('${c.dictType}', value);
                 }}
 #elseif($c.list && "" != ${c.javaField})
 #if(${c.htmlType} == "comp")
@@ -305,7 +306,8 @@ ${pageTheme}
 #if($c.list)
 #if($c.list && $c.dictType && "" != $c.dictType)
                 ,{field : '${c.javaField}',align: "center",title : '<$>{i18n("${com}")}'#if($c.tableSort),sortable: true#end,formatter: function(value, row, index) {
-                    return $.table.selectDictLabels(${c.javaField}Datas, value); }}
+                    ##return opt.common.selectDictLabels(${c.javaField}Datas, value); }}
+                    return opt.common.selectDictLabels('${c.dictType}', value);}}
 #elseif($c.list && "" != ${c.javaField})
 #if(${c.htmlType} == "comp")
                 ,{field : 'company.name',align: "center",title : '<$>{i18n("${com}")}'#if($c.tableSort),sortable: true#end }
