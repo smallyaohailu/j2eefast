@@ -86,7 +86,8 @@ public class Context {
 	}
 	
 	public Map<String,String> getMapping(DatasetExpression expr){
-		if(expr.getMappingType().equals(MappingType.simple)){
+		if(expr.getMappingType().equals(MappingType.simple) ||
+				expr.getMappingType().equals(MappingType.dictType)){
 			Map<String,String> mapping=expr.getMapping();
 			return mapping;
 		}else if(expr.getMappingType().equals(MappingType.dataset)){

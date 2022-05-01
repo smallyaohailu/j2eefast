@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bstek.ureport.definition.value.DatasetValue;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.bstek.ureport.build.BindData;
@@ -40,8 +41,17 @@ import com.bstek.ureport.model.Cell;
  * @since 2016年11月18日
  */
 public class DatasetExpression extends BaseExpression {
+
+//	public static void main(String[] args) {
+//		DatasetValue value=new DatasetValue();
+//		value.setMappingType(MappingType.valueOf("dictType"));
+////		value.setMappingType(MappingType.valueOf("simple"));
+//		System.out.println(value.getMappingType().toString());
+//	}
+
 	private static final long serialVersionUID = -8794866509447790340L;
 	private String datasetName;
+	private String dictType;
 	private AggregateType aggregate;
 	private String property;
 	/**
@@ -49,7 +59,7 @@ public class DatasetExpression extends BaseExpression {
 	 */
 	private List<GroupItem> groupItems;
 	
-	private MappingType mappingType=MappingType.simple;
+	private MappingType mappingType= MappingType.simple;
 	
 	private String mappingDataset;
 	private String mappingKeyProperty;
@@ -178,5 +188,18 @@ public class DatasetExpression extends BaseExpression {
 
 	public Map<String, String> getMapping() {
 		return mapping;
+	}
+
+	public void setMapping(Map map) {
+		this.mapping = map;
+	}
+
+
+	public String getDictType() {
+		return dictType;
+	}
+
+	public void setDictType(String dictType) {
+		this.dictType = dictType;
 	}
 }

@@ -21,11 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 
@@ -58,6 +54,11 @@ public class FileReportProvider implements ReportProvider,ApplicationContextAwar
 		} catch (FileNotFoundException e) {
 			throw new ReportException(e);
 		}
+	}
+
+	@Override
+	public Map<String, String> getTypeDict(String type) {
+		return null;
 	}
 
 	@Override

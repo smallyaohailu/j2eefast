@@ -17,6 +17,7 @@ package com.bstek.ureport.provider.report;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -29,6 +30,14 @@ public interface ReportProvider {
 	 * @return 返回的InputStream
 	 */
 	InputStream loadReport(String file);
+
+
+	/**
+	 * 获取系统字典
+	 * @param type
+	 * @return
+	 */
+	Map<String, String> getTypeDict(String type);
 
 
 	/**

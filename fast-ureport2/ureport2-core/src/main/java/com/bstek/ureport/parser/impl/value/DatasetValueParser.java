@@ -16,8 +16,13 @@
 package com.bstek.ureport.parser.impl.value;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import cn.hutool.extra.spring.SpringUtil;
+import com.bstek.ureport.provider.report.ReportProvider;
+import com.bstek.ureport.utils.ToolUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
@@ -110,6 +115,28 @@ public class DatasetValueParser extends ValueParser {
 					mappingItems=new ArrayList<MappingItem>();
 				}
 				mappingItems.add(item);
+			}else if(ele.getName().equals("mapping-dict")){
+				String deictType = ele.attributeValue("value");
+				//获取系统字典
+				Map<String,String> dict = null;
+				Collection<ReportProvider> providers= SpringUtil.getBeansOfType(ReportProvider.class).values();
+				for(ReportProvider provider:providers){
+					if(provider.disabled() || provider.getName()==null){
+						continue;
+					}
+					dict = provider.getTypeDict(deictType);
+					if(ToolUtils.isNotEmpty(dict)){
+						break;
+					}
+				}
+				value.setDictType(deictType);
+				value.setMapping(dict);
+//				for(Map.Entry<String, String> entry: dict.entrySet()){
+//					MappingItem item=new MappingItem();
+//					item.setValue(entry.getKey());
+//					item.setLabel(entry.getValue());
+//					mappingItems.add(item);
+//				}
 			}
 		}
 		if(topCondition!=null){

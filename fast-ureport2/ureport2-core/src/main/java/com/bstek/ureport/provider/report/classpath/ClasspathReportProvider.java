@@ -18,6 +18,7 @@ package com.bstek.ureport.provider.report.classpath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -55,6 +56,11 @@ public class ClasspathReportProvider implements ReportProvider,ApplicationContex
 			}
 			throw new ReportException(e);
 		}
+	}
+
+	@Override
+	public Map<String, String> getTypeDict(String type) {
+		return null;
 	}
 
 	@Override

@@ -21,7 +21,6 @@
         <dependency>
             <groupId>com.j2eefast</groupId>
             <artifactId>ureport2-core</artifactId>
-            <version>2.5.1</version>
         </dependency>
     </dependencies>
 
