@@ -15,14 +15,15 @@
  ******************************************************************************/
 package com.bstek.ureport.console.res;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +31,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.bstek.ureport.console.ServletAction;
 import com.bstek.ureport.console.UReportServlet;
+import org.springframework.http.HttpHeaders;
 
 /**
  * @author Jacky.gao
@@ -44,6 +46,7 @@ public class ResourceLoaderServletAction implements ServletAction,ApplicationCon
 		String uri=req.getRequestURI();
 		String resPath=uri.substring(path.length()+1);
 		String p="classpath:"+resPath;
+		byte[] outBytes = StrUtil.EMPTY.getBytes();
 		if(p.endsWith(".js")){
 			resp.setContentType("text/javascript");	
 		}else if(p.endsWith(".css")){
@@ -57,13 +60,32 @@ public class ResourceLoaderServletAction implements ServletAction,ApplicationCon
 		}else{
 			resp.setContentType("application/octet-stream");
 		}
-		InputStream input=applicationContext.getResource(p).getInputStream();
-		OutputStream output=resp.getOutputStream();
+		InputStream input = applicationContext.getResource(p).getInputStream();
+		outBytes = IOUtils.toByteArray(input);
+
+		ByteArrayOutputStream bout=new ByteArrayOutputStream();
+		GZIPOutputStream gzip=new GZIPOutputStream(bout);
+		gzip.write(outBytes);
+		//一般输出都要flush
+		gzip.flush();
+		gzip.close();
+		outBytes = bout.toByteArray();
+		//注明压缩类型
+		resp.setHeader("content-encoding", "gzip");
+		resp.setHeader("content-length",outBytes.length+"");
+		// Http 1.0 header, set a fix expires date.
+		resp.setDateHeader(HttpHeaders.EXPIRES, System.currentTimeMillis() + 30*24*60*60 * 1000);
+		// Http 1.1 header, set a time after now.
+		resp.setHeader(HttpHeaders.CACHE_CONTROL, "private, max-age=" + 30*24*60*60);
+
+		InputStream input0 = new ByteArrayInputStream(outBytes);
+		OutputStream output= resp.getOutputStream();
 		try{
-			IOUtils.copy(input, output);			
+			IoUtil.copy(input0,output);
 		}finally{
-			IOUtils.closeQuietly(input);
-			IOUtils.closeQuietly(output);
+			IoUtil.close(input);
+			IoUtil.close(input0);
+			IoUtil.close(output);
 		}
 	}
 
