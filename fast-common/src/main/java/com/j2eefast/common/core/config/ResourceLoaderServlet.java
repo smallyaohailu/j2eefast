@@ -24,6 +24,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -131,6 +133,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 					paramIn.set("userId", userId);
 					paramIn.set("_secretkey", ConfigConstant.PUBKEY);
 					paramIn.set("_i18n_tag", ConfigConstant.I18N_ATG);
+					paramIn.set("__DICTTAG__", ConfigConstant.DICT_TAG);
 					paramIn.set("_VERSION", PropertiesUtils.getInstance().get("version"));
 					paramIn.set("title", Global.getConfig("SYS_CONFIG_TITLE"));
 					paramIn.set("sysConfig", JSONUtil.parseObj(Global.getConfig(ConfigConstant.SYS_CONFIG_KEY)));
@@ -145,10 +148,10 @@ public class ResourceLoaderServlet extends HttpServlet {
 						.append(StrUtil.format(",basePath='{}';",basePath));
 				// 无头像设置默认
 				_default.append("function imgUserError(){var img=event.srcElement;img.src=baseURL+\"static/img/user2-160x160.jpg\"; img.onerror=null;};");
-				if(ConfigConstant.LIC_TAG.equals("NULL")){
+				if(!ConfigConstant.LIC_TAG.equals("SUCCESS")){
 					_default.append(";$(function() {" +
-							"let lic = $('<div id=\""+ RandomUtil.randomString(5) +"\" style=\"position: fixed;right: 100px;overflow: hidden;z-index: 19920219;" +
-							"pointer-events: none;opacity: 0.2;font-size: 14px;font-family: 微软雅黑;color: rgb(255 0 0);" +
+							"var lic = $('<div id=\""+ RandomUtil.randomString(5) +"\" style=\"position: fixed;right: 100px;overflow: hidden;z-index: 19920219;" +
+							"pointer-events: none;opacity: 0.2;font-size: 14px;font-family: Microsoft YaHei UI,Microsoft YaHei;color: rgb(255 0 0);" +
 							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">(J2eeFAST)</span></div>');" +
 							"if(!(self.frameElement && self.frameElement.tagName == \"IFRAME\")){" +
 							"if($('.wrapper > footer').length == 0){" +
@@ -156,7 +159,8 @@ public class ResourceLoaderServlet extends HttpServlet {
 							"lic.css('top','10px');"+
 							"lic.css('right','10px');"+
 							"}"+
-							"$('body').append(lic);" +
+							"var __index = Math.floor((Math.random()* $('body').children().length));"+
+							"window.setTimeout(function(){$($('body').children()[__index]).after(lic);},200);"+
 							"}"+
 							"});");
 				}
@@ -207,6 +211,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 		sb.append(StrUtil.format("__SECRETKEY__='{}',", ConfigConstant.PUBKEY));
 		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
 		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));
+		sb.append(StrUtil.format("__DICTTAG__='{}',", ConfigConstant.DICT_TAG));
 		sb.append(StrUtil.format("__VERSION__='{}'", PropertiesUtils.getInstance().get("version")));
 		return sb;
 	}

@@ -1,6 +1,6 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-    <@header title="用户管理" bodyClass="gray-bg animated fadeInRight" isAnimation=false libs=["table","zTree","layout-latest"]/>
+    <@header title="用户管理" bodyClass="gray-bg" isAnimation=false libs=["table","zTree","layout-latest","intro"]/>
     <div class="ui-layout-west">
         <div class="box box-main">
             <div class="box-header">
@@ -132,6 +132,35 @@
                 /*加载 树、树表格*/
                 initTable();
                 initLeftZtree();
+
+                //引导 ----- START ///
+                $('#user-form').attr('data-step','1');
+                $('#user-form').attr('data-intro','用户搜索工具类,您可以通过' +
+                    '<span class="badge">用户姓名</span>、<span class="badge">手机号码</span>、' +
+                    '<span class="badge">归属机构</span>、<span class="badge">状态</span>等更多操作联合检索查询.');
+
+                $('#tree').attr('data-step','2');
+                $('#tree').attr('data-intro','左侧公司组织架构');
+
+                $('.bootstrap-table .bs-bars').attr('data-step','3');
+                $('.bootstrap-table .bs-bars').attr('data-intro','<span class="badge">新增</span>、' +
+                    '<span class="badge">修改</span>、<span class="badge">删除</span>、' +
+                    '<span class="badge">导入用户信息</span>');
+
+                $('.bootstrap-table .fixed-table-container').attr('data-step','4');
+                $('.bootstrap-table .fixed-table-container').attr('data-intro','用户信息表格');
+                // 引入introJs后
+                introJs().goToStep(1).setOptions({
+                    prevLabel: "上一步",
+                    nextLabel: "下一步",
+                    skipLabel: "忽略",
+                    doneLabel: "结束",
+                    exitOnOverlayClick: false
+                }).oncomplete(function () {
+                    //到了最后一步
+                }).start();
+                //引导 ----- END ///
+
             });
 
             function initTable() {
@@ -152,6 +181,8 @@
                     // fixedNumber: 3,
                     // rightFixedColumns: true,
                     // rightFixedNumber: 2,
+                    //固定高度
+                    height: function(){ return $(window).height() - 114},
                     striped: true, // 表格斑马条纹
                     uniqueId: "id", /* 唯一ID */
                     modalName: "${i18n("用户")}",
@@ -168,17 +199,17 @@
                         },
                         {field: 'name', title:  "${i18n("姓名")}"},
                         {field: 'compName', valign: 'middle', title: "${i18n("归属公司")}",formatter: function (value, row, index) {
-                                return $.table.tooltip(value,5);}
+                                return opt.common.tooltip(value,5);}
                         },
                         {field: 'deptName', title:  "${i18n("归属机构")}"},
                         {field: 'roleName', title: "${i18n("角色")}",formatter: function (value, row, index) {
-                                return $.table.tooltip(value,5);}
+                                return opt.common.tooltip(value,5);}
                         },
                         {field: 'email', title:  "${i18n("邮箱")}"},
                         {field: 'mobile', title:  "${i18n("手机")}"},
                         {
                             field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
-                                return $.table.selectDictLabel(datas, value);
+                                return opt.common.selectDictLabel(datas, value);
                             }
                         },
                         {field: 'createTime', title: "${i18n("创建时间")}"},

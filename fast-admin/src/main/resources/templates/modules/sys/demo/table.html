@@ -92,12 +92,14 @@
             rightFixedColumns: true,// 是否开启右侧冻结列
             rightFixedNumber: 2, //右侧冻结几列
             // clickToSelect: true, //是否启用点击选中行
-            height: $(window).height() - 125, //是否需要固定表格高度
+            height: function(){ return $(window).height() - 114},//是否需要固定表格高度
             uniqueId: "id", /* 唯一ID */
+            striped: true, // 表格斑马条纹
             outcheckbox: false,
             subtotalShowFooter: true, // 是否显示表格小计底部统计行 配合 rowspan, subtotalFooterFormatter,subtotalFooterStyle 函数使用
             showBorder: true, // 是否显示表格边框
             totalShowFooter: true,
+            showCheckNumber: true, // 是否显示勾选数量
             isFixedColumn: true, // 是否开启固定表格宽度, 当我们的表格列较多则我们只需要设置每列固定宽度开启此项表格会自动出现水平滚动条
             subtotalFooterStyle: subtotalFooterStyle, // 表格底部统计行的样式设置函数
             totalFooterStyle: totalFooterStyle, //表格合计样式设置函数
@@ -207,11 +209,11 @@
                         }
                     },
                     {field: 'compName', valign: 'middle', title: "${i18n("归属公司")}", width: 120,formatter: function (value, row, index) {
-                            return $.table.tooltip(value,5);}
+                            return opt.common.tooltip(value,5);}
                     },
                     {field: 'deptName', title:  "${i18n("归属机构")}", width: 120},
                     {field: 'roleName', title: "${i18n("角色")}", width: 120,formatter: function (value, row, index) {
-                            return $.table.tooltip(value,5);}
+                            return opt.common.tooltip(value,5);}
                     },
                     {field: 'email', title:  "${i18n("邮箱")}",width:150},
                     {field: 'mobile', title:  "${i18n("手机1")}",width:150},
@@ -223,10 +225,10 @@
                     // 注意若表格为复杂表头字段设置visible: false 此行会隐藏 也不会出现
                     {field: 'mobile', title:  "${i18n("手机7")}",width:150,visible: false},
                     {field: 'status', title: "${i18n("状态")}",width:150, formatter: function (value, row, index) {
-                            return $.table.selectDictLabel(datas, value);
+                            return opt.common.selectDictLabel(datas, value);
                         }
                     },
-                    {field: 'createTime', title: "${i18n("创建时间")}",width:150}
+                    {field: 'createTime', title: "${i18n("创建时间")}",sortable: true,width:150}
                 ]
             ]
         };

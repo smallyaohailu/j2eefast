@@ -58,11 +58,11 @@
                  }},
                 {field: 'fullName', title: "${i18n("公司全称")}",align: "center"},
                 {field: 'type', title: "${i18n("类型")}", formatter: function(value, item, index) {
-                        return $.table.selectDictLabel(types, item.type);}
+                        return opt.common.selectDictLabel(types, item.type);}
                 },
                 {field: 'orderNum', title: "${i18n("排序")}",align: "center"},
                 {field: 'status', title: "${i18n("状态")}", formatter: function(value, item, index) {
-                        return $.table.selectDictLabel(datas, item.status);}
+                        return opt.common.selectDictLabel(datas, item.status);}
                 },
                 {field: 'createTime', title: "${i18n("创建时间")}"},
                 {title: "${i18n("操作")}",visible:visible, formatter: function(value, row, index) {

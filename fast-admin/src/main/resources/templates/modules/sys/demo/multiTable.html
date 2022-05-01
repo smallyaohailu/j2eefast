@@ -92,11 +92,11 @@
                     {field: 'roleName', title: "${i18n("角色名称")}"},
                     {field: 'roleKey', title: "${i18n("权限字符")}"},
                     {field: 'dataScope', title: "${i18n("数据范围")}", formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(dataScope, value);
+                            return opt.common.selectDictLabel(dataScope, value);
                     }},
                     {field: 'roleSort', title: "${i18n("顺序")}",sortable:true},
                     {field: 'status', title: "${i18n("状态")}", align: 'center', formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(datas, value);
+                            return opt.common.selectDictLabel(datas, value);
                     }},
                     {field: 'createTime', title: "${i18n("创建时间")}",sortable: true}
                     ]
@@ -138,17 +138,17 @@
                 },
                 {field: 'name', title:  "${i18n("姓名")}"},
                 {field: 'compName', valign: 'middle', title: "${i18n("归属公司")}",formatter: function (value, row, index) {
-                        return $.table.tooltip(value,5);}
+                        return opt.common.tooltip(value,5);}
                 },
                 {field: 'deptName', title:  "${i18n("归属机构")}"},
                 {field: 'roleName', title: "${i18n("角色")}",formatter: function (value, row, index) {
-                        return $.table.tooltip(value,5);}
+                        return opt.common.tooltip(value,5);}
                 },
                 {field: 'email', title:  "${i18n("邮箱")}"},
                 {field: 'mobile', title:  "${i18n("手机")}"},
                 {
                     field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
-                        return $.table.selectDictLabel(userDatas, value);
+                        return opt.common.selectDictLabel(userDatas, value);
                     }
                 },
                 {field: 'createTime', title: "${i18n("创建时间")}", sortable: true},

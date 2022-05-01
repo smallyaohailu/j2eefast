@@ -269,15 +269,10 @@ public class SysDeptController extends BaseController {
 	@RequiresPermissions("sys:dept:del")
 	@ResponseBody
 	public ResponseData delete(@PathVariable("deptId") Long deptId) {
-		if(UserUtils.getUserId().equals(Constant.SUPER_ADMIN) ||
-				UserUtils.hasRole(Constant.SU_ADMIN)){
-			if(sysCompService.delSysCompById(deptId)) {
-				return success();
-			}else {
-				return error("删除失败!");
-			}
-		}else{
-			return error(ToolUtil.message("sys.msg.permissions"));
+		if(sysCompService.delSysCompById(deptId)) {
+			return success();
+		}else {
+			return error("删除失败!");
 		}
 	}
 

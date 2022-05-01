@@ -38,6 +38,8 @@ public final class ConfigConstant {
 	public static final String 					FAST_SESSION_ID						= "fast.session.id";
 	public static final String 					JTA_ENABLED_YML 					= "fast.jta.enabled";
 	public static final String 					UREPORT_ENABLED_YML 				= "fast.ureport.enabled";
+	public static final String 					SYS_KEY_PUBKEY 						= "shiro.sysKey.pubKey";
+	public static final String 					SYS_KEY_PRIKEY 						= "shiro.sysKey.priKey";
 	public static final String 					TRUE 								= "true";
 	public static final String 					FLOWABLE_ENABLED_YML 				= "fast.flowable.enabled";
 	public static final String 					TENANTMODEL 						= "fast.tenantModel.enabled";
@@ -50,6 +52,7 @@ public final class ConfigConstant {
 	public static byte[]                  		PRIVKEY								= HexUtil.decodeHex("a1ab63f9b726482d47d7529b4bdb57fbdd68c492d19cf8e3f1140fb68d193f7b");
 	public static String                  		PUBKEY								= "QTwb20ZMEftb9jFnjgRBCULM7+LmKW+x/3wpuIOuVLTeHTkivKZVX8QNBGeexn5EDeymBaWbEgU/IGAyqofN3w==";
 	public static String						I18N_ATG							= "";
+	public static String						DICT_TAG							= "";
 	public static String 						LIC_TAG								= "NULL";
 	
 	/**

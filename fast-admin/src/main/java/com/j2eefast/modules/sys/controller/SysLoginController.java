@@ -267,10 +267,10 @@ public class SysLoginController extends BaseController {
 		String valideCode  = RandomUtil.randomNumbers(6);
 
 		//测试
-		//redisUtil.set(RedisKeys.getLoginValidKey(mobile), valideCode, Global.Validity());
-		//return success().put("valideCode",valideCode);
+		redisUtil.set(RedisKeys.getLoginValidKey(mobile), valideCode, Global.Validity());
+		return success().put("valideCode",valideCode);
 		
-		/** 测试功能可以屏蔽 */
+		/** 测试功能可以屏蔽
 		//6. 发送验证码
 		ResponseData data = MsgPushUtils.SendSms("", Global.loginSmsTemplateId(), new String[] {mobile},
 				new String[] {valideCode,Convert.toStr(Global.validityInt())});
@@ -281,6 +281,7 @@ public class SysLoginController extends BaseController {
 		}else {
 			return data;
 		}
+		*/
 		
 	}
 	

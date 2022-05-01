@@ -21,6 +21,13 @@ public @interface JsonListFiledIgnore {
     ConvertType convert() default ConvertType.EMPTY;
 
     /**
+     * 权限字符输出
+     * @return
+     */
+    String[] permissions() default {};
+
+
+    /**
      * 默认不输出
      * @return
      */

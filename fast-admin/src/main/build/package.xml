@@ -25,14 +25,12 @@
             <outputDirectory>${file.separator}</outputDirectory>
         </fileSet>
 
-        <!--如果要启动工作流放开此注解
+        <!-- 资源打包分离 需要单独整合为被打包的资源文件
         <fileSet>
             <directory>../fast-flowable/src/main/resources</directory>
             <outputDirectory>${file.separator}</outputDirectory>
         </fileSet>
-        -->
 
-        <!-- 资源打包分离 需要单独整合为被打包的资源文件
         <fileSet>
             <directory>../fast-generator/src/main/resources</directory>
             <outputDirectory>${file.separator}</outputDirectory>
