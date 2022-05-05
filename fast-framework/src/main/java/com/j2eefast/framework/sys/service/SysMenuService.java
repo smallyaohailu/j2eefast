@@ -5,25 +5,31 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.constants.Cache;
+import com.j2eefast.common.core.page.Query;
+import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
+import com.j2eefast.framework.sys.entity.MetaEntity;
+import com.j2eefast.framework.sys.entity.RouterEntity;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.mapper.SysMenuMapper;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.utils.Constant;
+import com.j2eefast.framework.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -50,13 +56,27 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	 */
 	public List<SysMenuEntity> findMenuList(SysMenuEntity menu, LoginUserEntity user) {
 		List<SysMenuEntity> menuList = null;
-		if (user.getId().equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)){
+		if (user.getId().equals(Constant.SUPER_ADMIN)){
 			menuList = sysMenuMapper.findMenuList(menu);
 		}
 		else{
 			menuList = sysMenuMapper.findMenuListByUserId(user.getId(),menu.getName(),menu.getHide());
 		}
 		return menuList;
+	}
+
+	/**
+	 * 自定义分页查询，含关联实体对像
+	 */
+	public PageUtil findPage(Map<String, Object> params, SysMenuEntity menu) {
+		Page<SysMenuEntity> page = sysMenuMapper.findPage(new Query<SysMenuEntity>(params).getPage(), menu)  ;
+		return new PageUtil(page);
+	}
+
+
+
+	public List<SysMenuEntity> selectList(SysMenuEntity menu){
+		return this.baseMapper.findMenuList(menu);
 	}
 
 
@@ -67,6 +87,36 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	 */
 	public SysMenuEntity selectMenuByMenId(Long menuId){
 		return sysMenuMapper.selectMenuByMenId(menuId);
+	}
+
+	/**
+	 * 菜单转换前端路由
+	 * @return
+	 */
+	public List<RouterEntity> buildMenus(List<SysMenuEntity> menuList){
+		List<RouterEntity> routers = new LinkedList<RouterEntity>();
+		for(SysMenuEntity menu: menuList){
+			RouterEntity router = new RouterEntity();
+			router.setName(menu.getName());
+			if(menu.getType() == 0){
+				router.setPath("/" + menu.getId());
+			}else{
+				router.setPath(menu.getUrl().startsWith("/")?menu.getUrl():("/" + menu.getUrl()));
+			}
+			router.setComponent(menu.getComponent());
+			router.setMeta(new MetaEntity(menu.getName(), menu.getIcon(), menu.getHide() == 1));
+			List<SysMenuEntity> cMenus = menu.getChildren();
+			if (!cMenus.isEmpty() && cMenus.size() > 0 && menu.getType() == 0){
+				if(cMenus.get(0).getType() == 0){
+					router.setRedirect("/" + cMenus.get(0).getId());
+				}else{
+					router.setRedirect(cMenus.get(0).getUrl().startsWith("/")?cMenus.get(0).getUrl():("/" + cMenus.get(0).getUrl()));
+				}
+				router.setChildren(buildMenus(cMenus));
+			}
+			routers.add(router);
+		}
+		return routers;
 	}
 
 	public List<SysMenuEntity> findUserMenuList(Long userId) {
@@ -192,7 +242,8 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 		List<Ztree> ztrees = new ArrayList<Ztree>();
 		String modules = StrUtil.EMPTY;
 		if(ToolUtil.isEmpty(role.getModuleCodes())){
-			for(Map<String, Object> s: user.getModules()){
+			List<Map<String, Object>> tempLsit  = ConstantFactory.me().getModules(user.getId());
+			for(Map<String, Object> s: tempLsit){
 				modules = modules+s.get("moduleCode")+StrUtil.COMMA;
 			}
 			modules = modules.substring(0,modules.length()-1);
@@ -212,7 +263,7 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 
 	public List<SysMenuEntity> selectModuleMenuAll(LoginUserEntity user, String moduleCodes) {
 		List<SysMenuEntity> menuList = null;
-		if (user.getId().equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)) {
+		if (user.getId().equals(Constant.SUPER_ADMIN) || UserUtils.isContains(user.getRoles(),Constant.SU_ADMIN)) {
 			menuList = this.sysMenuMapper.findModuleMenuAll(moduleCodes);
 		}
 		else {
@@ -266,6 +317,7 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	 * @return
 	 */
 	public boolean clearMenuRedis(){
+		redisUtil.deletes(Cache.MODULES_CONSTANT+"*");
 		return  redisUtil.deletes(Cache.MENU_CONSTANT+"*");
 	}
 
@@ -337,7 +389,8 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 
 	public List<SysMenuEntity> selectMenuAll(LoginUserEntity user){
 		List<SysMenuEntity> menuList = null;
-		if (user.getId().equals(Constant.SUPER_ADMIN) || user.getRoleKey().contains(Constant.SU_ADMIN)){
+		if (user.getId().equals(Constant.SUPER_ADMIN) ||
+				UserUtils.isContains(user.getRoles(),Constant.SU_ADMIN)){
 			menuList = this.list(new QueryWrapper<SysMenuEntity>().
 					orderByAsc("parent_id","order_num"));
 		}

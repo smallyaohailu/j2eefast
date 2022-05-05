@@ -58,7 +58,7 @@
             <li><a href="#tab_1_1" data-toggle="tab">Simple Line Icons</a></li>
             <li class="active"><a href="#tab_1_2" data-toggle="tab">Font Awesome Icons</a></li>
             <li><a href="#tab_1_3" data-toggle="tab">Glyphicons</a></li>
-            <li><a href="#tab_1_4" data-toggle="tab">Ionicons<span data-index="_new" class="label label-danger"><@ctx.i18n text = "新"/></span></a></li>
+            <li><a href="#tab_1_4" data-toggle="tab">Ionicons<span data-index="_new" class="label label-danger">${i18n("新")}</span></a></li>
         </ul>
         <#include "/common/icon.html"/>
     </div>
@@ -67,7 +67,7 @@
     <script>
 
         $(function() {
-            opt.modal.alertInfo('<span style="color: red; font-size: 13px; font-weight: bold">双击选择图标直接复制到剪贴板!</span>');
+            opt.modal.alertInfo('<span style="color: red; font-size: 13px; font-weight: bold">${i18n("双击选择图标直接复制到剪贴板!")}</span>');
         });
 
         function selectOnclick(){

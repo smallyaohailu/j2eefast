@@ -27,7 +27,8 @@ public class ImageUtils {
     /**
      * 缩略图生成，处理一些较大的图片，防止占用太多的网络资源
      */
-    public static void thumbnails(File imageFile, int maxWidth, int maxHeight, String outputFormat){
+    public static void thumbnails(File imageFile, int maxWidth, int maxHeight,
+                                  String outputFormat,boolean press, String preessText){
         if (imageFile == null || !imageFile.exists() || (maxWidth <= 0 && maxHeight <= 0)){
             return;
         }
@@ -59,7 +60,13 @@ public class ImageUtils {
                 }
                 bilder.toFile(imageFile);
 
-                ImgUtil.write(ImgUtil.pressText(bufferedImage,"J2eeFAST", Color.BLACK,new Font("Courier", Font.PLAIN, (int)20),0,0, (float)1),imageFile);
+                if(press){
+                    //添加水印
+                    ImgUtil.write(ImgUtil.pressText(bufferedImage,preessText, Color.BLACK,new Font("Courier", Font.PLAIN, (int)20),0,0, (float)1),imageFile);
+                }else{
+                    //不添加水印
+                    ImgUtil.write(bufferedImage,imageFile);
+                }
             }
         }catch(IOException e){
             LOG.error("图片压缩失败：" + imageFile.getAbsoluteFile(), e);

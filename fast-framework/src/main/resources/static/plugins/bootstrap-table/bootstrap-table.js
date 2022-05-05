@@ -20,6 +20,9 @@
  * 9.修复表格行title提示列转义显示问题
  * 10.修复页面同时多个表格属性firstLoad=false 异常情况
  * 11.优化加载样式
+ * 12.新增columns[{field:'user.name',fieldSort:'u.name'}]  fieldSort属性 支持排序名称与返回字段名称不一致
+ * 13.新增showCheckNumber 属性是否显示多选勾选总数
+ * 14.新增设置表格高度支持函数
  * --------------------------------------------------
  */
 (function ($) {
@@ -339,6 +342,7 @@
         firstLoad: true,
         isFixedColumn: false,
         onlyInfoPagination: false,
+        showCheckNumber: false, //显示表格勾选数量
         sidePagination: 'client', // client or server
         totalRows: 0, // server side need to set
         pageNumber: 1,
@@ -355,14 +359,21 @@
         searchAlign: 'right',
         selectItemName: 'btSelectItem',
         showHeader: true,
-        showFooter: false,
+        subtotalShowFooter: false, // 小计
+        rowTotal: undefined, //小计个数
+        subtotalRowStyle: undefined,
+        totalShowFooter: false, //合计
+        totalFooterHeight: undefined, //合计高度
+        totalFooterRowStyle: undefined, //合计行样式
         showColumns: false,
         showSearch: false,
         showPageGo: false,
+        exportData: undefined,
         showPaginationSwitch: false,
         showRefresh: false,
         showBorder: false,
         showToggle: false,
+        showExport: false,
         buttonsAlign: 'right',
         smartDisplay: true,
         escape: false,
@@ -374,6 +385,12 @@
         detailFormatter: function (index, row) {
             return '';
         },
+        // 自定义表格
+        showCustomView: false,
+        customViewFormatter: function(data){
+            return '';
+        },
+        // ----------
         trimOnSearch: true,
         clickToSelect: false,
         singleSelect: false,
@@ -394,6 +411,8 @@
             paginationSwitchUp: 'glyphicon-collapse-up icon-chevron-up',
             refresh: 'glyphicon-refresh icon-refresh',
             toggle: 'glyphicon-list-alt icon-list-alt',
+            exportIcon: 'glyphicon-export',
+            cardView: 'glyphicon glyphicon-random',
             columns: 'glyphicon-th icon-th',
             detailOpen: 'glyphicon-plus icon-plus',
             detailClose: 'glyphicon-minus icon-minus'
@@ -411,7 +430,11 @@
             return {};
         },
 
-        footerStyle: function (row, index) {
+        subtotalFooterStyle: function (row, index) {
+            return {};
+        },
+
+        totalFooterStyle: function (row, index){
             return {};
         },
 
@@ -513,6 +536,9 @@
         formatDetailPagination: function (totalRows) {
             return sprintf('Showing %s rows', totalRows);
         },
+        formatCheckNumber: function (number) {
+            return sprintf('Total number of checks :%s', number);
+        },
         formatSearch: function () {
             return 'Search';
         },
@@ -527,6 +553,12 @@
         },
         formatToggle: function () {
             return 'Toggle';
+        },
+        formatExport: function () {
+            return 'Export';
+        },
+        formatCardView: function () {
+            return 'Switch';
         },
         formatColumns: function () {
             return 'Columns';
@@ -553,13 +585,14 @@
         valign: undefined, // top, middle, bottom
         width: undefined,
         sortable: false,
-        footColspan: undefined, //底部统计列合并数量
+        subtotalFootColspan: undefined, //底部统计列合并数量
         order: 'asc', // asc, desc
         visible: true,
         switchable: true,
         clickToSelect: true,
         formatter: undefined,
-        footerFormatter: undefined,
+        subtotalFooterFormatter: undefined, //小计函数
+        totalFooterFormatter: undefined, //合计函数
         events: undefined,
         sorter: undefined,
         sortName: undefined,
@@ -631,33 +664,35 @@
     };
 
     BootstrapTable.prototype.initContainer = function () {
+        //TODO 调整加载等待动画位置适配 冻结列
         this.$container = $([
             '<div class="bootstrap-table">',
-                '<div class="fixed-table-toolbar"></div>',
-                this.options.paginationVAlign === 'top' || this.options.paginationVAlign === 'both' ?
-                    '<div class="fixed-table-pagination" style="clear: both;"></div>' :
-                    '',
-                '<div class="fixed-table-container">',
-                    '<div class="fixed-table-header"><table></table></div>',
-                    '<div class="fixed-table-body">',
-                        '<div class="fixed-table-loading">',
-                            '<span class="loading-wrap">',
-                                '<span class="loading-text" style="font-size: 13px;">',
-                                    this.options.formatLoadingMessage(),
-                                '</span>',
-                                '<span class="animation-wrap">',
-                                    '<span class="animation-dot"></span>',
-                                '</span>',
-                            '</span>',
-                        '</div>',
-                    '</div>',
-                    '<div class="fixed-table-footer">',
-                        '<table><tr></tr></table>',
-                    '</div>',
-                    this.options.paginationVAlign === 'bottom' || this.options.paginationVAlign === 'both' ?
-                        '<div class="fixed-table-pagination"></div>' :
-                        '',
-                '</div>',
+            '<div class="fixed-table-toolbar"></div>',
+            this.options.paginationVAlign === 'top' || this.options.paginationVAlign === 'both' ?
+                '<div class="fixed-table-pagination" style="clear: both;"></div>' :
+                '',
+            '<div class="fixed-table-container">',
+            '<div class="fixed-table-header"><table></table></div>',
+            '<div class="fixed-table-loading">',
+            '<span class="loading-wrap">',
+            '<span class="loading-text" style="font-size: 13px;">',
+            this.options.formatLoadingMessage(),
+            '</span>',
+            '<span class="animation-wrap">',
+            '<span class="animation-dot"></span>',
+            '</span>',
+            '</span>',
+            '</div>',
+            '<div class="fixed-table-body">',
+            '</div>',
+            this.options.showCustomView === true ? '<div class="fixed-table-custom-view"></div>' : '',
+            '<div class="fixed-table-footer">',
+            '<table><tr></tr></table>',
+            '</div>',
+            this.options.paginationVAlign === 'bottom' || this.options.paginationVAlign === 'both' ?
+                '<div class="fixed-table-pagination"></div>' :
+                '',
+            '</div>',
             '</div>'
         ].join(''));
         this.$container.insertAfter(this.$el);
@@ -668,7 +703,13 @@
         this.$tableFooter = this.$container.find('.fixed-table-footer');
         this.$toolbar = this.$container.find('.fixed-table-toolbar');
         this.$pagination = this.$container.find('.fixed-table-pagination');
-
+        if(this.options.showCustomView === true){
+            this.$customView = this.$container.find('.fixed-table-custom-view');
+            this.$tableBody.hide();
+            this.__custom = true;
+        }else{
+            this.__custom = false;
+        }
         this.$tableBody.append(this.$el);
         this.$container.after('<div class="clearfix"></div>');
 
@@ -677,7 +718,16 @@
             this.$el.addClass('table-striped');
         }
         if(this.options.height){
-            this.$container.css('height',this.options.height + 'px');
+            //TODO 兼容高度函数化
+            if(typeof this.options.height == 'function' ){
+                var h = calculateObjectValue(this.options, this.options.height, this.options, '');
+                this.$container.css('height',h + 'px');
+            }else{
+                this.$container.css('height',this.options.height + 'px');
+            }
+            //如果是设置高度设置表格相对位置
+            this.$tableBody.css('position','relative');
+            if(this.options.showCustomView) this.$customView.css('position','relative');
         }
         if ($.inArray('table-no-bordered', this.options.classes.split(' ')) !== -1) {
             this.$tableContainer.addClass('table-no-bordered');
@@ -792,7 +842,8 @@
             sorters: [],
             sortNames: [],
             cellStyles: [],
-            searchables: []
+            searchables: [],
+            sorts:[]
         };
 
         //
@@ -813,6 +864,7 @@
                     class_ = sprintf(' class="%s"', column['class']),
                     order = that.options.sortOrder || column.order,
                     unitWidth = 'px',
+                    sort = '',
                     width = column.width;
 
                 //如果表格列项宽度为字符串- 则转换成百分比占比宽度
@@ -830,6 +882,7 @@
                 if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
                     pywh += column.width;
                 }
+                sort = (column.fieldSort != undefined && column.fieldSort) ? column.fieldSort : '';
                 halign = sprintf('text-align: %s; ', column.halign ? column.halign : column.align);
                 align = sprintf('text-align: %s; ', column.align);
                 //设置头部行颜色
@@ -850,6 +903,7 @@
                     that.header.sortNames[column.fieldIndex] = column.sortName;
                     that.header.cellStyles[column.fieldIndex] = column.cellStyle;
                     that.header.searchables[column.fieldIndex] = column.searchable;
+                    that.header.sorts[column.fieldIndex] = sort;
 
                     if (!column.visible) {
                         return;
@@ -872,6 +926,7 @@
                     sprintf(' rowspan="%s"', column.rowspan),
                     sprintf(' colspan="%s"', column.colspan),
                     sprintf(' data-field="%s"', column.field),
+                    sort.length > 0 ? sprintf(' data-sort="%s"', sort): '',
                     "tabindex='0'",
                     '>');
 
@@ -892,6 +947,10 @@
                     that.options.singleSelect = true;
                 }
 
+                if(!column.radio && !column.checkbox){
+                    that.header.stateField = '__STATE__';
+                }
+
                 html.push(text);
                 html.push('</div>');
                 html.push('<div class="fht-cell"></div>');
@@ -901,10 +960,17 @@
             html.push('</tr>');
         });
 
+        this._$pywh = pywh;
         //TODO J2eeFAST 2021年07月08日15:47:27 表格列过多,根据表头列宽固定表格宽度
+        //fix: 设置了固定宽度但是宽度没有达到窗体最大值就不设置
         if(pywh!=0 && this.options.isFixedColumn){
-            this.$el.width(pywh + 'px');
+            if(pywh > this.$tableContainer.outerWidth()){
+                this.$el.width(pywh + 'px');
+                //设置显示滚动条overflow:scroll
+                this.$tableBody.css('overflow-x','scroll');
+            }
             this.$el.css('max-width', 'inherit');
+            // this.$tableHeader.css({'overflow-y':'scroll'});
         }
 
         this.$header.html(html.join(''));
@@ -936,11 +1002,11 @@
         $(window).off('resize.bootstrap-table');
         if (!this.options.showHeader || this.options.cardView) {
             this.$header.hide();
-            this.$tableHeader.hide();
+            //this.$tableHeader.hide();
             this.$tableLoading.css('top', 0);
         } else {
             this.$header.show();
-            this.$tableHeader.show();
+            //this.$tableHeader.show();
             this.$tableLoading.css('top', this.$header.outerHeight() + 1);
             // Assign the correct sortable arrow
             // 表头设置排序箭头
@@ -953,6 +1019,8 @@
         this.$selectAll.off('click').on('click', function () {
             var checked = $(this).prop('checked');
             that[checked ? 'checkAll' : 'uncheckAll']();
+
+
             that.updateSelected();
         });
 
@@ -961,7 +1029,7 @@
     };
 
     BootstrapTable.prototype.initFooter = function () {
-        if (!this.options.showFooter || this.options.cardView) {
+        if (!this.options.totalShowFooter || this.options.cardView) {
             this.$tableFooter.hide();
         } else {
             this.$tableFooter.show();
@@ -1077,7 +1145,13 @@
         if (this.options.sortName === $this.data('field')) {
             this.options.sortOrder = this.options.sortOrder === 'asc' ? 'desc' : 'asc';
         } else {
-            this.options.sortName = $this.data('field');
+            // this.options.sortName = $this.data('field');
+            // this.options.sortOrder = $this.data('order') === 'asc' ? 'desc' : 'asc';
+            if(typeof $this.data('sort') != "undefined" ){
+                this.options.sortName = $this.data('sort');
+            }else{
+                this.options.sortName = $this.data('field');
+            }
             this.options.sortOrder = $this.data('order') === 'asc' ? 'desc' : 'asc';
         }
         this.trigger('sort', this.options.sortName, this.options.sortOrder);
@@ -1110,12 +1184,19 @@
         if (this.$toolbar.find('.bs-bars').children().length) {
             $('body').append($(this.options.toolbar));
         }
+
         this.$toolbar.html('');
+
+        //TODO this.options.showToolbar false 不显示
+        if(!this.options.showToolbar){
+            return;
+        }
+
 
         if (typeof this.options.toolbar === 'string' || typeof this.options.toolbar === 'object') {
             $(sprintf('<div class="bs-bars pull-%s"></div>', this.options.toolbarAlign))
                 .appendTo(this.$toolbar)
-                .append($(this.options.toolbar));
+                .append($(this.options.toolbar).css('display',''));
         }
 
         // showColumns, showToggle, showRefresh
@@ -1124,6 +1205,29 @@
 
         if (typeof this.options.icons === 'string') {
             this.options.icons = calculateObjectValue(null, this.options.icons);
+        }
+
+        //导出
+        //glyphicon glyphicon-export
+        if (this.options.showExport) {
+            html.push(sprintf('<button class="btn' +
+                sprintf(' btn-%s', this.options.buttonsClass) +
+                sprintf(' btn-%s', this.options.iconSize) +
+                '" type="button" name="export" title="%s">',
+                this.options.formatExport()),
+                sprintf('<i class="%s %s"></i>', this.options.iconsPrefix, this.options.icons.exportIcon),
+                '</button>');
+        }
+
+        if(this.options.showCustomView){
+            //glyphicon glyphicon-random
+            html.push(sprintf('<button class="btn' +
+                sprintf(' btn-%s', this.options.buttonsClass) +
+                sprintf(' btn-%s', this.options.iconSize) +
+                '" type="button" name="customView" title="%s">',
+                this.options.formatCardView()),
+                sprintf('<i class="%s %s"></i>', this.options.iconsPrefix, this.options.icons.cardView),
+                '</button>');
         }
 
         if (this.options.showSearch) {
@@ -1155,7 +1259,7 @@
                 '</button>');
         }
 
-        if (this.options.showToggle) {
+        if (!this.options.showCustomView && this.options.showToggle) {
             html.push(sprintf('<button class="btn' +
                 sprintf(' btn-%s', this.options.buttonsClass) +
                 sprintf(' btn-%s', this.options.iconSize) +
@@ -1165,8 +1269,9 @@
                 '</button>');
         }
 
-        //是否隐藏列下拉工具 如果是复杂表头不显示
-        if (this.options.showColumns && this.options.columns.length == 0) {
+        //TODO 是否隐藏列下拉工具 如果是复杂表头不显示
+        if (!this.options.showCustomView &&
+            this.options.showColumns && this.options.columns.length == 1) {
             html.push(sprintf('<div class="keep-open btn-group" title="%s">',
                 this.options.formatColumns()),
                 '<button type="button" class="btn' +
@@ -1206,6 +1311,17 @@
             this.$toolbar.append(html.join(''));
         }
 
+
+        //导出事件
+        if (this.options.showExport) {
+            this.$toolbar.find('button[name="export"]')
+                .off('click').on('click', function () {
+                if(typeof that.options.exportData == "function"){
+                    calculateObjectValue(that.options, that.options.exportData, [], '');
+                }
+            });
+        }
+
         if (this.options.showPaginationSwitch) {
             this.$toolbar.find('button[name="paginationSwitch"]')
                 .off('click').on('click', $.proxy(this.togglePagination, this));
@@ -1216,7 +1332,14 @@
                 .off('click').on('click', $.proxy(this.refresh, this));
         }
 
-        if (this.options.showToggle) {
+        if (this.options.showCustomView) {
+            this.$toolbar.find('button[name="customView"]')
+                .off('click').on('click', function () {
+                that.__cardView();
+            });
+        }
+
+        if(!this.options.showCustomView && this.options.showCustomView){
             this.$toolbar.find('button[name="toggle"]')
                 .off('click').on('click', function () {
                 that.toggleView();
@@ -1229,7 +1352,7 @@
             })
         }
 
-        if (this.options.showColumns) {
+        if (!this.options.showCustomView && this.options.showColumns) {
             $keepOpen = this.$toolbar.find('.keep-open');
 
             if (switchableCount <= this.options.minimumCountColumns) {
@@ -1478,7 +1601,13 @@
             pageNumber.push('</ul></span>');
 
             html.push(this.options.formatRecordsPerPage(pageNumber.join('')));
+
             html.push('</span>');
+
+            //显示勾选总记录数量
+            if(this.options.showCheckNumber){
+                html.push('<span class="check-numer"></span>')
+            }
 
             html.push('</div>',
                 '<div class="pull-' + this.options.paginationHAlign + ' pagination">',
@@ -1565,7 +1694,14 @@
                 '<li class="page-next"><a href="javascript:void(0)">' + this.options.paginationNextText + '</a></li>',
                 '</ul>',
                 '</div>');
+        }else{
+            //显示勾选总记录数量
+            if(this.options.showCheckNumber){
+                html.push('<span class="check-numer"></span>')
+            }
+            html.push('</div>');
         }
+
         this.$pagination.html(html.join(''));
 
         if (!this.options.onlyInfoPagination) {
@@ -1597,6 +1733,7 @@
             $last.off('click').on('click', $.proxy(this.onPageLast, this));
             $number.off('click').on('click', $.proxy(this.onPageNumber, this));
         }
+
         //TODO 修复跳转指定页
         if (this.options.showPageGo) {
             var pagination = that.$pagination.find("ul.pagination"),
@@ -1700,6 +1837,161 @@
             this.pageTo = data.length;
         }
 
+        // if ( true ) {
+        //     var key,
+        //         item = {},
+        //         style = {},
+        //         csses = [],
+        //         data_ = '',
+        //         attributes = {},
+        //         htmlAttributes = [];
+        //
+        //     //style = calculateObjectValue(this.options, this.options.rowStyle, [item, i], style);
+        //
+        //     if(typeof style == "undefined"){
+        //         style = {};
+        //     }else{
+        //         if (style && style.css) {
+        //             for (key in style.css) {
+        //                 csses.push(key + ': ' + style.css[key]);
+        //             }
+        //         }
+        //     }
+        //     csses.push('height: auto')
+        //     // csses.push('display: none')
+        //     var trCss = csses.length > 0 ? sprintf(' style="%s"', csses.join('; ')) : '';
+        //     html.push('<tr',
+        //         sprintf('%s', trCss),
+        //         sprintf(' class="%s"', 'firstrow'),
+        //         sprintf('%s', data_),
+        //         '>'
+        //     );
+        //
+        //
+        //     if (!this.options.cardView && this.options.detailView) {
+        //         html.push('<td>',
+        //             '<a class="detail-icon" href="javascript:">',
+        //             sprintf('<i class="%s %s"></i>', this.options.iconsPrefix, this.options.icons.detailOpen),
+        //             '</a>',
+        //             '</td>');
+        //     }
+        //
+        //     $.each(this.header.fields, function (j, field) {
+        //
+        //         var text = '',
+        //             value = '',
+        //             type = '',
+        //             cellStyle = {},
+        //             id_ = '',
+        //             class_ = that.header.classes[j],
+        //             data_ = '',
+        //             rowspan_ = '',
+        //             colspan_ = '',
+        //             title_ = '',
+        //             column = that.columns[j];
+        //         if (that.fromHtml && typeof value === 'undefined') {
+        //             return;
+        //         }
+        //         if (!column.visible) {
+        //             return;
+        //         }
+        //         if (that.options.cardView && !column.cardVisible) {
+        //             return;
+        //         }
+        //
+        //         // style = sprintf('style="%s"', csses.concat(that.header.styles[j]).join('; '));
+        //         var _tt = [];
+        //         _tt.push('height: 0px');
+        //         _tt.push('line-height: initial');
+        //         _tt.push('width: '+column.width + 'px');
+        //         style = sprintf('style="%s"',  _tt.concat().join('; '));
+        //
+        //         // handle td's id and class
+        //         // if (item['_' + field + '_id']) {
+        //         //     id_ = sprintf(' id="%s"', item['_' + field + '_id']);
+        //         // }
+        //         // if (item['_' + field + '_class']) {
+        //         //     class_ = sprintf(' class="%s"', item['_' + field + '_class']);
+        //         // }
+        //         // if (item['_' + field + '_rowspan']) {
+        //         //     rowspan_ = sprintf(' rowspan="%s"', item['_' + field + '_rowspan']);
+        //         // }
+        //         // if (item['_' + field + '_colspan']) {
+        //         //     colspan_ = sprintf(' colspan="%s"', item['_' + field + '_colspan']);
+        //         // }
+        //         // if (item['_' + field + '_title']) {
+        //         //     title_ = sprintf(' title="%s"', item['_' + field + '_title']);
+        //         // }
+        //
+        //         // cellStyle = calculateObjectValue(that.header,
+        //         //     that.header.cellStyles[j], [value, item, i, field], cellStyle);
+        //         // if (typeof cellStyle !="undefined" && cellStyle.classes) {
+        //         //     class_ = sprintf(' class="%s"', cellStyle.classes);
+        //         // }
+        //         // if (typeof cellStyle !="undefined" && cellStyle.css) {
+        //         //     var csses_ = [];
+        //         //     for (var key in cellStyle.css) {
+        //         //         csses_.push(key + ': ' + cellStyle.css[key]);
+        //         //     }
+        //         //     csses_.push('height: 0px');
+        //         //     style = sprintf('style="%s"', csses_.concat(that.header.styles[j]).join('; '));
+        //         // }
+        //
+        //         // value = calculateObjectValue(column,
+        //         //     that.header.formatters[j], [value, item, i], value);
+        //
+        //         //TODO 扩增表格行titel提示 修复转义问题
+        //         // if(title_ === ""){
+        //         //     var tp = getItemField(item, field, that.options.escape);
+        //         //     if(field && tp && tp.length > 0){
+        //         //         var reg = /<[^>]+>/g;
+        //         //         if(reg.test(value)){
+        //         //             if($(value).is('span')){
+        //         //                 var txt = $(value).html();
+        //         //                 title_ = sprintf(' title="%s"', txt);
+        //         //             }
+        //         //         }else{
+        //         //             title_ = sprintf(' title="%s"', value);
+        //         //         }
+        //         //     }
+        //         // }
+        //
+        //         // if (item['_' + field + '_data'] && !$.isEmptyObject(item['_' + field + '_data'])) {
+        //         //     $.each(item['_' + field + '_data'], function (k, v) {
+        //         //         // ignore data-index
+        //         //         if (k === 'index') {
+        //         //             return;
+        //         //         }
+        //         //         data_ += sprintf(' data-%s="%s"', k, v);
+        //         //     });
+        //         // }
+        //
+        //         // 源码自带 如果数据为 null 或者 undefined 显示 undefinedText
+        //         value = "";
+        //
+        //         text = that.options.cardView ? ['<div class="card-view">', that.options.showHeader ? sprintf('<span class="title" %s>%s</span>', style,
+        //             getPropertyFromOther(that.columns, 'field', 'title', field)) : '',
+        //             //sprintf('<span class="value">%s</span>', value),
+        //             sprintf('<span %s>%s</span>', (class_===''?'class="value"':class_),value),
+        //             '</div>'
+        //         ].join('') : [sprintf('<td%s %s %s %s %s %s %s>',
+        //             id_, class_, style, data_, rowspan_, colspan_, title_),
+        //             value,
+        //             '</td>'
+        //         ].join('');
+        //
+        //         // Hide empty data on Card view when smartDisplay is set to true.
+        //         if (that.options.cardView && that.options.smartDisplay && value === '') {
+        //             // Should set a placeholder for event binding correct fieldIndex
+        //             text = '<div class="card-view"></div>';
+        //         }
+        //
+        //         html.push(text);
+        //     });
+        //
+        //     html.push('</tr>');
+        // }
+
         for (var i = this.pageFrom - 1; i < this.pageTo; i++) {
             var key,
                 item = data[i],
@@ -1711,9 +2003,13 @@
 
             style = calculateObjectValue(this.options, this.options.rowStyle, [item, i], style);
 
-            if (style && style.css) {
-                for (key in style.css) {
-                    csses.push(key + ': ' + style.css[key]);
+            if(typeof style == "undefined"){
+                style = {};
+            }else{
+                if (style && style.css) {
+                    for (key in style.css) {
+                        csses.push(key + ': ' + style.css[key]);
+                    }
                 }
             }
 
@@ -1735,9 +2031,10 @@
                     data_ += sprintf(' data-%s="%s"', k, v);
                 });
             }
-
+            var trCss = csses.length > 0 ? sprintf(' style="%s"', csses.join('; ')) : '';
             html.push('<tr',
                 sprintf(' %s', htmlAttributes.join(' ')),
+                sprintf('%s', trCss),
                 sprintf(' id="%s"', $.isArray(item) ? undefined : item._id),
                 sprintf(' class="%s"', style.classes || ($.isArray(item) ? undefined : item._class)),
                 sprintf(' data-index="%s"', i),
@@ -1780,7 +2077,9 @@
                     return;
                 }
 
-                style = sprintf('style="%s"', csses.concat(that.header.styles[j]).join('; '));
+                // style = sprintf('style="%s"', csses.concat(that.header.styles[j]).join('; '));
+                var _tt = [];
+                style = sprintf('style="%s"',  _tt.concat(that.header.styles[j]).join('; '));
 
                 // handle td's id and class
                 if (item['_' + field + '_id']) {
@@ -1801,10 +2100,10 @@
 
                 cellStyle = calculateObjectValue(that.header,
                     that.header.cellStyles[j], [value, item, i, field], cellStyle);
-                if (cellStyle.classes) {
+                if (typeof cellStyle !="undefined" && cellStyle.classes) {
                     class_ = sprintf(' class="%s"', cellStyle.classes);
                 }
-                if (cellStyle.css) {
+                if (typeof cellStyle !="undefined" && cellStyle.css) {
                     var csses_ = [];
                     for (var key in cellStyle.css) {
                         csses_.push(key + ': ' + cellStyle.css[key]);
@@ -1906,9 +2205,23 @@
                 sprintf('<td colspan="%s">%s</td>',
                     this.$header.find('th').length, this.options.formatNoMatches()),
                 '</tr>');
+            // 如果有统计则更新 border-bottom-width: 0px;
+            this.$el.css({'height':'100%','border-bottom-width':'0px'});
+            this.$tableBody.css('background-color','rgb(249 249 249)');
+        }else{
+            this.$el.css('height','');
+            this.$el.css('border-bottom-width','');
+            this.$tableBody.css('background-color','');
         }
 
         this.$body.html(html.join(''));
+
+        //
+        if(this.options.showCustomView === true
+            && data.length > 0){
+            var __view = calculateObjectValue(this, this.options.customViewFormatter, [data], '');
+            this.$customView.html(__view);
+        }
 
         if (!fixedScroll) {
             this.scrollTo(0);
@@ -1924,25 +2237,38 @@
                 field = fields[that.options.detailView && !that.options.cardView ? index - 1 : index],
                 column = that.columns[getFieldIndex(that.columns, field)],
                 value = getItemField(item, field, that.options.escape);
-
             // if(that.options.fixedColumns){
             //     $("#"+that.options.id+"-left-fixed-body-columns").find('tbody').find('tr[data-index="'+$tr.data('index')+'"]')
             //         .children(".bs-checkbox").find("input[name=btSelectItem]").trigger("click");
             // }else{
-                if ($td.find('.detail-icon').length) {
-                    return;
-                }
+            if ($td.find('.detail-icon').length) {
+                return;
+            }
+            //console.log('-->>>>column:',e.type);
+            // console.log('-->>>>item:',e.type === 'click' && that.options.clickToSelect && column.clickToSelect);
+            that.trigger(e.type === 'click' ? 'click-cell' : 'dbl-click-cell', field, value, item, $td);
+            that.trigger(e.type === 'click' ? 'click-row' : 'dbl-click-row', item, $tr, field);
 
-                that.trigger(e.type === 'click' ? 'click-cell' : 'dbl-click-cell', field, value, item, $td);
-                that.trigger(e.type === 'click' ? 'click-row' : 'dbl-click-row', item, $tr, field);
-
-                // if click to select - then trigger the checkbox/radio click
-                if (e.type === 'click' && that.options.clickToSelect && column.clickToSelect) {
-                    var $selectItem = $tr.find(sprintf('[name="%s"]', that.options.selectItemName));
-                    if ($selectItem.length) {
-                        $selectItem[0].click(); // #144: .trigger('click') bug
+            // if click to select - then trigger the checkbox/radio click
+            if (e.type === 'click' && that.options.clickToSelect && column.clickToSelect) {
+                var $selectItem = $tr.find(sprintf('[name="%s"]', that.options.selectItemName));
+                if ($selectItem.length) {
+                    $selectItem[0].click(); // #144: .trigger('click') bug
+                }else{
+                    //单击选择 首列无单选或者多选
+                    if(that.options.singleSelect){
+                        that.$body.find('> tr[data-index]').each(function(){
+                            if($(this).data('index') == $tr.data('index')){
+                                $(this).addClass('selected');
+                                that.data[$(this).data('index')][that.header.stateField] = true;
+                            }else{
+                                $(this).removeClass('selected');
+                                that.data[$(this).data('index')][that.header.stateField] = false;
+                            }
+                        })
                     }
                 }
+            }
             // }
         });
 
@@ -1970,10 +2296,61 @@
             //that.resetView();
         });
 
+        // 行多选单选事件
         this.$selectItem = this.$body.find(sprintf('[name="%s"]', this.options.selectItemName));
+
         this.$selectItem.off('click').on('click', function (event) {
 
-             // 允许其他监听
+            event.stopImmediatePropagation();
+
+            var $this = $(this),
+                checked = $this.prop('checked'),
+                row = that.data[$this.data('index')];
+
+            if (that.options.maintainSelected && $(this).is(':radio')) {
+                $.each(that.options.data, function (i, row) {
+                    row[that.header.stateField] = false;
+                });
+            }
+
+            //是否冻结右侧
+            if(that.options.rightFixedColumns && that.$rightfixedBody){
+                var index = $(this).data('index');
+                if (that.options.singleSelect) {
+                    that.$rightfixedBody.find('tr').each(function () {
+                        $(this).removeClass('selected');
+                    })
+                    that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+                        $(this).addClass('selected');
+                    })
+                }else{
+                    that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+                        checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                    })
+                }
+            }
+
+            //冻结左侧
+            if(that.options.fixedColumns){
+                var index = $(this).data('index');
+                $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
+                that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
+            }
+
+            row[that.header.stateField] = checked;
+
+            if (that.options.singleSelect) {
+                that.$selectItem.not(this).each(function () {
+                    that.data[$(this).data('index')][that.header.stateField] = false;
+                });
+                that.$selectItem.filter(':checked').not(this).prop('checked', false);
+            }
+
+            that.updateSelected();
+            that.trigger(checked ? 'check' : 'uncheck', row, $this);
+
+
+            // 允许其他监听
             //event.stopImmediatePropagation();
             //
             // var $this = $(this),
@@ -1999,65 +2376,69 @@
             // that.trigger(checked ? 'check' : 'uncheck', row, $this);
 
 
-            //勾选点击事件
-            //event.stopImmediatePropagation();
-            var $this = $(this),
-                checked = $this.prop('checked'),
-                row = that.data[$this.data('index')];
-
-            if(that.options.fixedColumns){
-                //冻结点击事件
-                var index = $this.data('index');
-                // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
-                // console.log("----"+that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").html());
-                // if(that.options.rightFixedColumns){
-                //     that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
-                //         checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
-                //     })
-                // }
-
-
-                $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
-                that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
-
-                if (that.options.maintainSelected && $(this).is(':radio')) {
-                    $.each(that.options.data, function (i, row) {
-                        row[that.header.stateField] = false;
-                    });
-                }
-
-                row[that.header.stateField] = checked;
-
-                // //只能选一个
-                if (that.options.singleSelect) {
-                    that.$selectItem.not(this).each(function () {
-                        that.data[$(this).data('index')][that.header.stateField] = false;
-                    });
-                    that.$selectItem.filter(':checked').not(this).prop('checked', false);
-                }
-
-                that.updateSelected();
-                that.trigger(checked ? 'check' : 'uncheck', row, that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox"));
-                // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
-            }else{
-                if (that.options.maintainSelected && $(this).is(':radio')) {
-                    $.each(that.options.data, function (i, row) {
-                        row[that.header.stateField] = false;
-                    });
-                }
-
-                row[that.header.stateField] = checked;
-
-                if (that.options.singleSelect) {
-                    that.$selectItem.not(this).each(function () {
-                        that.data[$(this).data('index')][that.header.stateField] = false;
-                    });
-                    that.$selectItem.filter(':checked').not(this).prop('checked', false);
-                }
-
-                that.updateSelected();
-                that.trigger(checked ? 'check' : 'uncheck', row, $this);
-            }
+            // //勾选点击事件
+            // event.stopImmediatePropagation();
+            // var $this = $(this),
+            //     checked = $this.prop('checked'),
+            //     index = $this.data('index'),
+            //     row = that.data[$this.data('index')];
+            //
+            // if(that.options.fixedColumns){
+            //     //冻结点击事件
+            //     //var index = $this.data('index');
+            //     // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
+            //     // console.log("----"+that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").html());
+            //     // if(that.options.rightFixedColumns){
+            //     //     that.$rightfixedBody.find('tr[data-index="'+index+'"]').each(function () {
+            //     //         checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+            //     //     })
+            //     // }
+            //
+            //
+            //     $this.parent().parent('tr[data-index="'+index+'"]').toggleClass("selected");
+            //     that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox").find("input[name=btSelectItem]").prop('checked', checked);
+            //
+            //     if (that.options.maintainSelected && $(this).is(':radio')) {
+            //         $.each(that.options.data, function (i, row) {
+            //             row[that.header.stateField] = false;
+            //         });
+            //     }
+            //
+            //     row[that.header.stateField] = checked;
+            //
+            //     // //只能选一个
+            //     if (that.options.singleSelect) {
+            //         that.$selectItem.not(this).each(function () {
+            //             that.data[$(this).data('index')][that.header.stateField] = false;
+            //         });
+            //         that.$selectItem.filter(':checked').not(this).prop('checked', false);
+            //     }
+            //
+            //     that.updateSelected();
+            //     that.trigger(checked ? 'check' : 'uncheck', row, that.$body.find('tr[data-index="'+index+'"]').children(".bs-checkbox"));
+            //     // checked? that.$body.find('tr[data-index="'+index+'"]').addClass('selected'): that.$body.find('tr[data-index="'+index+'"]').removeClass('selected');
+            // }else{
+            //
+            // }
+            //
+            //
+            // if (that.options.maintainSelected && $(this).is(':radio')) {
+            //     $.each(that.options.data, function (i, row) {
+            //         row[that.header.stateField] = false;
+            //     });
+            // }
+            //
+            // row[that.header.stateField] = checked;
+            //
+            // if (that.options.singleSelect) {
+            //     that.$selectItem.not(this).each(function () {
+            //         that.data[$(this).data('index')][that.header.stateField] = false;
+            //     });
+            //     that.$selectItem.filter(':checked').not(this).prop('checked', false);
+            // }
+            //
+            // that.updateSelected();
+            // that.trigger(checked ? 'check' : 'uncheck', row, $this);
 
         });
 
@@ -2099,21 +2480,64 @@
 
         this.updateSelected();
 
-        if(data.length == 0) return;
+        // if(data.length == 0) return;
 
         this.resetView();
 
         //TODO 监听窗体变化重置表格大小
-        this.$tableBodyResizeWidth = this.$tableBody.width();
-        this.$tableBody.off('resize').on('resize',function(){
+        if($(document.body).width() != 0 &&
+            $(document.body).height() != 0){
+            this.__win_height = $(document.body).height();
+        }
 
-            if($(this).width() == 0 || that.$tableBodyResizeWidth == $(this).width()){
+        //TODO 监听窗体变化重置表格大小
+        this.$tableBodyResizeWidth = this.$el.width();
+        this.$__index = 0;
+
+        this.$el.off('resize').on('resize',function(){
+            // console.log("$el>>>>>");
+            // console.log(that.options.id+"-->"+"$(this).width():"+$(this).width());
+            // console.log("$el<<<<<<");
+            var w = $(this).width();
+            if(w == 0 || w < 0 ||
+                that.$tableBodyResizeWidth == w){
                 return;
             }
 
-            that.$tableBodyResizeWidth = $(this).width();
+            that.$tableBodyResizeWidth = w;
+
+            window.clearTimeout(that.$__index);
             //重置视图
-            setTimeout(that.resetView(), 100);
+            that.$__index =  setTimeout(function(){
+                that.resetView();
+            }, 100);
+
+        });
+
+        $(document.body).off('resize').on('resize',function(){
+
+            var w = $(document.body).width();
+            var h = $(document.body).height();
+
+            // console.log("document.body>>>>>");
+            // console.log(that.options.id+"-->"+"that.__win_height:"+that.__win_height);
+            // console.log(that.options.id+"-->"+"w:"+w);
+            // console.log(that.options.id+"-->"+"h:"+h);
+            // console.log("document.body<<<<<<");
+
+            //窗口因为动画没变化不中断重置大小
+            if((w ==0 && h ==0) || (that.__win_height == h)){
+                return;
+            }
+
+            that.__win_height = h;
+
+            window.clearTimeout(that.$__index);
+            //重置视图
+            that.$__index =  setTimeout(function(){
+                that.resetView();
+            }, 100);
+
         });
 
         this.trigger('post-body', data);
@@ -2142,10 +2566,11 @@
                 //首次
                 var h = $("head"), borderStyle = [];
                 borderStyle.push('<style type=\'text/css\'>');
-                borderStyle.push('.fixed-table-container {border-left: 1px solid #e7eaec!important;border-top: 1px solid #e7eaec!important;}');
-                borderStyle.push('.table-striped .table, .table-striped .table, .table>thead>tr>th,');
+                borderStyle.push('.fixed-table-container {border: 1px solid #e7eaec!important;}');
+                borderStyle.push('.table>thead>tr>th,');
                 borderStyle.push('.table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td,');
                 borderStyle.push('.table>tbody>tr>td, .table>tfoot>tr>td {border-right: 1px solid #e7eaec!important;}');
+                borderStyle.push(' .fixed-table-footer .table>tbody>tr>td, .fixed-table-footer.table>tfoot>tr>td {border-right: 0px !important;}');
                 borderStyle.push('.table-striped table thead {background-color: #f5f5f6 !important;}');
                 borderStyle.push('</style>');
                 h.append(borderStyle.join(''));
@@ -2159,10 +2584,11 @@
             _isFirstLoad.push(this.options.id + "_sb");
             var h = $("head"), borderStyle = [];
             borderStyle.push('<style type=\'text/css\'>');
-            borderStyle.push('.fixed-table-container {border-left: 1px solid #e7eaec!important;border-top: 1px solid #e7eaec!important;}');
-            borderStyle.push('.table-striped .table, .table-striped .table, .table>thead>tr>th,');
+            borderStyle.push('.fixed-table-container {border: 1px solid #e7eaec!important;}');
+            borderStyle.push('.table>thead>tr>th,');
             borderStyle.push('.table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td,');
             borderStyle.push(' .table>tbody>tr>td, .table>tfoot>tr>td {border-right: 1px solid #e7eaec!important;}');
+            borderStyle.push(' .fixed-table-footer .table>tbody>tr>td, .fixed-table-footer.table>tfoot>tr>td {border-right: 0px !important;;}');
             borderStyle.push(' .table-striped table thead {background-color: #f5f5f6 !important;}');
             borderStyle.push('</style>');
             h.append(borderStyle.join(''));
@@ -2250,16 +2676,15 @@
                 that.$tableLoading.hide();
             },
             error: function (xhr, textStatus) {
-            	try{
-            		opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
+                try{
+                    opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
                     that.trigger('load-error', JSON.parse(xhr.responseText).msg || xhr.responseText, xhr);
                     that.$tableLoading.hide();
-            	}catch(e){
-            		console.error(xhr);
-            		that.trigger('load-error', '交易异常');
+                }catch(e){
+                    that.trigger('load-error', '交易异常');
                     that.$tableLoading.hide();
-            	}
-                
+                }
+
             }
         });
         if($('meta[name="csrf-token"]').attr("content")){
@@ -2291,19 +2716,34 @@
         var that = this;
 
         $.each(this.$header.find('th'), function (i, th) {
-            $(th).find('.sortable').removeClass('desc asc').addClass($(th).data('field') === that.options.sortName ? that.options.sortOrder : 'both');
+            //fix: 排序字段与查询显示字段不一致问题
+            var field = typeof $(th).data('sort') != "undefined" ? $(th).data('sort') : $(th).data('field');
+            $(th).find('.sortable').removeClass('desc asc').addClass(field === that.options.sortName ? that.options.sortOrder : 'both');
         });
     };
 
     BootstrapTable.prototype.updateSelected = function () {
+        var that = this;
         var checkAll = this.$selectItem.filter(':enabled').length &&
             this.$selectItem.filter(':enabled').length ===
             this.$selectItem.filter(':enabled').filter(':checked').length;
 
         this.$selectAll.add(this.$selectAll_).prop('checked', checkAll);
 
+
         this.$selectItem.each(function () {
             $(this).closest('tr')[$(this).prop('checked') ? 'addClass' : 'removeClass']('selected');
+            if($(this).attr('disabled') != 'disabled'){
+                //TODO fix: 冻结左边全选显示异常问题
+                if (that.options.rightFixedColumns && that.$rightfixedBody) {
+                    // that.$rightfixedBody.find('tr').each(function () {
+                    //     if($(this).data('index') != '-99999'){
+                    //         checked  ? $(this).addClass('selected') : $(this).removeClass('selected');
+                    //     }
+                    // })
+                    that.$rightfixedBody.find('tr[data-index="'+$(this).closest('tr').data('index')+'"]')[$(this).prop('checked') ? 'addClass' : 'removeClass']('selected');
+                }
+            }
         });
     };
 
@@ -2359,9 +2799,11 @@
         }
         fixedBody = this.$tableBody.get(0);
 
+        //TODO 固定高度表头适配问题
         scrollWidth = fixedBody.scrollWidth > fixedBody.clientWidth &&
         fixedBody.scrollHeight > fixedBody.clientHeight + this.$header.outerHeight() ?
             getScrollBarWidth() : 0;
+        //scrollWidth = getScrollBarWidth();
 
         this.$el.css('margin-top', -this.$header.outerHeight());
 
@@ -2380,12 +2822,38 @@
         }
 
         this.$header_ = this.$header.clone(true, true);
-        this.$selectAll_ = this.$header_.find('[name="btSelectAll"]');
 
-        this.$tableHeader.css({
-            'margin-right': scrollWidth
-        }).find('table')
-            .css('width', this.$el.width())
+        this.$selectAll_ = this.$header_.find('[name="btSelectAll"]');
+        if(this.$tableBody.height() < this.$el.find('>tbody').outerHeight()){
+            this.$tableHeader.css({'margin-right':'10px'});
+            if(this.options.totalShowFooter){
+                this.$tableFooter.css({'margin-right':'10px'});
+            }
+        }else{
+            this.$tableHeader.css({'margin-right':''});
+            if(this.options.totalShowFooter){
+                this.$tableFooter.css({'margin-right':''});
+            }
+        }
+        // if(scrollWidth > 0){
+        //     // this.$tableHeader.css({'overflow-y':'scroll'});
+        //     this.$tableHeader.css({'margin-right':'10px'});
+        //     if(this.options.totalShowFooter){
+        //         this.$tableFooter.css({'margin-right':'10px'});
+        //     }
+        // }
+
+        // this.$tableHeader.css({'margin-right':'10px'});
+        // if(this.options.totalShowFooter){
+        //     this.$tableFooter.css({'margin-right':'10px'});
+        // }
+
+        this.$tableHeader
+            //     .css({
+            //     'margin-right': scrollWidth
+            // })
+            .find('table')
+            .css({'max-width':'inherit','width': this.$el.outerWidth()})
             .html('').attr('class', this.$el.attr('class'))
             .append(this.$header_);
 
@@ -2419,20 +2887,43 @@
             // if ($th.length > 1) {
             //     $th = $($ths[$this[0].cellIndex]);
             // }
-
+            // console.log($this.innerWidth());
+            // console.log($this.outerWidth()-1);
+            // if (i === 0) {
+            //     $th.find('.fht-cell').width($this.innerWidth()+ 0.8);
+            // }else{
+            //     $th.find('.fht-cell').width($this.innerWidth());
+            // }
             $th.find('.fht-cell').width($this.innerWidth());
         });
+
+
+        //TODO: fix 初始化定位问题
+        that.$tableHeader.scrollLeft(this.$tableBody.scrollLeft());
+
         // horizontal scroll event
         // TODO: it's probably better improving the layout than binding to scroll event
-        this.$tableBody.off('scroll').on('scroll', function () {
+        // TDDO: 不移除防止插件设置失效问题
+        this.$tableBody.on('scroll', function () {
+
             that.$tableHeader.scrollLeft($(this).scrollLeft());
-            //that
-            if (that.options.showFooter && !that.options.cardView) {
-                that.$tableFooter.scrollLeft($(this).scrollLeft());
+            //新增滚动样式
+            if(that.options.fixedColumns && that.$fixedBody){
+                if($(this).scrollLeft() == 0){
+                    that.$fixedBody.removeClass('shadow');
+                }else{
+                    that.$fixedBody.addClass('shadow');
+                }
             }
+            //暂时不滑动
+            // if (that.options.totalShowFooter && !that.options.cardView) {
+            //     that.$tableFooter.scrollLeft($(this).scrollLeft());
+            // }
+
         });
 
         that.trigger('post-header');
+
     };
 
     BootstrapTable.prototype.resetFooter = function () {
@@ -2440,107 +2931,311 @@
             data = that.getData(),
             colspan = 0,
             html = [];
+        // console.log('data:',data);
         if(data && data.length == 0){
+            if(this.options.totalShowFooter){
+                if(this.$tableFooter &&
+                    this.$tableFooter.find('table>tbody>tr') &&
+                    this.$tableFooter.find('table>tbody>tr').find('td').length > 0){
+                    // console.log(this.$tableFooter.find('table>tbody>tr').find('td[data-field="__index"]').html());
+                    $.each(this.columns, function (i, column) {
+                        if(typeof column.totalFooterFormatter == 'function'){
+                            var value = calculateObjectValue(column, column.totalFooterFormatter, [data], '') || '';
+                            that.$tableFooter.find('table>tbody>tr').find("td[data-field='"+column.field+"']").empty().html(value);
+                        }
+                    })
+                }
+            }
             return;
         }
-        if (!this.options.showFooter || this.options.cardView) { //do nothing
+
+        if (this.options.cardView || (!this.options.subtotalShowFooter && !this.options.totalShowFooter)) { //do nothing
             return;
         }
 
         if (!this.options.cardView && this.options.detailView) {
             html.push('<td><div class="th-inner">&nbsp;</div><div class="fht-cell"></div></td>');
         }
+
         if(this.$body.find('tr:last').data('index') == '-99999'){
             return;
         }
-        //console.log(this.columns);
-        $.each(this.columns, function (i, column) {
 
-            var key,
-                falign = '', // footer align style
-                valign = '',
-                pywh = 0,
-                csses = [],
-                style = {},
-                class_ = sprintf(' class="%s"', column['class']),
-                unitWidth = 'px',
-                width = column.width;
+        if(this.options.subtotalShowFooter){
+            if(typeof this.options.rowTotal === 'function'){
+                for (var _k = this.pageFrom - 1; _k < this.pageTo; _k++) {
+                    var  item = data[_k], rowTotal;
+                    rowTotal = calculateObjectValue(this.options, this.options.rowTotal, [data,item, _k], '');
+                    if(rowTotal === true || rowTotal === 'true'){
+                        html = [];
+                        colspan = 0;
+                        $.each(this.columns, function (i, column) {
+                            var key,
+                                falign = '', // footer align style
+                                valign = '',
+                                pywh = 0,
+                                csses = [],
+                                style = {},
+                                class_ = sprintf(' class="%s"', column['class']),
+                                unitWidth = 'px',
+                                width = column.width;
 
-            //如果表格列项宽度为字符串- 则转换成百分比占比宽度
-            if (column.width !== undefined && (!that.options.cardView)) {
-                if (typeof column.width === 'string') {
-                    if (column.width.indexOf('%') !== -1) {
-                        unitWidth = '%';
+                            //如果表格列项宽度为字符串- 则转换成百分比占比宽度
+                            if (column.width !== undefined && (!that.options.cardView)) {
+                                if (typeof column.width === 'string') {
+                                    if (column.width.indexOf('%') !== -1) {
+                                        unitWidth = '%';
+                                    }
+                                }
+                            }
+                            if (column.width && typeof column.width === 'string') {
+                                width = column.width.replace('%', '').replace('px', '');
+                            }
+                            //--------------------------------------------
+                            //--------------------------------------------
+                            if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
+                                pywh += column.width;
+                            }
+                            var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
+                                '36px' : (width ? width + unitWidth : undefined));
+
+                            if (!column.visible) {
+                                colspan++;
+                                return;
+                            }
+
+                            if (that.options.cardView && (!column.cardVisible)) {
+                                return;
+                            }
+
+                            falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
+                            valign = sprintf('vertical-align: %s; ', column.valign);
+                            style = calculateObjectValue(column, that.options.subtotalFooterStyle, [column,item,_k],'');
+                            if (style && style.css) {
+                                for (key in style.css) {
+                                    csses.push(key + ': ' + style.css[key]);
+                                }
+                            }
+                            var flag = false;
+
+                            if(column.subtotalFootColspan){
+                                colspan = colspan + column.subtotalFootColspan;
+                                flag = true;
+                            }
+                            if(flag){
+                                html.push('<td', class_,sprintf(' title="%s"',column.title) ,sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')),sprintf('colspan="%s"',column.subtotalFootColspan), '>');
+                                html.push(calculateObjectValue(column, column.subtotalFooterFormatter, [data,item,_k], '') || '');//&nbsp;
+                                html.push('</div>');
+                                html.push('</td>');
+                            }else{
+                                if(i >= colspan){
+                                    html.push('<td', class_,sprintf(' title="%s"',column.title), sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')), '>');
+                                    html.push(calculateObjectValue(column, column.subtotalFooterFormatter, [data,item,_k], '') || '');//&nbsp;
+                                    html.push('</div>');
+                                    html.push('</td>');
+                                    colspan++
+                                }
+                            }
+                        });
+                        var _tr = [],__csses=[],__key;
+                        _tr.push('<tr data-index="-99999" class="_subtotal"');
+                        var __style = calculateObjectValue(this.options, this.options.subtotalRowStyle, [data,item,_k], '');
+                        if (__style && __style.css) {
+                            for (__key in __style.css) {
+                                __csses.push(__key + ': ' + __style.css[__key]);
+                            }
+                        }
+                        _tr.push(sprintf(' style="%s"',__csses.concat().join('; ')));
+                        _tr.push('></tr>');
+                        this.$body.find('tr[data-index="'+_k+'"]').after($(_tr.join('')).append(html.join('')));
                     }
                 }
             }
-            if (column.width && typeof column.width === 'string') {
-                width = column.width.replace('%', '').replace('px', '');
-            }
-            //--------------------------------------------
-            //--------------------------------------------
-            if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
-                pywh += column.width;
-            }
-            var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
-                '36px' : (width ? width + unitWidth : undefined));
+            else{
+                html = [];
+                $.each(this.columns, function (i, column) {
+                    var key,
+                        falign = '', // footer align style
+                        valign = '',
+                        pywh = 0,
+                        csses = [],
+                        style = {},
+                        class_ = sprintf(' class="%s"', column['class']),
+                        unitWidth = 'px',
+                        width = column.width;
 
-            if (!column.visible) {
-                colspan++;
-                return;
-            }
+                    //如果表格列项宽度为字符串- 则转换成百分比占比宽度
+                    if (column.width !== undefined && (!that.options.cardView)) {
+                        if (typeof column.width === 'string') {
+                            if (column.width.indexOf('%') !== -1) {
+                                unitWidth = '%';
+                            }
+                        }
+                    }
+                    if (column.width && typeof column.width === 'string') {
+                        width = column.width.replace('%', '').replace('px', '');
+                    }
+                    //--------------------------------------------
+                    //--------------------------------------------
+                    if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
+                        pywh += column.width;
+                    }
+                    var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
+                        '36px' : (width ? width + unitWidth : undefined));
 
-            if (that.options.cardView && (!column.cardVisible)) {
-                return;
-            }
+                    if (!column.visible) {
+                        colspan++;
+                        return;
+                    }
 
-            falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
-            valign = sprintf('vertical-align: %s; ', column.valign);
-            style = calculateObjectValue(column, that.options.footerStyle, [column],'');
-            if (style && style.css) {
-                for (key in style.css) {
-                    csses.push(key + ': ' + style.css[key]);
+                    if (that.options.cardView && (!column.cardVisible)) {
+                        return;
+                    }
+
+                    falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
+                    valign = sprintf('vertical-align: %s; ', column.valign);
+                    style = calculateObjectValue(column, that.options.subtotalFooterStyle, [column],'');
+                    if (style && style.css) {
+                        for (key in style.css) {
+                            csses.push(key + ': ' + style.css[key]);
+                        }
+                    }
+                    var flag = false;
+
+                    if(column.subtotalFootColspan){
+                        colspan = colspan + column.subtotalFootColspan;
+                        flag = true;
+                    }
+                    if(flag){
+                        html.push('<td', class_,sprintf(' title="%s"',column.title) ,sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')),sprintf('colspan="%s"',column.subtotalFootColspan), '>');
+                        html.push(calculateObjectValue(column, column.subtotalFooterFormatter, [data], '') || '');//&nbsp;
+                        html.push('</div>');
+                        html.push('</td>');
+                    }else{
+                        if(i >= colspan){
+                            html.push('<td', class_,sprintf(' title="%s"',column.title), sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')), '>');
+                            html.push(calculateObjectValue(column, column.subtotalFooterFormatter, [data], '') || '');//&nbsp;
+                            html.push('</div>');
+                            html.push('</td>');
+                            colspan++
+                        }
+                    }
+                });
+
+                var _tr = [],__csses=[], __key;
+                _tr.push('<tr data-index="-99999" class="_subtotal"');
+                var __style = calculateObjectValue(this.options, this.options.subtotalRowStyle, [data], '');
+                if (__style && __style.css) {
+                    for (__key in __style.css) {
+                        __csses.push(__key + ': ' + __style.css[__key]);
+                    }
                 }
+                _tr.push(sprintf(' style="%s"',__csses.concat().join('; ')));
+                _tr.push('></tr>');
+                this.$body.find('tr:last').after($(_tr.join('')).append(html.join('')));
             }
-            var flag = false;
+            this.$body.find('tr:last').after($('<tr data-index="-99999"></tr>').append('<td colspan="'+colspan+'" style="padding: 4px"></td>'));
+        }
 
-            if(column.footColspan){
-                colspan = colspan + column.footColspan;
-                flag = true;
-            }
-            //console.log("i:"+i + " colspan:"+colspan);
-            if(flag){
-                html.push('<td', class_,sprintf(' title="%s"',column.title) ,sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')),sprintf('colspan="%s"',column.footColspan), '>');
-                // html.push('<div>');
-                html.push(calculateObjectValue(column, column.footerFormatter, [data], '') || '');//&nbsp;
-                // html.push('</div>');
-                //html.push('<div class="fht-cell"></div>');
-                html.push('</div>');
-                html.push('</td>');
-            }else{
-                if(i >= colspan){
-                    html.push('<td', class_,sprintf(' title="%s"',column.title), sprintf(' style="%s"', falign + valign + widthpx + csses.concat().join('; ')), '>');
-                    // html.push('<div>');
-                    html.push(calculateObjectValue(column, column.footerFormatter, [data], '') || '');//&nbsp;
-                    // html.push('</div>');
-                    //html.push('<div class="fht-cell"></div>');
-                    html.push('</div>');
+        if(this.options.totalShowFooter){
+            html = [];
+            colspan = 0;
+            $.each(this.columns, function (i, column) {
+                var key,
+                    falign = '', // footer align style
+                    valign = '',
+                    pywh = 0,
+                    csses = [],
+                    style = {},
+                    class_ = sprintf(' class="%s"', column['class']),
+                    unitWidth = 'px',
+                    width = column.width;
+                //如果表格列项宽度为字符串- 则转换成百分比占比宽度
+                if (column.width !== undefined && (!that.options.cardView)) {
+                    if (typeof column.width === 'string') {
+                        if (column.width.indexOf('%') !== -1) {
+                            unitWidth = '%';
+                        }
+                    }
+                }
+                if (column.width && typeof column.width === 'string') {
+                    width = column.width.replace('%', '').replace('px', '');
+                }
+                //--------------------------------------------
+                //--------------------------------------------
+                if(column.width &&  Object.prototype.toString.apply(column.width) == '[object Number]'){
+                    pywh += column.width;
+                }
+                var widthpx = sprintf('width: %s; ', (column.checkbox || column.radio) && !width ?
+                    '36px' : (width ? width + unitWidth : undefined));
+
+                if (!column.visible) {
+                    colspan++;
+                    return;
+                }
+
+                if (that.options.cardView && (!column.cardVisible)) {
+                    return;
+                }
+
+                falign = sprintf('text-align: %s; ', column.falign ? column.falign : column.align);
+                valign = sprintf('vertical-align: %s; ', column.valign);
+                style = calculateObjectValue(column, that.options.totalFooterStyle, [column],'');
+                if (style && style.css) {
+                    for (key in style.css) {
+                        csses.push(key + ': ' + style.css[key]);
+                    }
+                }
+                var flag = false;
+
+                if(column.totalFootColspan){
+                    colspan = colspan + column.totalFootColspan;
+                    flag = true;
+
+                }
+                if(flag){
+                    var _width = 0;
+
+                    that.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (k) {
+                        if( i<= k && k < colspan){
+                            var $this = $(this);
+                            _width += $this.innerWidth();
+                        }
+                    });
+                    _width = "width:" + _width + "px;"
+                    html.push('<td', class_,sprintf(' title="%s"',column.title) , ' data-field="'+column.field+'"',sprintf(' style="%s"', falign + valign + _width + csses.concat().join('; ')),sprintf('colspan="%s"',column.totalFootColspan), '>');
+                    html.push(calculateObjectValue(column, column.totalFooterFormatter, [data], '') || '');//&nbsp;
                     html.push('</td>');
+                }else{
+                    if(i >= colspan){
+                        html.push('<td', class_,' data-field="'+column.field+'"', sprintf(' style="%s"', falign + valign  + csses.concat().join('; ')), '>');
+                        html.push(calculateObjectValue(column, column.totalFooterFormatter, [data], '') || '');//&nbsp;
+                        html.push('</td>');
+                        colspan++
+                    }
+                }
+
+            });
+
+            var __style = calculateObjectValue(this.options, this.options.totalFooterRowStyle, [data], ''),__csses=[],__key;
+            if (__style && __style.css) {
+                for (__key in __style.css) {
+                    __csses.push(__key + ': ' + __style.css[__key]);
                 }
             }
-        });
-        this.$body.find('tr:last').after($('<tr data-index="-99999" style="background-color: #eaeaea;"></tr>').append(html.join('')));
-        // this.$tableFooter.find('tr').html(html.join(''));
-        // this.$tableFooter.show();
-        // clearTimeout(this.timeoutFooter_);
-        // this.timeoutFooter_ = setTimeout($.proxy(this.fitFooter, this),
-        //     this.$el.is(':hidden') ? 100 : 0);
+            this.$tableFooter.find('tr').attr('style',__csses.concat().join('; ')).html(html.join(''));
+            this.$tableFooter.show();
+            clearTimeout(this.timeoutFooter_);
+            this.timeoutFooter_ = setTimeout($.proxy(this.fitFooter, this),
+                this.$el.is(':hidden') ? 100 : 0);
+        }
     };
 
     BootstrapTable.prototype.fitFooter = function () {
         var that = this,
             $footerTd,
-            elWidth,
+            elWidth = '100%',
+            fheight,
             scrollWidth;
 
         clearTimeout(this.timeoutFooter_);
@@ -2549,19 +3244,22 @@
             return;
         }
 
-        elWidth = this.$el.css('width');
-        scrollWidth = elWidth > this.$tableBody.width() ? getScrollBarWidth() : 0;
+        // elWidth = this.$el.css('width');
+        // scrollWidth = elWidth > this.$tableBody.width() ? getScrollBarWidth() : 0;
+        fheight = that.options.totalFooterHeight ? that.options.totalFooterHeight + 'px': '35px';
         this.$tableFooter.css({
             'margin-right': scrollWidth
-        }).find('table')
-            // .css('width', elWidth)
-            .attr('class', this.$el.attr('class'));
+        }).find('table').css({'width':elWidth,'max-width':'inherit','height': fheight,'table-layout':'fixed'})
+            .attr('class', 'table');
 
-        // $footerTd = this.$tableFooter.find('td');
-        // this.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (i) {
-        //     var $this = $(this);
-        //     $footerTd.eq(i).find('.fht-cell').width($this.innerWidth());
-        // });
+        $footerTd = this.$tableFooter.find('td');
+
+        this.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (i) {
+            var $this = $(this);
+            $footerTd.eq(i).find('.fht-cell').width($this.innerWidth());
+        });
+
+        //this.horizontalScroll();
     };
 
     BootstrapTable.prototype.toggleColumn = function (index, checked, needUpdate) {
@@ -2574,7 +3272,8 @@
         this.initPagination();
         this.initBody();
 
-        if (this.options.showColumns) {
+        if (!this.options.showCustomView &&
+            this.options.showColumns) {
             var $items = this.$toolbar.find('.keep-open input').prop('disabled', false);
 
             if (needUpdate) {
@@ -2586,6 +3285,11 @@
             }
         }
     };
+
+    //TODO: 新增多选勾选显示总数方法
+    BootstrapTable.prototype.setCheckNumer = function(num){
+        this.$pagination.find('.check-numer').empty().append('<span style="font-weight: bold">'+this.options.formatCheckNumber(' '+num)+'</span>');
+    }
 
     BootstrapTable.prototype.toggleRow = function (index, uniqueId, visible) {
         if (index === -1) {
@@ -2627,10 +3331,17 @@
             this.$selectItem.length === this.$selectItem.filter(':checked').length);
 
         if (this.options.height) {
+            var h;
+            if(typeof this.options.height == 'function' ){
+                h = calculateObjectValue(this.options, this.options.height, this.options, '');
+            }else{
+                h = this.options.height;
+            }
             var toolbarHeight = getRealHeight(this.$toolbar),
                 paginationHeight = getRealHeight(this.$pagination),
-                height = this.options.height - toolbarHeight - paginationHeight;
-
+                height = h - toolbarHeight - paginationHeight;
+            //重置表格高度
+            this.$container.css('height', h + 'px');
             this.$tableContainer.css('height', height + 'px');
             // console.log("--->>>>this.options.height:" + this.options.height);
             // console.log("--->>>>height:" + height);
@@ -2649,7 +3360,7 @@
             return;
         }
 
-        if (this.options.showHeader && this.options.height) {
+        if (!this.__custom && this.options.showHeader && this.options.height) {
             this.$tableHeader.show();
             this.resetHeader();
             padding += this.$header.outerHeight();
@@ -2658,10 +3369,15 @@
             this.trigger('post-header');
         }
 
-        if (this.options.showFooter) {
+        if (this.options.subtotalShowFooter
+            || this.options.totalShowFooter) {
             this.resetFooter();
-            if (this.options.height) {
-                padding += this.$tableFooter.outerHeight() + 1;
+            if (this.options.height && this.options.totalShowFooter) {
+                if(this.options.totalFooterHeight != undefined){
+                    padding += this.options.totalFooterHeight + 1;
+                }else{
+                    padding += 35 + 1;
+                }
             }
         }
 
@@ -2669,6 +3385,7 @@
         this.getCaret();
         this.$tableContainer.css('padding-bottom', padding + 'px');
         this.trigger('reset-view');
+
     };
 
     BootstrapTable.prototype.getData = function (useCurrentPage) {
@@ -3068,7 +3785,7 @@
         if (this.options.showHeader && this.options.height) {
             this.fitHeader();
         }
-        if (this.options.showFooter) {
+        if (this.options.subtotalShowFooter) {
             this.fitFooter();
         }
     };
@@ -3102,7 +3819,8 @@
         this.initSearch();
         this.initPagination();
         this.initBody();
-        if (this.options.showColumns) {
+        if (!this.options.showCustomView &&
+            this.options.showColumns) {
             var $items = this.$toolbar.find('.keep-open input').prop('disabled', false);
 
             if ($items.filter(':checked').length <= this.options.minimumCountColumns) {
@@ -3176,6 +3894,22 @@
 
         this.trigger('toggle', this.options.cardView);
     };
+
+
+    BootstrapTable.prototype.__cardView = function () {
+
+        this.__custom = !this.__custom;
+        if(this.__custom){
+            this.$tableHeader.hide();
+            this.$tableBody.hide();
+            this.$customView.fadeIn(500);
+        }else{
+            this.$customView.hide();
+            this.$tableHeader.show();
+            this.$tableBody.fadeIn(500);
+        }
+    };
+
 
     BootstrapTable.prototype.refreshOptions = function (options) {
         //If the objects are equivalent then avoid the call of destroy / init methods
@@ -3287,7 +4021,7 @@
         'check', 'uncheck',
         'checkBy', 'uncheckBy',
         'refresh',
-        'resetView',
+        'resetView','setCheckNumer',
         'resetWidth',
         'destroy',
         'showLoading', 'hideLoading',

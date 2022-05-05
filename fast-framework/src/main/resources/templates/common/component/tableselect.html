@@ -21,10 +21,12 @@
                     class = "form-control" <#-- 输入框样式-->
                     butClass = "fa fa-fw fa-address-card-o"
                     isClear = true <#-- 弹出是否出现清除按钮-->
-                    placeholder="请输入值"
+                    placeholder=""
                     correlationId="" <#-- 关联ID-->
                     checked= true
                     isorga = true <#-- 是否有机构选择-->
+                    sortName = "" <#-- 表格排序-->
+                    sortOrder = "" <#-- 表格排序-->
                     layout = "" <#--当isorga 为true是,支持机构左右侧展示 left, right 空不显示-->
                     helpTip = ""  <#--帮助提示 -->
                     separator = "," <#--多选参数分隔符 -->
@@ -48,7 +50,7 @@
     </#if>
     <div class="input-group" id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Div" data-url="${url}">
         <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>"  type="hidden" value="${value}"/>
-        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name" <#if labelName!="">name="${labelName}"</#if> type="text" <#if readonly>disabled="disabled"</#if> placeholder="${placeholder}" class="${class}" value="${labelValue}" <#if readonly> readonly=true</#if> <#if required> required</#if>/>
+        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name" <#if labelName!="">name="${labelName}"</#if> type="text" <#if readonly>disabled="disabled"</#if> placeholder="${i18n("${placeholder}")}" class="${class}" value="${labelValue}" <#if readonly> readonly=true</#if> <#if required> required</#if>/>
         <span class="input-group-btn" <#if readonly>disabled="disabled"</#if>  id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>But"><a  href="javascript:;"><i class="${butClass}"></i></a></span>
     </div>
     <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
@@ -63,14 +65,14 @@
                     <#if correlationId !="">
                     var correId = $("#${correlationId}").val();
                     if(opt.common.isEmpty(correId)){
-                        opt.error("<@ctx.i18n text = "关联信息不能为空"/>");
+                        opt.error("${i18n("关联信息不能为空")}");
                         return;
                     }
                     </#if>
                     var selectId = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val();
                     var selectName =  $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name").val();
                     var options = {
-                        title: <#if boxTitle =="">"<@ctx.i18n text = "请选择数据"/>" <#else>"${boxTitle}"</#if>,
+                        title: <#if boxTitle =="">"${i18n("请选择数据")}" <#else>"${boxTitle}"</#if>,
                         width: "${width}",
                         <#if height != "">
                         height: ${height},
@@ -87,7 +89,9 @@
                             keyId: "${keyId}",
                             keyName: "${keyName}",
                             layout: "${layout}",
-                            separator: "${separator}"
+                            separator: "${separator}",
+                            sortName: "${sortName}",
+                            sortOrder: "${sortOrder}"
                         },
                         obj: <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_data,
                         main: true,
@@ -105,6 +109,12 @@
                     if(typeof ${callbackFunName} == 'function'){
                         ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'ok', index, layero, <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_data);
                     };
+                    /*校验*/
+                    <#if required>
+                    $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name")
+                        .parentsUntil('from').validate()
+                        .element($("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name"));
+                    </#if>
                     selfLayer.close(index);
                 };
                 <#if isClear?string == "true">
@@ -115,6 +125,12 @@
                     if(typeof ${callbackFunName} == 'function'){
                         ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'clear', index, layero, <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_data);
                     };
+                    /*校验*/
+                    <#if required>
+                    $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name")
+                        .parentsUntil('from').validate()
+                        .element($("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name"));
+                    </#if>
                     selfLayer.close(index);
                 };
                 </#if>

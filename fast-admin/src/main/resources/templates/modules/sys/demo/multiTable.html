@@ -73,6 +73,7 @@
                 showSearch: false,
                 showBorder: true, // 是否显示表格边框
                 showToggle: false,
+                showToolbar: false,
                 showColumns: false,
                 outcheckbox: false,
                 showRefresh: false,
@@ -83,21 +84,21 @@
 						radio: true
                     },
                     {
-	                    title: "<@ctx.i18n text = "序号"/>",width:35, formatter: function (value, row, index) {
+	                    title: "${i18n("序号")}",width:35, formatter: function (value, row, index) {
 	                        return $.table.serialNumber(index);
 	                    }
 	                },
-                    {field: 'id',title: "<@ctx.i18n text = "角色编码"/>", sortable: true},
-                    {field: 'roleName', title: "<@ctx.i18n text = "角色名称"/>"},
-                    {field: 'roleKey', title: "<@ctx.i18n text = "权限字符"/>"},
-                    {field: 'dataScope', title: "<@ctx.i18n text = "数据范围"/>", formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(dataScope, value);
+                    {field: 'id',title: "${i18n("角色编码")}", sortable: true},
+                    {field: 'roleName', title: "${i18n("角色名称")}"},
+                    {field: 'roleKey', title: "${i18n("权限字符")}"},
+                    {field: 'dataScope', title: "${i18n("数据范围")}", formatter: function(value, row, index) {
+                            return opt.common.selectDictLabel(dataScope, value);
                     }},
-                    {field: 'roleSort', title: "<@ctx.i18n text = "顺序"/>",sortable:true},
-                    {field: 'status', title: "<@ctx.i18n text = "状态"/>", align: 'center', formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(datas, value);
+                    {field: 'roleSort', title: "${i18n("顺序")}",sortable:true},
+                    {field: 'status', title: "${i18n("状态")}", align: 'center', formatter: function(value, row, index) {
+                            return opt.common.selectDictLabel(datas, value);
                     }},
-                    {field: 'createTime', title: "<@ctx.i18n text = "创建时间"/>",sortable: true}
+                    {field: 'createTime', title: "${i18n("创建时间")}",sortable: true}
                     ]
                 ,onClickRow: function(rows){ //点击行关联查询第二个表
                     $('#roleKey').val(rows.roleKey);
@@ -120,6 +121,7 @@
             showToggle: false,
             showColumns: false,
             outcheckbox: false,
+            showToolbar: false,
             showRefresh: false,
             pageSize: 12,
             pageList: [12, 24, 36],
@@ -127,29 +129,29 @@
             uniqueId: "id", /* 唯一ID */
             columns:[
                 {
-                    title: "<@ctx.i18n text = "序号"/>",width:35, formatter: function (value, row, index) {
+                    title: "${i18n("序号")}",width:35, formatter: function (value, row, index) {
                         return $.table.serialNumber(index);
                     }
                 },
-                {field: 'id', title: "<@ctx.i18n text = "用户ID"/>", sortable: true, visible: false},
-                {field: 'username', title: "<@ctx.i18n text = "账号"/>",sortable: true
+                {field: 'id', title: "${i18n("用户ID")}", sortable: true, visible: false},
+                {field: 'username', title: "${i18n("账号")}",sortable: true
                 },
-                {field: 'name', title:  "<@ctx.i18n text = "姓名"/>"},
-                {field: 'compName', valign: 'middle', title: "<@ctx.i18n text = "归属公司"/>",formatter: function (value, row, index) {
-                        return $.table.tooltip(value,5);}
+                {field: 'name', title:  "${i18n("姓名")}"},
+                {field: 'compName', valign: 'middle', title: "${i18n("归属公司")}",formatter: function (value, row, index) {
+                        return opt.common.tooltip(value,5);}
                 },
-                {field: 'deptName', title:  "<@ctx.i18n text = "归属机构"/>"},
-                {field: 'roleName', title: "<@ctx.i18n text = "角色"/>",formatter: function (value, row, index) {
-                        return $.table.tooltip(value,5);}
+                {field: 'deptName', title:  "${i18n("归属机构")}"},
+                {field: 'roleName', title: "${i18n("角色")}",formatter: function (value, row, index) {
+                        return opt.common.tooltip(value,5);}
                 },
-                {field: 'email', title:  "<@ctx.i18n text = "邮箱"/>"},
-                {field: 'mobile', title:  "<@ctx.i18n text = "手机"/>"},
+                {field: 'email', title:  "${i18n("邮箱")}"},
+                {field: 'mobile', title:  "${i18n("手机")}"},
                 {
-                    field: 'status', title: "<@ctx.i18n text = "状态"/>", formatter: function (value, row, index) {
-                        return $.table.selectDictLabel(userDatas, value);
+                    field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
+                        return opt.common.selectDictLabel(userDatas, value);
                     }
                 },
-                {field: 'createTime', title: "<@ctx.i18n text = "创建时间"/>", sortable: true},
+                {field: 'createTime', title: "${i18n("创建时间")}", sortable: true},
             ]
         };
         $.table.init(options);

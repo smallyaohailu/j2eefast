@@ -1,0 +1,98 @@
+<!-- 系统自动生成 Date:2021-10-12 21:04 -->
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="语言配置" bodyClass="white-bg" libs=["bootstrapSelect"]/>
+<div class="wrapper wrapper-content ibox-content">
+<@f.form id="form-lang-edit"  class="form-horizontal">
+    <@f.hidden name="id" value="${sysLang.id}"/>
+    <@f.hidden name="moduleName" value="${sysLang.moduleName?default('')}"/>
+    <h4 class="form-header h4">${i18n("基本信息")}&nbsp;<i class="fa-fw fa fa-language"></i></h4>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    ${i18n("语言编码")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.input name="langCode" value="${sysLang.langCode?default('')}" required=true />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    ${i18n("语言译文")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.input name="langText" value="${sysLang.langText?default('')}" required=true />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    ${i18n("语言类型")}：
+                </label>
+                <div class="col-sm-8">
+                     <@f.select name="langType" dictType="sys_lang_type" value="${sysLang.langType?default('')}"   />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    ${i18n("归属模块")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.select name="moduleCode" value="${sysLang.moduleCode?default('')}" items=modules itemLabel="moduleName" itemValue="moduleCode" required=true/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    ${i18n("备注")}：
+                </label>
+                <div class="col-sm-10">
+                    <@f.textarea name="remark" value="${sysLang.remark?default('')}"   />
+                </div>
+            </div>
+        </div>
+    </div>
+</@f.form>
+<div class="hr-line-dashed"></div>
+<div class="row" id="_addTab">
+    <div class="col-sm-offset-5 col-sm-10">
+        <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>${i18n("保存")}</button>&nbsp;
+        <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>${i18n("关闭")}</button>
+    </div>
+</div>
+</div>
+<@footer>
+<script type="text/javascript">
+    var prefix = baseURL + "sys/lang";
+    /**表单验证*/
+    <@compress single_line=true>
+    $("#form-lang-edit").validate({
+        focusCleanup: true
+    });
+    </@compress>
+
+    function selectCallback(id, event, data) {
+        if(id == 'moduleCode'){
+            $('#moduleName').val(data[0].text);
+        }
+    }
+
+    function submitHandler() {
+        if (opt.validate.form()) {
+            opt.operate.saveTab(prefix + "/edit", $('#form-lang-edit').serialize());
+        }
+    }
+</script>
+</@footer>
+</@pageTheme>

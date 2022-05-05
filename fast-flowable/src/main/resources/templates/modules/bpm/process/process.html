@@ -8,20 +8,20 @@
                 <div class="select-list">
                     <ul>
                         <li>
-                            <@ctx.i18n text = "表单名称"/>：
+                            ${i18n("表单名称")}：
                             <input type="text" class="form-control" name="fromName"/>
                         </li>
                         <li>
-                            <@ctx.i18n text = "流程Key"/>：
+                            ${i18n("流程Key")}：
                             <input type="text" class="form-control" name="modelKey"/>
                         </li>
                         <li>
-                            <@ctx.i18n text = "流程版本号"/>：
+                            ${i18n("流程版本号")}：
                             <input type="text" class="form-control" name="version"/>
                         </li>
                         <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;<@ctx.i18n text = "查询"/></a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;<@ctx.i18n text = "重置"/></a>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;${i18n("查询")}</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
                         </li>
                     </ul>
                 </div>
@@ -46,18 +46,18 @@
                 columns: [
                     {title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
                             return $.table.serialNumber(index);}},
-                    {field : 'fromName',title : '<@ctx.i18n text = "填写表单名称"/>'},
-                    {field : 'modelKey',title : '<@ctx.i18n text = "流程Key"/>'},
-                    {field : 'version',title : '<@ctx.i18n text = "版本号"/>'},
-                    {field : 'suspensionState',title : '<@ctx.i18n text = "状态"/>',formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(statusDatas, value);}},
-                    {title:"<@ctx.i18n text = "操作"/>",class:'action',width:100,formatter: function(value, row, index) {
+                    {field : 'fromName',title : '${i18n("填写表单名称")}'},
+                    {field : 'modelKey',title : '${i18n("流程Key")}'},
+                    {field : 'version',title : '${i18n("版本号")}'},
+                    {field : 'suspensionState',title : '${i18n("状态")}',formatter: function(value, row, index) {
+                            return opt.common.selectDictLabel(statusDatas, value);}},
+                    {title:"${i18n("操作")}",class:'action',width:100,formatter: function(value, row, index) {
                             var actions = [];
                             if(row.suspensionState == "1"){
-                                actions.push('<a class="" href="javascript:void(0)" title="<@ctx.i18n text = "发起申请"/>" onclick="apply(\''+row.id+'\',\'' + row.prefixUrl +
+                                actions.push('<a class="" href="javascript:void(0)" title="${i18n("发起申请")}" onclick="apply(\''+row.id+'\',\'' + row.prefixUrl +
                                     '\',\'' + row.applyType + '\')"><i class="fa icon-check"></i></a> ');
                             }else{
-                                actions.push('<a class="" href="javascript:void(0)" title="<@ctx.i18n text = "禁止发起任务"/>" onclick="disable()"><i class="glyphicon glyphicon-ban-circle"></i></a> ');
+                                actions.push('<a class="" href="javascript:void(0)" title="${i18n("禁止发起任务")}" onclick="disable()"><i class="glyphicon glyphicon-ban-circle"></i></a> ');
                             }
                             return actions.join('');
                     }}
@@ -67,13 +67,13 @@
         });
 
         function disable(){
-            opt.modal.warning("<@ctx.i18n text = "流程表单已被挂起,不能申请请联系管理员!"/>");
+            opt.modal.warning("${i18n("流程表单已被挂起,不能申请请联系管理员!")}");
         }
         function apply(id,prefixUrl,applyType){
             if(applyType == "0"){
-                opt.modal.open('<i class="fa icon-note"></i> <@ctx.i18n text = "填写表单"/>',baseURL +prefixUrl +"/add/"+id);
+                opt.modal.open('<i class="fa icon-note"></i> ${i18n("填写表单")}',baseURL +prefixUrl +"/add/"+id);
             }else if(applyType == "1"){
-                opt.modal.openTab('<i class="fa icon-note"></i> <@ctx.i18n text = "填写表单"/>',baseURL +prefixUrl +"/add/"+id);
+                opt.modal.openTab('<i class="fa icon-note"></i> ${i18n("填写表单")}',baseURL +prefixUrl +"/add/"+id);
             }
         }
 

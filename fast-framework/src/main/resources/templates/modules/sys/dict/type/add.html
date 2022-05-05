@@ -1,34 +1,35 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="新增字典" bodyClass="white-bg"/>
+<@header title="字典管理" bodyClass="white-bg"/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-type-add" class="form-horizontal">
     <div class="form-group">
-        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>字典名称：</label>
+        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>${i18n("字典名称")}：</label>
         <div class="col-sm-8">
             <@f.input name="dictName" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>字典类型：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("字典类型")}：</label>
         <div class="col-sm-8">
-            <@f.input name="dictType" required=true helpTip="统一规范 请务必使用小写字母下划线定义 页面获取:dict.getType('sys_yes_no')"/>
+            <@f.input name="dictType" required=true 
+            helpTip="${i18n('统一规范:请务必使用小写字母下划线定义,页面获取:{0}{1}{2}',['${','dict.getType(\"sys_yes_no\")','}'])}"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">系统内置：</label>
+        <label class="col-sm-3 control-label">${i18n("系统内置")}：</label>
         <div class="col-sm-8">
             <@f.radio name="isSys" dictType="sys_yes_no"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">状态：</label>
+        <label class="col-sm-3 control-label">${i18n("状态")}：</label>
         <div class="col-sm-8">
             <@f.radio name="status" dictType="sys_normal_disable"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">备注：</label>
+        <label class="col-sm-3 control-label">${i18n("备注")}：</label>
         <div class="col-sm-8">
             <@f.textarea name="remark"/>
         </div>
@@ -60,7 +61,7 @@
         },
         messages: {
             "dictType": {
-                remote: "该字典类型已经存在"
+                remote: "${i18n("已经存在")}"
             }
         },
         focusCleanup: true

@@ -67,6 +67,16 @@ public class SysMenuEntity extends BaseEntity {
 	private String url;
 
 	/**
+	 * 组件地址
+	 */
+	private String component;
+
+	/**
+	 * 是否禁用 0 正常 1禁用
+	 */
+	private String status;
+
+	/**
 	 * 菜单打开方式
 	 */
 	private String target;
@@ -107,4 +117,9 @@ public class SysMenuEntity extends BaseEntity {
 	@TableField(exist = false)
 	private List<SysMenuEntity> children = new ArrayList<SysMenuEntity>();
 
+	/**
+	 * 是否有子元素
+	 */
+	@TableField(exist = false)
+	private Integer isTreeLeaf;
 }

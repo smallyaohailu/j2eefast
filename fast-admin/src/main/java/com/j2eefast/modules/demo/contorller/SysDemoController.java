@@ -52,10 +52,28 @@ public class SysDemoController extends BaseController {
         return urlPrefix + "/table";
     }
 
+    /**
+     * 卡片表格
+     * @author ZhouZhou
+     * @date 2022-04-29 15:58
+     * @return
+     */
+    @GetMapping("/cardTable")
+    public String cardTable(){
+        return urlPrefix + "/cardTable";
+    }
+    
+    
     @GetMapping("/fromTable")
     public String fromTable(){
         return urlPrefix + "/fromTable";
     }
+    
+    @GetMapping("/enc")
+    public String enc(){
+        return urlPrefix + "/enc";
+    }
+    
     /**
      * 创建表单视图
      * @return
@@ -188,6 +206,11 @@ public class SysDemoController extends BaseController {
     public String test(ModelMap mmap) {
         mmap.put("mode",FileUtil.readUtf8String(Constant.BASE_WEB_HTML +urlPrefix+ "/mode1.txt"));
         return urlPrefix + "/test";
+    }
+
+    @GetMapping("/test1")
+    public String test1(ModelMap mmap) {
+        return urlPrefix + "/test1";
     }
 
 

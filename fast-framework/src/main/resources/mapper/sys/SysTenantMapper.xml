@@ -26,14 +26,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         <include refid="sysTenantColumns"/>
 		FROM  sys_tenant a
-		WHERE a.id = '${id}'
+		WHERE a.id = #{id}
     </select>
 
     <select id="findSysTenantByIdTenantId"  resultType="com.j2eefast.framework.sys.entity.SysTenantEntity" >
         SELECT
         <include refid="sysTenantColumns"/>
         FROM  sys_tenant a
-        WHERE a.tenant_id = '${tenantId}'
+        WHERE a.tenant_id = #{tenantId}
     </select>
 
     <!--  根据获取实体List   -->

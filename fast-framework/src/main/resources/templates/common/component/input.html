@@ -18,6 +18,7 @@
                 id = "" <#-- ID 如果ID 不传则跟name一致-->
                 value = ""
                 type = "hidden"
+                template = false <#-- 控件是否做template用-->
                 refresh = true <#-- 隐藏域在from 表单中能否被重置按钮清空-->
                 >
     <#local  Assname="${id}"/>
@@ -30,28 +31,36 @@
     <#else>
         <#local AssId="${id}"/>
     </#if>
-    <input id="${AssId?replace(".","_")}" name="<#if name != "">${name}<#else>${AssId}</#if>" <#if !refresh> data-refresh="false"</#if>  type="${type}" value="${value}"/>
+    <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>" <#if !refresh> data-refresh="false"</#if>  type="${type}" value="${value}"/>
 </#macro>
 
 <#--
     //form input 输入框标签
 -->
-<#macro input   name
+<#macro input 	name
+				template = false <#-- 控件是否做template用-->
                 id = "" <#-- ID 如果ID 不传则跟name一致-->
                 value = ""
                 type = "text" <#--多增加 date -->
                 dataFormat = "" <#-- 时间格式化-->
                 dataType = "date" <#-- 控件显示-->
+                dateMark = "" <#-- 重要显示标志-->
+                maxDate = "" <#-- 最大日期-->
                 dataCallback = "" <#-- 日期控件回调函数-->
                 required=false <#-- 是否必输-->
                 class = "form-control" <#-- 输入框样式-->
+                selectData = "" <#--日期控件选择 0|1|2|3|4 代表需要哪些选择-->
+                defaultSelectData = "" <#-- 默认选择值-->
+                selectDataClick = "startTime#endTime" <#-- 选择事件-->
                 placeholder=""
                 autocomplete="" <#-- off 禁止历史数据-->
                 butClass = "" <#-- 小按钮class样式-->
                 butStyle = "" <#-- 小按钮style样式-->
                 helpTip = ""  <#--帮助提示 -->
+                disabled = "" <#-- -->
                 readonly = false <#-- 不可编辑-->
                 maxlength = "" <#--输入最大长度 -->
+                callbackFunName = "dateCallback"
                 >
         <#local  Assname="${id}"/>
         <#if name != "">
@@ -65,15 +74,125 @@
         </#if>
         <#if butClass!="">
             <div class="input-group">
-                <input id="${AssId?replace(".","_")}" name="<#if name != "">${name}<#else>${AssId}</#if>" <#if class != "">class="${class}<#if type == "date"> time-input</#if>"</#if> <#if dataFormat !="">data-format="${dataFormat}"</#if> <#if type == "date" && dataCallback !="">data-callback="${dataCallback}"</#if> <#if type == "date" && dataType !="">data-type="${dataType}"</#if><#rt>
-                       type="<#if type == "date">text<#else>${type}</#if>" <#if type=="password" || autocomplete == "off">autocomplete="off"</#if> value="${value}" <#if placeholder != "">placeholder="<@ctx.i18n text = "${placeholder}"/>"</#if>   <#if maxlength !=""> maxlength = "${maxlength}"</#if> <#if readonly> readonly = true</#if> <#if required> required </#if>/>
+                <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>" <#if class != "">class="${class}<#if type == "date"> date-input</#if>"</#if> <#if dataFormat !="">data-format="${dataFormat}"</#if> <#if type == "date" && dataCallback !="">data-callback="${dataCallback}"</#if> <#if type == "date" && dataType !="">data-type="${dataType}"</#if><#rt>
+                       type="<#if type == "date">text<#else>${type}</#if>" <#if autocomplete != "">autocomplete="${autocomplete}"</#if> value="${value}" <#if placeholder != "">placeholder="${i18n("${placeholder}")}"</#if>   <#if maxlength !=""> maxlength = "${maxlength}"</#if> <#if readonly> readonly = true</#if> <#if disabled !=""> disabled = "disabled"</#if> <#if required> required </#if>/>
                 <span class="input-group-addon"><i class="${butClass}" <#if butStyle!="">style="${butStyle}"</#if>></i></span>
             </div>
-            <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
+            <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${i18n("${helpTip}")}</span></#if>
         <#else>
-            <input id="${AssId?replace(".","_")}" name="<#if name != "">${name}<#else>${AssId}</#if>" <#if class != "">class="${class}<#if type == "date"> time-input</#if>"</#if> <#if dataFormat !="">data-format="${dataFormat}"</#if><#if type == "date" && dataCallback !="">data-callback="${dataCallback}"</#if> <#if type == "date" && dataType !="">data-type="${dataType}"</#if><#rt>
-                   type="<#if type == "date">text<#else>${type}</#if>" value="${value}" <#if type=="password" || autocomplete == "off">autocomplete="off"</#if> <#if placeholder != "">placeholder="<@ctx.i18n text = "${placeholder}"/>"</#if>   <#if maxlength !=""> maxlength = "${maxlength}"</#if> <#if readonly> readonly = true</#if> <#if required> required </#if>/>
-            <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
+            <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>" <#if class != "">class="${class}<#if type == "date"> date-input</#if>"</#if> <#if dataFormat !="">data-format="${dataFormat}"</#if><#if type == "date" && dataCallback !="">data-callback="${dataCallback}"</#if> <#if type == "date" && dataType !="">data-type="${dataType}"</#if><#rt>
+                   type="<#if type == "date">text<#else>${type}</#if>" value="${value}" <#if autocomplete != "">autocomplete="${autocomplete}"</#if> <#if placeholder != "">placeholder="${i18n("${placeholder}")}"</#if>   <#if maxlength !=""> maxlength = "${maxlength}"</#if> <#if readonly> readonly = true</#if> <#if disabled !=""> disabled = "disabled"</#if> <#if required> required </#if>/>
+            <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${i18n("${helpTip}")}</span></#if>
+        </#if>
+    <#if type =="date">
+<#--        <@compress single_line=true>-->
+        <script>
+            $(function(){
+                var time = $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>');
+                <#-- 控制控件外观 -->
+                var type = time.attr("data-type") || 'date';
+                <#-- 控制回显格式 -->
+                var format = time.attr("data-format") || 'yyyy-MM-dd';
+                <#-- 控制日期控件按钮 -->
+                var buttons = time.attr("data-btn") || 'clear|now|confirm', newBtnArr = [];
+                <#-- 日期控件选择完成后回调处理 -->
+                var callback = time.attr("data-callback") || {};
+                if (buttons) {
+                    if (buttons.indexOf("|") > 0) {
+                        var btnArr = buttons.split("|"), btnLen = btnArr.length;
+                        for (var j = 0; j < btnLen; j++) {
+                            if ("clear" === btnArr[j] || "now" === btnArr[j] || "confirm" === btnArr[j]) {
+                                newBtnArr.push(btnArr[j]);
+                            }
+                        }
+                    } else {
+                        if ("clear" === buttons || "now" === buttons || "confirm" === buttons) {
+                            newBtnArr.push(buttons);
+                        }
+                    }
+                } else {
+                    newBtnArr = ['clear', 'now', 'confirm'];
+                }
+                laydate.render({
+                    elem: '#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>',
+                    trigger: 'click',
+                    type: type,
+                    <#if dateMark!="">mark: ${dateMark},</#if>
+                    <#if maxDate!="">max: '${maxDate}',</#if>
+                    format: format,
+                    btns: newBtnArr,
+                    done: function (value, data) {
+                        time.val(value);
+                        if (typeof window[callback] != 'undefined'
+                            && window[callback] instanceof Function) {
+                            window[callback](value, data);
+                        }else{
+                            try{
+                                if(opt.common.isString(callback)){
+                                    console.log(callback);
+                                    eval(callback) || new Function(callback);
+                                }
+                            }catch (e) {
+                                console.error(e);
+                            }
+                        };
+                        if(typeof ${callbackFunName} == 'function'){
+                            ${callbackFunName}("<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>", value, data);
+                        }
+                    }
+                });
+            })
+        </script>
+<#--        </@compress>-->
+    </#if>
+        <#if selectData !="" && selectDataClick !="">
+            <div class="control-div inputDate">
+            <select onchange="opt.common.selectDate(this.value, '${selectDataClick?split("#")[0]}','${selectDataClick?split("#")[1]}');" class="form-control">
+                <option value="" <#if defaultSelectData == "" >selected="selected"</#if>>&nbsp;</option>
+                <#list selectData?split("#") as x>
+                    <#if x== "0">
+                        <option value="0" <#if defaultSelectData == "0" >selected="selected"</#if>>${i18n("今日")}</option>
+                    </#if>
+                    <#if x== "1">
+                        <option value="1" <#if defaultSelectData == "1" >selected="selected"</#if>>${i18n("昨日")}</option>
+                    </#if>
+                    <#if x== "2">
+                        <option value="2" <#if defaultSelectData == "2" >selected="selected"</#if>>${i18n("本周")}</option>
+                    </#if>
+                    <#if x== "3">
+                        <option value="3" <#if defaultSelectData == "3" >selected="selected"</#if>>${i18n("上一周")}</option>
+                    </#if>
+                    <#if x== "4">
+                        <option value="4" <#if defaultSelectData == "4" >selected="selected"</#if>>${i18n("上一月")}</option>
+                    </#if>
+                    <#if x== "5">
+                        <option value="5" <#if defaultSelectData == "5" >selected="selected"</#if>>${i18n("近一月")}</option>
+                    </#if>
+                    <#if x== "6">
+                        <option value="6" <#if defaultSelectData == "6" >selected="selected"</#if>>${i18n("近二月")}</option>
+                    </#if>
+                    <#if x== "7">
+                        <option value="7" <#if defaultSelectData == "7" >selected="selected"</#if>>${i18n("近三月")}</option>
+                    </#if>
+                    <#if x== "8">
+                        <option value="8" <#if defaultSelectData == "8" >selected="selected"</#if>>${i18n("本季度")}</option>
+                    </#if>
+                    <#if x== "9">
+                        <option value="9" <#if defaultSelectData == "9" >selected="selected"</#if>>${i18n("今年")}</option>
+                    </#if>
+                    <#if x== "10">
+                        <option value="10" <#if defaultSelectData == "10" >selected="selected"</#if>>${i18n("去年")}</option>
+                    </#if>
+                </#list>
+            </select>
+            </div>
+            <#if defaultSelectData !="">
+                 <script>
+                    $(function(){
+                        opt.common.selectDate('${defaultSelectData}', '${selectDataClick?split("#")[0]}','${selectDataClick?split("#")[1]}');
+                    })
+                 </script>
+            </#if>
         </#if>
 </#macro>
 
@@ -85,9 +204,11 @@
                     class = "form-control"
                     value = ""
                     readonly = false
+                    placeholder=""
                     rows = "5"
                     required = false
                     helpTip = ""  <#--帮助提示 -->
+                    template = false <#-- 控件是否做template用-->
                     >
     <#local  Assname="${id}"/>
     <#if name != "">
@@ -99,11 +220,58 @@
     <#else>
         <#local AssId="${id}"/>
     </#if>
-    <textarea id="${AssId?replace(".","_")}" name="<#if id == "">${name}<#else>${AssId}</#if>"  class="${class}" rows="${rows}" <#if readonly>readonly = "true"</#if> <#if required> required</#if>><#if value != "">${value}</#if></textarea>
+    <textarea id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if id == "">${name}<#else>${AssId}</#if>" <#if placeholder != "">placeholder="${i18n("${placeholder}")}"</#if>  class="${class}" rows="${rows}" <#if readonly>readonly = "true"</#if> <#if required> required</#if>><#if value != "">${value}</#if></textarea>
     <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
 </#macro>
 
-
+<#--
+    代码编辑器输入框
+-->
+<#macro inputCode   name
+                    id = ""
+                    class = "editor"
+                    value = ""
+                    height = "250"
+                    required = false
+                    fontSize = 14
+                    template = false
+                    readonly = false
+                    helpTip = ""
+                    base46 = true
+                    codeType = "html">
+    <#local  Assname="${id}"/>
+    <#if name != "">
+        <#local Assname="${name}"/>
+    </#if>
+    <#local AssId=""/>
+    <#if id == "">
+        <#local AssId="${Assname}"/>
+    <#else>
+        <#local AssId="${id}"/>
+    </#if>
+    <textarea id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" style="visibility: hidden;height: 15px;" name="<#if id == "">${name}<#else>${AssId}</#if>" <#if required> required</#if>></textarea>
+    <pre style="margin-top: -15px;"  id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>__code" class="${class}">${value}</pre>
+<#--    <div id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>__code_toolBar" class="ace_tip_search right">-->
+<#--        <button type="button" class="btn btn-info btn-xs">拷贝</button>-->
+<#--    </div>-->
+    <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
+    <@compress single_line=true>
+        <script>
+            $(function() {
+                $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>__code').aceEditor({
+                    id: '<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>__code',
+                    readOnly: ${readonly?string},
+                    height: '${height}',
+                    lang: '${codeType}',
+                    fontSize: ${fontSize},
+                    hiddenId: '<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>',
+                    base46: ${base46?string},
+                    top: 0
+                });
+            })
+        </script>
+    </@compress>
+</#macro>
 <#--
     //form radio 单选按钮
 -->
@@ -122,17 +290,17 @@
             <#items as d>
                 <#if d.status =='0' >
                     <#if value == "">
-                        <label class="${class}"><input type="radio" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if d.isDefault =='Y'>checked</#if>><@ctx.i18n text = "${d.dictLabel}"/></label>
+                        <label class="${class}"><input type="radio" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if d.isDefault =='Y'>checked</#if>>${i18n("${d.dictLabel}")}</label>
                     <#else>
-                        <label class="${class}"><input type="radio" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if d.dictValue ==value>checked</#if>><@ctx.i18n text = "${d.dictLabel}"/></label>
+                        <label class="${class}"><input type="radio" name="<#if id == "">${name}<#else>${id}</#if>" value="${d.dictValue}" <#if d.dictValue ==value>checked</#if>>${i18n("${d.dictLabel}")}</label>
                     </#if>
                 </#if>
             </#items>
         </#list>
     </#if>
-    <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
+    <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${i18n("${helpTip}")}</span></#if>
     <@compress single_line=true>
-        <script type="text/javascript">
+        <script>
             $(function(){
                 $('input[name="<#if id == ''>${name}<#else>${id}</#if>"]').on('ifCreated ifChecked', function(event){
                     /* 选择redio 回调事件*/
@@ -153,6 +321,7 @@
                 value = "" <#-- 开关组件默认 0 1 值-->
                 default = true <#-- 默认开-->
                 judgeValue = "0" <#-- 判断值默认0 开-->
+                template = false <#-- 控件是否做template用-->
                 >
     <#local  Assname="${id}"/>
     <#if name != "">
@@ -165,19 +334,19 @@
         <#local AssId="${id}"/>
     </#if>
     <label class="toggle-switch switch-solid">
-        <input id="${AssId?replace(".","_")}" name="<#if name != "">${name}<#else>${AssId}</#if>" value="<#if value != "">${value}</#if>" type="hidden"/>
-        <input type="checkbox" id="__${AssId?replace(".","_")}swh" <#if value == "" && default>checked="true"</#if> <#if value != "" && value == judgeValue>checked="true"</#if>/>
+        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>" value="<#if value != "">${value}</#if>" type="hidden"/>
+        <input type="checkbox" id="__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>swh" <#if value == "" && default>checked="true"</#if> <#if value != "" && value == judgeValue>checked="true"</#if>/>
         <span></span>
     </label>
     <@compress single_line=true>
-        <script type="text/javascript">
+        <script>
             $(function(){
-                $('#__${AssId?replace(".","_")}swh').unbind('click').on('click',function(e){
+                $('#__<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>swh').unbind('click').on('click',function(e){
                     var _value = "0";
                     if($(this).is(':checked') == true){
-                        $('#${AssId?replace(".","_")}').val("0");
+                        $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>').val("0");
                     }else{
-                        $('#${AssId?replace(".","_")}').val("1");
+                        $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>').val("1");
                         _value = "1";
                     }
                     if(typeof switchCallback == 'function'){

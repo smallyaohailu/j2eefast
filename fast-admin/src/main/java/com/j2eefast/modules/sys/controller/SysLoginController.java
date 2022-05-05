@@ -5,11 +5,20 @@
  */
 package com.j2eefast.modules.sys.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import javax.servlet.http.Cookie;
+import java.util.Map;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.codec.Base64Encoder;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
 import com.j2eefast.common.core.base.entity.LoginTenantEntity;
@@ -19,24 +28,33 @@ import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.license.annotation.FastLicense;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
-import com.j2eefast.framework.shiro.LoginType;
-import com.j2eefast.framework.shiro.UserToken;
+import com.j2eefast.framework.shiro.token.MobileToken;
 import com.j2eefast.framework.sys.entity.SysDictDataEntity;
+import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.sys.service.SysDictDataService;
 import com.j2eefast.framework.sys.service.SysTenantService;
+import com.j2eefast.framework.sys.service.SysUserService;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.base.Captcha;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.PhoneUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -62,9 +80,11 @@ public class SysLoginController extends BaseController {
 	@Autowired
 	private RedisUtil redisUtil;
 	@Autowired
-	private CaptchaService captchaService;
-	@Autowired
 	private SysTenantService sysTenantService;
+	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
+	private CaptchaService captchaService;
 
 	/**
 	 * 是否开启记住我功能
@@ -79,6 +99,12 @@ public class SysLoginController extends BaseController {
 	private boolean enabled;
 
 	/**
+	 * 个性化登录页面
+	 */
+	@Value("#{${web.view.loginHtml} ?: null}")
+	private LinkedHashMap<String, String> loginHtml;
+
+	/**
 	 * <p>生成验证码图片 系统参数管理配置</p>
 	 * <p>默认0 图形 1 算数 2 图形算数随机出现</p>
 	 * @author zhouzhou
@@ -86,31 +112,64 @@ public class SysLoginController extends BaseController {
 	 */
 	@RequestMapping(value = "captcha.gif", method = RequestMethod.GET)
 	public void captcha(HttpServletResponse response) throws IOException {
-		response.setHeader("Cache-Control", "no-store, no-cache");
-		response.setContentType(MimeType.IMAGE_GIF);
-		if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
-				.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
-			ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
-			// 几位数运算，默认是两位
-			gifCaptcha.setLen(3);
-			// 获取运算的公式：3+2=?
-			gifCaptcha.getArithmeticString();
-			// 获取运算的结果：5
-			String result =  gifCaptcha.text();
-			UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
-			gifCaptcha.out(response.getOutputStream());
-			return;
-		}else if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
-				.equals(Constant.SYS_DEFAULT_VALUE_TWO)){
-			int rd= Math.random()>0.5?1:0;
-			if(rd == 1){
+		String __ajax =  super.getPara("__ajax");
+		if(__ajax != null && __ajax.equals("json")) {
+			response.setContentType("application/json; charset=utf-8");
+			response.setCharacterEncoding("UTF-8");
+			JSONObject paramIn = new JSONObject();
+			if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
+				ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
+				// 几位数运算，默认是两位
+				gifCaptcha.setLen(3);
+				// 获取运算的公式：3+2=?
+				gifCaptcha.getArithmeticString();
+				// 获取运算的结果：5
+				String result =  gifCaptcha.text();
+				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+				paramIn.set("img",gifCaptcha.toBase64());
+			}else if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_TWO)){
+				int rd= Math.random()>0.5?1:0;
+				if(rd == 1){
+					GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
+					gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
+					String result = gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					paramIn.set("img",gifCaptcha.toBase64());
+				}else{
+					ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
+					// 几位数运算，默认是两位
+					gifCaptcha.setLen(3);
+					// 获取运算的公式：3+2=?
+					gifCaptcha.getArithmeticString();
+					// 获取运算的结果：5
+					String result =  gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					paramIn.set("img",gifCaptcha.toBase64());
+				}
+			}else{
 				GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
 				gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
 				String result = gifCaptcha.text();
 				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
-				gifCaptcha.out(response.getOutputStream());
-				return;
-			}else{
+				paramIn.set("img",gifCaptcha.toBase64());
+			}
+			paramIn.set("uuid", "");
+			paramIn.set("code", "0");
+			InputStream input= new ByteArrayInputStream(paramIn.toString().getBytes());
+			OutputStream output=response.getOutputStream();
+			try{
+				IoUtil.copy(input,output);
+			}finally{
+				IoUtil.close(input);
+				IoUtil.close(output);
+			}
+		}else {
+			response.setHeader("Cache-Control", "no-store, no-cache");
+			response.setContentType(MimeType.IMAGE_GIF);
+			if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
 				ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
 				// 几位数运算，默认是两位
 				gifCaptcha.setLen(3);
@@ -121,16 +180,112 @@ public class SysLoginController extends BaseController {
 				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
 				gifCaptcha.out(response.getOutputStream());
 				return;
+			}else if(Global.getDbKey(ConfigConstant.SYS_LOGIN_CAPTACHA_TYPE,Constant.SYS_DEFAULT_VALUE_ZERO)
+					.equals(Constant.SYS_DEFAULT_VALUE_TWO)){
+				int rd= Math.random()>0.5?1:0;
+				if(rd == 1){
+					GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
+					gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
+					String result = gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					gifCaptcha.out(response.getOutputStream());
+					return;
+				}else{
+					ArithmeticCaptcha gifCaptcha = new ArithmeticCaptcha();
+					// 几位数运算，默认是两位
+					gifCaptcha.setLen(3);
+					// 获取运算的公式：3+2=?
+					gifCaptcha.getArithmeticString();
+					// 获取运算的结果：5
+					String result =  gifCaptcha.text();
+					UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+					gifCaptcha.out(response.getOutputStream());
+					return;
+				}
+			}else{
+				GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
+				gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
+				String result = gifCaptcha.text();
+				UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
+				gifCaptcha.out(response.getOutputStream());
+				return;
 			}
-		}else{
-			GifCaptcha gifCaptcha = new GifCaptcha(130,48,4);
-			gifCaptcha.setCharType(Captcha.TYPE_DEFAULT);
-			String result = gifCaptcha.text();
-			UserUtils.setSessionAttribute(Constant.KAPTCHA_SESSION_KEY, result);
-			gifCaptcha.out(response.getOutputStream());
-			return;
 		}
 	}
+	
+	/**
+	 * 前端获取短信登录验证码 
+	 * 多租户需要传租户号码 tenantId
+	 * @author ZhouZhou
+	 * @date 2021-09-23
+	 * @param mobile 手机号码
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getLoginValideCode", method = RequestMethod.POST)
+	public ResponseData getLoginValideCode(String mobile) {
+		
+		if(!Global.isValidCode()) {
+			return error(ToolUtil.message("系统未开启短信登录功能"));
+		}
+		
+		//1.校验手机号码
+		if(!PhoneUtil.isMobile(mobile)) {
+			return error(ToolUtil.message("手机号码不合法，请重新输入"));
+		}
+		
+		//2.查询手机号码是否存在于系统
+		String tenantId = StrUtil.EMPTY;
+		if(enabled) {
+			tenantId = super.getPara(Constant.TENANT_PARAMETER);
+			if(ToolUtil.isEmpty(tenantId)){
+				return error(ToolUtil.message("必须传入租户号"));
+			}
+		}
+		
+		if(!sysUserService.findIsMobile(mobile, tenantId)) {
+			return error(ToolUtil.message("手机号码未注册"));
+		}
+		
+		//3.校验手机号码是否已经下发,不能过于频繁.
+		Long timeLen = redisUtil.getExpire(RedisKeys.getLoginValidKey(mobile));
+		if(timeLen > 0 && (Global.Validity() - timeLen) < Global.smsRate()) {
+			return error(ToolUtil.message("验证码已发,在有效期内都可以使用,请勿频繁发送"));
+		}
+		
+		//4.是否需要校验码获取短信验证码 防止恶意频繁发送获取验证码
+		if(Global.isValidationCode()){
+			//后台二次认证 图形验证码
+			CaptchaVO captchaVO = new CaptchaVO();
+			captchaVO.setCaptchaVerification(ServletUtil.getRequest().getParameter("__captchaVerification"));
+			if(!captchaService.verification(captchaVO).isSuccess()){
+				return error(ToolUtil.message("验证码有误"));
+			}
+		}
+		
+		//5. 生成验证码
+		String valideCode  = RandomUtil.randomNumbers(6);
+
+		//测试
+		redisUtil.set(RedisKeys.getLoginValidKey(mobile), valideCode, Global.Validity());
+		return success().put("valideCode",valideCode);
+		
+		/** 测试功能可以屏蔽
+		//6. 发送验证码
+		ResponseData data = MsgPushUtils.SendSms("", Global.loginSmsTemplateId(), new String[] {mobile},
+				new String[] {valideCode,Convert.toStr(Global.validityInt())});
+		if(data.get("code").equals(ResponseData.DEFAULT_SUCCESS_CODE)) {
+			//7.设置缓存
+			redisUtil.set(RedisKeys.getLoginValidKey(mobile), valideCode, Global.Validity());
+			return success();
+		}else {
+			return data;
+		}
+		*/
+		
+	}
+	
+	
 
 
 	/**
@@ -164,9 +319,17 @@ public class SysLoginController extends BaseController {
 				.equals(Constant.SYS_DEFAULT_VALUE_ONE));
 		mmp.put("rememberMe",rememberMe);
 		mmp.put("tenantModel",enabled);
+		mmp.put("valideLogin",Global.isValidCode());
+		mmp.put("isValidationCode",Global.isValidationCode());
 		List<LoginTenantEntity>  loginTenantList = sysTenantService.getLoginTenantList();
 		mmp.put("loginTenantList",loginTenantList);
-		return "login-" + view;
+
+		String urlPrefix = "login-" + view;
+		//是否有个性化转换登录页面
+		if(ToolUtil.isNotEmpty(loginHtml) && ToolUtil.isNotEmpty(loginHtml.get(view))){
+			urlPrefix = loginHtml.get(view);
+		}
+		return urlPrefix;
 	}
 
 
@@ -191,35 +354,49 @@ public class SysLoginController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseData login(String username, String password,Boolean rememberMe) {
-
-		if(Global.getDbKey(ConfigConstant.SYS_LOGIN_VERIFICATION,Constant.SYS_DEFAULT_VALUE_ONE)
-				.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
-			//后台二次认证 图形验证码
-			CaptchaVO captchaVO = new CaptchaVO();
-			captchaVO.setCaptchaVerification(super.getPara("__captchaVerification"));
-			if(!captchaService.verification(captchaVO).isSuccess()){
-				return error("50004","图形验证码不正确!");
-			}
-		}
-
-		String secretKey = super.getCookie(ConfigConstant.SECRETKEY);
-		Subject subject = null;
 		try {
-			//前端账号密码解密
-			username =new String(SoftEncryption.decryptBySM4(Base64.decode(username),
-					HexUtil.decodeHex(secretKey)).get("bytes",byte[].class)).trim();
-			password =new String(SoftEncryption.decryptBySM4(Base64.decode(password),
-					HexUtil.decodeHex(secretKey)).get("bytes",byte[].class)).trim();
 			//账号密码登录
-			UserToken token = new UserToken(username, password, LoginType.NORMAL.getDesc(),rememberMe);
-			subject = UserUtils.getSubject();
+			UsernamePasswordToken token = new UsernamePasswordToken(username, password,rememberMe);
+			Subject subject = UserUtils.getSubject();
 			subject.login(token);
-			//清除安全key
-			super.deleteCookieByName(ConfigConstant.SECRETKEY);
 		}catch (ServiceException e){
+			CookieUtil.setReadCookie(getHttpServletResponse(),ConfigConstant.SECRETKEY, ConfigConstant.PUBKEY,60*60*24*7);
 			return error("50006",ToolUtil.message("sys.login.sm4"));
 		}
 		catch (AuthenticationException e) {
+			RxcException ex = (RxcException) e.getCause();
+			String msg = ToolUtil.message("sys.login.failure");
+			if(!ToolUtil.isEmpty(e.getMessage())){
+				msg = e.getMessage();
+			}
+			if(ex.getCode() != null && "50004".equals(ex.getCode())) {
+				return error(ex.getCode(),ex.getMessage());
+			}
+			return error(msg);
+		}
+		if(super.getHeader("__ajax").equals("json")){
+			return success("登录成功!").put("sId",UserUtils.getSession().getId())
+			.put("token", Base64Encoder.encode(UserUtils.getUserInfo().getCsrfToken()))
+			.put("expires_in",UserUtils.getSession().getTimeout() / (1000 * 60));
+		}else{
+			return success("登录成功!");
+		}
+	}
+	
+	//@FastLicense(vertifys = {"online","detection"})
+	@ResponseBody
+	@RequestMapping(value = "/valideCodeLogin", method = RequestMethod.POST)
+	public ResponseData valideCodeLogin(String mobile, String valideCode,Boolean rememberMe) {
+		//1.校验手机号码
+		if(!PhoneUtil.isMobile(mobile)) {
+			return error("手机号码输入错误!");
+		}
+		try {
+			Subject subject = null;
+			MobileToken token = new MobileToken(mobile, valideCode,rememberMe);
+			subject = UserUtils.getSubject();
+			subject.login(token);
+		}catch (AuthenticationException e) {
 			RxcException ex = (RxcException) e.getCause();
 			String msg = ToolUtil.message("sys.login.failure");
 			if(!ToolUtil.isEmpty(e.getMessage())){
@@ -232,6 +409,9 @@ public class SysLoginController extends BaseController {
 		}
 		return success("登录成功!");
 	}
+
+
+
 
 	/**
 	 * 锁屏
@@ -262,22 +442,22 @@ public class SysLoginController extends BaseController {
 
 		if(ToolUtil.isNotEmpty(username) && ToolUtil.isNotEmpty(password)){
 			LoginUserEntity loginUser = UserUtils.getUserInfo();
-
-			String secretKey = "";
-			Cookie[] Cookies = request.getCookies();
-			for(int i =0;Cookies !=null && i<Cookies.length;i++){
-				Cookie c = Cookies[i];
-				if(c.getName().equals(ConfigConstant.SECRETKEY)) {
-					request.setAttribute(ConfigConstant.SECRETKEY, c.getValue());
-					secretKey = c.getValue();
-				}
-			}
 			try{
+				String kg4 = super.getPara("kg4");
+				String sign = super.getPara("sign");
+				//校验签名
+				String _sign = SoftEncryption.genSM3Keys((kg4 + username + password).getBytes())
+						.getStr("b64") ;
+				if(!_sign.equals(sign)){
+					//校验签名失败
+					throw new ServiceException("E0XA00011");
+				}
+				kg4 = SoftEncryption.decryptBySM2(Base64.decode(kg4),
+						ConfigConstant.PRIVKEY).getStr("hex");
 				username =new String(SoftEncryption.decryptBySM4(Base64.decode(username),
-						HexUtil.decodeHex(secretKey)).get("bytes",byte[].class)).trim();
-
+						HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
 				password =new String(SoftEncryption.decryptBySM4(Base64.decode(password),
-						HexUtil.decodeHex(secretKey)).get("bytes",byte[].class)).trim();
+						HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
 
 			}catch (Exception e){
 				throw new RxcException("解密失败,数据异常","50004");
@@ -292,8 +472,9 @@ public class SysLoginController extends BaseController {
 						throw new RxcException(ToolUtil.message("sys.login.code.error"),"50004");
 					}
 				}
-				password = UserUtils.sha256(password, loginUser.getSalt());
-				if (password.equals(loginUser.getPassword())){
+				SysUserEntity user = sysUserService.getById(loginUser.getId());
+				password = UserUtils.sha256(password, user.getSalt());
+				if (password.equals(user.getPassword())){
 					loginUser.setLoginStatus(0);
 					UserUtils.reloadUser(loginUser);
 					UserUtils.getSession().setAttribute("__unlock","unlock");
@@ -331,6 +512,14 @@ public class SysLoginController extends BaseController {
 		UserUtils.getSession().stop();
 		UserUtils.logout();
 		return REDIRECT+"login";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "logout",method = RequestMethod.POST)
+	public ResponseData loginOut() {
+		UserUtils.getSession().stop();
+		UserUtils.logout();
+		return success("退出成功");
 	}
 
 }

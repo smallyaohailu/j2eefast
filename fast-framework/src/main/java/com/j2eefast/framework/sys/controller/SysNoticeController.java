@@ -16,7 +16,6 @@ import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.sys.entity.SysNoticeEntity;
 import com.j2eefast.framework.sys.service.SysNoticeService;
-import com.j2eefast.framework.utils.Global;
 import com.j2eefast.framework.utils.UserUtils;
 import freemarker.template.Configuration;
 import freemarker.template.Template;

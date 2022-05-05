@@ -133,6 +133,14 @@ public class SysCompController extends BaseController {
 		return ztrees;
 	}
 
+	@GetMapping("/treeselect")
+	@RequiresPermissions("sys:user:list")
+	@ResponseBody
+	public ResponseData treeselect(){
+		List<Ztree> ztrees = sysCompService.findCompTree(super.getPara("type"));
+		return success(sysCompService.buildDeptTreeSelect(ztrees));
+	}
+
 	/**
 	 * 页面获取公司信息列表
 	 * @param params

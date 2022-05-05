@@ -1,14 +1,14 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="修改定时任务" bodyClass="white-bg" libs=["bootstrapSelect"]/>
+<@header title="任务管理" bodyClass="white-bg" libs=["bootstrapSelect"]/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-job-edit" class="form-horizontal">
 	<@f.hidden id="id" name="id" value="${job.id}"/>
-	<h4 class="form-header h4">基本信息</h4>
+	<h4 class="form-header h4">${i18n("基本信息")}</h4>
 	<div class="row">
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label class="col-sm-4 control-label"><span style="color: red; ">*</span>任务名称:</label>
+				<label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("任务名称")}:</label>
 				<div class="col-sm-8">
 					<@f.input name="jobName" value="${job.jobName}" placeholder="请输入任务名称" required=true/>
 				</div>
@@ -16,7 +16,7 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label class="col-sm-4 control-label"><span style="color: red; ">*</span>任务分组：</label>
+				<label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("任务分组")}：</label>
 				<div class="col-sm-8">
 					<@f.select name="jobGroup" value="${job.jobGroup}" dictType="sys_job_group" required=true/>
 				</div>
@@ -27,10 +27,10 @@
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label class="control-label col-sm-2" title="">
-					<span style="color: red; ">*</span>调用目标:</label>
+					<span style="color: red; ">*</span>${i18n("调用目标")}:</label>
 				<div class="col-sm-10">
 					<@f.input name="invokeTarget" value="${job.invokeTarget}" placeholder="调用目标" required=true
-					helpTip="SpringBean 调用示例：@Component(\"jobTaskTest\") 填写 jobTaskTest.fastParams(\"123\")"/>
+					helpTip="${i18n('SpringBean 调用示例: {0}填写 {1}',['@Component(\"jobTaskTest\")','jobTaskTest.fastParams(\"123\")'])}"/>
 				</div>
 			</div>
 		</div>
@@ -39,11 +39,11 @@
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label class="control-label col-sm-2" title="">
-					<span style="color: red; ">*</span>执行失败策略:</label>
+					<span style="color: red; ">*</span>${i18n("执行失败策略")}:</label>
 				<div class="col-sm-10">
-					<label class="radio-box"> <input type="radio" <#if job.misfirePolicy == "1" >checked</#if> name="misfirePolicy" value="1" /> 立即执行 </label>
-					<label class="radio-box"> <input type="radio" <#if job.misfirePolicy == "2" >checked</#if>name="misfirePolicy" value="2" /> 执行一次 </label>
-					<label class="radio-box"> <input type="radio" <#if job.misfirePolicy == "3" >checked</#if> name="misfirePolicy" value="3" /> 放弃执行 </label>
+					<label class="radio-box"> <input type="radio" <#if job.misfirePolicy == "1" >checked</#if> name="misfirePolicy" value="1" /> ${i18n("立即执行")} </label>
+					<label class="radio-box"> <input type="radio" <#if job.misfirePolicy == "2" >checked</#if>name="misfirePolicy" value="2" /> ${i18n("执行一次")} </label>
+					<label class="radio-box"> <input type="radio" <#if job.misfirePolicy == "3" >checked</#if> name="misfirePolicy" value="3" /> ${i18n("放弃执行")} </label>
 				</div>
 			</div>
 		</div>
@@ -52,10 +52,10 @@
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label class="control-label col-sm-2" title="">
-					<span style="color: red; ">*</span>是否允许并发进行:</label>
+					<span style="color: red; ">*</span>${i18n("是否允许并发进行")}:</label>
 				<div class="col-sm-10">
-					<label class="radio-box"> <input type="radio" <#if job.concurrent == "0" >checked</#if> name="concurrent" value="0"/> 允许 </label>
-					<label class="radio-box"> <input type="radio" <#if job.concurrent == "1" >checked</#if> name="concurrent" value="1"/> 禁止 </label>
+					<label class="radio-box"> <input type="radio" <#if job.concurrent == "0" >checked</#if> name="concurrent" value="0"/> ${i18n("允许")} </label>
+					<label class="radio-box"> <input type="radio" <#if job.concurrent == "1" >checked</#if> name="concurrent" value="1"/> ${i18n("禁止")} </label>
 				</div>
 			</div>
 		</div>
@@ -64,7 +64,7 @@
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label class="control-label col-sm-2" title="">
-					<span style="color: red; ">*</span> Cron执行表达式:</label>
+					<span style="color: red; ">*</span> ${i18n("Cron执行表达式")}:</label>
 				<div class="col-sm-10">
 					<@f.hidden name="cronExpression" value="${job.cronExpression?default('')}"/>
 					<iframe id="cronFrame" src="${ctxStatic}/sys/schedule/cron" style="width:100%;height:530px;border:0;"></iframe>
@@ -85,18 +85,18 @@
 	<div class="row">
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label class="col-sm-4 control-label">状态：</label>
+				<label class="col-sm-4 control-label">${i18n("状态")}：</label>
 				<div class="col-sm-8">
 					<@f.radio name="status" value="${job.status}" dictType="sys_job_status"/>
 				</div>
 			</div>
 		</div>
 	</div>
-	<h4 class="form-header h4">其它信息</h4>
+	<h4 class="form-header h4">${i18n("其它信息")}</h4>
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="form-group">
-				<label class="col-sm-2 control-label">备注：</label>
+				<label class="col-sm-2 control-label">${i18n("备注")}：</label>
 				<div class="col-sm-10">
 					<@f.textarea  name="remark" value="${job.remark?default('')}"/>
 				</div>
@@ -107,8 +107,8 @@
 	<div class="hr-line-dashed"></div>
 	<div class="row" id="_addTab">
 		<div class="col-sm-offset-5 col-sm-10">
-			<button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><@ctx.i18n text = "保存"/></button>&nbsp;
-			<button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>
+			<button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>${i18n("保存")}</button>&nbsp;
+			<button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>${i18n("关闭")}</button>
 		</div>
 	</div>
 </div>
@@ -137,7 +137,7 @@
 			},
 			messages: {
 	            "cronExpression": {
-	                remote: "表达式不正确"
+	                remote: "${i18n("表达式不正确")}"
 	            }
 	        },
 	        focusCleanup: true

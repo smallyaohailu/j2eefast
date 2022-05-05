@@ -8,21 +8,23 @@ package com.j2eefast.framework.config;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.j2eefast.common.core.adapter.SecurityKeyInterceptorAdapter;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.license.interceptor.LicenseCheckInterceptor;
 import com.j2eefast.common.core.utils.CookieUtil;
+import com.j2eefast.common.core.utils.Global;
+import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.framework.interceptor.RepeatSubmitInterceptor;
-import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.request.RequestContextListener;
@@ -37,14 +39,19 @@ import com.j2eefast.common.core.utils.ToolUtil;
 
 /**
  * WebMvc配置
+ * @author zhouzhou
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
 
-
-	@Value("#{ @environment['spring.messages.defaultLocale'] ?: 'zh_CN' }")
+	@Value("#{ @environment['fast.messages.defaultLocale'] ?: 'zh_CN' }")
 	private String defaultLocale;
+	@Value("#{ @environment['web.staticPrefix'] ?: 'classpath:/static/' }")
+	private String staticPrefix;
+	@Value("#{ @environment['web.cacheTime'] ?: 25 }")
+    private int cacheTime;
+
 	@Value("#{${web.adapter.registry} ?: null}")
 	private LinkedHashMap<String, String> adapterRegistry ;
 
@@ -63,9 +70,11 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
+		//TODO 2.5.1 版本去除
+	    //registry.addResourceHandler("/i18n/**").addResourceLocations("classpath:/i18n/");
+        registry.addResourceHandler("/static/**").addResourceLocations(staticPrefix)
+				.setCacheControl(CacheControl.maxAge(cacheTime, TimeUnit.DAYS).cachePublic());
 
-	    registry.addResourceHandler("/i18n/**").addResourceLocations("classpath:/i18n/");
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
         /**工作流资源拦截 若不用可以屏蔽*/
 		registry.addResourceHandler("/flowable/**").addResourceLocations("classpath:/flowable/");
         /** 本地文件上传路径 */
@@ -76,26 +85,9 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
 
-//    /**
-//     * web跨域访问配置
-//     */
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry)
-//    {
-//        // 设置允许跨域的路径
-//        registry.addMapping("/**")
-//                // 设置允许跨域请求的域名
-//                .allowedOrigins("*")
-//                // 是否允许证书
-//                .allowCredentials(true)
-//                // 设置允许的方法
-//                .allowedMethods("GET", "POST", "DELETE", "PUT")
-//                // 设置允许的header属性
-//                .allowedHeaders("*")
-//                // 跨域允许时间
-//                .maxAge(3600);
-//    }
-
+	/**
+	 * 注册系统拦截器
+	 */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(LicenseCheckInterceptor).addPathPatterns("/**");
@@ -156,18 +148,22 @@ public class WebConfig implements WebMvcConfigurer {
         @Override
         public Locale resolveLocale(HttpServletRequest request) {
 			String language = request.getParameter(ConfigConstant.LANGUAGE);
+			String cookie_language = CookieUtil.getCookie(request,ConfigConstant.LANGUAGE);
 			Locale locale = null;
 			if(ToolUtil.isNotEmpty(language)){
 				String[] split = language.split("_");
 				locale = new Locale(split[0],split[1]);
+				if(!language.equals(cookie_language)) {
+					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,language,60*60*24*7);
+				}
 			}else {
-				language = CookieUtil.getCookie(request,ConfigConstant.LANGUAGE);
-				if(ToolUtil.isNotEmpty(language)){
-					String[] split = language.split("_");
+				if(ToolUtil.isNotEmpty(cookie_language)){
+					String[] split = cookie_language.split("_");
 					locale = new Locale(split[0],split[1]);
 				}else{
 					String[] split = defaultLocale.split("_");
 					locale = new Locale(split[0],split[1]);
+					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,defaultLocale,60*60*24*7);
 				}
 			}
 			return locale;

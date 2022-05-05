@@ -119,8 +119,10 @@ public class BinaryUploader {
 					// 如果开启了压缩图片
 					if ((Boolean)conf.get("imageCompressEnable")){
 						Integer maxWidth = (Integer)conf.get("imageCompressBorder");
-						ImageUtils.thumbnails(new File(physicalPath), maxWidth, -1, null);
+						ImageUtils.thumbnails(new File(physicalPath), maxWidth, -1, null,
+								(Boolean)conf.get("imagePressEnable"),(String)conf.get("imagePressText"));
 					}
+
 				}
 				String url = PathFormat.format(savePath);
 				int index = url.indexOf(FILEUEDITOR_BASE_URL);

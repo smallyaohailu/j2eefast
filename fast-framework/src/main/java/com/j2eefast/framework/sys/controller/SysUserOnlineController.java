@@ -13,6 +13,7 @@ import com.j2eefast.common.core.shiro.RedisSessionDAO;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.server.OnlineEntity;
 import com.j2eefast.framework.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public class SysUserOnlineController extends BaseController {
 
     @Lazy
     @Resource
-    private RedisSessionDAO redisSessionDAO;
+    private RedisSessionDAO sessionDAO;
 
     @RequiresPermissions("sys:online:view")
     @GetMapping()
@@ -70,7 +71,7 @@ public class SysUserOnlineController extends BaseController {
         //每页条数
         int limit = Integer.parseInt((String) params.get("__limit"));
 
-        Collection<Session> list = redisSessionDAO.getActiveSessions();
+        Collection<Session> list = sessionDAO.getActiveSessions();
         List<OnlineEntity> userList = new ArrayList<>();
         for (Session session : list) {
             if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
@@ -89,7 +90,7 @@ public class SysUserOnlineController extends BaseController {
             online.setLoginIp(session.getHost());
             online.setName(user.getName());
             online.setUsername(user.getUsername());
-            online.setCompName(user.getCompName());
+            online.setCompName(ConstantFactory.me().getCompName(user.getId()));
             online.setLoginLocation(user.getLoginLocation());
             online.setLoginStatus(ToolUtil.isNotEmpty(user.getLoginStatus())?user.getLoginStatus():1);
             online.setSId(session.getId().toString());
@@ -128,16 +129,16 @@ public class SysUserOnlineController extends BaseController {
                 if (UserUtils.getSession().getId().equals(sessionId)) {
                     return error("自己不能踢自己下线操作!");
                 }
-                Session session = redisSessionDAO.readSession(sessionId);
+                Session session = sessionDAO.readSession(sessionId);
                 Subject subject = new Subject.Builder().session(session).buildSubject();
                 LoginUserEntity loginUserEntity =  (LoginUserEntity) subject.getPrincipal();
                 if(ToolUtil.isNotEmpty(loginUserEntity.getLoginStatus()) && loginUserEntity.getLoginStatus() != -9){
                     ((LoginUserEntity) subject.getPrincipal()).setLoginStatus(-9);
-                    redisSessionDAO.update(session);
+                    sessionDAO.update(session);
                 }
                 if(ToolUtil.isEmpty(loginUserEntity.getLoginStatus())){
                     ((LoginUserEntity) subject.getPrincipal()).setLoginStatus(-9);
-                    redisSessionDAO.update(session);
+                    sessionDAO.update(session);
                 }
             }
             return success();

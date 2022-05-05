@@ -15,6 +15,7 @@ import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.mutidatasource.DataSourceContextHolder;
 import com.j2eefast.common.core.mutidatasource.annotaion.mybatis.MybatisMapperRefresh;
 import com.j2eefast.common.core.page.Query;
+import com.j2eefast.common.core.utils.Md5Util;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
@@ -24,6 +25,7 @@ import com.j2eefast.common.db.utils.SqlExe;
 import com.j2eefast.framework.sys.mapper.SysDatabaseMapper;
 import com.j2eefast.framework.sys.service.SysMenuService;
 import com.j2eefast.framework.utils.Global;
+import com.j2eefast.generator.gen.entity.GenEditCodeEntity;
 import com.j2eefast.generator.gen.entity.GenTableColumnEntity;
 import com.j2eefast.generator.gen.entity.GenTableEntity;
 import com.j2eefast.generator.gen.mapper.GenTableMapper;
@@ -64,6 +66,10 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
 
     @Autowired
     private GenTableColumnService genTableColumnService;
+
+    @Lazy
+    @Resource
+    private GenEditCodeService genEditCodeService;
 
     @Lazy
     @Resource
@@ -193,6 +199,7 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
         String path = table.getRunPath().equals("/")? Global.getTempPath() + File.separator: table.getRunPath();
         // 查询列信息
         List<GenTableColumnEntity> columns = table.getColumns();
+
         setPkColumn(table, columns);
 
         VelocityInitializer.initVelocity();
@@ -220,6 +227,11 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
         if(ToolUtil.isNotEmpty(table.getMenuName()) && ToolUtil.isNotEmpty(table.getParentName())){
             isMenu = true;
         }
+
+
+        //1. 清空代码设计器数据
+        genEditCodeService.remove(new QueryWrapper<GenEditCodeEntity>().eq("table_id",tableId));
+
         for (String template : templates) {
             // 渲染模板
             StringWriter sw = new StringWriter();
@@ -229,9 +241,19 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
                 String p = path + VelocityUtils.getFileName(template, table);
                 String temp =StrUtil.replace(sw.toString(),"<@>","#");
                 temp =StrUtil.replace(temp,"<$>","$");
-                FileUtil.writeString(temp,p,CharsetUtil.UTF_8);
+                File  file = FileUtil.writeString(temp,p,CharsetUtil.UTF_8);
                 if(template.contains("sql.vm")){
                     runMenuSqlPath = p;
+                }else{
+                    //2.插入
+                    GenEditCodeEntity genEditCode = new GenEditCodeEntity();
+                    genEditCode.setTableId(tableId);
+                    genEditCode.setMd5(Md5Util.hash(p));
+                    genEditCode.setPath(FileUtil.normalize(p));
+                    genEditCode.setTemplate(temp.getBytes());
+                    genEditCode.setName(FileUtil.getName(file));
+                    genEditCode.setSuffix(FileUtil.getSuffix(file));
+                    genEditCodeService.save(genEditCode);
                 }
             }
             catch (IORuntimeException e) {
@@ -271,8 +293,20 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
                     try {
                         String p = path + VelocityUtils.getFileName(template, table);
                         String temp =StrUtil.replace(sw.toString(),"<@>","#");
-                        temp =StrUtil.replace(temp,"<$>","$");
-                        FileUtil.writeString(temp,p,CharsetUtil.UTF_8);
+                        temp = StrUtil.replace(temp,"<$>","$");
+
+                        //保存
+                        File file = FileUtil.writeString(temp,p,CharsetUtil.UTF_8);
+
+                        //2.插入
+                        GenEditCodeEntity genEditCode = new GenEditCodeEntity();
+                        genEditCode.setTableId(tableId);
+                        genEditCode.setMd5(Md5Util.hash(p));
+                        genEditCode.setPath(FileUtil.normalize(p));
+                        genEditCode.setTemplate(temp.getBytes());
+                        genEditCode.setName(FileUtil.getName(file));
+                        genEditCode.setSuffix(FileUtil.getSuffix(file));
+                        genEditCodeService.save(genEditCode);
                     }
                     catch (IORuntimeException e) {
                         throw  new RxcException("文件生成失败","99991");
@@ -319,10 +353,11 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
     }
 
     /**
-     * 代码预览
+     * 代码预览 启用 改成直接从数据库中获取
      * @param tableId
      * @return
      */
+    @Deprecated
     public Map<String, String> previewCode(Long tableId) {
 
         Map<String, String> dataMap = new LinkedHashMap<>();

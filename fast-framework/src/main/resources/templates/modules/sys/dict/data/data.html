@@ -1,6 +1,6 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="字典列表" libs=["table"]/>
+<@header title="字典管理" libs=["table"]/>
 <div class="container-div" id="_app">
     <div class="row">
     <div class="col-sm-12 search-collapse">
@@ -8,19 +8,19 @@
     <div class="select-list">
         <ul>
             <li>
-                字典名称：
+                ${i18n("字典名称")}：
                 <@f.select name="dictType" value="${dictHtml.dictType}" items=dictList itemLabel="dictName" itemValue="dictType"/>
             </li>
             <li>
-                字典标签：<input type="text" class="form-control" name="dictLabel"/>
+                ${i18n("字典标签")}：<input type="text" class="form-control" name="dictLabel"/>
             </li>
             <li>
-                数据状态：
+                ${i18n("数据状态")}：
                 <@f.select name="status" blankValue="" blankLabel="所有" dictType="sys_normal_disable" />
             </li>
             <li>
-                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;<@ctx.i18n text = "查询"/></a>
-                <a class="btn btn-warning btn-rounded btn-sm" @click="resetPre"><i class="fa fa-refresh"></i>&nbsp;<@ctx.i18n text = "重置"/></a>
+                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;${i18n("查询")}</a>
+                <a class="btn btn-warning btn-rounded btn-sm" @click="resetPre"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
             </li>
         </ul>
     </div>
@@ -28,18 +28,18 @@
     </div>
     <@table id="bootstrap-table">
         <@shiro.hasPermission name="sys:dict:add">
-            <a class="btn btn-success" @click="add"><i class="fa fa-plus"></i>&nbsp;<@ctx.i18n text = "新增"/></a>
+            <a class="btn btn-success" @click="add"><i class="fa fa-plus"></i>&nbsp;${i18n("新增")}</a>
         </@shiro.hasPermission>
         <@shiro.hasPermission name="sys:dict:edit">
-            <a class="btn btn-primary single disabled" onclick="opt.operate.edit()"><i class="fa fa-pencil-square-o"></i>&nbsp;<@ctx.i18n text = "修改"/></a>
+            <a class="btn btn-primary single disabled" onclick="opt.operate.edit()"><i class="fa fa-pencil-square-o"></i>&nbsp;${i18n("修改")}</a>
         </@shiro.hasPermission>
         <@shiro.hasPermission name="sys:dict:del">
             <a class="btn btn-danger multiple disabled" onclick="opt.operate.delAll()">
-                <i class="fa fa-remove"></i> <@ctx.i18n text = "删除"/>
+                <i class="fa fa-remove"></i> ${i18n("删除")}
             </a>
         </@shiro.hasPermission>
         <a class="btn btn-warning" onclick="opt.modal.closeTab()">
-            <i class="fa fa-reply-all"></i> <@ctx.i18n text = "关闭"/>
+            <i class="fa fa-reply-all"></i> ${i18n("关闭")}
         </a>
     </@table>
     </div>
@@ -85,14 +85,14 @@
                 delUrl: prefix + "/del",
                 sortName: "dictSort",
                 queryParams: this.queryParams, /*初始化请求参数*/
-                modalName: "字典数据",
+                modalName: "${i18n("字典")}",
                 columns: [
                      /*{checkbox: true},*/
-                    {field: 'id', title: "<@ctx.i18n text = "字典编码"/>", sortable: true},
-                    {field: 'dictValue', title: "<@ctx.i18n text = "字典键值"/>",formatter:function (value) {
-                            return $.table.tooltip(value,20);
+                    {field: 'id', title: "${i18n("字典编码")}", sortable: true},
+                    {field: 'dictValue', title: "${i18n("字典键值")}",formatter:function (value) {
+                            return opt.common.tooltip(value,20);
                     }},
-                    {field: 'dictLabel', title: "<@ctx.i18n text = "字典标签"/>", formatter: function(value, row, index) {
+                    {field: 'dictLabel', title: "${i18n("字典标签")}", formatter: function(value, row, index) {
 
                             var actions = [];
                             var listClass = "";
@@ -119,28 +119,28 @@
                                     value));
                                 return actions.join('');
                             }else{
-                                return $.table.tooltip(value,20);
+                                return opt.common.tooltip(value,20);
                             }
 
                         }},
-                    {field: 'dictSort', title: "<@ctx.i18n text = "字典排序"/>",sortable: true},
-                    {field: 'status', title: "<@ctx.i18n text = "状态"/>", align: 'center', formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(datas, value);
+                    {field: 'dictSort', title: "${i18n("排序")}",sortable: true},
+                    {field: 'status', title: "${i18n("状态")}", align: 'center', formatter: function(value, row, index) {
+                            return opt.common.selectDictLabel(datas, value);
                         }},
-                    {field: 'remark', title: "<@ctx.i18n text = "备注"/>"},
-                    {field: 'createTime', title: "<@ctx.i18n text = "创建时间"/>", sortable: true},
-                    {field: 'isDefault', title: "<@ctx.i18n text = "系统默认"/>", formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(isSysDatas, value);
+                    {field: 'remark', title: "${i18n("备注")}"},
+                    {field: 'createTime', title: "${i18n("创建时间")}", sortable: true},
+                    {field: 'isDefault', title: "${i18n("系统默认")}", formatter: function(value, row, index) {
+                            return opt.common.selectDictLabel(isSysDatas, value);
                         }
                     },
-                    {field: 'isSys', title: "<@ctx.i18n text = "系统内置"/>", formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(isSysDatas, value);
+                    {field: 'isSys', title: "${i18n("系统内置")}", formatter: function(value, row, index) {
+                            return opt.common.selectDictLabel(isSysDatas, value);
                         }
                     },
-                    {title:"<@ctx.i18n text = "操作"/>", align: 'center', formatter: function(value, row, index) {
+                    {title:"${i18n("操作")}", align: 'center', formatter: function(value, row, index) {
                             var actions = [];
-                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                            actions.push('<a class="btn btn-danger btn-xs ' + delFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i> ${i18n("编辑")}</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + delFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i> ${i18n("删除")}</a>');
                             return actions.join('');
                         }}]
             };

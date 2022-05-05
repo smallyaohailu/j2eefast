@@ -8,7 +8,11 @@ ${pageTheme}
 #break
 #end
 #end
+#if($menuName != '')
+<@header title="${menuName}" bodyClass="white-bg" libs=["bootstrapSelect"#if($table.rFile),"fileupload"#end#if($selectPage_ == "1"),"selectPage"#end#if($table.master),"table"#end]/>
+#else
 <@header title="修改${functionName}" bodyClass="white-bg" libs=["bootstrapSelect"#if($table.rFile),"fileupload"#end#if($selectPage_ == "1"),"selectPage"#end#if($table.master),"table"#end]/>
+#end
 #foreach($column in $columns)
 #if($column.edit && !$column.superColumn && !$column.pk && $column.htmlType == "datetime")
 #break
@@ -17,7 +21,7 @@ ${pageTheme}
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-${businessName}-edit"  class="form-horizontal">
     <@f.hidden name="${pkColumn.javaField}" value="${${className}.${pkColumn.javaField}}"/>
-    <h4 class="form-header h4"><@ctx.i18n text = "基本信息"/>&nbsp;<i class="fa-fw ${table.menuIcon}"></i></h4>
+    <h4 class="form-header h4"><$>{i18n("基本信息")}&nbsp;<i class="fa-fw ${table.menuIcon}"></i></h4>
 #set($indexTag = 0)
 #set($isTag = 1)
 #foreach($column in $columns)
@@ -59,7 +63,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.treeselect id="${treeParentCode}" name="${treeParentCode}" boxTitle="选择${comment}" url="${moduleName}/${businessName}/treeData"
@@ -82,7 +86,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.input name="${field}" value="${${className}.${field}?default('')}"  #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -103,7 +107,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.iconselect name="${field}" value="${${className}.${field}?default('')}" placeholder="选择图标" #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -121,7 +125,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <div class="input-group">
@@ -144,7 +148,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                      <@f.selectLinkage name="${field}" value="${${className}.${field}?default('')}"/>
@@ -165,7 +169,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                      <@f.select name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}"  #if($column.required) required=true#end  multiple=true #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -183,7 +187,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <select name="${field}" class="form-control m-b"#if($column.required) required#end>
@@ -207,7 +211,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                      <@f.select name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}"  #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -225,7 +229,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <select name="${field}" class="form-control m-b"#if($column.required) required#end>
@@ -249,7 +253,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                    <@f.radio name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}" #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -270,7 +274,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <div class="radio-box">
@@ -293,7 +297,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.checkbox name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}" #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -311,7 +315,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <label><input type="checkbox" name="${field}" value=""#if($column.required) required#end>
@@ -334,7 +338,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.input name="${field}" type="date" dataType="date" dataFormat="yyyy-MM-dd" value="${(${className}.${field}?string('yyyy-MM-dd'))!}"
@@ -356,7 +360,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <textarea name="${field}" class="form-control"#if($column.required) required#end>${${className}.${field}?default('')}</textarea>
@@ -377,7 +381,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                         <@f.treeselect name="${field}" value="${${className}.${field}?default('')}"
@@ -401,7 +405,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                         <@f.treeselect  name="${field}" value="${${className}.${field}?default('')}"
@@ -421,7 +425,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <input name="${field}" class="form-control" type="text"#if($column.required) required#end>
@@ -451,7 +455,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.treeselect id="${treeParentCode}" name="${treeParentCode}" boxTitle="选择${comment}" url="${moduleName}/${businessName}/treeData"
@@ -474,7 +478,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.input name="${field}" value="${${className}.${field}?default('')}"  #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -495,7 +499,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.iconselect name="${field}" value="${${className}.${field}?default('')}" placeholder="选择图标" #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -516,7 +520,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <div class="input-group">
@@ -536,7 +540,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                      <@f.selectLinkage name="${field}" value="${${className}.${field}?default('')}"/>
@@ -557,7 +561,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                      <@f.select name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}"  #if($column.required) required=true#end  multiple=true #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -575,7 +579,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <select name="${field}" class="form-control m-b"#if($column.required) required#end>
@@ -599,7 +603,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                      <@f.select name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}"  #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -620,7 +624,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <select name="${field}" class="form-control m-b"#if($column.required) required#end>
@@ -644,7 +648,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                    <@f.radio name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}" #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -665,7 +669,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <div class="radio-box">
@@ -688,7 +692,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.checkbox name="${field}" dictType="${dictType}" value="${${className}.${field}?default('')}" #if($column.required) required=true#end #if($column.info && $column.info !="")#if($column.circleType == "R")helpTip="${column.editInfo}"#end#end/>
@@ -706,7 +710,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                        <label><input type="checkbox" name="${field}" value=""#if($column.required) required#end>
@@ -729,7 +733,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <@f.input name="${field}" type="date" dataType="date" dataFormat="yyyy-MM-dd" value="${(${className}.${field}?string('yyyy-MM-dd'))!}"
@@ -751,7 +755,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <textarea name="${field}" class="form-control"#if($column.required) required#end>${${className}.${field}?default('')}</textarea>
@@ -772,7 +776,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                         <@f.treeselect name="${field}" value="${${className}.${field}?default('')}"
@@ -796,7 +800,7 @@ ${pageTheme}
 #if($column.required)
                     <span style="color: red; ">* </span>
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                         <@f.treeselect  name="${field}" value="${${className}.${field}?default('')}"
@@ -816,7 +820,7 @@ ${pageTheme}
                     <i class="fa fa-question-circle-o" title="${column.editInfo}"></i>
 #end
 #end
-                    <@ctx.i18n text = "${comment}"/>：
+                    <$>{i18n("${comment}")}：
                 </label>
                 <div class="col-sm-8">
                     <input name="${field}" class="form-control" type="text"#if($column.required) required#end>
@@ -839,13 +843,13 @@ ${pageTheme}
     </div>
 #end
 #if($table.rImg || $table.rFile)
-    <h4 class="form-header h4"><@ctx.i18n text = "附件上传"/>&nbsp;<i class="fa-fw fa icon-cloud-upload"></i></h4>
+    <h4 class="form-header h4"><$>{i18n("附件上传")}&nbsp;<i class="fa-fw fa icon-cloud-upload"></i></h4>
 #end
 #if($table.rImg)
     <div class="row">
        <div class="col-xs-12">
             <div class="form-group">
-                <label class="col-sm-2 control-label"><@ctx.i18n text = "图片附件上传"/>：
+                <label class="col-sm-2 control-label"><$>{i18n("图片附件上传")}：
                 </label>
                 <div class="col-sm-10">
                     <@f.fileupload name="upload_img" bizId="${${className}.${pkColumn.javaField}}" bizType="${tableName}_img" isLazy=true preview="true" uploadType="image"/>
@@ -858,7 +862,7 @@ ${pageTheme}
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
-                <label class="col-sm-2 control-label"><@ctx.i18n text = "文件附件上传"/>：
+                <label class="col-sm-2 control-label"><$>{i18n("文件附件上传")}：
                 </label>
                 <div class="col-sm-10">
                      <@f.fileupload name="upload_file" bizId="${${className}.${pkColumn.javaField}}" bizType="${tableName}_file" isLazy=true preview="true" uploadType="all"/>
@@ -872,9 +876,9 @@ ${pageTheme}
   <div class="row">
         <div class="col-xs-12">
             <@table id="bootstrap-table">
-                <a class="btn btn-success" onclick="addColumn()"><i class="fa fa-plus"></i>&nbsp;<@ctx.i18n text = "新增"/></a>
+                <a class="btn btn-success" onclick="addColumn()"><i class="fa fa-plus"></i>&nbsp;<$>{i18n("新增")}</a>
                 <a class="btn btn-danger" onclick="$.table.removeData()">
-                    <i class="fa fa-remove"></i> <@ctx.i18n text = "删除"/>
+                    <i class="fa fa-remove"></i> <$>{i18n("删除")}
                 </a>
             </@table>
         </div>
@@ -884,8 +888,8 @@ ${pageTheme}
 <div class="hr-line-dashed"></div>
 <div class="row" id="_addTab">
     <div class="col-sm-offset-5 col-sm-10">
-        <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><@ctx.i18n text = "保存"/></button>&nbsp;
-        <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><$>{i18n("保存")}</button>&nbsp;
+        <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><$>{i18n("关闭")}</button>
     </div>
 </div>
 </div>
@@ -1023,7 +1027,7 @@ ${pageTheme}
 #set($com=$c.columnComment)
 #end
 #if($c.edit && !$c.pk)
-            ,{field: '${c.javaField}',align: 'center',title: '${com}',formatter: function(value, row, index) {
+            ,{field: '${c.javaField}',align: 'center',title: '<$>{i18n("${com}")}',formatter: function(value, row, index) {
 #if($c.htmlType == "input")
                 var html = opt.common.sprintf("<input class='form-control' type='text' name='${classEnty}[%s].${c.javaField}' value='%s'>", index, value);
                 return html;

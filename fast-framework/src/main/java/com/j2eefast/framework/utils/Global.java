@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.utils.SpringUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -25,6 +26,7 @@ import cn.hutool.setting.Setting;
  * @author zhouzhou loveingowp@163.com
  * @data 2019-04-05 19:44
  */
+@Deprecated
 public class Global {
 	
 	private static final Logger log = LoggerFactory.getLogger(Global.class);
@@ -35,12 +37,10 @@ public class Global {
     public static String  getConfig(String key){
     	try{
     		return SpringUtil.getBean(SysConfigService.class).getConfigObject(key, String.class);
-        }catch (Exception e)
-        {
+        }catch (Exception e){
         	log.error("获取配置错误!", e);
         	return null;
         }
-    	
     }
     
     
@@ -146,6 +146,7 @@ public class Global {
     	//获取登陆最大错误次数
     	return array.getInt("login_maxCount",5);
     }
+    
     /**
      * 登陆错误次数需要输入验证码
      */
@@ -161,6 +162,74 @@ public class Global {
     	return array.getInt("login_NumCount",5);
     }
     
+    /**
+     * 是否支持短信登录
+     * @author ZhouZhou
+     * @return
+     */
+    public static boolean isValidCode() {
+    	
+    	String jsonStr = StrUtil.blankToDefault(getConfig(ConfigConstant.SYS_LOGIN_SMS),
+    			"{\"isLogin\":1,\"validity\":5,\"rate\":1,\"templateId\":\"1134302\"}");
+    	//JSON 格式转换
+    	JSONObject array = JSONUtil.parseObj(jsonStr);
+    	
+    	return array.getInt("isLogin",0) == 1;
+    }
+    
+    /**
+     * 短信验证码有效期
+     * @author ZhouZhou
+     * @date 2021-09-23
+     * @return
+     */
+    public static Long Validity() {
+    	String jsonStr = StrUtil.blankToDefault(getConfig(ConfigConstant.SYS_LOGIN_SMS),
+    			"{\"isLogin\":1,\"validity\":5,\"rate\":1,\"templateId\":\"1134302\"}");
+    	//JSON 格式转换
+    	JSONObject array = JSONUtil.parseObj(jsonStr);
+    	
+    	return Convert.toLong(array.getInt("validity",5)*60);
+    }
+
+    public static Integer validityInt() {
+        String jsonStr = StrUtil.blankToDefault(getConfig(ConfigConstant.SYS_LOGIN_SMS),
+                "{\"isLogin\":1,\"validity\":5,\"rate\":1,\"templateId\":\"1134302\"}");
+        //JSON 格式转换
+        JSONObject array = JSONUtil.parseObj(jsonStr);
+
+        return array.getInt("validity",5);
+    }
+
+
+    /**
+     * 限制频率
+     * @date 2021-09-23
+     * @return
+     */
+    public static Long smsRate() {
+    	String jsonStr = StrUtil.blankToDefault(getConfig(ConfigConstant.SYS_LOGIN_SMS),
+    			"{\"isLogin\":1,\"validity\":5,\"rate\":1,\"templateId\":\"1134302\"}");
+    	//JSON 格式转换
+    	JSONObject array = JSONUtil.parseObj(jsonStr);
+    	
+    	return Convert.toLong(array.getInt("rate",5) * 60);
+    }
+    
+    /**
+     * 模板ID
+     * @author ZhouZhou
+     * @date 2021-09-23
+     * @return
+     */
+    public static String loginSmsTemplateId() {
+    	String jsonStr = StrUtil.blankToDefault(getConfig(ConfigConstant.SYS_LOGIN_SMS),
+    			"{\"isLogin\":1,\"validity\":5,\"rate\":1,\"templateId\":\"1134302\"}");
+    	//JSON 格式转换
+    	JSONObject array = JSONUtil.parseObj(jsonStr);
+    	
+    	return array.getStr("templateId","1134302");
+    }
     
     /**
      * 单位(分钟) 禁止30分钟

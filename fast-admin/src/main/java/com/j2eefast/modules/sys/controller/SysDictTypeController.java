@@ -5,8 +5,10 @@
  */
 package com.j2eefast.modules.sys.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.base.entity.Ztree;
+import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
@@ -125,7 +127,7 @@ public class SysDictTypeController extends BaseController {
         if (!sysDictTypeSerive.checkDictTypeUnique(dict)) {
             return error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        return sysDictTypeSerive.updateById(dict)?success():error("修改失败!");
+        return sysDictTypeSerive.updateDictType(dict)?success():error("修改失败!");
     }
 
 
@@ -167,6 +169,7 @@ public class SysDictTypeController extends BaseController {
     @RepeatSubmit
     @ResponseBody
     public ResponseData clearConfig(){
+        ConfigConstant.DICT_TAG = RandomUtil.randomString(5);
         return sysDictTypeSerive.clearDictRedis()?success():error("Redis没有开启无需清理!");
     }
 }

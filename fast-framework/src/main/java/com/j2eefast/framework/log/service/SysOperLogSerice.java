@@ -13,6 +13,9 @@ import com.j2eefast.framework.annotation.DataFilter;
 import com.j2eefast.framework.log.entity.SysOperLogEntity;
 import com.j2eefast.framework.log.mapper.SysOperLogMapper;
 import com.j2eefast.framework.utils.Constant;
+
+import cn.hutool.core.date.DateUtil;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
@@ -43,6 +46,10 @@ public class SysOperLogSerice extends ServiceImpl<SysOperLogMapper, SysOperLogEn
 		String deptId = (String) params.get("deptId");
 		Page<SysOperLogEntity> page = this.baseMapper.findPage(new Query<SysOperLogEntity>(params).getPage(),
 				title,operName,status,beginTime,endTime,pabusinessTypes,deptId,(String) params.get(Constant.SQL_FILTER));
+		page.getRecords().forEach(e->{
+			//转换耗时时间输出
+			e.setCTime(DateUtil.formatBetween(e.getTime()));
+		});
 		return new PageUtil(page);
 	}
 
@@ -55,5 +62,14 @@ public class SysOperLogSerice extends ServiceImpl<SysOperLogMapper, SysOperLogEn
 	public boolean cleanLog() {
 		this.baseMapper.cleanLog();
 		return true;
+	}
+
+	/**
+	 * 插入日志
+	 * @param sysOperLog
+	 * @return
+	 */
+	public boolean insertLog(SysOperLogEntity sysOperLog){
+		return this.baseMapper.insertLog(sysOperLog) > 0;
 	}
 }

@@ -1,7 +1,7 @@
 package com.j2eefast.framework.quartz.utils;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import com.j2eefast.common.core.utils.BeanUtil;
-import com.j2eefast.common.core.utils.ExceptionUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.framework.quartz.entity.SysJobEntity;
 import com.j2eefast.framework.quartz.entity.SysJobLogEntity;
@@ -28,8 +28,7 @@ public abstract class AbstractQuartzJob implements Job {
 	private static ThreadLocal<Date> threadLocal = new ThreadLocal<>();
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException
-	{
+	public void execute(JobExecutionContext context) throws JobExecutionException{
 		SysJobEntity sysJob = new SysJobEntity();
 		//修改通过拷贝类实现
 		BeanUtil.copyBeanProp(sysJob, context.getMergedJobDataMap().get(JobInvokeUtil.TASK_PROPERTIES));
@@ -70,12 +69,12 @@ public abstract class AbstractQuartzJob implements Job {
 		sysJobLog.setJobGroup(sysJob.getJobGroup());
 		sysJobLog.setJobId(sysJob.getId());
 		sysJobLog.setInvokeTarget(sysJob.getInvokeTarget());
-		long runMs = new Date().getTime() - startTime.getTime();
+		long runMs = System.currentTimeMillis() - startTime.getTime();
 		sysJobLog.setTimes((int) runMs);
 		if (e != null) {
 			log.error("任务执行失败，任务ID：" + sysJobLog.getJobId(), e);
 			sysJobLog.setStatus(Constant.ScheduleStatus.PAUSE.getValue());
-			String errorMsg = StringUtils.substring(ExceptionUtil.getExceptionMessage(e), 0, 2000);
+			String errorMsg = ExceptionUtil.stacktraceToOneLineString(e,2000);
 			sysJobLog.setError(errorMsg);
 		}
 		else{

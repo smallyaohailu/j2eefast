@@ -1,0 +1,95 @@
+<!-- 系统自动生成 Date:2021-10-12 21:04 -->
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="语言配置" bodyClass="gray-bg animated fadeInRight" isAnimation=false libs=["table","zTree"]/>
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <@f.form id="lang-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label> ${i18n("语言编码")}：</label>
+                            <@f.input name="langCode"/>
+                        </li>
+                        <li>
+                            <label> ${i18n("语言类型")}：</label>
+                            <@f.select name="langType" blankValue="" blankLabel="所有" dictType="sys_lang_type"/>
+                        </li>
+                        <li>
+                            <label> ${i18n("归属模块")}：</label>
+                            <@f.select name="moduleCode" blankValue="" blankLabel="所有" items=modules itemLabel="moduleName" itemValue="moduleCode"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;${i18n("查询")}</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
+                        </li>
+                    </ul>
+                </div>
+            </@f.form>
+        </div>
+        <@table id="bootstrap-table">
+            <@shiro.hasPermission name="sys:lang:add">
+                <a class="btn btn-success" onclick="opt.operate.addTab()"><i class="fa fa-plus"></i>&nbsp;${i18n("新增")}</a>
+            </@shiro.hasPermission>
+            <@shiro.hasPermission name="sys:lang:edit">
+                <a class="btn btn-primary single disabled" onclick="opt.operate.editTab()"><i class="fa fa-pencil-square-o"></i>&nbsp;${i18n("修改")}</a>
+            </@shiro.hasPermission>
+            <@shiro.hasPermission name="sys:lang:del">
+                <a class="btn btn-danger multiple disabled" onclick="opt.operate.delAll()"><i class="fa fa-remove"></i> ${i18n("删除")}</a>
+            </@shiro.hasPermission>
+            <@shiro.hasPermission name="sys:lang:clear">
+                <a class="btn btn-danger" onclick="clearLang()"><i class="fa fa-refresh"></i>&nbsp;${i18n("刷新缓存")}</a>
+            </@shiro.hasPermission>
+        </@table>
+    </div>
+</div>
+<@footer>
+<script type="text/javascript">
+    var editFlag = "${permission.hasPermi("sys:lang:edit")}";
+    var listFlag = "${permission.hasPermi("sys:lang:add")}";
+    var delFlag = "${permission.hasPermi("sys:lang:del")}";
+    var visible = ${permission.isPermitteds("sys:lang:edit,sys:lang:del,sys:lang:add")?string('true', 'false')};
+    var langTypeDatas = ${dict.getDictListJson('sys_lang_type')};
+    var prefix = baseURL + "sys/lang";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            addUrl: prefix + "/add",
+            editUrl: prefix + "/edit/{id}",
+            delUrl: prefix + "/del",
+            modalName: "语言",
+            uniqueId:  'id',/* 唯一ID */
+            showPageGo: true,/* 分页设置 */
+            pageSize: 10,/* 分页设置 */
+            pageList: [10, 30, 50],/* 分页设置 */
+            columns:[
+                {title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
+                    return $.table.serialNumber(index);
+                }}
+                ,{field : 'id',title : '${i18n("主键")}',visible: false}
+                ,{field : 'langCode',title : '${i18n("语言编码")}'}
+                ,{field : 'langType',title : '${i18n("语言类型")}',formatter: function(value, row, index) {
+                    return opt.common.selectDictLabels(langTypeDatas, value);
+                }}
+                ,{field : 'langText',title : '${i18n("语言译文")}'}
+                ,{field : 'moduleName',title : '${i18n("模块名称")}'}
+                ,{field : 'createTime',title : '${i18n("创建时间")}'}
+                ,{title:"${i18n("操作")}",align: 'center',visible:visible,formatter: function(value, row, index) {
+                    var actions = [];
+                    actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="opt.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i>${i18n("编辑")}</a> ');
+                    actions.push('<a class="btn btn-danger btn-xs ' + delFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i>${i18n("删除")}</a>');
+                    return actions.join('');
+                }}
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function clearLang() {
+        opt.operate.get(prefix + "/clearLang");
+    }
+</script>
+</@footer>
+</@pageTheme>

@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.j2eefast</groupId>
 		<artifactId>fast</artifactId>
-		<version>2.2.0</version>
+		<version>2.5.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -18,14 +18,14 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- 配置servlet -->
+		<!-- 配置servlet-->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- 多模块排除内置tomcat -->
+		<!-- 多模块排除内置tomcat
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -35,6 +35,12 @@
 					<artifactId>spring-boot-starter-tomcat</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency> -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -53,6 +59,7 @@
 	<build>
 		<finalName>fast</finalName>
 		<plugins>
+
 			<!-- 跳过单元测试 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -61,10 +68,11 @@
 					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.2.8.RELEASE</version>
+				<version>2.2.13.RELEASE</version>
 				<configuration>
 					<fork>true</fork>
 				</configuration>
@@ -83,10 +91,13 @@
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<warName>${project.name}</warName>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
-
+		<!--/////////拷贝子项目资源 资源分离打包-////////////// -->
 		<resources>
 			<!-- 打包时将页面文件拷贝到META-INF目录下 -->
 			<resource>
@@ -98,12 +109,12 @@
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/**</include>
-				</includes>
+				<!-- 排除文件-->
+				<excludes>
+					<exclude>run/*</exclude>
+				</excludes>
 				<filtering>false</filtering>
 			</resource>
-			<!--/////////拷贝子项目资源-////////////// -->
 			<resource>
 				<directory>../fast-web/src/main/resources</directory>
 				<includes>
@@ -112,26 +123,21 @@
 				<filtering>false</filtering>
 			</resource>
 
-			<!-- 不要工作流请注释掉
+			<!-- 2.5.0 以上版本 generator模块、fast-framework模块 都是整体打包 不分离资源文件所以屏蔽以下、若需要资源分离请在相应模块放开、这里对应放开注释
+			
+			不要工作流请注释掉
 			<resource>
 				<directory>../fast-flowable/src/main/resources</directory>
 				<includes>
 					<include>**/**</include>
 				</includes>
 				<filtering>false</filtering>
-			</resource>-->
-
-			<resource>
-				<directory>../fast-generator/src/main/resources</directory>
-				<includes>
-					<include>**/**</include>
-				</includes>
-				<filtering>false</filtering>
 			</resource>
+			
 			<resource>
 				<directory>../fast-framework/src/main/resources</directory>
 				<filtering>false</filtering>
-				<!-- Added packaging to filter uncompressed core JS(打包排除核心未压缩的文件)-->
+				//Added packaging to filter uncompressed core JS(打包排除核心未压缩的文件)
 				<excludes>
 	                <exclude>static/libs/SM4.js</exclude>
 	                <exclude>static/plugins/captcha/ase.js</exclude>
@@ -145,6 +151,7 @@
 	                <exclude>static/plugins/layer/layer.js</exclude>
 	            </excludes>
 			</resource>
+			
 			<resource>
 				<directory>../fast-generator/src/main/resources</directory>
 				<includes>
@@ -152,7 +159,7 @@
 				</includes>
 				<filtering>false</filtering>
 			</resource>
-			<!-- //////////////////////////////////////////-->
+			//////////////////////////////////////////-->
 		</resources>
 	</build>
 </project>

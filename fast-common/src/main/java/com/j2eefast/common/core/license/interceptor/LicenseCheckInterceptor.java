@@ -4,12 +4,14 @@
  */
 package com.j2eefast.common.core.license.interceptor;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import com.j2eefast.common.core.config.LicenseCheckListener;
 import com.j2eefast.common.core.license.LicenseVerify;
 import com.j2eefast.common.core.license.annotation.FastLicense;
 import com.j2eefast.common.core.shiro.RedisSessionDAO;
 import com.j2eefast.common.core.utils.ResponseData;
+import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -35,14 +37,13 @@ public class LicenseCheckInterceptor implements HandlerInterceptor {
     private LicenseCheckListener listener;
     @Lazy
     @Resource
-    private RedisSessionDAO redisSessionDAO;
+    private RedisSessionDAO sessionDAO;
 
     public LicenseCheckInterceptor(){
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Method method = handlerMethod.getMethod();
@@ -63,7 +64,7 @@ public class LicenseCheckInterceptor implements HandlerInterceptor {
                    }
                    if(vertify.equals("online")){
                        int online = licenseVerify.onlineNumVerify(listener.getVerifyParam());
-                       if (!redisSessionDAO.checkNumber(online)) {
+                       if (!sessionDAO.checkNumber(online)) {
                            response.setCharacterEncoding("utf-8");
                            response.setContentType("text/html;charset=utf-8");
                            response.getWriter().write(JSONUtil.parse(ResponseData.error("99997","在线用户已达最大,限制登录!!")).toString());

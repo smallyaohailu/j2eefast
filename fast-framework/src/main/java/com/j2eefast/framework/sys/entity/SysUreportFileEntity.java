@@ -7,10 +7,8 @@ package com.j2eefast.framework.sys.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.j2eefast.common.core.base.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -46,5 +44,56 @@ public class SysUreportFileEntity implements Serializable {
     @TableField(value = "update_time", fill = FieldFill.UPDATE)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
     private Date updateTime;
+    
+    /**
+     * 下载时文件名称
+     */
+    private String fileName;
+
+    /**
+     * 访问权限
+     */
+    private String roleKeys;
+
+    /**
+     * 数据过滤表表别称
+     */
+    private String tableAlias;
+
+    /**
+     * 开放功能
+     */
+    private String func;
+
+//    /**
+//     * 是否分页
+//     */
+//    private String page;
+//
+//    /**
+//     * 分页大小
+//     */
+//    private int pageSize;
+//
+//    /**
+//     * 源对象多个,分割
+//     */
+//    private String objName;
+
+    /**
+     * 报表描述
+     */
+    private String remark;
+
+    private String code;
+
+    private String share;
+
+    private String pass;
+
+    private int time;
+//
+//    private Date time;
+//    private String watermark;
 
 }

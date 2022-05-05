@@ -18,6 +18,7 @@
 	</#if>
 <@compress single_line=true>
 <script>
+    <#---->
     var _hmt = _hmt || [];
     (function() {
       var hm = document.createElement("script");
@@ -25,8 +26,25 @@
       var s = document.getElementsByTagName("script")[0];
       s.parentNode.insertBefore(hm, s);
     })();
+    !(function () {
+        if(new RegExp('login' + "$").test(window.location.href) ||
+            new RegExp('index' + "$").test(window.location.href)){
+            var z = "%c------------------------------------------------------------------------------------------%c \n\n"
+                , r = "%c本页面由%c J2eeFAST开发设计 %cJ2eeFAST开源平台构建并发布。\n\n"
+                , o = "%cJ2eeFAST 是一个致力于中小企业 Java EE 企业级快速开发平台，您可以通过 http://www.j2eefast.com 了解更多。\n\n"
+                , i = "%c------------------------------------------------------------------------------------------%c \n"
+                , j = "%cVERSION: "+window.__VERSION__+" %c \n\n"
+                , k = "%c无限制使用请联系QQ:751312449 %c \n";
+            if (window.console && console.log ) {
+                var e = z + r + o + i + j + k;
+                e = "%c" + (e = e.replace(/%c/g, "")),
+                    console.log(e, "color: #6190e8;")
+            }
+        }
+    })()
 </script>
 </@compress>
+
 <#assign jscssLib="">
 <#assign animationTag=true>
 </#macro>
@@ -43,43 +61,37 @@
                 >
 <#assign jscssLib=libs>
 <#assign animationTag=isAnimation>
+<#import "springctx.ftl" as ctx>
 <!DOCTYPE html>
 <html>
 <head>
 <#-- 其他地方代码都可以改,未获得作者许可此信息(以下信息到END结束)请不要修改。请尊重作者劳动成果! ™否则作者有权收回软件使用权ø -->
 <#-- 软著编号: 2020SR1589493 -->
-<title>${title} - Powered By J2eeFast</title>
+<title>${i18n("${title}")} - Powered By J2eeFAST</title>
 <meta content='on' http-equiv='x-dns-prefetch-control'>
-<#import "springctx.ftl" as ctx>
 <meta charset="utf-8">
 <meta content='always' name='referrer'>
 <meta content='J2eeFAST' property='og:site_name'>
 <meta content='Object' property='og:type'>
 <meta content='http://www.j2eefast.com/' property='og:url'>
-<meta content='${title} - Powered By J2eeFast' itemprop='name' property='og:title'>
+<meta content='${i18n("${title}")} - Powered By J2eeFAST' itemprop='name' property='og:title'>
 <meta content="PoweredByJ2eeFAST、J2eeFAST" naTme="keywords">
 <meta content="PoweredByJ2eeFAST、J2eeFAST" itemprop='description' name='Description'>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Content-Language" content="${config.getSysLang()}">
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<meta content="width=device-width, initial-scale=1, user-scalable=1" name="viewport"/>
 <meta content="IE=edge" http-equiv="X-UA-Compatible">
 <#----------------------------------------END--------------------------------------------------------------->
-<#if sys_csrfToken??>
-<meta content="${sys_csrfToken}" name="csrf-token" />
+<#if FAST_LOGIN_CSRF_TOKEN??>
+<meta content="${FAST_LOGIN_CSRF_TOKEN}" name="csrf-token" />
 </#if>
 <link rel="shortcut icon" href="${ctxStatic}/static/img/favicon.ico"/>
 <script src="${ctxStatic}/static/libs/jquery.min.js"></script>
 <script src="${ctxStatic}/static/libs/jquery-migrate.min.js"></script>
+<script src="${ctxStatic}/static/config.js"></script>
 <#if isPAS>
-<script>
-var baseURL = "${ctxStatic}/", _lang = "${config.getSysLang()}",  _username = "<@shiro.principal property="username"/>"  ,
-_userId = "<@shiro.principal property="id"/>",
-LockScreen = ${config.getKey('SYS_LOCK_SCEREEN')}; function imgUserError(){var img=event.srcElement;img.src=baseURL+"static/img/user2-160x160.jpg"; img.onerror=null;}
-</script>
 <@cssLibs.css Libs = libs/>
 <#-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <#-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -113,22 +125,35 @@ LockScreen = ${config.getKey('SYS_LOCK_SCEREEN')}; function imgUserError(){var i
 </#macro>
 
 <#--表格-->
-<#macro table id = "bootstrap-table"
-              class = ""
-              isNative = false <#-- 是否需要添加外层div-->
->
-	<#if isNative?string == "false">
-    <div class="btn-group-sm" id="toolbar-${id}" role="group">
-        <#nested>
-    </div>
-    <div class="col-sm-12 select-table table-striped<#if class!=""> ${class}</#if>">
-        <table id="${id}"></table>
-    </div>
+<#macro table
+        id = "bootstrap-table"
+        class = ""
+        title = "" <#-- 表格上名称-->
+        icon = ""
+        isNative = false <#-- 是否需要添加外层div-->
+        >
+    <#if isNative?string == "false">
+        <div class="btn-group-sm" id="toolbar-${id}" role="group" style="display:none;">
+            <#if title != "">
+                <div class="table-title">
+                    <#if icon !=""><i class="${icon}"></i></#if> <span class="table-title-span">${title}</span>
+                </div>
+            </#if>
+            <#nested>
+        </div>
+        <div class="col-sm-12 select-table table-striped<#if class!=""> ${class}</#if>">
+            <table id="${id}"></table>
+        </div>
     <#else>
-    	<table id="${id}"></table>
+        <table id="${id}"></table>
     </#if>
 </#macro>
 
+<#-- 国际化-->
+<#function i18n text args=[]>
+    <#assign tt="${springMacroRequestContext.getMessage(text,args,text)}">
+    <#return tt>
+</#function>
 <#-- 引入控件组件-->
 <#import "jslibs.html" as jsLibs>
 <#import "csslibs.html" as cssLibs>

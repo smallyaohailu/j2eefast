@@ -74,11 +74,29 @@ public class PermissionConfig {
      * @param permission
      * @return
      */
-    public boolean isRole(String permission)
-    {
+    public boolean isRole(String permission){
         return UserUtils.hasRole(permission);
     }
-    
+
+
+    /**
+     * 判断用户是否拥有其中某一个角色
+     * @param permission
+     * @return
+     */
+    public boolean isRoles(String... permission){
+        return UserUtils.hasAnyRoleKeys(permission);
+    }
+
+
+    /**
+     * 取isRoles 反
+     * @param permission
+     * @return
+     */
+    public boolean notIsRoles(String... permission){
+        return !isRoles(permission);
+    }
     
     public SysUserEntity getUserEntity() {
 		return (SysUserEntity) SecurityUtils.getSubject().getPrincipal();

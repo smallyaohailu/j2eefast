@@ -19,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         <include refid="exampleTestChildColumns"/>
 		FROM  example_test_child a
-		WHERE a.id = '${id}'
+		WHERE a.id = #{id}
     </select>
 
     <!--  根据获取实体List   -->

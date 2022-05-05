@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j2eefast.common.core.base.entity.BaseEntity;
-import com.j2eefast.common.core.base.entity.annotaion.JsonListFiledIgnore;
 import lombok.Data;
 
 /**
@@ -114,6 +113,10 @@ public class SysCompEntity extends BaseEntity {
 	@TableField(exist = false)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Boolean isParent;
+
+	/**是否有节点*/
+	@TableField(exist = false)
+	private Integer isTreeLeaf;
 
 	/**
 	 * 地区名称

@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.exceptions.ExceptionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.PropertyPreFilters;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
@@ -20,6 +22,7 @@ import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.log.entity.SysOperLogEntity;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.utils.UserUtils;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
@@ -54,10 +57,14 @@ public class BussinessLogAop {
 
 	private static final Logger					LOG 					= LoggerFactory.getLogger(BussinessLogAop.class);
 
-	// 排除敏感参数
+	/**
+	 * 排除敏感参数
+	 */
     public static final String[] EXCLUDE_PARAMETER = { "password", "oldPassword", "newPassword", "confirmPassword" };
-    
-	//计算请求时间
+
+	/**
+	 * 计算请求时间
+	 */
 	private static final ThreadLocal<Long>     STARTTIMETHREADLOCAL     = new NamedThreadLocal<Long>("BussinessLogAop StartTime");
 	
 	/**
@@ -67,7 +74,6 @@ public class BussinessLogAop {
 	 */
 	@Pointcut("@annotation(com.j2eefast.common.core.business.annotaion.BussinessLog)")
 	public void logCut() {
-		
 	}
 
 	
@@ -147,18 +153,21 @@ public class BussinessLogAop {
 			if (currentUser != null){
 				//当操作用户存在 保存用户相关信息
 				operLog.setOperName(currentUser.getName());
-				if (ToolUtil.isNotEmpty(currentUser.getCompName())){
-					operLog.setCompName(currentUser.getCompName());
+				if (ToolUtil.isNotEmpty(ConstantFactory.me().getCompName(currentUser.getId()))){
+					operLog.setCompName(ConstantFactory.me().getCompName(currentUser.getId()));
 				}
 				operLog.setCompId(currentUser.getCompId());
 				operLog.setDeptId(currentUser.getDeptId());
+				operLog.setTenantId(currentUser.getTenantId());
+			}else{
+				operLog.setTenantId("000000");
 			}
 			
 			// 判断是否异常
 			if (ToolUtil.isNotEmpty(e)){
 				operLog.setStatus(BusinessStatus.FAIL.ordinal());
 				//错误信息直接保存
-				operLog.setErrorMsg(e.getMessage());
+				operLog.setErrorMsg(ExceptionUtil.stacktraceToString(e,8000));
 			}
 			
 			// 设置方法名称

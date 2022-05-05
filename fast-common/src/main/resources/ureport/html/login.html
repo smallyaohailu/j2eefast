@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>J2eeFAST平台-Ureport2表报平台</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="max-age=30">
+    <meta name="renderer" content="origin">
+    <script src="${contextPath}/static/libs/jquery.min.js"></script>
+    <script src="${contextPath}/static/libs/jquery-migrate.min.js"></script>
+    <script type="text/javascript"  src="${contextPath}/static/config.js"></script>
+    <script type="text/javascript">
+        window.__SERVER__="${contextPath}/ureport";
+        window.__BASEURL__ = window.__SERVER__ + "/shareview/verify?${customParameters}";
+        window.__SURL__ = "${__surl}";
+    </script>
+    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap.min.js"></script>
+    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/Chart.bundle.min.js"></script>
+    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/chartjs-plugin-datalabels.min.js"></script>
+    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap-datetimepicker.js"></script>
+    <link href="${contextPath}/ureport/res/ureport-asserts/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .loaderbox{display:inline-block;min-width:125px;padding:10px;margin:0 auto;color:#000 !important;font-size:13px;font-weight:400;text-align:center;vertical-align:middle;background-color:#eee;-webkit-box-shadow:0 1px 8px rgba(0,0,0,0.1);-moz-box-shadow:0 1px 8px rgba(0,0,0,0.1);box-shadow:0 1px 8px rgba(0,0,0,0.1)}.loaderbox .loading-circle{float:left;width:18px;height:18px;border-radius:50%;border-top:.225em solid rgba(163,175,183,.5);border-right:.225em solid rgba(163,175,183,.5);border-bottom:.225em solid rgba(163,175,183,.5);border-left:.225em solid #a3afb7;-webkit-animation:loader-circle 1.1s infinite linear;animation:loader-circle 1.1s infinite linear;margin-right:10px}@-webkit-keyframes loader-circle{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes loader-circle{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.loaderbox .loading-cube{float:left;width:18px;height:18px;margin-right:10px;-webkit-transform:rotate(45deg) translateZ(0);transform:rotate(45deg) translateZ(0)}.loaderbox .loading-cube:after,.loaderbox .loading-cube:before{position:absolute;width:0;height:0;content:"";background:#a3afb7}.loaderbox .loading-cube:before{bottom:50%;left:0;-webkit-animation:loader-folding-cube-before 2.4s infinite ease-in-out;animation:loader-folding-cube-before 2.4s infinite ease-in-out;-webkit-animation-delay:-.6s;animation-delay:-.6s}.loaderbox .loading-cube:after{top:50%;right:0;-webkit-animation:loader-folding-cube-after 2.4s infinite ease-in-out;animation:loader-folding-cube-after 2.4s infinite ease-in-out}@-webkit-keyframes loader-folding-cube-before{0%{width:50%;height:0}12.5%,7.5%{width:50%;height:50%}20%,25%{width:100%;height:50%}50%{right:0;left:auto;width:100%;height:50%}57.5%,62.5%{width:50%;height:50%}70%,75%{width:50%;height:0}}@keyframes loader-folding-cube-before{0%{width:50%;height:0}12.5%,7.5%{width:50%;height:50%}20%,25%{width:100%;height:50%}50%{right:0;left:auto;width:100%;height:50%}57.5%,62.5%{width:50%;height:50%}70%,75%{width:50%;height:0}}@-webkit-keyframes loader-folding-cube-after{0%{width:50%;height:0}12.5%,7.5%{width:50%;height:50%}20%,25%{width:100%;height:50%}50%{right:auto;left:0;width:100%;height:50%}57.5%,62.5%{width:50%;height:50%}75%{width:50%;height:0}}@keyframes loader-folding-cube-after{0%{width:50%;height:0}12.5%,7.5%{width:50%;height:50%}20%,25%{width:100%;height:50%}50%{right:auto;left:0;width:100%;height:50%}57.5%,62.5%{width:50%;height:50%}75%{width:50%;height:0}}
+    </style>
+    <style type="text/css" id="tpl-css">
+        body{background:#fff;height:100%;width:100%;font-family:PingFangSC-Regular,"Helvetica Neue",Helvetica,Arial,sans-serif,"Microsoft YaHei";font-size:12px;line-height:1.5;color:#666}body,div,dd{margin:0;padding:0}a{color:#09aaff;text-decoration:none;outline:0}a:hover,a:active,a:focus{color:#0098ea;text-decoration:underline}#ft{position:absolute;bottom:0;width:100%}.module-share-footer{padding:10px 0}.module-share-footer a:link,.module-share-footer a:visited,.module-share-footer a:hover,.module-share-footer a:active,.module-share-footer div{color:#666}.module-share-footer a{padding:0 3px}.module-share-footer div{text-align:center}.init-docs{display:none}.init-docs .cloud-bg{position:absolute;bottom:0;left:0;width:100%;height:400px}.init-docs .cloud-bg .bg1{position:absolute;width:100%;height:400px;background:url(${contextPath}/ureport/res/ureport/img/footer-cloud.png);background-repeat:repeat-x;background-position:0 bottom;bottom:0}.acss-header{display:block;position:absolute;top:50%;left:50%;margin:-240px 0 0 -230px;z-index:1;*left:0;*margin-left:0}.acss_banner{width:212px;height:55px;margin:0 auto 70px}.verify-form{margin:0 auto;width:460px;text-align:left;font-size:14px;position:relative;background:#fff;border-radius:4px;box-shadow:0 0 10px rgb(171 198 235 / 30%)}.avatar{display:inline-block;vertical-align:middle;padding:15px 10px 15px 30px}.verify-property{width:248px;color:#fff;overflow:hidden;display:inline-block;vertical-align:middle}.verify-property .verify-user{height:26px;line-height:30px;overflow:hidden}.verify-property .username{_display:inline;display:inline-block;font-size:16px;font-weight:900}.photo-frame span{line-height:1;display:table-cell;vertical-align:middle;text-align:center}.photo-frame>span{height:44px}.ac-close{padding:20px 30px 48px}.verify-input{float:left;width:460px}.verify-input .pickpw{padding:0 0 15px}.verify-input .pickpw dt{font-weight:700}.verify-input dt{padding:0 0 5px;margin:20px 0 10px;color:#666;font-weight:500}.verify-input .input-area{position:relative}.QKKaIE{width:280px}.QKKaIE:focus{outline:0}.LxgeIt{width:280px;border:1px solid #f2f2f2;padding:8px 10px;line-height:19px;border-radius:4px}.b-btn-8,.LxgeIt{float:left}.verify-form .submit-a{position:relative;display:inline-block;font-size:14px;border:1px solid #09aaff;background:#09aaff;padding-left:13px;text-decoration:none;vertical-align:top;white-space:nowrap;outline:0}.verify-form .g-button-blue-large{border-radius:4px;margin-left:14px;height:36px;line-height:36px}.verify-form .g-button-large .g-button-right,.verify-form .g-button-blue-large .g-button-right{height:36px;line-height:36px}.verify-form .submit-a .g-button-right{padding-right:13px}.verify-form .submit-a .text{width:auto;color:#fff;display:inline-block;font-size:13px;margin-left:2px;margin-right:2px;vertical-align:baseline;height:36px;line-height:36px}.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}.verify-input .pickcode{margin:20px 0 0}.LIztsC{width:80px;border:1px solid #ccc;padding:8px 10px;height:19px;line-height:14px;border-radius:4px;vertical-align:top}#uocwZk4P{vertical-align:top;height:35px;border:1px solid #CCC;width:91px;margin:0 5px;border-radius:4px}.change-code{line-height:37px;padding-left:10px;display:inline-block;vertical-align:top;font-size:12px;color:#438aee}#eltxPEmP{color:#ff5858;position:absolute;top:205px;left:30px;font-size:10px}.cert-tip{display:none;cursor:pointer;color:#0065dd;position:absolute;top:205px;right:30px;width:84px;font-size:10px;text-align:center}.ac-close .pickcode{display:none}.verify-property .author-desc{display:-webkit-box;word-break:break-all;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2;color:#e1f5ff;overflow:hidden;font-size:10px;width:248px}.is-svip .verify-property .author-desc{color:rgba(100,54,13,.7);margin:5px 0}
+    </style>
+</head>
+<body style="margin: 5px;">
+<div id="printTool" style="border:solid 1px #ddd;border-radius:5px;height:35px;width:100%;margin-bottom:5px;background:#f8f8f8;display: none">
+    <div style="text-align:center">
+        <button type="button" class="btn btn-default share-ureport-print" style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="打印当前">
+            <img src='${contextPath}/ureport/res/ureport/img/print2.svg' width="20px" height="20px"> 打印当前
+        </button>
+        <button type="button" class="btn btn-default share-ureport-printAll" data-pg="300" style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="打印所有">
+            <img src='${contextPath}/ureport/res/ureport/img/print3.svg' width="24px" height="24px"> 打印所有
+        </button>
+        <span id='pagingContainer' style="font-size:14px;margin-left:1px;color:#337ab7">
+			共<span id='totalPageLabel'></span>页
+			<select id="pageSelector" class="form-control" style="display:inline-block;width:inherit;font-size:13px;height:28px;margin-top:2px">
+			</select>
+			<span id='pageLinkContainer'></span>
+		</span>
+    </div>
+</div>
+<div class="docs init-docs" id="doc">
+    <div class="acss-header" id="jynPBDn">
+        <div class="verify-form">
+            <form action="#" class="clearfix" name="accessForm" onsubmit="return false">
+                <div class="CMxQsC is-svip theme-share-back" style="background: url('${contextPath}/ureport/res/ureport/img/svip_share_code.png') no-repeat;">
+                    <div class="avatar">
+                        <div class="photo-frame theme-share-head" style="background: rgb(233, 200, 122);">
+                            <span class="radius-3">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="verify-property">
+                        <div class="verify-user theme-share-text" style="color: rgb(100, 54, 13);">
+                            <div class="username theme-share-name" style="color: rgb(100, 54, 13);">JUREPORT</div>
+                        </div>
+                        <div class="author-desc theme-share-name" style="color: rgb(100, 54, 13);">报表分享</div>
+                    </div>
+                    <div class="verify-btn">
+                    </div>
+                    <div class="cb"></div>
+                </div>
+                <div class="verify-input ac-close clearfix">
+                    <dl class="pickpw clearfix">
+                        <dt>请输入提取码：</dt>
+                        <dd class="clearfix input-area">
+                            <input class="QKKaIE LxgeIt" id="accessCode" tabindex="1" type="text">
+                            <div id="submitBtn">
+                                <a class="submit-a g-button-blue-large" href="javascript:;" title="提取报表">
+                                <span class="g-button-right">
+                                    <span class="text submit-btn-text" style="width: auto;">提取报表</span>
+                                </span>
+                                </a>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl class="pickcode clearfix">
+                        <dt>验证码：</dt>
+                        <dd class="clearfix">
+                            <input class="LIztsC QKKaIE" autofocus="autofocus" id="tdPKyn" tabindex="2" type="text">
+                            <img alt="验证码" id="uocwZk4P"><a class="change-code" href="javascript:;">换一张</a>
+                        </dd>
+                    </dl>
+                    <div class="verify-desc-protect-share limit-share-limit-num" style="display: none">
+                        <div class="verify-desc-protect-share-limit"><span class="verify-desc-protect-share-limit-show"></span><span class="verify-desc-protect-share-limit-num"></span></div>
+                    </div>
+                </div>
+            </form>
+            <div id="eltxPEmP" class="tip" style="display: block;"></div>
+            <div class="cert-tip"></div>
+        </div>
+    </div>
+    <div class="cloud-bg">
+        <div class="bg1"></div>
+        <div class="bg2"></div>
+        <div class="bg3"></div>
+    </div>
+</div>
+<div class="module-share-footer" id="ft">
+    <div>Copyright © 2018-2021 Powered By J2eeFAST</div>
+</div>
+<iframe name="_print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
+</body>
+<script src="${contextPath}/static/plugins/blockUI/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${contextPath}/ureport/res/ureport/js/sharepreview.bundle.js"></script>
+</html>

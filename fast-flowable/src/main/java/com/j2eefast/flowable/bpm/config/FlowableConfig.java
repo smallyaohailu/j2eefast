@@ -5,22 +5,15 @@
 package com.j2eefast.flowable.bpm.config;
 
 import org.activiti.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory;
-import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.impl.rules.RulesDeployer;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.spring.boot.EngineConfigurationConfigurer;
-import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.ui.common.tenant.DefaultTenantProvider;
-import org.flowable.ui.modeler.repository.ModelRepositoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.*;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-
 import javax.sql.DataSource;
 import java.util.ArrayList;
 
@@ -42,6 +35,8 @@ import java.util.ArrayList;
 		,"org.flowable.ui.task.service.debugger"
 },excludeFilters=@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,value = {DefaultTenantProvider.class}))
 public class FlowableConfig{
+
+
 
 	@Bean(name = "processEngineConfiguration")
 	public SpringProcessEngineConfiguration getSpringProcessEngineConfiguration(@Qualifier("flowableSourcePrimary") DataSource dataSource

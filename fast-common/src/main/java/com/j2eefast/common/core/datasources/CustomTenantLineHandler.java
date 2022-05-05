@@ -1,20 +1,22 @@
+/*
+ * All content copyright http://www.j2eefast.com, unless
+ * otherwise indicated. All rights reserved.
+ * No deletion without permission
+ */
 package com.j2eefast.common.core.datasources;
 
-import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
-import com.google.common.collect.Lists;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ToolUtil;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 多租户表区分
  * @author huanzhou
  */
 public class CustomTenantLineHandler implements TenantLineHandler {

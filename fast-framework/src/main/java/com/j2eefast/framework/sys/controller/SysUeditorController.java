@@ -5,8 +5,8 @@
  */
 package com.j2eefast.framework.sys.controller;
 
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.framework.ueditor.ActionEnter;
-import com.j2eefast.framework.utils.Global;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;

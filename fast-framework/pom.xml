@@ -5,15 +5,32 @@
 	<parent>
 		<artifactId>fast</artifactId>
 		<groupId>com.j2eefast</groupId>
-		<version>2.5.0</version>
+		<version>2.6.0</version>
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>fast-framework</artifactId>
 	<name>fast 核心模块</name>
+	
 	<description>
 		fast 核心模块
 	</description>
+	
+	<developers>  
+		<developer>
+			<id>J2eeFAST</id>
+			<name>ZHOUZHOU</name>
+			<email>loveingowp at 163.com</email>
+			<url>http://www.j2eefast.com</url>
+		</developer>
+	</developers>
+	
+	<licenses>
+	    <license>
+	      <name>Apache-2.0</name>
+	      <url>https://gitee.com/zhouhuanOGP/J2EEFAST/blob/master/LICENSE</url>
+	    </license>
+	</licenses>
 	
 	<dependencies>
 		
@@ -22,11 +39,6 @@
 			<artifactId>fast-common</artifactId>
 		</dependency>
 	     
-	     <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-freemarker</artifactId>
-		 </dependency>
-
 		<!-- Java图形验证码-->
 		<dependency>
 			<groupId>com.github.whvcse</groupId>
@@ -98,44 +110,80 @@
 
 	<build>
 		<plugins>
-			<!-- YUI Compressor Maven压缩JS/CSS插件
+
+			<!-- FAST Compressor Maven压缩JS/CSS插件
+				 如果要压缩请下载 https://gitee.com/zhouhuanOGP/fast-compressor
+				 项目到本地自行编译在编译压缩插件就可用了
+			-->
+			<!--
 			<plugin>
-				<groupId>net.alchim31.maven</groupId>
-				<artifactId>yuicompressor-maven-plugin</artifactId>
-				<version>1.5.1</version>
+				<groupId>com.j2eefast.compressor</groupId>
+				<artifactId>fast-compressor-maven</artifactId>
+				<version>2.0.0</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
 						<goals>
-							<goal>compress</goal>
+							<goal>fast-compress</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<skip>false</skip>
 					<encoding>UTF-8</encoding>
 					<jswarn>false</jswarn>
+					<nosuffix>true</nosuffix>
+					<linebreakpos>5000</linebreakpos>
 					<force>true</force>
-					<suffix>-min</suffix>
-					<sourceDirectory>src/main/resources/static/js</sourceDirectory>
-					<outputDirectory>src/main/resources/static/js</outputDirectory>
-					压缩js和css文件
+					需要压缩的文件
 					<includes>
-						<include>*.js</include>
+						<include>static/css/*.css</include>
+						<include>static/css/Ionicons/css/*.css</include>
+						<include>static/js/**</include>
+						<include>static/libs/*.js</include>
+						<include>static/plugins/ace/aceEditor.js</include>
+						<include>static/plugins/blockUI/jquery.blockUI.js</include>
+						<include>static/plugins/captcha/crypto-js.js</include>
+						<include>static/plugins/captcha/verify.js</include>
+						<include>static/plugins/captcha/css/verify.css</include>
+						<include>static/plugins/webuploader/0.1.5/webuploader.ex.js</include>
+						<include>static/plugins/webuploader/0.1.5/webuploader.ex.css</include>
+						<include>static/plugins/bootstrap-table/columns/bootstrap-table-fixed-columns.js</include>
+						<include>static/plugins/bootstrap-table/locale/bootstrap-table-i18n.js</include>
+						<include>static/plugins/bootstrap-table/bootstrap-table.css</include>
+						<include>static/plugins/bootstrap-table/bootstrap-table.js</include>
+						<include>static/plugins/bootstrap-table/table.extend.js</include>
+						<include>static/plugins/bootstrap-treetable/bootstrap-treetable.js</include>
+						<include>static/plugins/bootstrap-treetable/treetable.extend.js</include>
+						<include>static/plugins/ztree/3.5/ztree.extend.js</include>
+						<include>static/plugins/layer/layer.js</include>
+						<include>static/plugins/laydate/laydate.js</include>
+						<include>static/plugins/comments/comments.js</include>
+						<include>static/plugins/comments/comments.css</include>
 					</includes>
+					排除不需要压缩的文件
 					<excludes>
 						<exclude>**/*.min.js</exclude>
 						<exclude>**/*.min.css</exclude>
+						<exclude>static/css/iCheck/**</exclude>
+						<exclude>static/css/style.css</exclude>
+						<exclude>static/css/animate.css</exclude>
+						<exclude>static/libs/bootstrap.js</exclude>
+						<exclude>static/libs/jquery-migrate.js</exclude>
+						<exclude>static/libs/jquery-ui-sortable.js</exclude>
+						<exclude>static/libs/Sortable.js</exclude>
+						<exclude>static/libs/SM4.js</exclude>
+						<exclude>static/libs/vue.js</exclude>
+						<exclude>static/libs/des.js</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
-	        -->
-			<!-- 打jar包的插件-->
+			-->
+			
+			<!-- 打jar包的插件 不打包资源文件（配置文件和依赖包分开）
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<!-- 不打包资源文件（配置文件和依赖包分开）-->
 					<excludes>
 						<exclude>templates/**</exclude>
 						<exclude>mapper/**</exclude>
@@ -143,9 +191,30 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			-->
+
+			<!-- 资源文件不分离-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<!-- 生成环境排除非压缩JS-->
+					<excludes>
+						<exclude>static/css/animate.css</exclude>
+						<exclude>static/css/style.css</exclude>
+						<exclude>static/libs/bootstrap.js</exclude>
+						<exclude>static/libs/jquery-migrate.js</exclude>
+						<exclude>static/libs/jquery-ui-sortable.js</exclude>
+						<exclude>static/libs/Sortable.js</exclude>
+						<exclude>static/libs/SM4.js</exclude>
+						<exclude>static/libs/vue.js</exclude>
+						<exclude>static/libs/des.js</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 
 		</plugins>
 
 	</build>
-
+	
 </project>

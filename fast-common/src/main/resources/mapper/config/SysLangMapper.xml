@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.j2eefast.common.config.mapper.SysLangMapper">
+
+    <!--  实体栏位  --> 
+    <sql id="sysLangColumns">
+         a.id AS "id" ,
+         a.module_code AS "moduleCode" ,
+         a.lang_code AS "langCode" ,
+         a.lang_type AS "langType" ,
+         a.lang_text AS "langText" ,
+         a.module_name AS "moduleName" ,
+         a.create_by AS "createBy" ,
+         a.create_time AS "createTime" ,
+         a.update_by AS "updateBy" ,
+         a.update_time AS "updateTime" ,
+         a.remark AS "remark" 
+    </sql>
+
+    <!--  根据主键获取实体   -->
+    <select id="findSysLangById"  resultType="com.j2eefast.common.config.entity.SysLangEntity" >
+        SELECT
+        <include refid="sysLangColumns"/>
+		FROM  sys_lang a
+		WHERE a.id = #{id}
+    </select>
+
+    <!--  根据获取实体List   -->
+    <select id="findList" resultType="com.j2eefast.common.config.entity.SysLangEntity">
+        SELECT
+        <include refid="sysLangColumns"/>
+        FROM sys_lang a
+		<where>
+            <if test="langCode != null  and langCode != ''"> AND a.lang_code = #{langCode} </if>
+            <if test="langType != null  and langType != ''"> AND a.lang_type = #{langType} </if>
+        </where>
+    </select>
+
+    <!-- 根据获取实体 page -->
+    <select id="findPage" resultType="com.j2eefast.common.config.entity.SysLangEntity">
+        SELECT
+        <include refid="sysLangColumns"/>
+        FROM sys_lang a
+        <where>
+            <if test="sysLang.langCode != null  and sysLang.langCode != ''"> AND a.lang_code = #{sysLang.langCode} </if>
+            <if test="sysLang.langType != null  and sysLang.langType != ''"> AND a.lang_type = #{sysLang.langType} </if>
+            <if test = "sql_filter !=null and sql_filter!=''">
+                AND ${sql_filter}
+            </if>
+        </where>
+    </select>
+
+</mapper>

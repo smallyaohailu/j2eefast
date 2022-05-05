@@ -5,6 +5,7 @@
  */
 package com.j2eefast.framework.log.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -49,4 +50,13 @@ public interface SysOperLogMapper extends BaseMapper<SysOperLogEntity> {
 									  @Param("businessTypes") String businessTypes,
 									  @Param("deptId") String deptId,
 									  @Param("sql_filter") String sql_filter);
+
+
+	/**
+	 * 插入
+	 * @param sysOperLog
+	 * @return
+	 */
+	@InterceptorIgnore(tenantLine = "true")
+	int insertLog(SysOperLogEntity sysOperLog);
 }

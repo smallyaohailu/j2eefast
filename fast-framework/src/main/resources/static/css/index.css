@@ -4,11 +4,11 @@
  * @author ZhouZhou
  */
 @charset "utf-8";
-.login-page .login-box-body .form-control-feedback {
-    cursor: pointer;
-    pointer-events: auto;
-    color: rgb(177, 198, 219);
-}
+/*.login-page .login-box-body .form-control-feedback {*/
+/*    cursor: pointer;*/
+/*    pointer-events: auto;*/
+/*    color: rgb(177, 198, 219);*/
+/*}*/
 .icheck label {
     margin: 0;
     padding: 2px 8px 0 0;
@@ -57,12 +57,35 @@
     height: 2px;
     background-color: #292b34;
     border-radius: 0;
+    content: "";
+    transition: all .3s cubic-bezier(.645,.045,.355,1),border 0s,color .1s,font-size 0s;
 }
+
 .layui-tab-title li .layui-tab-close:hover {
     transform: scale(1.2);
     background-color:transparent;
     color: #FF5722 !important;
 }
+
+
+/* .layui-tab-title li:after{
+	width: 100%;
+	top: 38px;
+    border: 0;
+    height: 2px;
+    background-color: #292b34;
+    border-radius: 0;
+    content: "";
+	transition:all .3s cubic-bezier(.645,.045,.355,1),border 0s,color .1s,font-size 0s
+}
+.layui-tab-title li:hover{
+	background:#e8f4ff
+}
+.layui-tab-title li:hover:after{
+	width: 100%;
+	transition:all .3s cubic-bezier(.645,.045,.355,1),border 0s,color .1s,font-size 0s
+} */
+
 
 .layui-tab-card>.layui-tab-title {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
@@ -404,6 +427,15 @@
     width: 70px;
     text-align: center;
 }
+
+/*TOP更多菜单*/
+.navbar-nav .treeview-menu{position:absolute;z-index:100;background:#fff;width:180px;padding-left:0;border:1px solid #ccc;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.navbar-nav .treeview-menu a{color:#666;padding:10px 15px!important;}
+.navbar-nav .treeview-menu a:hover{color:#000;background:#fafafa;}
+.navbar-nav > .treeview > a > .pull-right-container > .fa-angle-left{display:none;}
+.navbar-nav li > a > .pull-right-container > .fa-angle-left {margin-top:3px;transition:transform 0.5s ease;}
+.navbar-nav .menu-open > a > .pull-right-container > .fa-angle-left {transform: rotate(-90deg);}
+
 .layui-form-label {
     float: left;
     display: block;
@@ -467,31 +499,31 @@
 /*    }*/
 /*}*/
 
-.btn-primary{
-    background-color: #1890ff!important;
-    border-color: #1890ff!important;
-}
+/*.btn-primary{*/
+/*    background-color: #1890ff!important;*/
+/*    border-color: #1890ff!important;*/
+/*}*/
 
-.btn-primary:hover{
-      background-color: #1483ea !important;
-      border-color: #1483ea!important;
-  }
+/*.btn-primary:hover{*/
+/*      background-color: #1483ea !important;*/
+/*      border-color: #1483ea!important;*/
+/*}*/
 
 /** 滚动条样式 **/
-::-webkit-scrollbar-track {
-    background-color: #F5F5F5;
-}
+/*::-webkit-scrollbar-track {*/
+/*    background-color: #F5F5F5;*/
+/*}*/
 
-::-webkit-scrollbar {
-    width: 6px;
-    height: 10px;
-    background-color: #F5F5F5;
-}
+/*::-webkit-scrollbar {*/
+/*    width: 6px;*/
+/*    height: 10px;*/
+/*    background-color: #F5F5F5;*/
+/*}*/
 
-::-webkit-scrollbar-thumb {
-    border-radius: 6px;
-    background-color: #999;
-}
+/*::-webkit-scrollbar-thumb {*/
+/*    border-radius: 6px;*/
+/*    background-color: #999;*/
+/*}*/
 
 .layui-layer-note .el-textarea{
     height: 100%;
@@ -563,24 +595,4 @@
     to {
         transform: rotate(1turn);
     }
-}
-
-.login__ie_compatible{
-    left: 0;
-    width: 100%;
-    text-align: center;
-    color: #999;
-    font-size: 12px;
-    margin-top: 20px;
-    bottom: 0px;
-}
-.login__ie_compatible:last-child{
-    margin-top: 3px !important;
-    bottom: 0px;
-}
-
-.login__ie_compatible > .icon{
-    width: 15px;
-    display: inline-block;
-    vertical-align: middle;
 }

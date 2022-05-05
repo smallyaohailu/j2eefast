@@ -62,7 +62,7 @@ public class DeModelController extends BaseController {
 		UserRepresentation userRepresentation = new UserRepresentation();
 		userRepresentation.setId(UserUtils.getLoginName());
 		userRepresentation.setFullName(UserUtils.getUserInfo().getName());
-		userRepresentation.setPrivileges(UserUtils.getUserInfo().getRoleKey());
+		//userRepresentation.setPrivileges(UserUtils.getUserInfo().getRoleKey());
 		userRepresentation.setTenantId(UserUtils.getTenantId());
 		return userRepresentation;
 	}

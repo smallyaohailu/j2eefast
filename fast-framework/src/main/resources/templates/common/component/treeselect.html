@@ -10,15 +10,17 @@
                     id = ""
                     url = "sys/comp/treeData"
                     boxTitle = ""
-                    width="380"
-                    height=""
+                    width="320"
+                    height="600"
                     value=""
                     labelValue=""
                     labelName="" <#--标签名称 -->
                     checked=false
+                    maxmin=true <#--弹出窗体是否有大小化按钮 -->
+                    closeBtn=1 <#--弹出窗体关闭按钮样式 -->
                     radioType="all" <#-- 当checked=false 单选时 控制同级单选互斥还是整个树互斥 all 整个树互斥 level, checked=true 多选此值无效-->
                     required=false <#-- 是否必输-->
-                    readonly=true <#-- 是否只读模式-->
+                    readonly=false <#-- 是否只读模式-->
                     correlationId="" <#-- 关联ID-->
                     correlationValue= "-1"  <#-- 关联默认值-->
                     class = "form-control" <#-- 输入框样式-->
@@ -48,17 +50,20 @@
     </#if>
     <div class="input-group" id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Div" data-url="${url}">
         <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>"  type="hidden" value="${value}"/>
-        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name" <#if labelName!="">name="${labelName}"</#if> type="text" placeholder="${placeholder}" class="${class} inputZtree" value="${labelValue}" <#if readonly> readonly = "readonly"</#if> <#if required> required</#if>/>
+        <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name" <#if labelName!="">name="${labelName}"</#if> type="text" placeholder="${i18n("${placeholder}")}" class="${class} inputZtree" value="${labelValue}" <#if readonly>disabled="disabled"</#if> <#if required> required</#if>/>
         <#if isParentIds?string == "true">
             <input name="${parenName}" <#if parenIdsValue!="">value="${parenIdsValue}"</#if> type="hidden"/>
         </#if>
-        <span class="input-group-btn" id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>But"><a  href="javascript:;"><i class="${butClass}"></i></a></span>
+        <span class="input-group-btn" <#if readonly>disabled="disabled"</#if> id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>But"><a  href="javascript:;"><i class="${butClass}"></i></a></span>
     </div>
     <#if helpTip!=""><span class="help-block m-b-none"><i class="fa fa-info-circle" style="color: red"></i>${helpTip}</span></#if>
     <@compress single_line=true>
     <script type="text/javascript">
         $(function(){
             $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>But, #<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name").unbind('click').on('click',function(){
+                if($(this).attr("disabled") && $(this).attr("disabled")!=''){
+                    return;
+                }
                 var treeId = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val();
                 <#if keyId != "id">
                 treeId = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").attr('data-id');
@@ -67,19 +72,21 @@
                 <#if correlationId !="">
                 var correlationId = $("#${correlationId}").val() == "" ? "${correlationValue}": $("#${correlationId}").val();
                 if(opt.common.isEmpty(correlationId) || correlationId == '-1'){
-                    opt.error("<@ctx.i18n text = "关联信息不能为空"/>");
+                    opt.error("${i18n("关联信息不能为空")}");
                     return;
                 }
                 <#else>
                 var correlationId = "";
                 </#if>
                 var options = {
-                    title: <#if boxTitle =="">"<@ctx.i18n text = "请选择数据"/>" <#else>"${boxTitle}"</#if>,
+                    title: <#if boxTitle =="">"${i18n("请选择数据")}" <#else>"${i18n("${boxTitle}")}"</#if>,
                     width: "${width}",
                     <#if height != "">
                     height: ${height},
                     </#if>
                     url: baseURL + "sys/component/treeselect",
+                    maxmin: <#if maxmin?string == "true">true<#else>false</#if>,
+                    closeBtn: ${closeBtn},
                     <#-- POST提交组件控制类参数-->
                     fromData:{
                         url: $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Div").data("url"),
@@ -103,7 +110,9 @@
             });
 
             function func_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>doSubmit(index, layero,selfLayer) {
-                var nodes = $.tree.callBackTree(layero,index);
+                var $tree = layero.find("iframe")[0].contentWindow.$.tree;
+                var nodes = $tree.callBackTree(layero,index);
+                nodes._oldId = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val();
                 <#if keyId != "id">
                 $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").attr('data-id',nodes.id);
                 </#if>
@@ -115,18 +124,34 @@
                 if(typeof ${callbackFunName} == 'function'){
                     ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'ok', index, layero, nodes);
                 }
+                
+                /*校验*/
+                <#if required>
+                $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name")
+                    .parentsUntil('from').validate()
+                    .element($("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name"));
+                </#if>
                 selfLayer.close(index);
             };
             <#if isClear?string == "true">
             function func_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>clear(index, layero,selfLayer) {
+                var _oldId = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val();
                 $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val("").change();
                 $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name").val("").change();
                 <#if isParentIds>
                 $('input[name="${parenName}"]').val("").change();
                 </#if>
+
                 if(typeof ${callbackFunName}  == 'function'){
-                    ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'clear', index, layero, '');
+                    ${callbackFunName}('<#if !template>${Assname?replace(".","_")}<#else>${Assname}</#if>', 'clear', index, layero, _oldId);
                 }
+                
+                /*校验*/
+                <#if required>
+                $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name")
+                    .parentsUntil('from').validate()
+                    .element($("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>Name"));
+                </#if>
                 selfLayer.close(index);
             };
             </#if>

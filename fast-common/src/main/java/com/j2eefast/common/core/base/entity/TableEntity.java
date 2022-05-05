@@ -34,7 +34,12 @@ public class TableEntity {
 	 * 查询字段是否为树查询
 	 */
 	private TableZtreeEntity ztree;
-	
+
+	/**
+	 * 字段是否出现排序
+	 */
+	private boolean sortable;
+
 	/**
 	 * 是否查询
 	 */

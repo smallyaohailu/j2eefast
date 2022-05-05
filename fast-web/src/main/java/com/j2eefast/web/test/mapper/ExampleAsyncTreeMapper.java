@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * example_tree Mapper接口
  * @author: ZhouZhou
- * @date 2020-12-21 11:03:28
+ * @date 2021-10-20 11:43:20
  */
 public interface ExampleAsyncTreeMapper extends BaseMapper<ExampleAsyncTreeEntity> {
 

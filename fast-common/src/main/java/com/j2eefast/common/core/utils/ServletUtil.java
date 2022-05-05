@@ -13,6 +13,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.j2eefast.common.core.io.PropertiesUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -34,9 +37,39 @@ public class ServletUtil {
      */
     public static String getIp() {
         HttpServletRequest request = getRequest();
+        String ip = "127.0.0.1";
         if (request == null) {
-            return "127.0.0.1";
+            return ip;
         } else {
+
+            Boolean forward = (Boolean) PropertiesUtils.getInstance()
+                    .get("server.use-forward-headers");
+            String xffName = PropertiesUtils.getInstance().getProperty("server.tomcat.remote-ip-header");
+            if(forward && ToolUtil.isNotEmpty(xffName)){
+                ip =  request.getHeader(xffName);
+                if(ToolUtil.isNotEmpty(ip)){
+                    return ip;
+                }
+            }
+
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("Proxy-Client-IP");
+            }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("x-forwarded-for");
+            }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("WL-Proxy-Client-IP");
+            }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("X-Real-IP");
+            }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getRemoteHost();
+            }
+            if(ToolUtil.isNotEmpty(ip)){
+                return ip;
+            }
         	return NetUtil.getMultistageReverseProxyIp(request.getRemoteAddr());
         }
     }
@@ -163,5 +196,33 @@ public class ServletUtil {
         }
 
         return false;
+    }
+
+    /**
+     * 设置客户端缓存过期时间 的Header.
+     */
+    public static void setExpiresHeader(HttpServletResponse response, long expiresSeconds) {
+        // Http 1.0 header, set a fix expires date.
+        response.setDateHeader(HttpHeaders.EXPIRES, System.currentTimeMillis() + expiresSeconds * 1000);
+        // Http 1.1 header, set a time after now.
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "private, max-age=" + expiresSeconds);
+    }
+
+    /**
+     * 设置禁止客户端缓存的Header.
+     */
+    public static void setNoCacheHeader(HttpServletResponse response) {
+        // Http 1.0 header
+        response.setDateHeader(HttpHeaders.EXPIRES, 1L);
+        response.addHeader(HttpHeaders.PRAGMA, "no-cache");
+        // Http 1.1 header
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0");
+    }
+
+    /**
+     * 设置LastModified Header.
+     */
+    public static void setLastModifiedHeader(HttpServletResponse response, long lastModifiedDate) {
+        response.setDateHeader(HttpHeaders.LAST_MODIFIED, lastModifiedDate);
     }
 }

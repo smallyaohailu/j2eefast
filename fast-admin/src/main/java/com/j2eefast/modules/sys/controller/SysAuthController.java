@@ -12,10 +12,12 @@ import com.j2eefast.common.core.utils.AuthStateRedisCache;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.shiro.LoginType;
 import com.j2eefast.framework.shiro.UserToken;
+import com.j2eefast.framework.shiro.token.OtherToken;
 import com.j2eefast.framework.sys.entity.SysAuthUserEntity;
 import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.sys.service.SysAuthUserService;
+import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.DictConfig;
 import com.j2eefast.framework.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -67,10 +69,17 @@ public class SysAuthController extends BaseController {
             super.getHttpServletResponse().sendRedirect("../404.html");
             return;
         }
+        //获取租户号码
+        String tenantId = super.getPara(Constant.TENANT_PARAMETER, Constant.SUPER_TENANT);
+        String rememberMe = super.getPara("rememberMe", "false");
+        
         JSONObject json =  JSONUtil.parseObj(dictLabel);
         AuthRequest authRequest = ToolUtil.getAuthRequest(source,
                 json.getStr("clientId"),json.getStr("clientSecret"),json.getStr("redirectUri"),stateRedisCache);
-        String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
+        String state = AuthStateUtils.createState();
+        //前端是否勾选记住我
+        state = state.substring(0,state.length() - 7) +(rememberMe.equals("true")?"1":"0")+ tenantId;
+        String authorizeUrl = authRequest.authorize(state);
         log.info("authorizeUrl:"+authorizeUrl);
         super.getHttpServletResponse().sendRedirect(authorizeUrl);
     }
@@ -92,12 +101,16 @@ public class SysAuthController extends BaseController {
         @SuppressWarnings("unchecked")
 		AuthResponse<AuthUser> response = authRequest.login(callback);
         System.out.println(JSONUtil.parse(response).toString());
+        
         if (response.ok()) {
+        	
             if(source.equals("gitee")){
                 response.getData().getUuid();
             }
+            
             if(UserUtils.isLogin()){
-                SysUserEntity user = sysUserMapper.findAuthByUuid(source+ response.getData().getUuid());
+            	
+                SysUserEntity user = sysUserMapper.findAuthByUuid(source+ response.getData().getUuid(), UserUtils.getTenantId());
                 if(!ToolUtil.isEmpty(user)){
                     return new ModelAndView(REDIRECT+"/index#sys/user/profile/oauth2?err=5001#_sysInfo");
                 }
@@ -114,20 +127,43 @@ public class SysAuthController extends BaseController {
                 sysAuthUserService.saveAuthUser(authUser);
                 return new ModelAndView(REDIRECT+"/index#sys/user/profile/oauth2#_sysInfo");
             }
-            SysUserEntity user = sysUserMapper.findAuthByUuid(source+ response.getData().getUuid());
+            
+            String state = super.getPara("state");
+        	state = state.substring(state.length() - 7);
+        	String r  = state.substring(0,1);
+        	String tenantId = state.substring(1);
+        	boolean rememberMe = r.equals("1")?true:false;
+        	
+        	//生产正式环境
+//        	try {
+//        		 OtherToken otherToken = new OtherToken(source+ response.getData().getUuid(),tenantId,rememberMe);
+//            	 //绑定用户登录
+//               Subject subject = null;
+//            	 subject = UserUtils.getSubject();
+//               subject.login(otherToken);
+//               return new ModelAndView(REDIRECT+"/index");
+//        	}catch (Exception e) {
+//        		Map<String, Object> map = new HashMap<>(1);
+//              map.put("errorMsg", response.getMsg());
+//              return new ModelAndView("404");
+//			}
+        	
+        	//演示环境
+            SysUserEntity user = sysUserMapper.findAuthByUuid(source+ response.getData().getUuid(),tenantId);
             if(!ToolUtil.isEmpty(user)){
                 //绑定用户登录
-                Subject subject = null;
-                UserToken token = new UserToken(user.getUsername(), user.getPassword(), LoginType.FREE.getDesc(),false);
-                subject = UserUtils.getSubject();
-                subject.login(token);
-                return new ModelAndView(REDIRECT+"/index");
+       		   OtherToken otherToken = new OtherToken(source+ response.getData().getUuid(),tenantId,rememberMe);
+           	   //绑定用户登录
+               Subject subject = null;
+           	   subject = UserUtils.getSubject();
+               subject.login(otherToken); 
+               return new ModelAndView(REDIRECT+"/index");
             }else{
                 //游客登录 演示网站暂时定死账号登录
+            	OtherToken otherToken = new OtherToken("gitee1816537","000000",rememberMe);
                 Subject subject = null;
-                UserToken token = new UserToken("99999", "123456", LoginType.NORMAL.getDesc(),false);
-                subject = UserUtils.getSubject();
-                subject.login(token);
+            	subject = UserUtils.getSubject();
+                subject.login(otherToken); 
                 return new ModelAndView(REDIRECT+"/index");
             }
         }

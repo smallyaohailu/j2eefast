@@ -27,7 +27,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          a.remark AS "remark" ,
          a.update_time AS "updateTime" ,
          a.update_by AS "updateBy" ,
-         a.create_time AS "createTime" 
+         a.create_time AS "createTime" ,
+         a.t_man_dd AS "tManDd" 
     </sql>
 
     <!-- 外联表  -->
@@ -42,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="exampleTestColumns"/>
 		FROM  example_test a
         <include refid="exampleTestJoins"/>
-		WHERE a.id = '${id}'
+		WHERE a.id = #{id}
     </select>
 
     <!--  根据获取实体List   -->
@@ -60,9 +61,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <if test="email != null  and email != ''"> AND a.email = #{email} </if>
             <if test="phone != null  and phone != ''"> AND a.phone = #{phone} </if>
-            <if test="sex != null  and sex != ''"> AND a.sex = #{sex} </if>
             <if test="age != null "> AND a.age = #{age} </if>
-            <if test="compId != null "> AND a.comp_id = #{compId} </if>
+            <if test="joinDate != null "> AND a.join_date = #{joinDate} </if>
+            <if test="leaveDate != null "> AND a.leave_date = #{leaveDate} </if>
+            <if test="deptId != null "> AND a.dept_id = #{deptId} </if>
         </where>
     </select>
 
@@ -81,9 +83,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <if test="exampleTest.email != null  and exampleTest.email != ''"> AND a.email = #{exampleTest.email} </if>
             <if test="exampleTest.phone != null  and exampleTest.phone != ''"> AND a.phone = #{exampleTest.phone} </if>
-            <if test="exampleTest.sex != null  and exampleTest.sex != ''"> AND a.sex = #{exampleTest.sex} </if>
             <if test="exampleTest.age != null "> AND a.age = #{exampleTest.age} </if>
-            <if test="exampleTest.compId != null "> AND a.comp_id = #{exampleTest.compId} </if>
+            <if test="exampleTest.joinDate != null "> AND a.join_date = #{exampleTest.joinDate} </if>
+            <if test="exampleTest.leaveDate != null "> AND a.leave_date = #{exampleTest.leaveDate} </if>
+            <if test="exampleTest.deptId != null "> AND a.dept_id = #{exampleTest.deptId} </if>
             <if test = "sql_filter !=null and sql_filter!=''">
                 AND ${sql_filter}
             </if>

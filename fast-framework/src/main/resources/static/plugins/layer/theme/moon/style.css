@@ -9,18 +9,35 @@ html #layui_layer_skinmoonstylecss {
 	width: 1989px;
 }
 
-body .layer-ext-moon[type="dialog"] {
-	min-width: 320px;
+body .layer-ext-moon-msg[type="dialog"] {
+	min-width: 100px;
+	background-color: #000;
+	filter: alpha(opacity=50);
+	background-color: rgba(0,0,0,.5);
+	color: #fff;
+	border: none;
 }
 
-body .layer-ext-moon-msg[type="dialog"]{min-width:200px;}
+.layer-ext-moon-msg .layui-layer-content {
+	position: relative;
+	padding: 20px;
+	line-height: 5px;
+	word-break: break-all;
+	overflow: hidden;
+	font-size: 14px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+
+/*body .layer-ext-moon-msg[type="dialog"]{min-width:200px;}*/
 body .layer-ext-moon .layui-layer-title {
 	background: #F8F8F8;
 	color: #333;
 	font-size: 14px;
 	height: 42px;
 	line-height: 42px;
-    border: none;
+	border: none;
 	border-radius: 4px 4px 0 0;
 }
 
@@ -31,11 +48,11 @@ body .layer-ext-moon .layui-layer-content .layui-layer-ico {
 }
 body .layer-ext-moon .layui-layer-ico0 {
 	background: url(default.png) no-repeat -96px 0;
-	;
+;
 }
 body .layer-ext-moon .layui-layer-ico1 {
 	background: url(default.png) no-repeat -224px 0;
-	;
+;
 }
 body .layer-ext-moon .layui-layer-ico2 {
 	background: url(default.png) no-repeat -192px 0;
@@ -93,7 +110,7 @@ body .layer-ext-moon .layui-layer-setwin .layui-layer-close1:hover {
 }
 
 body .layer-ext-moon .layui-layer-setwin .layui-layer-close2:hover {
-	 background-position:-180px -31px
+	background-position:-180px -31px
 }
 body .layui-layer {
 	border-radius: 4px;
@@ -101,8 +118,8 @@ body .layui-layer {
 
 body .layer-ext-moon .layui-layer-padding{padding-top: 24px;}
 body .layer-ext-moon .layui-layer-btn {
-    text-align: right;
-    padding: 10px 15px 12px;
+	text-align: right;
+	padding: 10px 15px 12px;
 	/*background: #f0f4f7;*/
 	/*border-top: 1px #c7c7c7 solid;*/
 }

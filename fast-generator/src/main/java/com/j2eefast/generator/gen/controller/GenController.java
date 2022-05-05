@@ -7,6 +7,7 @@ package com.j2eefast.generator.gen.controller;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.enums.BusinessType;
@@ -22,8 +23,10 @@ import com.j2eefast.framework.sys.service.SysDatabaseService;
 import com.j2eefast.framework.sys.service.SysModuleService;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.framework.utils.UserUtils;
+import com.j2eefast.generator.gen.entity.GenEditCodeEntity;
 import com.j2eefast.generator.gen.entity.GenTableColumnEntity;
 import com.j2eefast.generator.gen.entity.GenTableEntity;
+import com.j2eefast.generator.gen.service.GenEditCodeService;
 import com.j2eefast.generator.gen.service.GenTableColumnService;
 import com.j2eefast.generator.gen.service.GenTableService;
 import com.j2eefast.generator.gen.util.GenUtils;
@@ -67,6 +70,9 @@ public class GenController extends BaseController {
 
     @Autowired
     private GenTableColumnService genTableColumnService;
+
+    @Autowired
+    private GenEditCodeService genEditCodeService;
 
     @RequiresPermissions("tool:gen:view")
     @GetMapping()
@@ -191,22 +197,49 @@ public class GenController extends BaseController {
     @RequiresPermissions("tool:gen:preview")
     @GetMapping("/preview/{tableId}")
     public String preview(@PathVariable("tableId") Long tableId, ModelMap mmap){
-        Map<String, String> dataMap = genTableService.previewCode(tableId);
-        Map <String,String> map = new LinkedHashMap<>();
-        for(Map.Entry<String, String> entry : dataMap.entrySet()){
-            String mapKey = entry.getKey(); //vm/java/entity.java.vm
-            mapKey = mapKey.substring(mapKey.lastIndexOf("/"),mapKey.length());//entity.java.vm
-            mapKey = mapKey.substring(1,mapKey.lastIndexOf("."));
-            String mapValue = entry.getValue();
-            if(mapKey.equals("sql")){
-                map.put("run.sql",mapValue);
-            }else{
-                map.put(mapKey,mapValue);
-            }
 
+        List<GenEditCodeEntity> listGen = genEditCodeService
+                .list(new QueryWrapper<GenEditCodeEntity>().eq("table_id",tableId));
+        for(GenEditCodeEntity genEdit: listGen){
+            genEdit.setTemplateValue(new String(genEdit.getTemplate()));
         }
-        mmap.put("gen_code", map);
+        mmap.put("gen_code", listGen);
         return urlPrefix + "/codeView";
+    }
+
+    /**
+     * 在线编辑
+     * @param tableId
+     * @param mmap
+     * @return
+     */
+    @RequiresPermissions("tool:gen:preview")
+    @GetMapping("/editCode/{tableId}")
+    public String editCode(@PathVariable("tableId") Long tableId, ModelMap mmap){
+//        Map<String, String> dataMap = genTableService.previewCode(tableId);
+//        Map <String,String> map = new LinkedHashMap<>();
+//        for(Map.Entry<String, String> entry : dataMap.entrySet()){
+//            String mapKey = entry.getKey(); //vm/java/entity.java.vm
+//            mapKey = mapKey.substring(mapKey.lastIndexOf("/"),mapKey.length());//entity.java.vm
+//            mapKey = mapKey.substring(1,mapKey.lastIndexOf("."));
+//            String mapValue = entry.getValue();
+//            if(mapKey.equals("sql")){
+//                map.put("run.sql",mapValue);
+//            }else{
+//                map.put(mapKey,mapValue);
+//            }
+//
+//        }
+//        mmap.put("gen_code", map);
+
+        List<GenEditCodeEntity> listGen = genEditCodeService
+                .list(new QueryWrapper<GenEditCodeEntity>().eq("table_id",tableId));
+        for(GenEditCodeEntity genEdit: listGen){
+            genEdit.setTemplateValue(new String(genEdit.getTemplate()));
+        }
+        mmap.put("gen_code", listGen);
+
+        return urlPrefix + "/editCode";
     }
 
     /**

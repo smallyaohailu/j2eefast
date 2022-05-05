@@ -5,10 +5,8 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -83,7 +81,7 @@ public class SysCompService extends ServiceImpl<SysCompMapper,SysCompEntity>  {
 		return SpringUtil.getAopProxy(this).getDeptList(params);
 	}
 
-	@DataFilter(compAlias="c",deptAlias = "c")
+	@DataFilter(compAlias="c",deptAlias = "c", isDeptTable = true)
 	public List<SysCompEntity> getDeptList(Map<String, Object> params){
 		String name = (String)params.get("name");
 		String type = (String)params.get("type");
@@ -316,6 +314,45 @@ public class SysCompService extends ServiceImpl<SysCompMapper,SysCompEntity>  {
 		return ztrees;
 	}
 
+	public List<Ztree> buildDeptTreeSelect(List<Ztree> ztrees){
+		List<Ztree> list = new ArrayList<>();
+		for (int i=0; i < ztrees.size(); i++){
+			if(ztrees.get(i).getpId().equals("0")){
+				list.add(ztrees.get(i));
+			}else{
+				recursionFn(list,ztrees.get(i));
+			}
+		}
+		return list;
+	}
+
+
+	/**
+	 * 递归列表
+	 */
+	private void recursionFn(List<Ztree> list, Ztree t)
+	{
+		Iterator<Ztree> it = list.iterator();
+		while (it.hasNext()){
+			Ztree n = (Ztree) it.next();
+			if(n.getId().equals(t.getpId())){
+				if(ToolUtil.isEmpty(n.getChildren())){
+					List<Ztree> temp = new ArrayList<>();
+					temp.add(t);
+					n.setChildren(temp);
+				}else{
+					n.getChildren().add(t);
+				}
+			}else{
+				if(n.isParent()){
+					if(!ToolUtil.isEmpty(n.getChildren())){
+						recursionFn(n.getChildren(),t);
+					}
+				}
+			}
+		}
+	}
+
 	public List<Ztree> initZtree(List<SysCompEntity> list) {
 		return  initZtree(list,null);
 	}
@@ -332,6 +369,7 @@ public class SysCompService extends ServiceImpl<SysCompMapper,SysCompEntity>  {
 				ztree.setName(comp.getName());
 				ztree.setTitle(comp.getName());
 				ztree.setType(comp.getType());
+				ztree.setIsParent(comp.getIsTreeLeaf() == 1);
 				if(isCheck){
 					ztree.setChecked(roleCompList.contains(comp.getId() + comp.getName()));
 				}

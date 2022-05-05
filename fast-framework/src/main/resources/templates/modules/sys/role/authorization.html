@@ -1,15 +1,15 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="角色授权" libs=["zTree"]/>
+<@header title="角色管理" libs=["zTree"]/>
 <div class="container-div">
 <div class="col-sm-12 search-collapse">
 <@f.form id="form-role-authorization">
     <@f.hidden name="id" value="${role.id?default('')}"/>
-    <h4 class="form-header h4"><@ctx.i18n text = "基本信息"/></h4>
+    <h4 class="form-header h4">${i18n("基本信息")}</h4>
     <div class="row">
         <div class="col-sm-5">
             <div class="form-group">
-                <label class="col-sm-4 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "角色名称"/>：</label>
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("角色名称")}：</label>
                 <div class="col-sm-8">
                     <@f.input name="roleName" value="${role.roleName?default('')}" readonly=true  required=true/>
                 </div>
@@ -17,18 +17,18 @@
         </div>
         <div class="col-sm-7">
             <div class="form-group">
-                <label class="col-sm-2 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "角色编码"/>：</label>
-                <div class="col-sm-7">
+                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("角色编码")}：</label>
+                <div class="col-sm-8">
                     <@f.input name="roleKey" value="${role.roleKey?default('')}" readonly=true  required=true/>
                 </div>
             </div>
         </div>
     </div>
-    <h4 class="form-header h4"><@ctx.i18n text = "授权功能菜单"/></h4>
+    <h4 class="form-header h4">${i18n("授权功能菜单")}</h4>
     <div class="row">
         <div class="col-sm-5">
             <div class="form-group">
-                <label class="col-sm-4 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "管理模块"/>：</label>
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("管理模块")}：</label>
                 <div class="col-sm-8">
                     <@f.checkbox name="moduleCodes" items=modules itemLabel="moduleName" value="${selectModules}" itemValue="moduleCode" required=true/>
                 </div>
@@ -36,8 +36,8 @@
         </div>
         <div class="col-sm-7">
             <div class="form-group">
-                <label class="col-sm-2 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "菜单权限"/>：</label>
-                <div class="col-sm-9">
+                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("菜单权限")}：</label>
+                <div class="col-sm-8">
 <#--                    <div class="box box-solid" style="background:#FAFAFA;border-top: 0;">-->
 <#--                        <div id="menuTrees" class="ztree"></div>-->
 <#--                    </div>-->
@@ -45,13 +45,13 @@
                         <div class="box-header">
                             <div class="box-title">
                                 <label class="check-box">
-                                    <input type="checkbox" id="checkall"/> 全部勾选
+                                    <input type="checkbox" id="checkall"/> ${i18n("全部勾选")}
                                 </label>
                             </div>
                             <div class="box-tools pull-right" style="top:8px;">
                                 <a class="btn btn-box-tool" id="expand"
-                                   value="dataScopeTree" >展开</a>/
-                                <a class="btn btn-box-tool" id="collapse" value="dataScopeTree" >折叠</a>
+                                   value="dataScopeTree" >${i18n("展开")}</a>/
+                                <a class="btn btn-box-tool" id="collapse" value="dataScopeTree" >${i18n("折叠")}</a>
                             </div>
                         </div>
                         <div class="box-body">

@@ -45,6 +45,8 @@ public class LicenseVerify {
         LOG.info(MessageFormat.format("证书安装成功，证书有效期：{0} - {1}",DatePattern.NORM_DATETIME_FORMAT.format(result.getNotBefore()),
                 DatePattern.NORM_DATETIME_FORMAT.format(result.getNotAfter())));
 
+        ConfigConstant.LIC_TAG = "SUCCESS";
+
         return result;
     }
 

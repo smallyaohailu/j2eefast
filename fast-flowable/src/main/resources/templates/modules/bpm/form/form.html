@@ -8,29 +8,29 @@
         <div class="select-list">
             <ul>
                 <li>
-                    <@ctx.i18n text = "请假人姓名"/>：
+                    ${i18n("请假人姓名")}：
                     <input type="text" class="form-control" name="userName"/>
                 </li>
                 <li>
-                    <@ctx.i18n text = "请假天数"/>：
+                    ${i18n("请假天数")}：
                     <input type="text" class="form-control" name="leaveDays"/>
                 </li>
                 <li>
-                    <@ctx.i18n text = "请假类型"/>：
+                    ${i18n("请假类型")}：
                     <select name="leaveType" class="form-control">
-                        <option value=""><@ctx.i18n text = "所有"/></option>
+                        <option value="">${i18n("所有")}</option>
                     <#list dict.getType('sys_leave_type')>
                         <#items as d>
                             <#if d.status =='0' >
-                                <option value="${d.dictValue}" text="${d.dictLabel}"><@ctx.i18n text = "${d.dictLabel}"/></option>
+                                <option value="${d.dictValue}" text="${d.dictLabel}">${i18n("${d.dictLabel}"/></option>
                             </#if>
                         </#items>
                     </#list>
                     </select>
                 </li>
                 <li>
-                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;<@ctx.i18n text = "查询"/></a>
-                    <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;<@ctx.i18n text = "重置"/></a>
+                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;${i18n("查询")}</a>
+                    <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
                 </li>
                 </ul>
             </div>
@@ -38,11 +38,11 @@
     </div>
     <@table id="bootstrap-table">
         <@shiro.hasPermission name="bpm:form:add">
-                        <a class="btn btn-success" onclick="opt.operate.add()"><i class="fa fa-plus"></i>&nbsp;<@ctx.i18n text = "新增"/></a>
+                        <a class="btn btn-success" onclick="opt.operate.add()"><i class="fa fa-plus"></i>&nbsp;${i18n("新增")}</a>
         </@shiro.hasPermission>
         <@shiro.hasPermission name="bpm:form:del">
             <a class="btn btn-danger multiple disabled" onclick="opt.operate.delAll()">
-                <i class="fa fa-remove"></i> <@ctx.i18n text = "删除"/>
+                <i class="fa fa-remove"></i> ${i18n("删除")}
             </a>
         </@shiro.hasPermission>
     </@table>
@@ -73,54 +73,54 @@
             }
                 ,{
                     field : 'id'
-                    ,title : '<@ctx.i18n text = "主键"/>'
+                    ,title : '${i18n("主键")}'
                     ,visible: false
                 }
                 ,{
                     field : 'userName'
-                    ,title : '<@ctx.i18n text = "请假人姓名"/>'
+                    ,title : '${i18n("请假人姓名")}'
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ,{
                     field : 'startTime'
-                    ,title : '<@ctx.i18n text = "开始时间"/>'
+                    ,title : '${i18n("开始时间")}'
                     ,width: 170
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{
                     field : 'endTime'
-                    ,title : '<@ctx.i18n text = "结束时间"/>'
+                    ,title : '${i18n("结束时间")}'
                     ,width: 170
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{
                     field : 'leaveDays'
-                    ,title : '<@ctx.i18n text = "请假天数"/>'
+                    ,title : '${i18n("请假天数")}'
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{
                     field : 'leaveType'
-                    ,title : '<@ctx.i18n text = "请假类型"/>'
+                    ,title : '${i18n("请假类型")}'
                     ,formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(leaveTypeDatas, value);
+                       return opt.common.selectDictLabel(leaveTypeDatas, value);
                     }
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{
                     field : 'leaveReason'
-                    ,title : '<@ctx.i18n text = "请假原因"/>'
+                    ,title : '${i18n("请假原因")}'
                     ,formatter: function(value, row, index) {
-                        return $.table.tooltip(value, 20);
+                        return opt.common.tooltip(value, 20);
                     }
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{
                     field : 'status'
-                    ,title : '<@ctx.i18n text = "状态"/>'
+                    ,title : '${i18n("状态")}'
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ,{
-                    title:"<@ctx.i18n text = "操作"/>"
+                    title:"${i18n("操作")}"
                     ,align: 'left'
                     ,visible:visible
                     ,class:'action'
                     ,formatter: function(value, row, index) {
                         var actions = [];
-                        actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "编辑"/>" onclick="opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
-                        actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="<@ctx.i18n text = "删除"/>" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
+                        actions.push('<a class="' + editFlag + '" href="javascript:void(0)" title="${i18n("编辑")}" onclick="opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i></a> ');
+                        actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
                         return actions.join('');
                     }
                 }

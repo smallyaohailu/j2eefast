@@ -11,11 +11,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import cn.hutool.core.util.CharUtil;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.crypto.SM4;
+import com.j2eefast.common.core.crypto.SoftEncryption;
 import com.j2eefast.common.core.utils.HexUtil;
 import com.j2eefast.common.core.utils.YamlParsing;
 import lombok.extern.slf4j.Slf4j;
@@ -109,7 +111,21 @@ public class PropertiesUtils {
 				INSTANCE.put("checkCode",HexUtil.encodeHexStr(SM4.encryptData_ECB(HexUtil.decodeHex
 						(ConfigConstant.FAST_OS_SN),ConfigConstant.FAST_VERIFY_KEY)).substring(0,6));
 				INSTANCE.put("pCIp",StrUtil.cleanBlank(StrUtil.join(StrUtil.COMMA,ConfigConstant.FAST_IPS)));
+
+				if(ToolUtil.isEmpty(INSTANCE.get(ConfigConstant.SYS_KEY_PUBKEY))
+						|| ToolUtil.isEmpty(INSTANCE.get(ConfigConstant.SYS_KEY_PRIKEY))){
+					JSONObject object = SoftEncryption.genSM2Keys();
+					// J2eeFAST 2021年09月05日 21:19:13
+					// 系统生成 公私密钥对 --> 目前系统登录加密使用-> 后期可以扩展到 前端重要数据加密使用
+					ConfigConstant.PRIVKEY = object.get("priKeyByte",byte[].class);
+					ConfigConstant.PUBKEY = Base64.encode(object.get("pubKeyByte",byte[].class));
+				}else{
+					ConfigConstant.PUBKEY = (String) INSTANCE.get(ConfigConstant.SYS_KEY_PUBKEY);
+					ConfigConstant.PRIVKEY = Base64.decode((String) INSTANCE.get(ConfigConstant.SYS_KEY_PRIKEY));
+				}
 			}
+
+			ConfigConstant.DICT_TAG = RandomUtil.randomString(5);
 
 			try{
 				// J2eeFAST 2020-12-18 23:05:53 动态设置系统环境

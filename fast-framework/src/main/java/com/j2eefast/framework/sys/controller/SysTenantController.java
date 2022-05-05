@@ -141,9 +141,8 @@ public class SysTenantController extends BaseController{
         return error("租户ID已经存在!");
     }
 
-    @RequiresPermissions("sys:tenant:tree")
     @GetMapping("/findTenantTree")
-    @RequiresRoles(Constant.SU_ADMIN)
+    @RequiresPermissions("sys:tenant:tree")
     @ResponseBody
     public List<Ztree> findTenantTree(){
         if(!UserUtils.isSuperTenant()){
@@ -155,7 +154,6 @@ public class SysTenantController extends BaseController{
     //switchTenant
     @RequiresPermissions("sys:tenant:switch")
     @PostMapping("/switchTenant")
-    @RequiresRoles(Constant.SU_ADMIN)
     @ResponseBody
     public ResponseData switchTenant(SysTenantEntity sysTenant){
         if(!UserUtils.isSuperTenant()){

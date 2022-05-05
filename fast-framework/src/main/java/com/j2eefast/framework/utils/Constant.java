@@ -7,8 +7,11 @@
 package com.j2eefast.framework.utils;
 
 import com.google.common.collect.Lists;
+import com.j2eefast.framework.sys.entity.SysDictDataEntity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 常量
@@ -107,6 +110,11 @@ public class Constant {
 
 //	/** 添加的参数 登陆错误次数*/ 后期添加
 //	public static final int LOGIN_NUM_MAX = 3;
+
+	/**
+	 * 系统缓存字典
+	 */
+	public static Map<String, List<SysDictDataEntity>> SYS_DICT = new HashMap<>();
 
 	/**
 	 * 菜单类型

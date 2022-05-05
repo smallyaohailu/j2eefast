@@ -10,6 +10,7 @@
                 readonly = false 	<#-- 是否只读模式 -->
                 maxlength =  10000 <#-- 最大输入长度默认不限-->
                 height = 300 <#-- 高度-->
+                template = false <#-- 控件是否做template用-->
                 toolbars = "all" <#--工具类 默认所有 -->
                 type = ["content"] <#--获取数据类型 html (整个html的内容), content (内容), txt(纯文本), plaintxt (带格式的纯文本)-->
                 >
@@ -23,8 +24,8 @@
     <#else>
         <#local AssId="${id}"/>
     </#if>
-    <input id="${AssId?replace(".","_")}" name="<#if name != "">${name}<#else>${AssId}</#if>" value="<#if value != "">${value}</#if>" type="hidden"/>
-    <script id="${AssId?replace(".","_")}ContentUE" type="text/plain" style="width:100%;height:${height}px;"></script>
+    <input id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>" name="<#if name != "">${name}<#else>${AssId}</#if>" value="<#if value != "">${value}</#if>" type="hidden"/>
+    <script id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>ContentUE" type="text/plain" style="width:100%;height:${height}px;"></script>
     <@compress single_line=true>
     <script type="text/javascript">
         $(function() {
@@ -32,7 +33,7 @@
                 opt.error("ueditor 插件未引入,请模板引擎header Lis中引入!!");
                 return;
             }
-            var remarksUE_${AssId?replace(".","_")} = UE.getEditor('${AssId?replace(".","_")}ContentUE', {
+            var remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if> = UE.getEditor('<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>ContentUE', {
                 serverUrl: window.UEDITOR_CONFIG.serverUrl+"?bizType=${bizType}&bizId=${bizId}",
                 <#--maximumWords: ${maxlength},-->
                 readonly: ${readonly?string('true','false')},
@@ -60,53 +61,53 @@
                 </#if>
             });
             /* 更新编辑器内容  remarksUE.updateContent();*/
-            remarksUE_${AssId?replace(".","_")}.updateContent = function(){
-                var ${AssId?replace(".","_")}_html = "";
-                if (!remarksUE_${AssId?replace(".","_")}.hasContents()){
+            remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.updateContent = function(){
+                var <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html = "";
+                if (!remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.hasContents()){
                     $('#<#if id == "">${name}<#else>${id}</#if>').val("").change();
                 }else{
                     <#if type[0] == "html">
-                    ${AssId?replace(".","_")}_html = remarksUE_${AssId?replace(".","_")}.getAllHtml().replace('<!--HTML-->','');
+                    <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getAllHtml().replace('<!--HTML-->','');
                     <#elseif type[0] == "content">
-                    ${AssId?replace(".","_")}_html = remarksUE_${AssId?replace(".","_")}.getContent().replace('<!--HTML-->','');
+                    <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getContent().replace('<!--HTML-->','');
                     <#elseif type[0] == "txt">
-                    ${AssId?replace(".","_")}_html = remarksUE_${AssId?replace(".","_")}.getContentTxt().replace('<!--HTML-->','');
+                    <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getContentTxt().replace('<!--HTML-->','');
                     <#elseif type[0] == "plaintxt">
-                    ${AssId?replace(".","_")}_html = remarksUE_${AssId?replace(".","_")}.getPlainTxt().replace('<!--HTML-->','');
+                    <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getPlainTxt().replace('<!--HTML-->','');
                     </#if>
-                    $('#${AssId?replace(".","_")}').val(${AssId?replace(".","_")}_html).change();
+                    $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>').val(<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html).change();
                 }
                 if (typeof window.webuploaderRefresh == 'function'){
                     <#assign res="" />
                     <#list type as x>
                     <#if x != type[0] >
                     <#if x == "html">
-                    var ${AssId?replace(".","_")}_html${x?index} = remarksUE_${AssId?replace(".","_")}.getAllHtml().replace('<!--HTML-->','');
+                    var <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html${x?index} = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getAllHtml().replace('<!--HTML-->','');
                     <#elseif x == "content">
-                    var ${AssId?replace(".","_")}_html${x?index} = remarksUE_${AssId?replace(".","_")}.getContent().replace('<!--HTML-->','');
+                    var <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html${x?index} = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getContent().replace('<!--HTML-->','');
                     <#elseif x == "txt">
-                    var ${AssId?replace(".","_")}_html${x?index} = remarksUE_${AssId?replace(".","_")}.getContentTxt().replace('<!--HTML-->','');
+                    var <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html${x?index} = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getContentTxt().replace('<!--HTML-->','');
                     <#elseif x == "plaintxt">
-                    var ${AssId?replace(".","_")}_html${x?index} = remarksUE_${AssId?replace(".","_")}.getPlainTxt().replace('<!--HTML-->','');
+                    var <#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html${x?index} = remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.getPlainTxt().replace('<!--HTML-->','');
                     </#if>
-                    <#assign res= res + ',${AssId?replace(".","_")}_html${x?index}' />
+                    <#assign res= res + ',<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html${x?index}' />
                     </#if>
                     </#list>
-                    window.webuploaderRefresh("${AssId?replace(".","_")}",${AssId?replace(".","_")}_html${res});
+                    window.webuploaderRefresh("<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>",<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>_html${res});
                 }
             };
             /* 编辑器加载完成事件*/
-            remarksUE_${AssId?replace(".","_")}.ready(function(){
-                remarksUE_${AssId?replace(".","_")}.execCommand('insertHtml', $("#${AssId?replace(".","_")}").val());
-                remarksUE_${AssId?replace(".","_")}.addListener('contentchange', function(){
-                    remarksUE_${AssId?replace(".","_")}.updateContent();
+            remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.ready(function(){
+                remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.execCommand('insertHtml', $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val());
+                remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.addListener('contentchange', function(){
+                    remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.updateContent();
                 });
-                remarksUE_${AssId?replace(".","_")}.addListener('focus blur', function(type, arg1, arg2){
+                remarksUE_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>.addListener('focus blur', function(type, arg1, arg2){
                     if(type == 'focus'){
-                        $('#${AssId?replace(".","_")}ContentUE').addClass('_focus');
+                        $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>ContentUE').addClass('_focus');
                     }
                     if(type == 'blur'){
-                        $('#${AssId?replace(".","_")}ContentUE').removeClass('_focus');
+                        $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>ContentUE').removeClass('_focus');
                     }
                 });
             });

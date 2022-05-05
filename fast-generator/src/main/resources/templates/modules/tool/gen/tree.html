@@ -56,7 +56,7 @@
 					data: {"pid":treeNode.id,"path":""+treeNode.title},
 					beforeSend: function () {
 						$(window).block({ message: '<div class="loaderbox"><div class="loading-activity"></div> ' +
-									'<@ctx.i18n text = "数据正在认证,请稍后..."/>' + '</div>' });
+									'${i18n("数据正在认证,请稍后..."/>' + '</div>' });
 					},
 					success: function(result) {
 						$._tree.addNodes(node, result);

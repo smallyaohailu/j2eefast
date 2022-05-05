@@ -6,13 +6,19 @@
 package com.j2eefast.modules.sys.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import cn.hutool.core.util.StrUtil;
+import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.framework.annotation.RepeatSubmit;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
+import com.j2eefast.framework.sys.entity.RouterEntity;
 import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.service.SysModuleService;
@@ -50,6 +56,37 @@ public class SysMenuController extends BaseController {
 	@GetMapping()
 	public String menu(){
 		return urlPrefix + "/menu";
+	}
+
+
+	/**
+	 * 获取用户登录菜单信息
+	 * @return
+	 */
+	@GetMapping("/getRouters")
+	@ResponseBody
+	public ResponseData getRouters(){
+		LoginUserEntity user = UserUtils.getUserInfo();
+		List<Map<String, Object>> modules = ConstantFactory.me().getModules(user.getId());
+		Map<String, List<SysMenuEntity>> menuList = new HashMap<>();
+		List<SysMenuEntity> listMenu = new ArrayList<>();
+		for(Map<String, Object> s: modules){
+			List<SysMenuEntity> menu = ConstantFactory.me().getMenuByUserIdModuleCode(user.getId(),
+					(String) s.get("moduleCode"),user);
+			// 模块菜单 添加到父
+			SysMenuEntity sysMenuEntity = new SysMenuEntity();
+			sysMenuEntity.setComponent("LAYOUT");
+			sysMenuEntity.setUrl("/"+s.get("id"));
+			sysMenuEntity.setName((String) s.get("moduleName"));
+			sysMenuEntity.setIcon((String) s.get("icon"));
+			sysMenuEntity.setHide(0);
+			sysMenuEntity.setChildren(menu);
+			sysMenuEntity.setType(0);
+			sysMenuEntity.setId((Long) s.get("id"));
+			listMenu.add(sysMenuEntity);
+		}
+		List<RouterEntity>  routerEntityList = sysMenuService.buildMenus(listMenu);
+		return success(routerEntityList);
 	}
 
 	/**
@@ -124,16 +161,27 @@ public class SysMenuController extends BaseController {
 	}
 
 
-	/**
-	 * 所有菜单列表
-	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	@RequiresPermissions("sys:menu:list")
 	@ResponseBody
-	public ResponseData list(SysMenuEntity menu) {
-		List<SysMenuEntity> menuList = sysMenuService.findMenuList(menu, UserUtils.getUserInfo());
-		return success().put("list", menuList);
+	public ResponseData list(@RequestParam Map<String, Object> params, SysMenuEntity menu) {
+		PageUtil page = sysMenuService.findPage(params, menu);
+		return success(page);
 	}
+
+	/**
+	 * 异步请求数据
+	 * @param menu
+	 * @return
+	 */
+	@RequestMapping("/listChild")
+	@RequiresPermissions("sys:menu:list")
+	@ResponseBody
+	public ResponseData listChild(SysMenuEntity menu) {
+		List<SysMenuEntity> list = sysMenuService.selectList(menu);
+		return success().put("list", list);
+	}
+
 
 	/**
 	 * 加载角色菜单列表树
@@ -178,7 +226,17 @@ public class SysMenuController extends BaseController {
 		List<Ztree> ztrees = sysMenuService.menuTreeData(UserUtils.getUserInfo());
 		return ztrees;
 	}
-	
+
+	/**
+	 * 加载所有菜单列表
+	 */
+	@GetMapping("/getAllmenu")
+	@ResponseBody
+	public ResponseData getAllmenu(){
+		List<SysMenuEntity> listMenu = sysMenuService.findUserMenuList(UserUtils.getUserId());
+		return success(listMenu);
+	}
+
 	/**
 	 * 管理员查看用户已获取的菜单权限
 	 */

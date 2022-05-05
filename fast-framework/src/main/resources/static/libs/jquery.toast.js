@@ -1,7 +1,9 @@
 // jQuery toast plugin created by Kamran Ahmed copyright MIT license 2015
 /**
  * J2eeFAST 二次优化样式
- * @date 2020-09-29
+ * 1.优化样式
+ * 2.添加悬停重置事件
+ * @date 2022-04-11
  */
 if ( typeof Object.create !== 'function' ) {
     Object.create = function( obj ) {
@@ -14,7 +16,7 @@ if ( typeof Object.create !== 'function' ) {
 (function( $, window, document, undefined ) {
 
     "use strict";
-    
+
     var Toast = {
 
         _positionClasses : ['bottom-left', 'bottom-right', 'top-right', 'top-left', 'bottom-center', 'top-center', 'mid-center'],
@@ -38,21 +40,21 @@ if ( typeof Object.create !== 'function' ) {
         process: function () {
             this.setup();
             this.addToDom();
-            this.position();
+            this.position(); //定位
             this.bindToast();
             this.animate();
         },
 
         setup: function () {
-            
+
             var _toastContent = '';
-            
+
             this._toastEl = this._toastEl || $('<div></div>', {
                 class : 'jq-toast-single'
             });
 
             // For the loader on top
-            _toastContent += '<span class="jq-toast-loader"></span>';            
+            _toastContent += '<span class="jq-toast-loader"></span>';
 
             if ( this.options.allowToastClose ) {
                 _toastContent += '<span class="close-jq-toast-single">&times;</span>';
@@ -146,6 +148,14 @@ if ( typeof Object.create !== 'function' ) {
                 that.processLoader();
             });
 
+            if (that.options.closeOnHover) {
+                this._toastEl.hover(function(){
+                    that.stickAround(that)
+                }, function(){
+                    that.delayedHideToast(that);
+                });
+            }
+
             this._toastEl.find('.close-jq-toast-single').on('click', function ( e ) {
 
                 e.preventDefault();
@@ -190,31 +200,31 @@ if ( typeof Object.create !== 'function' ) {
                 this._toastEl.on('afterHidden', function () {
                     that.options.afterHidden();
                 });
-            };          
+            };
         },
 
         addToDom: function () {
 
-             var _container = $('.jq-toast-wrap');
-             
-             if ( _container.length === 0 ) {
-                
+            var _container = $('.jq-toast-wrap');
+
+            if ( _container.length === 0 ) {
+
                 _container = $('<div></div>',{
                     class: "jq-toast-wrap"
                 });
 
                 $('body').append( _container );
 
-             } else if ( !this.options.stack || isNaN( parseInt(this.options.stack, 10) ) ) {
+            } else if ( !this.options.stack || isNaN( parseInt(this.options.stack, 10) ) ) {
                 _container.empty();
-             }
+            }
 
-             _container.find('.jq-toast-single:hidden').remove();
+            _container.find('.jq-toast-single:hidden').remove();
 
-             _container.append( this._toastEl );
+            _container.append( this._toastEl );
 
             if ( this.options.stack && !isNaN( parseInt( this.options.stack ), 10 ) ) {
-                
+
                 var _prevToastCount = _container.find('.jq-toast-single').length,
                     _extToastCount = _prevToastCount - this.options.stack;
 
@@ -229,6 +239,50 @@ if ( typeof Object.create !== 'function' ) {
 
         canAutoHide: function () {
             return ( this.options.hideAfter !== false ) && !isNaN( parseInt( this.options.hideAfter, 10 ) );
+        },
+
+        /**
+         * 悬停调用
+         * @param __this
+         */
+        stickAround: function(__this){
+            if (__this.canAutoHide()) {
+                window.clearTimeout(__this.intervalId);
+                var loader = __this._toastEl.find('.jq-toast-loader');
+                loader.removeClass('jq-toast-loaded');
+                loader.attr('style','');
+            };
+        },
+
+        /**
+         * 离开调用
+         * @param __this
+         */
+        delayedHideToast: function(__this){
+            if (__this.canAutoHide()) {
+                var loader = __this._toastEl.find('.jq-toast-loader');
+                loader.attr('style','');
+                __this.processLoader();
+                __this.intervalId = window.setTimeout(function(){
+                    if ( __this.options.showHideTransition.toLowerCase() === 'fade' ) {
+                        __this._toastEl.trigger('beforeHide');
+                        __this._toastEl.fadeOut(function () {
+                            __this._toastEl.trigger('afterHidden');
+                        });
+                    } else if ( __this.options.showHideTransition.toLowerCase() === 'slide' ) {
+                        __this._toastEl.trigger('beforeHide');
+                        __this._toastEl.slideUp(function () {
+                            __this._toastEl.trigger('afterHidden');
+                        });
+                    } else {
+                        __this._toastEl.trigger('beforeHide');
+                        __this._toastEl.hide(function () {
+                            __this._toastEl.trigger('afterHidden');
+                        });
+                    }
+
+                }, __this.options.hideAfter);
+            };
         },
 
         processLoader: function () {
@@ -283,8 +337,8 @@ if ( typeof Object.create !== 'function' ) {
 
                 var that = this;
 
-                window.setTimeout(function(){
-                    
+                that.intervalId = window.setTimeout(function(){
+
                     if ( that.options.showHideTransition.toLowerCase() === 'fade' ) {
                         that._toastEl.trigger('beforeHide');
                         that._toastEl.fadeOut(function () {
@@ -322,13 +376,13 @@ if ( typeof Object.create !== 'function' ) {
             this.bindToast();
         }
     };
-    
+
     $.toast = function(options) {
         var toast = Object.create(Toast);
         toast.init(options, this);
 
         return {
-            
+
             reset: function ( what ) {
                 toast.reset( what );
             },
@@ -340,23 +394,24 @@ if ( typeof Object.create !== 'function' ) {
     };
 
     $.toast.options = {
-        text: '',
-        heading: '',
-        showHideTransition: 'fade',
-        allowToastClose: true,
-        hideAfter: 3000,
-        loader: true,
-        loaderBg: '#000000',
-        stack: 5,
-        position: 'bottom-left',
-        bgColor: false,
-        textColor: false,
-        textAlign: 'left',
-        icon: false,
-        beforeShow: function () {},
-        afterShown: function () {},
-        beforeHide: function () {},
-        afterHidden: function () {}
+        text: '', //消息提示框的内容。
+        heading: '',//消息提示框的标题。
+        showHideTransition: 'fade',//消息提示框的动画效果。可取值：plain，fade，slide。
+        allowToastClose: true, //是否有关闭按钮
+        hideAfter: 3000, //是否自动隐藏
+        loader: true, // 是否显示加载条
+        loaderBg: '#000000',//加载条的背景颜色。
+        stack: 5, //消息栈。同时允许的提示框数量
+        position: 'bottom-left',//消息提示框的位置：bottom-left, bottom-right,bottom-center,top-left,top-right,top-center,mid-center。
+        bgColor: false,//背景颜色。
+        textColor: false,//文字颜色。
+        textAlign: 'left',//文本对齐：left, right, center
+        icon: false,//消息提示框的图标样式。
+        closeOnHover: true, //悬浮禁止关闭
+        beforeShow: function () {},//会在toast即将出现之前触发
+        afterShown: function () {},//会在toast出现后触发
+        beforeHide: function () {},//会在toast藏起来之前触发
+        afterHidden: function () {}//会在toast藏起来后被触发
     };
 
 })( jQuery, window, document );

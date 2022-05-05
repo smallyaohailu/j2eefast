@@ -179,7 +179,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			FROM pg_tables AS p LEFT JOIN pg_class  AS c ON p.tablename = c.relname) AS t
 			<where>
 				<if test="schema != null and schema != ''">
-					AND  t.tableowner = '${schema}'
+					AND  t.tableowner = #{schema}
 				</if>
 				AND t.table_name NOT LIKE 'qrtz_%'
 				<if test="tableName != null and tableName != ''">
@@ -269,7 +269,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			LEFT JOIN pg_class  AS c ON p.tablename = c.relname
 			<where>
 				<if test="schema != null and schema != ''">
-					AND  p.tableowner = '${schema}'
+					AND  p.tableowner = #{schema}
 				</if>
 				AND p.tablename NOT LIKE 'qrtz_%' AND p.tablename NOT LIKE 'gen_%'
 				AND p.tablename IN
@@ -341,7 +341,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			FROM pg_tables AS p LEFT JOIN pg_class  AS c on p.tablename = c.relname) AS t
 			<where>
 				<if test="schema != null and schema != ''">
-					AND  t.tableowner = '${schema}'
+					AND  t.tableowner = #{schema}
 				</if>
 				AND t.table_name NOT LIKE 'qrtz_%'
 				<if test="tableName != null and tableName != ''">

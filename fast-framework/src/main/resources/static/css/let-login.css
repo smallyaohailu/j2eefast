@@ -50,7 +50,9 @@ body.hold-transition{
 
 .login-logo a{
     color: #444;
+    font-family: Arial, "Microsoft YaHei";
 }
+
 .login-logo small {
     font-size: 16px;
 }
@@ -62,7 +64,57 @@ body.hold-transition{
     color: #666;
     box-shadow: 0 2px 6px #999;
     border-radius: 5px;
+    position: relative;
 }
+
+.login-box-body .login-tabs {
+    position: relative;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    overflow: hidden;
+    width: 53px;
+    height: 53px;
+    margin-top: -20px;
+    margin-right: -20px;
+    z-index: 10000;
+    float: right;
+    border-top-right-radius: 5px;
+}
+
+.login-box .login-tabs:before {
+    content: '';
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 52px solid #1890ff;
+    border-left: 53px solid transparent;
+}
+.login-box-body .login-tabs .tab-bg {
+    color: #fff;
+    width: 40px;
+    height: 25px;
+    content: '';
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    position: absolute;
+    top: 10px;
+    left: 15px;
+}
+/*.login-box-body .login-tabs .tab-bg {*/
+/*    display: inline-block;*/
+/*    width: 103px;*/
+/*    height: 103px;*/
+/*    margin: -55px 0 0 17px;*/
+/*    content: '';*/
+/*    !* -webkit-transform: rotate(45deg); *!*/
+/*    -ms-transform: rotate(45deg);*/
+/*    transform: rotate(45deg);*/
+/*    background: #1890ff;*/
+/*}*/
 
 .login-box-msg {
     margin: 0;
@@ -73,6 +125,10 @@ body.hold-transition{
 
 .login-page .form-group {
     margin-bottom: 20px;
+}
+
+.login-page .form-group .col-xs-6{
+    padding-right: 0px;
 }
 
 .login-page .has-feedback .form-control {
@@ -266,19 +322,35 @@ body.hold-transition{
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Liberation Sans","PingFang SC","Microsoft YaHei","Hiragino Sans GB","Wenquanyi Micro Hei","WenQuanYi Zen Hei","ST Heiti",SimHei,SimSun,"WenQuanYi Zen Hei Sharp",sans-serif;
 }
 /**********/
+.__copyright{
+    margin: 1.7% auto;
+}
+.login__footer{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Liberation Sans", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, SimSun, "WenQuanYi Zen Hei Sharp", sans-serif;
+    font-size: 13px;
+    line-height: 1.33;
+    width: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 7px;
+}
+.footer-item{
+    margin-left: 8px;
+}
 
-@media (min-width: 768px) {
-    .login-footer {
-        margin: 2% auto;
-        text-align: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Liberation Sans", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, SimSun, "WenQuanYi Zen Hei Sharp", sans-serif;
-        font-size: 13px;
-        line-height: 1.33;
-    }
-    .footer-item{
-        margin-left: 8px;
+@media(max-height: 900px){
+    .login__footer {
+        display: none!important;
     }
 }
+@media (max-width: 868px){
+    .login__footer {
+        display: none!important;
+    }
+}
+
 
 .text-black {
     color: #111 !important;
@@ -293,6 +365,7 @@ body.hold-transition{
     text-align: center;
     letter-spacing: 4px;
     min-width: 100px;
+    margin-left: 10px;
 }
 .form-tenant{
     display: inline-block;
@@ -609,4 +682,39 @@ body.hold-transition{
 .callout.callout-warning {
     background-color: #f39c12 !important;
     border-color: #c87f0a;
+}
+.input-group .form-control:first-child{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-group-btn:last-child>.btn{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-group .input-group .input-group-btn input {
+    background: transparent;
+    /*border: 1px solid #fe7300;*/
+    border: 1px solid #e4eaec;
+    color: #fe7300 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    outline: medium !important;
+    max-width: 140px;
+    overflow: hidden; /*自动隐藏文字*/
+	text-overflow: ellipsis;/*文字隐藏后添加省略号*/
+	white-space: nowrap;
+}
+
+.form-group .input-group .input-group-btn input:hover {
+    background: rgba(252, 252, 252, 0.9);
+}
+
+.form-group .input-group input[type="text"] {
+    background: #fff8f8;
+    border-color: #e4eaec;
+    color: #d95c5c;
+    /* border-radius: 0em 0.2857rem 0.2857rem 0em; */
+    -webkit-box-shadow: 2px 0em 0em 0em #ff0000 inset;
+    box-shadow: 2px 0em 0em 0em #ff0000 inset;
 }

@@ -6,22 +6,26 @@
 package com.j2eefast.framework.utils;
 
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
-import com.j2eefast.common.core.utils.BeanUtil;
-import com.j2eefast.framework.shiro.realm.UserRealm;
-import lombok.extern.slf4j.Slf4j;
+import com.j2eefast.framework.shiro.realm.OtherRealm;
+import com.j2eefast.framework.shiro.realm.UserNameRealm;
+import com.j2eefast.framework.shiro.realm.ValideCodeRealm;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
+import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.utils.ToolUtil;
-import org.apache.shiro.subject.support.DelegatingSubject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -29,9 +33,7 @@ import org.apache.shiro.subject.support.DelegatingSubject;
  * @author zhouzhou loveingowp@163.com
  * @time 2018-11-15 20:20
  * @version V1.0
- *
  */
-@Slf4j
 public class UserUtils {
 
 
@@ -61,6 +63,20 @@ public class UserUtils {
 	}
 
 	/**
+	 * 获取用户角色集合
+	 * @return
+	 */
+	public static List<String> getRoleKeys(){
+		List<Object> objects = getUserInfo().getRoles();
+		List<String> roles = new ArrayList<>();
+		for(Object o: objects){
+			SysRoleEntity role = (SysRoleEntity) o;
+			roles.add(role.getRoleKey());
+		}
+		return roles;
+	}
+
+	/**
 	 * 获取登陆IP
 	 * @return
 	 */
@@ -87,8 +103,21 @@ public class UserUtils {
 	 */
 	public static void clearCachedAuthorizationInfo() {
 		RealmSecurityManager rsm = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-		UserRealm realm = (UserRealm) rsm.getRealms().iterator().next();
-		realm.clearCachedAuthorizationInfo();
+		AuthorizingRealm realm = (AuthorizingRealm) rsm.getRealms().iterator().next();
+		if(realm instanceof UserNameRealm) {
+			UserNameRealm userNameRealm = (UserNameRealm) realm;
+			userNameRealm.clearCachedAuthorizationInfo();
+		}
+
+		if(realm instanceof ValideCodeRealm) {
+			ValideCodeRealm valideCodeRealm = (ValideCodeRealm) realm;
+			valideCodeRealm.clearCachedAuthorizationInfo();
+		}
+
+		if(realm instanceof OtherRealm) {
+			OtherRealm otherRealm = (OtherRealm) realm;
+			otherRealm.clearCachedAuthorizationInfo();
+		}
 	}
 
 	/**
@@ -96,7 +125,7 @@ public class UserUtils {
 	 * @return
 	 */
 	public static Long getUserId() {
-		return getUserInfo().getId();
+		return ToolUtil.isEmpty(getUserInfo())?-1L:getUserInfo().getId();
 	}
 
 	public static String getUserIdToStr() {
@@ -128,8 +157,28 @@ public class UserUtils {
 		return getUserInfo().getUsername();
 	}
 
+	/**
+	 * 获取登录者公司名称
+	 * @return
+	 */
+	public static String getCompName(){
+		return ConstantFactory.me().getCompName(UserUtils.getUserId());
+	}
+
+	/**
+	 * 获取登录用户名称
+	 * @return
+	 */
 	public static String getName() {
 		return getUserInfo().getName();
+	}
+	
+	/**
+	 * 获取登录用户部门名称
+	 * @return
+	 */
+	public static String getDeptName() {
+		return  ConstantFactory.me().getDeptName(getUserId());
 	}
 
 	/**
@@ -188,8 +237,17 @@ public class UserUtils {
 		getSession().removeAttribute(key);
 	}
 
+	/**
+	 * 当前请求是否登录
+	 * @return
+	 */
 	public static boolean isLogin() {
-		return SecurityUtils.getSubject()!=null && SecurityUtils.getSubject().getPrincipal() != null;
+		Subject subject = SecurityUtils.getSubject();
+		if(ToolUtil.isEmpty(subject) ||
+				(!subject.isAuthenticated() && !subject.isRemembered())){
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -213,11 +271,31 @@ public class UserUtils {
 		return kaptcha.toString();
 	}
 
+	public static boolean isContains(List<Object> roles, String Key){
+		boolean flag = false;
+		for(Object o: roles){
+			SysRoleEntity role = (SysRoleEntity) o;
+			if(role.getRoleKey().equals(Key)){
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}
+
+	public static List<String> getRoleKey(List<Object> roles){
+		List<String> list  = new ArrayList<>();
+		for(Object o: roles){
+			SysRoleEntity role = (SysRoleEntity) o;
+			list.add(role.getRoleKey());
+		}
+		return list;
+	}
+
 	/**
 	 * 生成随机盐
 	 */
-	public static String randomSalt()
-	{
+	public static String randomSalt(){
 		return RandomStringUtils.randomAlphanumeric(20);
 	}
 

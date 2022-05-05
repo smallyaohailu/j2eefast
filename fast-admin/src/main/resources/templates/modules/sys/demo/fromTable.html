@@ -10,24 +10,24 @@
                     <tr>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "姓名"/>
+                            ${i18n("姓名")}
                         </td>
                         <td width="100"><@f.input name="name"  required=true /></td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "性别"/>
+                            ${i18n("性别")}
                         </td>
                         <td width="80"><@f.select name="sex" dictType="sys_user_sex"/></td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "出生年月"/>
+                            ${i18n("出生年月")}
                         </td>
                         <td width="150"><@f.input name="joinDate" type="date" dataType="date" dataFormat="yyyy-MM-dd"
                             butClass="fa fa-fw fa-calendar"  />
                         </td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "政治面貌"/>
+                            ${i18n("政治面貌")}
                         </td>
                         <td width="100">
                             <@f.input name="name"  required=true />
@@ -39,19 +39,19 @@
                     <tr>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "民族"/>
+                            ${i18n("民族")}
                         </td>
                         <td width="100"><@f.input name="name"  required=true /></td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "籍贯"/>
+                            ${i18n("籍贯")}
                         </td>
                         <td width="150">
                             <@f.input name="name"  required=true />
                         </td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "身份证"/>
+                            ${i18n("身份证")}
                         </td>
                         <td colspan="3">
                             <@f.input name="name"  required=true />
@@ -60,18 +60,18 @@
                     <tr>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "学历"/>
+                            ${i18n("学历")}
                         </td>
                         <td width="100"><@f.input name="name"  required=true /></td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "毕业院校"/>
+                            ${i18n("毕业院校")}
                         </td>
                         <td width="150"><@f.input name="name"  required=true />
                         </td>
                         <td class="form-label" width="100">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "联系电话"/>
+                            ${i18n("联系电话")}
                         </td>
                         <td colspan="3">
                             <@f.input name="name"  required=true />
@@ -79,19 +79,19 @@
                     </tr>
                     <tr>
                         <td class="form-label"><span style="color: red; ">* </span>
-                            <@ctx.i18n text = "联系地址"/></td>
+                            ${i18n("联系地址")}</td>
                         <td colspan="8"><@f.input name="name"  required=true /></td>
                     </tr>
                     <tr>
                         <td class="form-label">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "工作经历"/>
+                            ${i18n("工作经历")}
                         </td>
                         <td colspan="8">
                             <@table id="bootstrap-table" class="form-table">
-                                <a class="btn btn-success" onclick="addColumn()"><i class="fa fa-plus"></i>&nbsp;<@ctx.i18n text = "新增"/></a>
+                                <a class="btn btn-success" onclick="addColumn()"><i class="fa fa-plus"></i>&nbsp;${i18n("新增")}</a>
                                 <a class="btn btn-danger" onclick="$.table.removeData()">
-                                    <i class="fa fa-remove"></i> <@ctx.i18n text = "删除"/>
+                                    <i class="fa fa-remove"></i> ${i18n("删除")}
                                 </a>
                             </@table>
                         </td>
@@ -100,7 +100,7 @@
                     <tr>
                         <td class="form-label">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "主要业绩奖励情况"/>
+                            ${i18n("主要业绩奖励情况")}
                         </td>
                         <td colspan="8">
                             <@f.textarea name="r" rows="10"/>
@@ -109,7 +109,7 @@
                     <tr>
                         <td class="form-label">
                             <span style="color: red; ">* </span>
-                            <@ctx.i18n text = "应聘岗位、理由及其他原因"/>
+                            ${i18n("应聘岗位、理由及其他原因")}
                         </td>
                         <td colspan="8">
                             <@f.textarea name="r" rows="6"/>
@@ -121,8 +121,8 @@
         <div class="hr-line-dashed hidden-print"></div>
         <div class="row hidden-print" id="_addTab">
             <div class="col-sm-offset-5 col-sm-10">
-                <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><@ctx.i18n text = "保存"/></button>&nbsp;
-                <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>${i18n("保存")}</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>${i18n("关闭")}</button>
             </div>
         </div>
     </div>

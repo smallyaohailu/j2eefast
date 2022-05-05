@@ -8,7 +8,7 @@
         <div class="col-lg-2 col-xs-6">
             <!-- small box -->
             <div class="card-link-block">
-                <div class="card-link-block-num">15</div>
+                <div class="card-link-block-num" id="txt">0</div>
                 <div class="card-link-block-text">外出申请</div>
                 <i class="card-link-block-icon fa icon-book-open"></i>
                 <div class="card-link-block-band">待审批</div>
@@ -18,7 +18,7 @@
         <div class="col-lg-2 col-xs-6">
             <!-- small box -->
             <div class="card-link-block bg-yellow">
-                <div class="card-link-block-num">13</div>
+                <div class="card-link-block-num" id="txt1">0</div>
                 <div class="card-link-block-text">请假审批</div>
                 <i class="card-link-block-icon fa icon-speedometer"></i>
                 <div class="card-link-block-band">待审批</div>
@@ -28,7 +28,7 @@
         <div class="col-lg-2 col-xs-6">
             <!-- small box -->
             <div class="card-link-block bg-primary">
-                <div class="card-link-block-num">13</div>
+                <div class="card-link-block-num">130</div>
                 <div class="card-link-block-text">请假审批</div>
                 <i class="card-link-block-icon fa icon-envelope"></i>
                 <div class="card-link-block-band">待审批</div>
@@ -38,7 +38,7 @@
         <div class="col-lg-2 col-xs-6">
             <!-- small box -->
             <div class="card-link-block bg-aqua">
-                <div class="card-link-block-num">13</div>
+                <div class="card-link-block-num">1309</div>
                 <div class="card-link-block-text">请假审批</div>
                 <i class="card-link-block-icon fa icon-social-twitter"></i>
                 <div class="card-link-block-band">待审批</div>
@@ -48,7 +48,7 @@
         <div class="col-lg-2 col-xs-6">
             <!-- small box -->
             <div class="card-link-block bg-red">
-                <div class="card-link-block-num">13</div>
+                <div class="card-link-block-num">130</div>
                 <div class="card-link-block-text">请假审批</div>
                 <i class="card-link-block-icon fa icon-lock"></i>
                 <div class="card-link-block-band">待审批</div>
@@ -57,7 +57,7 @@
         <div class="col-lg-2 col-xs-6">
             <!-- small box -->
             <div class="card-link-block bg-green">
-                <div class="card-link-block-num">13</div>
+                <div class="card-link-block-num">139</div>
                 <div class="card-link-block-text">请假审批</div>
                 <i class="card-link-block-icon fa icon-paper-plane"></i>
                 <div class="card-link-block-band">待审批</div>
@@ -458,6 +458,19 @@
 
         pieChart3.setOption(option);
         $(window).resize(pieChart3.resize);
+
+        $(function () {
+            opt.animateNum('txt',{
+                time: 2500,
+                    num: 1000,
+                    regulator: 100
+            });
+            opt.animateNum('txt1',{
+                time: 1500,
+                num: 12000,
+                regulator: 50
+            });
+        })
     </script>
 </@footer>
 </@pageTheme>

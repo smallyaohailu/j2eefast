@@ -1,0 +1,194 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="报表列表" bodyClass="white-bg" libs=["bootstrapSelect"]/>
+<div class="wrapper wrapper-content ibox-content">
+<@f.form id="form-urepost-edit" class="form-horizontal">
+    <@f.hidden id="id" name="id" value="${sysFile.id}"/>
+    <@f.hidden name="name" value="${sysFile.name}"/>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("文件名称")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.plaintext value="${sysFile.name?default('')}"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("文件下载名称")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.input name="fileName"  value="${sysFile.fileName?default('')}" helpTip="为导出报表文件名称!" required=true/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><span style="color: red; ">*</span>${i18n("开放功能")}：
+                </label>
+                <div class="col-sm-10">
+                    <@f.checkbox name="func" value="${selectFuncs?default('')}" dictType="sys_ureport_func" helpTip="报表开放那些功能,为了系统安全考虑没必要全开"  required=true/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><span style="color: red; ">*</span>${i18n("访问权限")}：
+                </label>
+                <div class="col-sm-10">
+                    <@f.checkbox name="roleKeys" value="${selectRoles?default('')}" items=roles itemLabel="roleName"
+                    itemValue="roleKey" required=true/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">${i18n("公司表别名")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.input name="tableAlias" helpTip="${i18n('数据权限设置(类似{0}写法)',['@DataFilter注解参数'])}" value="${table0?default('')}"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">${i18n("部门表别名")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.input name="tableAlias" value="${table1?default('')}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">${i18n("用户表别名")}：
+                </label>
+                <div class="col-sm-8">
+                    <@f.input name="tableAlias" value="${table2?default('')}"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("创建时间")}：</label>
+                <div class="col-sm-8">
+                    <@f.plaintext value="${sysFile.createTime?string('yyyy-MM-dd')}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><span style="color: red; ">*</span>${i18n("描述")}：
+                </label>
+                <div class="col-sm-10">
+                    <@f.textarea name="remark" value="${sysFile.remark?default('')}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</@f.form>
+</div>
+<@footer>
+<script type="text/javascript">
+
+    var prefix = baseURL + "sys/ureport";
+
+    $("#form-urepost-edit").validate({
+        focusCleanup: true
+    });
+
+
+
+    function submitHandler() {
+        if (opt.validate.form()) {
+            opt.operate.save(prefix + "/edit", $('#form-urepost-edit').serialize());
+        }
+    }
+
+    $(function() {
+
+        $("input[name=func]").each(function () {
+
+            $(this).on('ifChecked', function(){
+                if($(this).val() == '_ALL'){
+                    $("input[name=func]").each(function () {
+                        if($(this).val() != '_ALL'){
+                            $(this).iCheck('uncheck')
+                            $(this).iCheck('disable');
+                        }
+                    })
+                }
+            });
+
+            //取消
+            $(this).on('ifUnchecked', function(event){
+                if($(this).val() == '_ALL'){
+                    $("input[name=func]").each(function () {
+                        if($(this).val() != '_ALL'){
+                            $(this).iCheck('enable');
+                        }
+                    })
+                }
+            });
+        })
+
+
+        $("input[name=roleKeys]").each(function () {
+
+            $(this).on('ifChecked', function(){
+                if($(this).val() == '_ALL'){
+                    $("input[name=roleKeys]").each(function () {
+                        if($(this).val() != '_ALL'){
+                            $(this).iCheck('uncheck')
+                            $(this).iCheck('disable');
+                        }
+                    })
+                }
+
+                if($(this).val() == '_DISABLE'){
+                    $("input[name=roleKeys]").each(function () {
+                        if($(this).val() != '_DISABLE'){
+                            $(this).iCheck('uncheck')
+                            $(this).iCheck('disable');
+                        }
+                    })
+                }
+
+            });
+
+            //取消
+            $(this).on('ifUnchecked', function(event){
+                if($(this).val() == '_ALL'){
+                    $("input[name=roleKeys]").each(function () {
+                        if($(this).val() != '_ALL'){
+                            $(this).iCheck('enable');
+                        }
+                    })
+                }
+
+                if($(this).val() == '_DISABLE'){
+                    $("input[name=roleKeys]").each(function () {
+                        if($(this).val() != '_DISABLE'){
+                            $(this).iCheck('enable');
+                        }
+                    })
+                }
+            });
+        })
+
+    })
+</script>
+</@footer>
+</@pageTheme>

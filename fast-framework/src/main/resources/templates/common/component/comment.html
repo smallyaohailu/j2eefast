@@ -9,6 +9,7 @@
                 listURL = "sys/msg/commets/list" <#-- 请求数据的ajax的url-->
                 delUrl = "sys/msg/commets/del" <#-- 删除评论 -->
                 title = "评论留言"
+                template = false <#-- 控件是否做template用-->
                 titleIcon = "fa fa-fw fa-comments-o"
                 >
     <#local  Assname="${id}"/>
@@ -21,12 +22,12 @@
     <#else>
         <#local AssId="${id}"/>
     </#if>
-    <textarea id="${AssId}"></textarea>
+    <textarea id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>"></textarea>
     <@compress single_line=true>
         <script type="text/javascript">
             $(function() {
-                $('#${AssId}').comments({
-                    id:'${AssId}',
+                $('#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>').comments({
+                    id:'<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>',
                     msgId:'${msgId}',
                     pushURL: '${pushURL}',
                     listURL: '${listURL}',

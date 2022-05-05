@@ -1,85 +1,82 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="新增字典" bodyClass="white-bg"  libs=["bootstrapSelect","colorpicker"]/>
+<@header title="字典管理" bodyClass="white-bg"  libs=["bootstrapSelect","colorpicker"]/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-dict-add" class="form-horizontal">
     <div class="form-group">
-        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>字典键值：</label>
+        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>${i18n("字典键值")}：</label>
         <div class="col-sm-8">
             <@f.input name="dictValue" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>字典标签：</label>
+        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>${i18n("字典标签")}：</label>
         <div class="col-sm-8">
             <@f.input name="dictLabel" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">字典类型：</label>
+        <label class="col-sm-3 control-label">${i18n("字典类型")}：</label>
         <div class="col-sm-8">
             <@f.input name="dictType" value="${dictType}" readonly=true required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>系统内置：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("系统内置")}：</label>
         <div class="col-sm-8">
             <@f.radio name="isSys" dictType="sys_yes_no"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">CSS类名：</label>
+        <label class="col-sm-3 control-label">${i18n("CSS类名")}：</label>
         <div class="col-sm-8">
-            <@f.input name="cssClass"  helpTip="如:class=\"red\", 请填写:red"/>
+            <@f.input name="cssClass"  helpTip="${i18n('如:class=\"red\", 请填写:red')}"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">CSS样式：</label>
+        <label class="col-sm-3 control-label">${i18n("CSS样式")}：</label>
         <div class="col-sm-8">
-            <@f.input name="cssStyle" butClass="fa fa-square" helpTip="如：style=\"color:red\", 请填写：color:red"/>
+            <@f.input name="cssStyle" butClass="fa fa-square" helpTip="${i18n('如:style=\"color:red\", 请填写: color:red')}"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>字典排序：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("字典排序")}：</label>
         <div class="col-sm-8">
             <@f.input name="dictSort" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><@ctx.i18n text = "回显样式"/>：
-<#--            <a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="<@ctx.i18n text = "回显样式"/>"-->
-<#--               data-content="table表格字典列显示样式属性">-->
-<#--                <i class="fa fa-question-circle-o" style="color: orange"></i></a>-->
-            <a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="<@ctx.i18n text = "回显样式"/>"
-               data-content="table表格字典列显示样式属性">
+        <label class="col-sm-3 control-label">${i18n("回显样式")}：
+            <a tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="${i18n("回显样式")}"
+               data-content="${i18n('table表格字典列显示样式属性')}">
                 <i class="fa fa-question-circle-o" style="color: orange"></i></a>
         </label>
         <div class="col-sm-8">
             <select name="listClass" class="form-control">
-                <option value="">---请选择---</option>
-                <option value="default">默认--default</option>
-                <option value="primary">主要--primary</option>
-                <option value="success">成功--success</option>
-                <option value="info">   信息--info</option>
-                <option value="warning">警告--warning</option>
-                <option value="danger"> 危险--danger</option>
+                <option value="">---${i18n("请选择")}---</option>
+                <option value="default">${i18n("默认")}--default</option>
+                <option value="primary">${i18n("主要")}--primary</option>
+                <option value="success">${i18n("成功")}--success</option>
+                <option value="info">${i18n("信息")}--info</option>
+                <option value="warning">${i18n("警告")}--warning</option>
+                <option value="danger">${i18n("危险")}--danger</option>
             </select>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>系统默认：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("系统默认")}：</label>
         <div class="col-sm-8">
             <@f.radio name="isDefault" dictType="sys_yes_no"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>状态：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("状态")}：</label>
         <div class="col-sm-8">
             <@f.radio name="status"  dictType="sys_normal_disable"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">备注：</label>
+        <label class="col-sm-3 control-label">${i18n("备注")}：</label>
         <div class="col-sm-8">
             <@f.textarea name="remark" rows="3"/>
         </div>

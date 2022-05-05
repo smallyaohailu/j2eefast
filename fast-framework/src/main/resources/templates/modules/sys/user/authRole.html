@@ -1,30 +1,32 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="角色授权" bodyClass="white-bg" libs=["table"]/>
+<@header title="角色管理" bodyClass="white-bg" libs=["table"]/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-role-authorization" class="form-horizontal">
-    <input id="userId" name="userId" type="hidden" value="${user.id?default("")}"/>
-    <h4 class="form-header h4"><@ctx.i18n text = "基本信息"/></h4>
+	<@f.hidden name="userId" value="${user.id?default('')}"/>
+	<@f.hidden name="username" value="${user.username?default('')}"/>
+	<@f.hidden name="name" value="${user.name?default('')}"/>
+    <h4 class="form-header h4">${i18n("基本信息")}</h4>
     <div class="row">
         <div class="col-sm-5">
             <div class="form-group">
-                <label class="col-sm-4 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "账号"/>：</label>
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("账号")}：</label>
                 <div class="col-sm-8">
-                    <@f.input name="username" value="${user.username?default('')}" readonly=true />
+                    <@f.plaintext value="${user.username?default('')}"/>
                 </div>
             </div>
         </div>
         <div class="col-sm-7">
             <div class="form-group">
-                <label class="col-sm-2 control-label"><span style="color: red; ">*</span><@ctx.i18n text = "用户姓名"/>：</label>
+                <label class="col-sm-2 control-label"><span style="color: red; ">*</span>${i18n("用户姓名")}：</label>
                 <div class="col-sm-7">
-                    <@f.input name="name" value="${user.name?default('')}" readonly=true />
+                    <@f.plaintext value="${user.name?default('')}"/>
                 </div>
             </div>
         </div>
     </div>
 </@f.form>
-    <h4 class="form-header h4 mb5"><@ctx.i18n text = "分配角色"/></h4>
+    <h4 class="form-header h4 mb5">${i18n("分配角色")}</h4>
     <div class="row">
         <div class="col-md-12">
             <@table id="bootstrap-table">
@@ -34,8 +36,8 @@
         <div class="hr-line-dashed"></div>
         <div class="row" id="_addTab">
         <div class="col-sm-offset-5 col-sm-10">
-            <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i><@ctx.i18n text = "保存"/></button>&nbsp;
-            <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i><@ctx.i18n text = "关闭"/></button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="opt.form.submit()"><i class="fa fa-check"></i>${i18n("保存")}</button>&nbsp;
+            <button type="button" class="btn btn-sm btn-danger" onclick="opt.modal.closeTab()"><i class="fa fa-reply-all"></i>${i18n("关闭")}</button>
         </div>
     </div>
 </div>
@@ -72,11 +74,11 @@
                             };
                     }
                     },
-                    {title: "序号",width:10,align:"center", formatter: function (value, row, index) {
+                    {title: "${i18n("序号")}",width:10,align:"center", formatter: function (value, row, index) {
                             return $.table.serialNumber(index);
                         }},
-                    {field: 'roleName', title: "<@ctx.i18n text = "角色名称"/>"},
-                    {field: 'roleKey', title: "<@ctx.i18n text = "权限字符"/>"}]
+                    {field: 'roleName', title: "${i18n("角色名称")}"},
+                    {field: 'roleKey', title: "${i18n("权限字符")}"}]
             };
             $.table.init(options);
         });

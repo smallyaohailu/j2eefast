@@ -5,9 +5,7 @@
  */
 package com.j2eefast.common.core.utils;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
-import java.util.HashSet;
 
 /**
  * Redis工具类
@@ -40,7 +37,7 @@ public class RedisUtil {
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	@Lazy
-	private RedisTemplate 							redisTemplate;
+	private RedisTemplate<String, Object> 			redisTemplate;
 	@Resource(name = "redisTemplate")
 	private ValueOperations<String, String> 		valueOperations;
 	@Resource(name = "redisTemplate")
@@ -70,7 +67,6 @@ public class RedisUtil {
 	 * @param key 键
 	 * @param time 时间(秒)
 	 */
-	@SuppressWarnings("unchecked")
 	public void expire(String key,long time){
 		redisTemplate.expire(key, time, TimeUnit.SECONDS);
 	}
@@ -78,7 +74,6 @@ public class RedisUtil {
 	/**
 	 * 数据存放Set集合
 	 */
-	@SuppressWarnings("unchecked")
 	public void add(String key,long expire,String... values) {
 		setOperations.add(key, values);
 		if(expire != NOT_EXPIRE) {
@@ -98,7 +93,6 @@ public class RedisUtil {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public void set(String key, Object value, long expire) {
 		valueOperations.set(key, toJson(value));
 		if (expire != NOT_EXPIRE) {
@@ -106,7 +100,6 @@ public class RedisUtil {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setMillse(String key, Object value, long expire) {
 		valueOperations.set(key, toJson(value));
 		if (expire != NOT_EXPIRE) {
@@ -123,12 +116,10 @@ public class RedisUtil {
 	 * @param key 键
 	 * @param value 值
 	 */
-	@SuppressWarnings("unchecked")
 	public void  setSession(String key,Object value) {
 		redisTemplate.opsForValue().set(key, value);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setSeConds(String key, Object value, long expire) {
 		valueOperations.set(key, toJson(value));
 		if (expire != NOT_EXPIRE) {
@@ -146,7 +137,6 @@ public class RedisUtil {
 	 * @param value 值
 	 * @param time 时间(秒) time要大于0 如果time小于等于0 将设置无限期
 	 */
-	@SuppressWarnings("unchecked")
 	public void setSession(String key,Object value,long time){
 		if(time>0){
 			redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
@@ -155,12 +145,26 @@ public class RedisUtil {
 		}
 	}
 	
+	/**
+	 * 从redis中获取key对应的过期时间;
+	 * 如果该值有过期时间，就返回相应的过期时间;
+	 * 如果该值没有设置过期时间，就返回-1;
+	 * 如果没有该值，就返回-2;
+	 * @author ZhouZhou
+	 * @date 2021-09-23 23:18
+	 * @param key
+	 * @return
+	 */
+	public Long getExpire(String key) {
+		return redisTemplate.opsForValue().getOperations().getExpire(key,TimeUnit.SECONDS);
+	}
+	
+	
 	public void setApi(String key, Object value) {
 		set(key, value, DEFAULT_EXPIRE_MT);
 		return;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> T get(String key, Class<T> clazz, long expire) {
 		String value = valueOperations.get(key);
 		if (expire != NOT_EXPIRE) {
@@ -210,7 +214,7 @@ public class RedisUtil {
 			if(key.length==1){
 				redisTemplate.delete(key[0]);
 			}else{
-				redisTemplate.delete(CollectionUtils.arrayToList(key));
+				redisTemplate.delete(Arrays.asList(key));
 			}
 		}
 	}
@@ -250,21 +254,13 @@ public class RedisUtil {
 	}
 
 	public void del(String... key) {
-
 		if (key != null && key.length > 0) {
-
 			if (key.length == 1) {
-
 				redisTemplate.delete(key[0]);
-
 			} else {
-
-				redisTemplate.delete(CollectionUtils.arrayToList(key));
-
+				redisTemplate.delete(Arrays.asList(key));
 			}
-
 		}
-
 	}
 
 

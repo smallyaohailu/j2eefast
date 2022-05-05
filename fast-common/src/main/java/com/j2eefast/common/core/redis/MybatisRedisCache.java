@@ -1,18 +1,18 @@
+/*
+ * All content copyright http://www.j2eefast.com, unless 
+ * otherwise indicated. All rights reserved.
+ * No deletion without permission
+ */
 package com.j2eefast.common.core.redis;
 
-import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import org.apache.ibatis.cache.Cache;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 /**

@@ -6,6 +6,7 @@
 package com.j2eefast.web.test.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
@@ -15,7 +16,7 @@ import lombok.Setter;
 /**
  * example_test_child
  * @author: ZhouZhou
- * @date 2021-08-16 20:41:57
+ * @date 2021-10-21 09:46:49
  */
 @Getter
 @Setter
@@ -32,6 +33,7 @@ public class ExampleTestChildEntity implements Serializable{
     private Long testId;
 
     /** 工作公司 */
+    @NotBlank(message = "参数值不能为空")
     private String workCompany;
 
     /** 起始时间 */

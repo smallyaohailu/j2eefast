@@ -5,6 +5,7 @@
  */
 package com.j2eefast.framework.utils;
 
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.framework.sys.entity.SysNoticeEntity;
 import com.j2eefast.framework.sys.service.SysNoticeService;

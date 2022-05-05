@@ -1,5 +1,7 @@
 package com.j2eefast.framework.utils;
 
+import cn.hutool.core.date.BetweenFormatter;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.system.SystemUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
@@ -8,6 +10,9 @@ import com.j2eefast.framework.sys.entity.SysFileEntity;
 import com.j2eefast.framework.sys.entity.server.CpuEntity;
 import com.j2eefast.framework.sys.entity.server.JvmEntity;
 import com.j2eefast.framework.sys.entity.server.MemEntity;
+import com.j2eefast.framework.sys.entity.server.RedisEntity;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.CentralProcessor.TickType;
@@ -17,9 +22,13 @@ import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
+
+import java.lang.management.ManagementFactory;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 服务器相关信息
@@ -49,6 +58,18 @@ public class ServerUtil{
      * 服务器相关信息
      */
     private SysEntity sys = new SysEntity();
+
+
+    private RedisEntity redis = new RedisEntity();
+
+
+    public RedisEntity getRedis() {
+        return redis;
+    }
+
+    public void setRedis(RedisEntity redis) {
+        this.redis = redis;
+    }
 
     /**
      * 磁盘相关信息
@@ -105,21 +126,37 @@ public class ServerUtil{
         this.sysFiles = sysFiles;
     }
 
-    public void copyTo() throws Exception
+    public void copyTo(RedisTemplate redisTemplate, String init) throws Exception
     {
         SystemInfo si = new SystemInfo();
-        
         HardwareAbstractionLayer hal = si.getHardware();
-
         setCpuInfo(hal.getProcessor());
-
         setMemInfo(hal.getMemory());
-
-        setSysInfo();
-
         setJvmInfo();
 
-        setSysFiles(si.getOperatingSystem());
+        if("0".equals(init)){
+            setRedis(redisTemplate);
+            setSysInfo();
+            setSysFiles(si.getOperatingSystem());
+        }
+
+
+
+    }
+
+    private void setRedis(RedisTemplate redisTemplate){
+        Properties info = (Properties) redisTemplate.execute((RedisCallback) redisConnection -> redisConnection.info());
+        //命令使用情况
+        //Properties commandStats = (Properties) redisTemplate.execute((RedisCallback) redisConnection -> redisConnection.info("commandstats"));
+        Long dbSize = (Long) redisTemplate.execute((RedisCallback) redisConnection -> redisConnection.dbSize());
+        redis.setKey(dbSize);
+        redis.setPost(info.getProperty("tcp_port"));
+        redis.setConfigPath(info.getProperty("config_file"));
+        redis.setRunPath(info.getProperty("executable"));
+        redis.setRunTime(info.getProperty("uptime_in_days"));
+        redis.setTotalMemory(info.getProperty("used_memory_human"));
+        redis.setRunMemory(info.getProperty("used_memory_rss_human"));
+        redis.setVersion(info.getProperty("redis_version"));
     }
 
     /**
@@ -165,7 +202,7 @@ public class ServerUtil{
     {
         sys.setComputerName(SystemUtil.getHostInfo().getName());
         sys.setComputerIp(SystemUtil.getHostInfo().getAddress());
-        sys.setOsName(SystemUtil.getOsInfo().getName());
+        sys.setOsName(SystemUtil.getOsInfo().getName() + " "+SystemUtil.getOsInfo().getVersion());
         sys.setOsArch(SystemUtil.getOsInfo().getArch());
         sys.setUserDir(SystemUtil.getUserInfo().getCurrentDir());
     }
@@ -173,13 +210,15 @@ public class ServerUtil{
     /**
      * 设置Java虚拟机
      */
-    private void setJvmInfo() throws UnknownHostException
-    {
+    private void setJvmInfo() throws UnknownHostException {
+        long time = ManagementFactory.getRuntimeMXBean().getStartTime();
         jvm.setTotal(Runtime.getRuntime().totalMemory());
         jvm.setMax(Runtime.getRuntime().maxMemory());
         jvm.setFree(Runtime.getRuntime().freeMemory());
         jvm.setVersion(SystemUtil.getJavaInfo().getVersion());
         jvm.setHome(SystemUtil.getJavaRuntimeInfo().getHomeDir());
+        jvm.setStartTime(DateUtil.formatDateTime(new Date(time)));
+        jvm.setRunTime(DateUtil.formatBetween(new Date(time),DateUtil.date(), BetweenFormatter.Level.MILLISECOND));
     }
 
     /**

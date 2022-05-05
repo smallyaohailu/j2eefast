@@ -1,0 +1,399 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="国密加密测试">
+<style>
+textarea{
+	color: #000;
+    font-size: 14px;
+    font-weight: 500;
+}
+</style>
+</@header>
+<div style="text-align:center;">
+    <div style="font-size: 24px;color: black; font-weight: bold; padding-top: 20px; padding-bottom: 10px;">
+        前端JS国密算法加解密
+        <span style="font-size: 10px;color: red;">
+            后端Java配套的请在common模块下crypto包下自行查看
+        </span>
+    </div>
+    <div >
+        <form action="#" method="post" >
+            <table  style="margin-left: auto;margin-right: auto;"><!--border=0 cellpadding=0 cellspacing=0-->
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        sm2公钥：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="2" cols="100" name="pubkey" id="pubkey"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        sm2私钥：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="2" cols="100" name="privkey" id="privkey"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        sm4密钥：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="2" cols="100" name="sm4Key" id="sm4Key"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        登录账号：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="2" cols="100"  id="username"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        登录密码：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="2" cols="100"  id="password"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        输入数据(16进制字符串)：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="5" cols="100" name="inputtext" id="inputtext"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:auto;text-align: right;">
+                        结果：
+                    </td>
+                    <td style="text-align: left;"  valign="middle">
+                        <textarea rows="5" cols="100" name="crypttext" id="crypttext"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="width:auto;text-align: center;">
+                        <input type="button" value="生成SM2公私密钥对" id="btn_genkey"/>
+                        <input type="button" value="SM2加密" id="btn_enc"/>
+                        <input type="button" value="SM2解密" id="btn_dec"/>
+                        <input type="button" value="SM3生成摘要" id="btn_SM3"/>
+                        <input type="button" value="开始随机测试" id="btn_test"/>
+                        <input type="button" value="登录加密" id="btn_login"/>
+                        <input type="button" value="SM4解密" id="btn_sm4dec"/>
+                        <input type="button" value="SM4加密" id="btn_sm4enc"/>
+                        <input type="button" value="生成SM4密钥" id="btn_sm4genkey"/>
+                        <input type="button" value="Base64解码" id="btn_base_jm"/>
+                        <input type="button" value="Base64编码" id="btn_login_bm"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<@footer>
+<!--引入国密JS -->
+<script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
+<script>
+/**
+     * SM3 摘要签名
+     */
+    $("#btn_SM3").click(function(){
+        var inputtext = $("#inputtext").val();
+        if(inputtext.length <= 0){
+            alert("输入数据不能为空");
+        }
+        var _e = Hex.utf8StrToBytes(inputtext);
+        var sm3 = new SM3Digest();
+        sm3.update(_e,0,_e.length);//数据很多的话，可以分多次update
+        var sm3Hash = sm3.doFinal();//得到的数据是个byte数组
+        var _sign = Base64.fromByteArray(sm3Hash);
+        $("#crypttext").val(_sign);
+    });
+
+
+
+    $("#btn_base_jm").click(function(){
+        var inputtext = $("#inputtext").val();
+        if(inputtext.length <= 0){
+            alert("输入数据不能为空");
+        }
+        var _pubkey = Base64.toByteArray(inputtext);
+        $("#crypttext").val(Hex.encode(_pubkey,0,_pubkey.length));
+    });
+
+    $("#btn_login_bm").click(function(){
+        var inputtext = $("#inputtext").val();
+        if(inputtext.length <= 0){
+            alert("输入数据不能为空");
+        }
+        var _bt = Hex.decode(inputtext);
+        $("#crypttext").val(Base64.fromByteArray(_bt));
+    });
+
+    /**
+     * 随机生成数据测试
+     */
+    function generate(len){
+        var realLen = 0;
+        if(len != undefined && len > 0){
+            realLen = len;
+        }else{
+            realLen = parseInt(Math.random()*1024)+1;
+        }
+        var data = new Array(realLen);
+
+        for(var i = 0;i<realLen;i++){
+            data[i] = parseInt(Math.random()*256);
+        }
+        return data;
+    }
+
+    /**
+     * 生成密钥
+     */
+    $("#btn_genkey").click(function(){
+        var sm2 = new SM2();
+        var keyPair = sm2.generateKeyPairHex();//得到的keypair结构：{'privkeyhex': hPrv, 'pubkeyhex': hPub}
+        $("#pubkey").val(keyPair['pubkeyhex'].toUpperCase());
+        $("#privkey").val(keyPair['privkeyhex'].toUpperCase());
+    });
+
+    /*
+     * 测试加密
+     */
+    $("#btn_enc").click(function(){
+        var pubkey = $("#pubkey").val();
+        if(pubkey == "" || pubkey.length < 64){
+            alert("公钥为空或错误");
+        }
+        var inputtext = $("#inputtext").val();
+        if(inputtext.length <= 0){
+            alert("输入数据不能为空");
+        }
+        var sm2DataHex = inputtext;//转成byte数组
+        console.log(sm2DataHex);
+
+        //sm2加密
+        var sm2 = new SM2();
+        var cipher = sm2.encrypt(Hex.decode(pubkey),Hex.decode(sm2DataHex));//函数输入输出都是16进制数据
+
+        $("#crypttext").val(Hex.encode(cipher,0,cipher.length));
+    });
+
+    /**
+     * 测试登录
+     */
+    $("#btn_login").click(function(){
+        // 公钥
+        var pubkey = $("#pubkey").val();
+        if(pubkey == "" || pubkey.length < 64){
+             alert("公钥为空或错误");
+        }
+
+        // 登录账号
+        var username = $("#username").val();
+
+        if(username == ""){
+            alert("登录账号不能为空");
+        }
+
+        // 登录密码
+        var password = $("#password").val();
+
+        if(password == ""){
+            alert("登录密码不能为空");
+        }
+
+        // 登录密码加密
+        var _login = SoftEncryption.loginSM2Encry(username,password,
+            Base64.fromByteArray(Hex.decode(pubkey)));
+        console.log(_login);
+        $("#crypttext").val(JSON.stringify(_login));
+        //console.log(Hex.encode(Base64.toByteArray(pubkey)));
+    })
+
+    $("#btn_login_jm").click(function(){
+        var privkey = $("#privkey").val();
+        if(privkey == "" || privkey.length < 64){
+            alert("公钥为空或错误");
+        }
+        var inputtext = $("#inputtext").val();
+        if(inputtext.length <= 0){
+            alert("输入数据不能为空");
+        }
+        var sm2 = new SM2();
+        var plain = sm2.decrypt(Hex.decode(privkey),Hex.decode(inputtext));
+
+        $("#crypttext").val(Hex.encode(plain,0,plain.length));
+        //console.log(Hex.encode(Base64.toByteArray(pubkey)));
+    })
+
+    /**
+     * SM4 解密
+     */
+    $("#btn_sm4dec").click(function(){
+        var key = $("#sm4Key").val();
+        var inputtext = $("#inputtext").val();
+        var sm4 = new SM4();
+        var r =  sm4.decrypt_ecb(Hex.decode(key),Hex.decode(inputtext));
+        $("#crypttext").val(Hex.encode(r));
+        console.log(r);
+        console.log(Hex.encode(r,0,r.length));
+        console.log(Hex.bytesToUtf8Str(r));
+    })
+
+    /**
+     * SM4 加密
+     */
+    $("#btn_sm4enc").click(function(){
+        var key = $("#sm4Key").val();
+        var inputtext = $("#inputtext").val();
+        var sm4 = new SM4();
+        var r =  sm4.encrypt_ecb(Hex.decode(key),Hex.decode(inputtext));
+        $("#crypttext").val(Hex.encode(r));
+        console.log(r);
+        console.log(Hex.encode(r,0,r.length));
+        console.log(Hex.bytesToUtf8Str(r));
+    })
+
+    /**
+     *生成SM4 密钥
+     */
+    $("#btn_sm4genkey").click(function(){
+        $("#crypttext").val(new SM4().generateKey());
+    })
+    //
+
+    HexStr2Bytes = function (str)
+    {
+
+        var pos = 0;
+
+        var len = str.length;
+
+        if(len %2 != 0)
+
+        {
+
+            return null;
+
+        }
+
+        len /= 2;
+
+        var hexA = new Array();
+
+        for(var i=0; i<len; i++)
+
+        {
+
+            var s = str.substr(pos, 2);
+
+            var v = parseInt(s, 16);
+
+            hexA.push(v);
+
+            pos += 2;
+
+        }
+
+        return hexA;
+
+    }
+
+    /*
+     * 测试解密
+     */
+    $("#btn_dec").click(function(){
+        var privkey = $("#privkey").val();
+        if(privkey == "" || privkey.length < 32){
+            alert("私钥为空或错误");
+        }
+        var inputtext = $("#inputtext").val();
+        if(inputtext.length <= 0){
+            alert("输入数据不能为空");
+        }
+
+        var sm2 = new SM2();
+        var plain = sm2.decrypt(Hex.decode(privkey),Hex.decode((inputtext)));
+
+        var utf8Str = Hex.encode(plain);
+        $("#crypttext").val(utf8Str);
+    });
+
+    var count = 0;
+    var failedTime = 0;
+    /*
+     * 随机测试
+     */
+    function testSm2(){
+
+        var dataBy = generate(count);
+
+        var sm2 = new SM2();
+        var keyPair = sm2.generateKeyPairHex();//得到的keypair结构：{'privkeyhex': hPrv, 'pubkeyhex': hPub}
+
+        var pubkey = keyPair['pubkeyhex'];
+        var privkey = keyPair['privkeyhex'];
+
+        var dataHex = Hex.encode(dataBy,0,dataBy.length);//转成16进制
+
+        var cipherHex = sm2.encrypt(Hex.decode(pubkey),dataBy);
+        if(cipherHex == null || cipherHex.length <= 0){
+            console.log("false:");
+            console.log("sm2DataHex="+dataHex);
+            console.log("pubkey="+pubkey);
+            console.log("privkey="+privkey);
+            failedTime ++;
+        }
+
+        var plainHex = sm2.decrypt(Hex.decode(privkey),cipherHex);//解密
+        var _r = Hex.encode(plainHex,0,plainHex.length);
+        if(plainHex == null || plainHex.length <= 0 || dataHex != _r){
+            console.log("false:");
+            console.log("dataHex="+dataHex);
+            console.log("cipher="+cipherHex);
+            console.log("plainhex"+plainHex);
+            console.log("pubkey="+pubkey);
+            console.log("privkey="+privkey);
+            failedTime ++;
+        }
+
+        count ++;
+        if(count % 100 == 0){
+            $("#crypttext").val("随机测试已循环"+count+"次\n其中成功"+(count-failedTime)+"次\n失败"+failedTime+"次\n若有失败，请查看控制台信息");
+        }
+
+    }
+
+
+    var isKeepLoop = 1;
+    function loopTest(){
+        if(isKeepLoop > 0){
+            testSm2();
+            setTimeout("loopTest()", 1);
+        }else{
+
+        }
+    }
+
+    $("#btn_test").click(function(){
+        var dowhat = $("#btn_test").val();
+
+        if(dowhat == "开始随机测试"){
+            isKeepLoop = 1;
+            loopTest();
+            $("#btn_test").val("停止随机测试");
+        }else{
+            isKeepLoop = 0;
+            $("#btn_test").val("开始随机测试");
+        }
+
+    });
+</script>
+</@footer>
+</@pageTheme>

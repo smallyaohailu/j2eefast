@@ -5,18 +5,26 @@
  */
 package com.j2eefast.framework.sys.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bstek.ureport.Utils;
+import com.bstek.ureport.definition.datasource.BuildinDatasource;
+import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
 import com.j2eefast.common.db.context.SqlSessionFactoryContext;
 import com.j2eefast.common.db.entity.SysDatabaseEntity;
 import com.j2eefast.framework.sys.mapper.SysDatabaseMapper;
+
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
@@ -25,9 +33,7 @@ import javax.annotation.Resource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>多源数据</p>
@@ -89,10 +95,28 @@ public class SysDatabaseService extends ServiceImpl<SysDatabaseMapper, SysDataba
 			if (sqlSessionFactory != null) {
 				throw new RxcException("当前上下文中已存在该名称，请重启项目或更换名称");
 			}
-
+			
 			//往上下文中添加数据源
 			SqlSessionFactoryContext.addSqlSessionFactory(database.getDbName(), database);
 
+			//如果开启 ureport2报表 动态注入到Spring容器
+			if((Boolean)PropertiesUtils.getInstance().get(ConfigConstant.UREPORT_ENABLED_YML)){
+				SpringUtil.registerBean(BuildinDatasource.class.getName() + database.getDbName(), new BuildinDatasource() {
+                    @Override
+                    public String name() {
+                        return database.getDbName();
+                    }
+                    @SneakyThrows
+                    @Override
+                    public Connection getConnection() {
+                        return DataSourceContext.getDataSources().get(database.getDbName())
+                        		.getConnection();
+                    }
+                });
+				Collection<BuildinDatasource> buildinDatasources = new ArrayList<>(5);
+				buildinDatasources.addAll(SpringUtil.getBeansOfType(BuildinDatasource.class).values());
+				BeanUtil.setFieldValue(Utils.class,"buildinDatasources",buildinDatasources);
+			}
 			return true;
 		}
 		return false;
@@ -114,14 +138,33 @@ public class SysDatabaseService extends ServiceImpl<SysDatabaseMapper, SysDataba
 		return true;
 	}
 
+	/**
+	 * 删除数据源
+	 * @author ZhouZhou
+	 * @param ids
+	 * @return
+	 */
+	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids){
+		
 		List<SysDatabaseEntity> list = this.listByIds(Arrays.asList(ids));
 		boolean flag = false;
 		for(SysDatabaseEntity db: list){
+			
 			if(db.getDbName().equalsIgnoreCase(DataSourceContext.MASTER_DATASOURCE_NAME)){
 				new RxcException("主数据库不能删除!");
 			}
+			
 			DataSourceContext.removeByName(db.getDbName());
+			
+			//如果开启 ureport2报表 动态删除Spring容器中对象
+			if((Boolean)PropertiesUtils.getInstance().get(ConfigConstant.UREPORT_ENABLED_YML)){
+				//删除
+				SpringUtil.destroyBean(BuildinDatasource.class.getName() + StrUtil.DOT+ db.getDbName());
+				Collection<BuildinDatasource> buildinDatasources = new ArrayList<>(5);
+				buildinDatasources.addAll(SpringUtil.getBeansOfType(BuildinDatasource.class).values());
+				BeanUtil.setFieldValue(Utils.class,"buildinDatasources",buildinDatasources);
+			}
 			this.removeById(db.getId());
 			flag = true;
 		}

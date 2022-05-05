@@ -33,5 +33,9 @@ public class RedisKeys {
 	public static String getNoticeKey(){
 		return "sys:notice";
 	}
+	
+	public static String getLoginValidKey(String key) {
+		return "sys:login:" + key;
+	}
 
 }

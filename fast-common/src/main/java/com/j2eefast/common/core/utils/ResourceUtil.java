@@ -5,6 +5,8 @@ package com.j2eefast.common.core.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import com.j2eefast.common.core.exception.RxcException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -16,6 +18,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  * p>资源供给</p>
  * @author ThinkGem
  */
+@Deprecated
 public class ResourceUtil extends org.springframework.util.ResourceUtils {
 
     private static ResourceLoader resourceLoader;
@@ -67,7 +70,7 @@ public class ResourceUtil extends org.springframework.util.ResourceUtils {
         try(InputStream is = ResourceUtil.getResourceFileStream(location)){
             return IOUtils.toString(is, "UTF-8");
         }catch (IOException e) {
-            throw ExceptionUtil.unchecked(e);
+            throw new RxcException("获取资源文件内容异常","A0001");
         }
     }
 
@@ -81,7 +84,7 @@ public class ResourceUtil extends org.springframework.util.ResourceUtils {
             Resource[] resources = resourceResolver.getResources(locationPattern);
             return resources;
         } catch (IOException e) {
-            throw ExceptionUtil.unchecked(e);
+            throw new RxcException("搜索资源文件异常","A0002");
         }
     }
 

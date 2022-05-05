@@ -5,27 +5,22 @@
  */
 package com.j2eefast.framework.sys.constant.factory;
 
-/**
- * <p></p>
- *
- * @author: zhouzhou
- * @date: 2019-04-07 10:04
- * @web: http://www.j2eefast.com
- * @version: 1.0.1
- */
-
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.Cache;
 import com.j2eefast.common.core.constants.CacheKey;
+import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.log.mapper.SysLoginInfoMapper;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
+import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.entity.SysUserEntity;
+import com.j2eefast.framework.sys.mapper.SysModuleMapper;
 import com.j2eefast.framework.sys.mapper.SysRoleMapper;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.sys.service.SysFileService;
@@ -36,8 +31,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>获取方法</p>
@@ -53,13 +47,11 @@ public class ConstantFactory implements IConstantFactory {
 
 	private SysRoleMapper sysRoleMapper = SpringUtil.getBean(SysRoleMapper.class);
 	private SysUserMapper sysUserMapper = SpringUtil.getBean(SysUserMapper.class);
+	private SysModuleMapper sysModuleMapper = SpringUtil.getBean(SysModuleMapper.class);
 	private SysMenuService sysMenuService = SpringUtil.getBean(SysMenuService.class);
 	private SysLoginInfoMapper sysLoginInfoMapper = SpringUtil.getBean(SysLoginInfoMapper.class);
-
 	private  SysFileUploadService sysFileUploadService = SpringUtil.getBean(SysFileUploadService.class);
-
 	private  SysFileService sysFileService = SpringUtil.getBean(SysFileService.class);
-
 	public static IConstantFactory me() {
 		return SpringUtil.getBean("constantFactory");
 	}
@@ -123,6 +115,48 @@ public class ConstantFactory implements IConstantFactory {
 	}
 
 	@Override
+	public List<SysRoleEntity> getRoles(Long userId) {
+		if (ToolUtil.isEmpty(userId)) {
+			return null;
+		}
+		List<SysRoleEntity>  roleList = sysRoleMapper.getRolesByUserId(userId);
+		if(ToolUtil.isEmpty(roleList)) {
+			return null;
+		}
+		return roleList;
+	}
+
+	@Override
+	@Cacheable(value = Cache.MODULES_CONSTANT, key = "'" + CacheKey.MODULES + "'+#userId")
+	public List<Map<String, Object>> getModules(Long userId) {
+//		List<SysRoleEntity> roles = this.getRoles(userId);
+//		List<String> roleKey = new ArrayList<>();
+//		roles.forEach(role->{
+//			roleKey.add(role.getRoleKey());
+//		});
+		List<Map<String, Object>>  results;
+		if(userId.equals(Constant.SUPER_ADMIN)){
+			List<SysModuleEntity> modules = sysModuleMapper.findModules();
+			results = new ArrayList<>(modules.size());
+			modules.forEach(module->{
+				Map<String, Object> map = BeanUtil.beanToMap(module);
+				results.add(map);
+			});
+			return results;
+		}else{
+			//获取用户角色列表
+			List<Long> roleList = ConstantFactory.me().getRoleIds(userId);
+			List<SysModuleEntity> modules = sysModuleMapper.findModuleByRoleIds(roleList);
+			results = new ArrayList<>(modules.size());
+			modules.forEach(module->{
+				Map<String, Object> map = BeanUtil.beanToMap(module);
+				results.add(map);
+			});
+			return results;
+		}
+	}
+
+	@Override
 	@Cacheable(value = Cache.ROLECONSTANT, key = "'" + CacheKey.ROLE + "'+#roleId")
 	public SysRoleEntity getRoleById(Long roleId) {
 		if (0 == roleId) {
@@ -133,6 +167,32 @@ public class ConstantFactory implements IConstantFactory {
 			return roleObj;
 		}
 		return null;
+	}
+
+	@Override
+	@Cacheable(value = Cache.ROLECONSTANT, key = "'" + CacheKey.PERMISSIONS + "'+#userId")
+	public Set<String> findPermissionsByUserId(Long userId) {
+
+		//获取用户角色列表
+		List<Long> roleList = getRoleIds(userId);
+
+		//设置权限列表
+		Set<String> permissionSet = new HashSet<>();
+		for (Long roleId : roleList) {
+			List<String> permissions = sysMenuService.findPermsByRoleId(roleId);
+			if (permissions != null) {
+				for (String permission : permissions) {
+					if (ToolUtil.isNotEmpty(permission)) {
+						String[] perm = StrUtil.splitToArray(permission,",");
+						for(String s: perm){
+							permissionSet.add(s);
+						}
+					}
+				}
+			}
+		}
+
+		return permissionSet;
 	}
 
 //	@Override
@@ -161,9 +221,20 @@ public class ConstantFactory implements IConstantFactory {
 //		return "";
 //	}
 
+	/**
+	 * 根据用户ID获取用户部门名称
+	 */
 	@Override
-	public String getDeptName(Long deptId) {
-		return null;
+	@Cacheable(value = Cache.CONSTANT, key = "'" + CacheKey.DEPT_NAME + "'+#userId")
+	public String getDeptName(Long userId) {
+		if (ToolUtil.isEmpty(userId)) {
+			return "";
+		}
+		String deptName = sysUserMapper.findDeptNameByUserId(userId);
+		if (ToolUtil.isNotEmpty(deptName)) {
+			return deptName;
+		}
+		return "";
 	}
 
 	@Override
@@ -179,7 +250,8 @@ public class ConstantFactory implements IConstantFactory {
 	@Override
 	@Cacheable(value = Cache.MENU_CONSTANT, key = "'" + CacheKey.MENU_NAME + "'+ T(String).valueOf(#userId).concat('-').concat(#moduleCode)")
 	public List<SysMenuEntity> getMenuByUserIdModuleCode(Long userId, String moduleCode, LoginUserEntity user) {
-		List<SysMenuEntity> menuList = sysMenuService.findUserModuleMenuList(userId,moduleCode,user.getRoleKey().contains(Constant.SU_ADMIN));
+		List<SysMenuEntity> menuList = sysMenuService.findUserModuleMenuList(userId,moduleCode,
+				false);
 		if(ToolUtil.isNotEmpty(menuList)){
 			return menuList;
 		}
@@ -231,9 +303,66 @@ public class ConstantFactory implements IConstantFactory {
 	public void clearMenu() {
 	}
 
+	/**
+	 * 根据用户ID删除
+	 * @param userId
+	 */
+	@Override
+	public void clearMenu(Long userId) {
+		SpringUtil.getBean(RedisUtil.class).deletes(Cache.MODULES_CONSTANT +"::"+CacheKey.MODULES + userId);
+	}
+
 	@Override
 	@CacheEvict(value=Cache.ROLECONSTANT, allEntries=true)
 	public void clearRole() {
+	}
+
+	@Override
+	@CacheEvict(value=Cache.ROLECONSTANT,key = "'" + CacheKey.PERMISSIONS + "'+#userId", allEntries=true)
+	public void clearRole(Long userId) {
+
+	}
+
+	/**
+	 * 根据用户id对应公司名称清除缓存
+	 */
+	@Override
+	@CacheEvict(value = Cache.CONSTANT, key = "'" + CacheKey.COMP_NAME + "'+#userId", allEntries=true)
+	public void clearCompName(Long userId) {
+			
+	}
+	
+
+	/**
+	 * 根据用户id部门名称清除缓存
+	 */
+	@Override
+	@CacheEvict(value = Cache.CONSTANT, key = "'" + CacheKey.DEPT_NAME + "'+#userId", allEntries=true)
+	public void clearDeptName(Long userId) {
+		
+	}
+
+	@Override
+	@CacheEvict(value=Cache.MODULES_CONSTANT, allEntries=true)
+	public void clearModules() {
+
+	}
+
+	@Override
+	public void clearModules(Long userId) {
+		SpringUtil.getBean(RedisUtil.class).deletes(Cache.MODULES_CONSTANT +"::"+CacheKey.MODULES + userId);
+	}
+
+	/**
+	 * 根据用户ID清理用户缓存信息
+	 */
+	@Override
+	public void clearUser(Long userId) {
+		ConstantFactory.me().clearCompName(userId);
+		ConstantFactory.me().clearDeptName(userId);
+		ConstantFactory.me().clearMenu(userId);
+		ConstantFactory.me().clearModules(userId);
+		ConstantFactory.me().clearRole(userId);
 	}
 
 

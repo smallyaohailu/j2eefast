@@ -92,12 +92,13 @@ public class SysComponentController extends BaseController {
 			t.setDict(o.getStr("dict",""));
 			t.setQuery(o.getStr("query","").equals("true"));
 			t.setTitle(o.getStr("title",""));
+			t.setSortable(o.getStr("sortable","").equals("true"));
 			if(o.containsKey("zTree")){
 				JSONObject ztree = o.getJSONObject("zTree");
 				TableZtreeEntity ztreeEntity = new TableZtreeEntity();
 				ztreeEntity.setClear(ztree.getBool("isClear",true));
 				ztreeEntity.setUrl(ztree.getStr("url",""));
-				ztreeEntity.setName(ztree.getStr("name",t.getTitle()));
+				ztreeEntity.setName(ztree.getStr("name",t.getField()));
 				ztreeEntity.setKeyId(ztree.getStr("keyId","id"));
 				ztreeEntity.setExpandLevel(ztree.getBool("expandLevel",false));
 				ztreeEntity.setSelectParent(ztree.getBool("isSelectParent",false));
@@ -131,6 +132,11 @@ public class SysComponentController extends BaseController {
 		mmap.put("keyName",super.getPara("keyName"));
 
 		mmap.put("separator",super.getPara("separator"));
+
+		//初始化表格排序字段
+		mmap.put("sortName",super.getPara("sortName"));
+		//初始化表格排序
+		mmap.put("sortOrder",super.getPara("sortOrder"));
 
 		mmap.put("layout", StrUtil.blankToDefault(super.getPara("layout"),""));
 		//是否需要查询

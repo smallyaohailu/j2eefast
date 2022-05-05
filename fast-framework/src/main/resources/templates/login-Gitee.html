@@ -20,9 +20,9 @@
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/select2/select2-bootstrap.css"/>
 </#if>
 <#if verification>
-<link rel="stylesheet" href="${ctxStatic}/static/plugins/captcha/css/verify.min.css">
+<link rel="stylesheet" href="${ctxStatic}/static/plugins/captcha/css/verify.css">
 </#if>
-<link rel="stylesheet" href="${ctxStatic}/static/css/login2.min.css?V=${config.getDvVersion()}">
+<link rel="stylesheet" href="${ctxStatic}/static/css/login2.css?V=${config.getDvVersion()}">
 <style>[v-cloak]{display:none !important;}
 <#--.login-body {-->
 <#--    background-image: url(${ctxStatic}/static/img/login/bg4.jpg);-->
@@ -87,7 +87,7 @@
                     <div class="login-form__container is-login">
                         <header class="login-form__header">
                             <h2 class="login-form__title">
-                                <span><@ctx.i18n text = "欢迎登录"/></span>
+                                <span>${i18n("欢迎登录")}</span>
                             </h2>
                             <span class="pull-right">
 <#--                                没有帐号？<a href="#">点此注册</a>-->
@@ -111,14 +111,14 @@
 									      </div>
 								        </#if> 
                                         <div class="field">
-                                            <input class="login-password__account-input" id="username" v-model="username" placeholder="<@ctx.i18n text = "账号/邮箱/手机号码"/>" type="text">
+                                            <input class="login-password__account-input" id="username" v-model="username" placeholder="${i18n("账号/邮箱/手机号码")}" type="text">
                                         </div>
                                         <div class="field">
-                                            <input autocomplete="off" id="password" v-model="password" placeholder="<@ctx.i18n text = "密码"/>" type="password">
+                                            <input autocomplete="off" id="password" v-model="password" placeholder="${i18n("密码")}" type="password">
                                         </div>
                                         <div v-if="loadcode" class="field">
                                             <div class="ui right labeled input captcha-labeled">
-                                                <input v-model="captcha" placeholder="<@ctx.i18n text = "验证码"/>" type="text">
+                                                <input v-model="captcha" placeholder="${i18n("验证码")}" type="text">
                                                 <div class="ui basic orange button login__captcha-button" copyright="J2eeFAST" :style="src"  @click="refreshCode">
                                                 </div>
                                             </div>
@@ -126,8 +126,8 @@
                                         <div class="fields">
                                             <div class="field">
                                                 <div class="checkbox">
-                                                    <label title="<@ctx.i18n text = "公共场所慎用,下次登录免输账号"/>" data-toggle="tooltip" data-placement="bottom">
-                                                        <input type="checkbox" name="rememberUserCode" data-style="minimal-grey" />&nbsp;<@ctx.i18n text = "记住账号"/>
+                                                    <label title="${i18n("公共场所慎用,下次登录免输账号")}" data-toggle="tooltip" data-placement="bottom">
+                                                        <input type="checkbox" name="rememberUserCode" data-style="minimal-grey" />&nbsp;${i18n("记住账号")}
                                                     </label>
                                                 </div>
                                             </div>
@@ -135,22 +135,22 @@
 <#--                                            <a class="login__toggle-button" data-control="phone" href="https://gitee.com/login">短信验证登录</a>-->
                                                 <#if rememberMe>
                                                     <div class="checkbox">
-                                                        <label title="<@ctx.i18n text = "公共场所慎用,下次登录免输账号、密码"/>">
-                                                            <input type="checkbox" name="rememberme" v-model="rememberme" data-style="minimal-grey"> <@ctx.i18n text = "自动登录"/>
+                                                        <label title="${i18n("公共场所慎用,下次登录免输账号、密码")}">
+                                                            <input type="checkbox" name="rememberme" v-model="rememberme" data-style="minimal-grey"> ${i18n("自动登录")}
                                                         </label>
                                                     </div>
                                                 </#if>
                                             </div>
                                         </div>
                                         <div class="field">
-                                            <input class="ui fluid orange submit button large" @click="login" data-loading="正在验证登录，请稍后..." type="button" value="<@ctx.i18n text = "登 录"/>">
+                                            <input class="ui fluid orange submit button large" @click="login" data-loading="正在验证登录，请稍后..." type="button" value="${i18n("登 录")}">
                                         </div>
 <#--                                        <div class="field text-center">-->
 <#--&lt;#&ndash;                                            <a class="forget-password" href="https://gitee.com/password/new">已有帐号，忘记密码？</a>&ndash;&gt;-->
 <#--                                        </div>-->
                                         <div class="dropdown pull-right">
                                             <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
-                                                <i class="fa fa-language"></i>&nbsp;<@ctx.i18n text = "中文(简体)"/>
+                                                <i class="fa fa-language"></i>&nbsp;${i18n("中文(简体)")}
                                             </a>
                                             <ul class="dropdown-menu">
                                                 <li class="mt5"></li>
@@ -176,27 +176,27 @@
                                 <div class="field">
                                     <div class="ui horizontal divider login-login__oauth-title">
                                         <span class="text-muted">
-                                            其他方式登录
+                                           ${i18n("其他方式登录")}
                                         </span>
                                     </div>
                                 </div>
                                 <div class="ui horizontal list login-oauth__list">
-                                    <div class="item" title="<@ctx.i18n text = "使用 Gitee 账号授权登录"/>" data-toggle="tooltip" data-placement="top">
+                                    <div class="item" title="${i18n("使用 Gitee 账号授权登录")}" data-toggle="tooltip" data-placement="top">
                                         <a href="${ctxStatic}/auth/gitee">
                                             <img src="${ctxStatic}/static/img/login/gitee.svg"/>
                                         </a>
                                     </div>
-                                    <div class="item" title="<@ctx.i18n text = "使用 GitHub 账号授权登录"/>" data-toggle="tooltip" data-placement="top">
+                                    <div class="item" title="${i18n("使用 GitHub 账号授权登录")}" data-toggle="tooltip" data-placement="top">
                                         <a href="${ctxStatic}/auth/github">
                                             <img src="${ctxStatic}/static/img/login/github.svg"/>
                                         </a>
                                     </div>
-                                    <div class="item" title="<@ctx.i18n text = "使用 OsChina 账号授权登录"/>" data-toggle="tooltip" data-placement="top">
+                                    <div class="item" title="${i18n("使用 OsChina 账号授权登录")}" data-toggle="tooltip" data-placement="top">
                                         <a href="${ctxStatic}/auth/oschina">
                                                 <img src="${ctxStatic}/static/img/login/oschina.svg"/>
                                         </a>
                                     </div>
-                                    <div class="item" title="<@ctx.i18n text = "功能开发中..."/>" data-toggle="tooltip" data-placement="top">
+                                    <div class="item" title="${i18n("功能开发中...")}" data-toggle="tooltip" data-placement="top">
                                         <a href="#">
                                             <img src="${ctxStatic}/static/img/login/qq-no.svg"/>
                                         </a>
@@ -214,7 +214,7 @@
                     Copyright &copy; 2018-${config.getCopyrightYear()} ${config.getCompany()}
                 </span>
                 <span class="footer-item">
-                     <a href="https://www.yuque.com/u1174484/j2eefast/tv3kee" target="_blank">帮助文档</a>
+                     <a href="https://www.yuque.com/u1174484/j2eefast/tv3kee" target="_blank">${i18n("帮助文档")}</a>
                 </span>
                 <#list dict.getType('sys_login_view')>
                     <#items as d>
@@ -239,19 +239,17 @@
 <#if tenantModel>
 <script src="${ctxStatic}/static/plugins/select2/select2.min.js"></script>
 </#if>
-<script src="${ctxStatic}/static/libs/SM4.min.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
 <#-- iCheck -->
 <script src="${ctxStatic}/static/libs/icheck.min.js"></script>
 <script src="${ctxStatic}/static/libs/vue.min.js"></script>
 <#if verification>
-<script src="${ctxStatic}/static/plugins/captcha/crypto-js.min.js"></script>
+<script src="${ctxStatic}/static/plugins/captcha/crypto-js.js"></script>
 <script src="${ctxStatic}/static/plugins/captcha/ase.min.js"></script>
-<script src="${ctxStatic}/static/plugins/captcha/verify.min.js"></script>
+<script src="${ctxStatic}/static/plugins/captcha/verify.js"></script>
 <#else>
-<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.min.js"></script>
-<#--<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.js"></script>-->
+<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.js"></script>
 </#if>
-<script>var ctx = "${ctxStatic}/", _secretKey = "${_secretKey}";</script>
 <script>
     var vm = new Vue({
         el:'#app',
@@ -274,7 +272,7 @@
         },
         methods: {
             refreshCode: function(){ /*刷新验证码*/
-                this.src = 'background: url("'+ctx+"captcha.gif?t=" + $.now()+'") !important';
+                this.src = 'background: url("'+ctx+"/captcha.gif?t=" + $.now()+'") !important';
             },
             _onkeydown : function(e){
                 var that = this;
@@ -289,21 +287,23 @@
                     return;
                 }
                 if(vm.username.length < 3 ||  vm.password.length < 3){
-                    return that.errrInfo('<@ctx.i18n text = "账号或者密码输入有误"/>');
+                    return that.errrInfo('${i18n("账号或者密码输入有误")}');
                 }
                 <#if tenantModel>
                 if(vm.tenantId.length == 0){
-                    return that.errrInfo('<@ctx.i18n text = "请选择租户号"/>');
+                    return that.errrInfo('${i18n("请选择租户号")}');
                 }
                 </#if>
                 <#if verification>
                 $("#verfyImg").find(".mask").css("display","block");
                 <#else>
                 $(window).block({ message: '<div class="loaderbox"><div class="loading-circle"></div> '
-                        + '<@ctx.i18n text = "数据正在认证,请稍后..."/>' + '</div>' });
-                var s4=new SM4Util(that.getCookie("_secretKey"));
-                var data = {"username":s4.encryptData_ECB(vm.username),
-                    "password":s4.encryptData_ECB(vm.password),
+                        + '${i18n("数据正在认证,请稍后...")}' + '</div>' });
+                var s4 = SoftEncryption.loginSM2Encry(vm.username,vm.password,that.getCookie("_secretKey"));
+                var data = {"username":s4.username,
+                    "password":s4.password,
+                    "kg4":s4.kg4,
+                    "sign":s4.sign,
                     "captcha":vm.captcha,
                     "tenantId":vm.tenantId,
                     "rememberMe":vm.rememberme};
@@ -337,12 +337,12 @@
                         return unescape(document.cookie.substring(c_start,c_end))
                     }
                 };
-                return _secretKey;
+                return __SECRETKEY__;
             },
             postLogin: function(data,flag){
                 $.ajax({
                     type: "POST",
-                    url: ctx+"login",
+                    url: ctx+"/login",
                     data: data,
                     dataType: "json",
                     success: function(result){
@@ -355,7 +355,7 @@
                             };
                             setTimeout(
                                 function () {
-                                    location.href = ctx + 'index';
+                                    location.href = ctx + '/index';
                                 }
                                 , 100);
                         }else if(result.code == '50004' || result.code == '50006'){
@@ -436,9 +436,11 @@
                 baseUrl:'${ctxStatic}',
                 mode:'pop',
                 success : function(params) {
-                    var s4=new SM4Util(that.getCookie("_secretKey"));
-                    var data = {"username":s4.encryptData_ECB(vm.username),
-                        "password":s4.encryptData_ECB(vm.password),
+                    var s4 = SoftEncryption.loginSM2Encry(vm.username,vm.password,that.getCookie("_secretKey"));
+                    var data = {"username":s4.username,
+                        "password":s4.password,
+                        "kg4":s4.kg4,
+                        "sign":s4.sign,
                         "captcha":vm.captcha,
                         "tenantId":vm.tenantId,
                         "rememberMe":vm.rememberme};

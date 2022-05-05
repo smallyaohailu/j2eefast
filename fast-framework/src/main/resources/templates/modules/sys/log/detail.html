@@ -1,66 +1,66 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="操作日志详细" bodyClass="white-bg" libs=["jsonview","prism"]/>
+<@header title="日志管理" bodyClass="white-bg" libs=["jsonview","prism"]/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="signupForm" class="form-horizontal">
 	<div class="form-group">
-		<label class="col-sm-2 control-label">操作模块：</label>
+		<label class="col-sm-3 control-label">${i18n("操作模块")}：</label>
 		<div class="form-control-static">
 			${sysLog.title}  /  ${dict.getLabel('sys_oper_type',sysLog.businessType?c)}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">登录信息：</label>
+		<label class="col-sm-3 control-label">${i18n("登录信息")}：</label>
 		<div class="form-control-static">
 			${sysLog.operName}  /  ${sysLog.compName}  /  ${sysLog.operIp}  /  ${sysLog.operLocation}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">请求地址：</label>
+		<label class="col-sm-3 control-label">${i18n("请求地址")}：</label>
 		<div class="form-control-static">
 			${sysLog.operUrl}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">请求方式：</label>
+		<label class="col-sm-3 control-label">${i18n("请求方式")}：</label>
 		<div class="label label-primary">
 			${sysLog.requestMethod}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">用户代理：</label>
+		<label class="col-sm-3 control-label">${i18n("用户代理")}：</label>
 		<div class="col-sm-8 pl0 form-control-static">
 			${sysLog.userAgent?default('')}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">响应时间：</label>
+		<label class="col-sm-3 control-label">${i18n("响应时间")}：</label>
 		<div class="form-control-static">
-			${sysLog.time} 毫秒
+			${i18n("{0} 毫秒",["${sysLog.time}"])}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">操作方法：</label>
+		<label class="col-sm-3 control-label">${i18n("操作方法")}：</label>
 		<div class="form-control-static">
 			${sysLog.method}
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">请求参数：</label>
+		<label class="col-sm-3 control-label">${i18n("请求参数")}：</label>
 		<div class="form-control-static"><pre id="operParam"></pre></div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">返回参数：</label>
+		<label class="col-sm-3 control-label">${i18n("返回参数")}：</label>
 		<div class="form-control-static"><pre id="jsonResult"></pre></div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">状态：</label>
+		<label class="col-sm-3 control-label">${i18n("状态")}：</label>
 		<div class="<#if sysLog.status == 0 >label label-primary<#else> label label-danger</#if>">
-			<#if sysLog.status == 0 >正常<#else>异常</#if>
+			<#if sysLog.status == 0 >${i18n("正常")}<#else>${i18n("异常")}</#if>
 		</div>
 	</div>
 	<div class="form-group" style="display:<#if sysLog.status == 0 >none<#else>block</#if>">
-		<label class="col-sm-2 control-label">异常信息：</label>
+		<label class="col-sm-3 control-label">${i18n("异常信息")}：</label>
 		<div class="form-control-static">
 			<@f.code codeType="java">
 				${sysLog.errorMsg?default('')}
@@ -72,13 +72,13 @@
 <@footer>
 <script>
 	$(function() {
-		var operParam = "${sysLog.operParam?js_string}";
+		var operParam = "${sysLog.operParam?default('')?js_string}";
 		if (opt.common.isNotEmpty(operParam) && operParam.length < 2000) {
 			$("#operParam").JSONView(operParam);
 		} else {
 			$("#operParam").text(operParam);
 		}
-		var jsonResult = "${sysLog.jsonResult?js_string}";
+		var jsonResult = "${sysLog.jsonResult?default('')?js_string}";
 		if (opt.common.isNotEmpty(jsonResult) && jsonResult.length < 2000) {
 			$("#jsonResult").JSONView(jsonResult);
 		} else {

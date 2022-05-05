@@ -1,0 +1,131 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark=true>
+<@header title="产品许可">
+<link rel="stylesheet" href="${ctxStatic}/static/css/jquery.toast.css">
+<script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/libs/jquery.toast.js?V=${config.getDvVersion()}"></script>
+</@header>
+<section class="section-content">
+    <div class="error-page">
+        <div class="headline text-aqua">&nbsp; <i class="fa fa-shield"></i></div>
+        <div class="error-content">
+            <h3 style="font-weight: bold">${i18n("访问权限受限")}</h3>
+            <p>
+                 ${i18n("非常感谢您对J2eeFAST的认可与支持,您的授权证书过期!")}
+                <br/>
+                <br/>    ${i18n("机器码是")}：${fastSN}
+                <br/>    ${i18n("产品名称")}：${productName}
+                <br/>    ${i18n("技术支持")}：j2eeFast
+                <br/> <span style="font-weight: bold"> ${i18n("最大在线人数")}：${onlineNum}</span>
+                <br/><span style="font-weight: bold">    ${i18n("授权时间")}：${authorizationTime}</span>
+            </p>
+            <button type="button" class="btn btn-success btn-sm" id="licSelect"><i
+                        class="fa fa-upload"></i> ${i18n("上传许可")}(*.lic)</button>&nbsp
+            <button type="button" class="btn btn-info btn-sm" onclick="opt.modal.closeTab()"><i
+                        class="fa fa-reply-all"></i> ${i18n("关闭页面")}</button>
+        </div>
+        <div class="copyright">
+            &copy; ${config.getCopyrightYear()} ${productName} &nbsp;&nbsp; <a
+                    href="http://www.j2eefast.com">${config.getCompany()} V${config.getVersion()}</a>
+        </div>
+    </div>
+</section>
+<@footer>
+<script>
+        var prefix = baseURL + "authInsu";
+        /*上传许可文件*/
+        $('#licSelect').click(function(){
+            opt.layer.open({
+                type: 1,
+                area: ['500px', '280px'],
+                title: '<i class="fa fa-upload"></i> ${i18n("上传许可文件")} <i class="fa fa-info-circle" style="color: red"></i>注意:此操作会影响系统运行,谨慎!',
+                shadeClose: true,
+                shade: 0.3,
+                resize: false,
+                scrollbar: true,
+                content: opt.template('licUploadTpl'),
+                btn: ['<i class="fa fa-check"></i> '+$.i18n.text("上传"),
+                    '<i class="fa fa-remove"></i> '+$.i18n.text("取消")],
+                btn1: function(index, layero){
+                    var form = {
+                        inputForm: layero.find('#inputForm'),
+                        f: layero.find('#f').val()
+                    };
+                    if(opt.common.isEmpty(layero.find('#name').val())
+                        || opt.common.isEmpty(layero.find('#password').val()) ){
+                        opt.warning("${i18n("管理员账号或者密码不能为空")}");
+                        return false;
+                    }
+                    if (form.f == '' || !opt.common.endWith(form.f, '.lic')){
+                        opt.warning("${i18n("许可文件不正确，请选择后缀为 .lic 的文件。")}");
+                        return false;
+                    }
+                    var s4 = SoftEncryption.loginSM2Encry(layero.find('#name').val(),
+                        layero.find('#password').val(),__SECRETKEY__);
+                    var formdata = new FormData();
+                    var file = layero.find('#f')[0].files[0];
+                    formdata.append("licfile", file);
+                    formdata.append("name",s4.username);
+                    formdata.append("password",s4.password);
+                    formdata.append("kg4",s4.kg4);
+                    formdata.append("sign",s4.sign);
+                    opt.common.sendAjax({
+                        url: prefix + "/uploadLic",
+                        data: formdata,
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
+                        success: function(result) {
+                            if(result.code == opt.variable.web_status.SUCCESS){
+                                opt.layer.closeAll();
+                                opt.success("${i18n("许可文件上传成功!")}");
+                                window.setTimeout(function(){
+                                    window.location.href = ctx+'/login';
+                                },2000);
+                            }else{
+                                opt.error(result.msg || '服务器异常..');
+                            }
+                        }
+                    });
+                    return true;
+                }
+            });
+        });
+</script>
+<script id="licUploadTpl" type="text/template">//<!--
+<form id="inputForm" method="post" enctype="multipart/form-data" class="form-horizontal mt20 mb10">
+		<div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-xs-5 control-label"><span style="color: red; ">*</span>${i18n("管理员账号")}：</label>
+                    <div class="col-xs-7">
+                        <@f.input name="name" required=true/>
+                    </div>
+                </div>
+              </div>
+         </div>
+		<div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-xs-5 control-label"><span style="color: red; ">*</span>${i18n("密码")}：</label>
+                    <div class="col-xs-7">
+                        <@f.input type="password" name="password" required=true/>
+                    </div>
+                </div>
+              </div>
+         </div>
+         <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-5"><span class="required">*</span> ${i18n("许可文件")}(.lic)：</label>
+                    <div class="col-xs-7">
+                        <input type="file" id="f" name="f" style="padding-top: 4px;"/>
+                    </div>
+                </div>
+              </div>
+         </div>
+</form>
+//-->
+</script>
+</@footer>
+</@pageTheme>

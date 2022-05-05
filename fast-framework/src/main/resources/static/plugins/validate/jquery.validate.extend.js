@@ -125,11 +125,11 @@ opt.domReady(function(){
 		}
 		});
 
-	$.validator.setDefaults({
-		submitHandler: function(form) {
-			form.submit();
-		}
-	});
+	// $.validator.setDefaults({
+	// 	submitHandler: function(form) {
+	// 		form.submit();
+	// 	}
+	// });
 
 	//校验基础信息表单
 	$("#basicInfoForm").validate({

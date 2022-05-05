@@ -62,7 +62,7 @@ public class SysConfigService extends ServiceImpl<SysConfigMapper, SysConfigEnti
      */
     public boolean addSysConfig(SysConfigEntity sysConfig){
         if(this.save(sysConfig)){
-            redisUtil.set(CONFIG_KEY+sysConfig.getParamKey(),sysConfig);
+            redisUtil.set(CONFIG_KEY+sysConfig.getParamKey(),sysConfig,RedisUtil.NOT_EXPIRE);
             return true;
         }
         return false;
@@ -75,7 +75,7 @@ public class SysConfigService extends ServiceImpl<SysConfigMapper, SysConfigEnti
      */
     public boolean updateSysConfigById(SysConfigEntity sysConfig){
         if(this.updateById(sysConfig)){
-            redisUtil.set(CONFIG_KEY+sysConfig.getParamKey(),sysConfig);
+            redisUtil.set(CONFIG_KEY+sysConfig.getParamKey(),sysConfig,RedisUtil.NOT_EXPIRE);
             return true;
         }
         return false;
@@ -118,7 +118,7 @@ public class SysConfigService extends ServiceImpl<SysConfigMapper, SysConfigEnti
         SysConfigEntity config = redisUtil.get(CONFIG_KEY+key, SysConfigEntity.class);
         if (config == null) {
             config = this.baseMapper.queryByKey(key);
-            redisUtil.set(CONFIG_KEY+key,config);
+            redisUtil.set(CONFIG_KEY+key,config,RedisUtil.NOT_EXPIRE);
         }
 
         return config == null ? null : config.getParamValue();

@@ -1,16 +1,16 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="新增机构" bodyClass="white-bg" libs=["bootstrapSelect"]/>
+<@header title="机构管理" bodyClass="white-bg" libs=["bootstrapSelect"]/>
 <div class="wrapper wrapper-content ibox-content">
 <@f.form id="form-dept-add" class="form-horizontal">
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>机构类型：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("机构类型")}：</label>
         <div class="col-sm-8">
             <@f.select name="type" dictType="sys_comp_type"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>上级机构：</label>
+        <label class="col-sm-3 control-label "><span style="color: red; ">*</span>${i18n("上级机构")}：</label>
         <div class="col-sm-8">
             <@f.treeselect id="parentId" name="parentId" boxTitle="请选择上级机构" url="sys/comp/treeData"
             expandLevel=true isParentIds=true value="${(dept.id)!''}" labelValue="${(dept.name)!''}"
@@ -19,37 +19,37 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>机构名称：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("机构名称")}：</label>
         <div class="col-sm-8">
             <@f.input name="name" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>机构编码：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("机构编码")}：</label>
         <div class="col-sm-8">
             <@f.input name="code" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>机构全称：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("机构全称")}：</label>
         <div class="col-sm-8">
             <@f.input name="fullName" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>显示排序：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("显示排序")}：</label>
         <div class="col-sm-8">
             <@f.input name="orderNum" required=true/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>状态：</label>
+        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>${i18n("状态")}：</label>
         <div class="col-sm-8">
             <@f.radio name="status" dictType="sys_normal_disable"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">备注：</label>
+        <label class="col-sm-3 control-label">${i18n("备注")}：</label>
         <div class="col-sm-8">
             <@f.textarea name="remark"/>
         </div>
@@ -103,10 +103,10 @@
         },
         messages: {
             "name": {
-                remote: "已经存在"
+                remote: "${i18n("已经存在")}"
             },
             "code":{
-                remote: "已经存在"
+                remote: "${i18n("已经存在")}"
             }
         },
         focusCleanup: true

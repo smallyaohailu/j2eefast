@@ -1,26 +1,26 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark=true>
-<@header title="产品许可信息"/>
+<@header title="产品许可"/>
 <section class="section-content">
     <div class="error-page">
         <div class="headline text-aqua">&nbsp; <i class="fa fa-shield"></i></div>
         <div class="error-content">
-            <h3 style="font-weight: bold">安全信息</h3>
+            <h3 style="font-weight: bold">${i18n("安全信息")}</h3>
             <p>
-                 非常感谢您对J2eeFAST的认可与支持,我们始终秉承开源免费,安全稳定！
+                 ${i18n("非常感谢您对J2eeFAST的认可与支持,我们始终秉承开源免费,安全稳定!")}
                 <br/>
-                <br/>    机器码是：${fastSN}
-                <br/>    产品名称：${productName}
-                <br/>    技术支持：j2eeFast
-                <br/> <span style="font-weight: bold"> 最大在线人数：${onlineNum}</span>
-                <br/><span style="font-weight: bold">    授权时间：${authorizationTime}</span>
+                <br/>    ${i18n("机器码是")}：${fastSN}
+                <br/>    ${i18n("产品名称")}：${productName}
+                <br/>    ${i18n("技术支持")}：j2eeFast
+                <br/> <span style="font-weight: bold"> ${i18n("最大在线人数")}：${onlineNum}</span>
+                <br/><span style="font-weight: bold">    ${i18n("授权时间")}：${authorizationTime}</span>
             </p>
             <button type="button" class="btn btn-success btn-sm" id="licSelect"><i
-                        class="fa fa-upload"></i> 上传许可(*.lic)</button>&nbsp
+                        class="fa fa-upload"></i> ${i18n("上传许可")}(*.lic)</button>&nbsp
             <button type="button" class="btn btn-danger btn-sm" id="licDownload"><i
-                        class="fa fa-download"></i> 生成许可</button>&nbsp
+                        class="fa fa-download"></i> ${i18n("生成许可")}</button>&nbsp
             <button type="button" class="btn btn-info btn-sm" onclick="opt.modal.closeTab()"><i
-                        class="fa fa-reply-all"></i> 关闭页面</button>
+                        class="fa fa-reply-all"></i> ${i18n("关闭页面")}</button>
         </div>
         <div class="copyright">
             &copy; ${config.getCopyrightYear()} ${productName} &nbsp;&nbsp; <a
@@ -36,21 +36,21 @@
             opt.layer.open({
                 type: 1,
                 area: ['580px', '180px'],
-                title: '<i class="fa fa-upload"></i> 上传许可文件 <i class="fa fa-info-circle" style="color: red"></i>注意:此操作会影响系统运行,谨慎!',
+                title: '<i class="fa fa-upload"></i> ${i18n("上传许可文件")} <i class="fa fa-info-circle" style="color: red"></i>注意:此操作会影响系统运行,谨慎!',
                 shade: 0.3,
                 shadeClose: true,
                 resize: false,
                 scrollbar: true,
                 content: opt.template('licUploadTpl'),
-                btn: ['<i class="fa fa-check"></i> 上传',
-                    '<i class="fa fa-remove"></i> 取消'],
+                btn: ['<i class="fa fa-check"></i> '+$.i18n.text("上传"),
+                    '<i class="fa fa-remove"></i> '+$.i18n.text("取消")],
                 btn1: function(index, layero){
                     var form = {
                         inputForm: layero.find('#inputForm'),
                         f: layero.find('#f').val()
                     };
                     if (form.f == '' || !opt.common.endWith(form.f, '.lic')){
-                        opt.warning("<@ctx.i18n text = "许可文件不正确，请选择后缀为 .lic 的文件。"/>");
+                        opt.warning("${i18n("许可文件不正确，请选择后缀为 .lic 的文件。")}");
                         return false;
                     }
                     var formdata = new FormData();
@@ -65,7 +65,7 @@
                         success: function(result) {
                             if(result.code == opt.variable.web_status.SUCCESS){
                                 opt.layer.closeAll();
-                                opt.success("<@ctx.i18n text = "许可文件上传成功!"/>");
+                                opt.success("${i18n("许可文件上传成功!")}");
                                 location.reload();
                             }else{
                                 opt.error(result.msg);
@@ -81,8 +81,8 @@
         $("#licDownload").click(function(){
             opt.layer.open({
                 type: 1,
-                area: ['590px', '390px'],
-                title: '<i class="fa fa-download"></i>下载许可文件',
+                area: ['600px', '400px'],
+                title: '<i class="fa fa-download"></i>${i18n("下载许可文件")}',
                 shadeClose: true,
                 shade: 0.3,
                 resize: false,
@@ -127,7 +127,7 @@
                         },
                         messages: {
                             "verifyNo":{
-                                remote: "<@ctx.i18n text = "机器码或者验证码不正确,请仔细核对!"/>"
+                                remote: "${i18n("机器码或者验证码不正确,请仔细核对!")}"
                             },
                             maxNum:"只能是数字,最大4位"
                         },
@@ -171,7 +171,7 @@
     </script>
 <script id="licUploadTpl" type="text/template">//<!--
 <form id="inputForm" method="post" enctype="multipart/form-data" class="form-horizontal mt20 mb10">
-        <label class="control-label col-xs-5"><span class="required">*</span> 许可文件(.lic)：</label>
+        <label class="control-label col-xs-5"><span class="required">*</span> ${i18n("许可文件")}(.lic)：</label>
         <div class="col-xs-7">
             <input type="file" id="f" name="f" style="padding-top: 4px;"/>
         </div>
@@ -183,27 +183,27 @@
         <div class="layui-form-item">
 		</div>
 		<div class="layui-form-item">
-	    	<label class="layui-form-label"><span style="color: red; ">*</span><@ctx.i18n text = "机器码"/>:</label>
+	    	<label class="layui-form-label"><span style="color: red; ">*</span>${i18n("机器码")}:</label>
 	    	<div class="layui-input-inline">
-	    		<input type="text"  name="sn"  maxlength="32" placeholder="<@ctx.i18n text = "机器码32位"/>" autocomplete="off" class="form-control">
+	    		<input type="text"  name="sn"  maxlength="32" placeholder="${i18n("机器码32位")}" autocomplete="off" class="form-control">
 	    	</div>
 		</div>
 		<div class="layui-form-item">
-	    	<label class="layui-form-label"><span style="color: red; ">*</span><@ctx.i18n text = "验证码"/>:</label>
+	    	<label class="layui-form-label"><span style="color: red; ">*</span>${i18n("验证码")}:</label>
 	    	<div class="layui-input-inline">
-	    		<input type="text"  name="verifyNo" maxlength="6" placeholder="<@ctx.i18n text = "验证码6位"/>" autocomplete="off" class="form-control">
+	    		<input type="text"  name="verifyNo" maxlength="6" placeholder="${i18n("验证码6位")}" autocomplete="off" class="form-control">
 	    	</div>
 		</div>
 		<div class="layui-form-item">
-	    	<label class="layui-form-label"><@ctx.i18n text = "最大在线人数"/>:</label>
+	    	<label class="layui-form-label">${i18n("最大在线人数")}:</label>
 	    	<div class="layui-input-inline">
-	    		<input type="text"  name="maxNum" maxlength="4" placeholder="<@ctx.i18n text = "不是必输(默认不限制),如果需要输入数字"/>" autocomplete="off" class="form-control">
+	    		<input type="text"  name="maxNum" maxlength="4" placeholder="${i18n("不是必输(默认不限制),如果需要输入数字")}" autocomplete="off" class="form-control">
 	    	</div>
 		</div>
 		<div class="layui-form-item m0">
-	    	<label class="layui-form-label"><@ctx.i18n text = "IP"/>:</label>
+	    	<label class="layui-form-label">${i18n("IP")}:</label>
 	    	<div class="layui-input-inline">
-	    		<input type="text"  name="ip" placeholder="<@ctx.i18n text = "不是必输(默认不限制),如果需要验证则输入.多个IP,隔开"/>" autocomplete="off" class="form-control">
+	    		<input type="text"  name="ip" placeholder="${i18n("不是必输(默认不限制),如果需要验证则输入.多个IP,隔开")}" autocomplete="off" class="form-control">
 	    	</div>
 		</div>
 		<div class="layui-form-item">
@@ -217,8 +217,7 @@
             function show() {
                  opt.modal.openView("verifySn.png","${ctxStatic}/static/img/verifySn.png",800,700);
             };
-     </script>
-//-->
+    </script>//-->
  </script>
 </@footer>
 </@pageTheme>

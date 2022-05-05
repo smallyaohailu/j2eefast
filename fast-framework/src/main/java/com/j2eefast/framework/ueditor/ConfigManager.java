@@ -98,6 +98,8 @@ public final class ConfigManager {
 				conf.put( "fieldName", this.jsonConfig.getString( "imageFieldName" ) );
 				conf.put( "imageCompressEnable", this.jsonConfig.getBoolean( "imageCompressEnable" ) );
 				conf.put( "imageCompressBorder", this.jsonConfig.getInteger( "imageCompressBorder" ) );
+				conf.put( "imagePressEnable", this.jsonConfig.getBoolean( "imagePressEnable" ) );
+				conf.put( "imagePressText", this.jsonConfig.getString( "imagePressText" ) );
 				savePath = this.jsonConfig.getString( "imagePathFormat" );
 				break;
 

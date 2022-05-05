@@ -1,6 +1,6 @@
 <#include "/common/defaultEngine.html"/>
 <@pageTheme mark="${config.optimize()?string('true', 'false')}">
-<@header title="前端组件使用说明" isAnimation=false bodyClass="white-bg" libs=["table","prism","bootstrapSelect","ueditor","fileupload","selectPage","treeTable"]
+<@header title="前端组件使用说明" isAnimation=false bodyClass="white-bg" libs=["table","prism","bootstrapSelect","ueditor","fileupload","selectPage","treeTable","code"]
 attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
 <style>
 .form-group .control-label {
@@ -23,6 +23,7 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
                             <li><a href="#m_hidden0"><span class="jftn-avbar-item-lin">输入框组件</span></a></li>
                             <li><a href="#c_time"><span class="jftn-avbar-item-lin">时间组件</span></a></li>
                             <li><a href="#c_textarea0"><span class="jftn-avbar-item-lin">多行文本组件</span></a></li>
+                            <li><a href="#c_textarea1"><span class="jftn-avbar-item-lin">多行文本代码编辑器组件</span></a></li>
                             <li><a href="#c_ueditor8"><span class="jftn-avbar-item-lin">HTML文本组件</span></a></li>
                             <li><a href="#c_imageclip00"><span class="jftn-avbar-item-lin">头像剪辑组件</span></a></li>
                             <li><a href="#c_select00"><span class="jftn-avbar-item-lin">下拉菜单组件</span></a></li>
@@ -156,6 +157,22 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label"><a data-toggle="collapse" href="#c_hidden" aria-expanded="true"><i class="fa fa-question-circle-o" title="点我，显示源码帮助"></i> &nbsp;</a><span style="color: red; ">*</span>时间范围：</label>
+                        <div class="col-sm-8">
+                            <div class="select-list">
+                                <li>
+                                    <@f.input name="startTime0" type="date" dataCallback="$('#endTime0').click()"/>
+                                    <span>-</span>
+                                    <@f.input name="endTime0" type="date" selectData="0#1#2#3#4#5#6#7#8#9#10" selectDataClick="startTime0#endTime0"/>
+                                </li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row" id="c_textarea0">
                 <div class="col-sm-12">
                     <div class="form-group">
@@ -177,6 +194,37 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
                                 <@f.textarea name="text" rows="6"/>
                             </#noparse>
                             </@f.code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="c_textarea1">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><a data-toggle="collapse" href="#d_textarea" aria-expanded="true"><i class="fa fa-question-circle-o" title="点我，显示源码帮助"></i> &nbsp;</a><span style="color: red; ">*</span>多行文本代码编辑器组件：</label>
+                        <div class="col-sm-10">
+                            <@f.inputCode name="code01"/>
+                            <div id="d_textarea" class="panel-collapse collapse" >
+                                <@f.code>
+                                    <#noparse>
+                                        //多行文本代码编辑标签: <@f.inputCode/>
+                                        // 注意:libs 引入code 插件
+                                        //参数: 1. name 控件name 必输
+                                        2. id 控件id 不是必输 如果不输则与name名称一样
+                                        3. class 控件样式 不是必输 默认 "form-control"
+                                        4. value 控制值 不是必输 默认 ""
+                                        5. required 控件在from 不是必输 默认 false 表单中是否必输 true为表单中必输
+                                        6. readOnly 控件是否可以修改 不是必输 默认 false
+                                        7. fontSize 控件内容字体大小
+                                        8. height 控件高度
+                                        9. helpTip 控件提示
+                                        10.base46 默认true 提交数据是否进行base46编码
+                                        11.codeType 控件支持代码语言
+                                        //栗子 🌰
+                                        <@f.inputCode name="code01"/>
+                                    </#noparse>
+                                </@f.code>
                             </div>
                         </div>
                     </div>
@@ -676,7 +724,7 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
                                         1. id 控件id 必输
                                         2. 与普通表格一样支持上面功能按钮. 例如:
                                         <@table id="bootstrap-tree-table">
-                                        <a class="btn btn-info" id="expandAllBtn"><i class="fa fa-exchange"></i><@ctx.i18n text = "展开/折叠"/></a>
+                                        <a class="btn btn-info" id="expandAllBtn"><i class="fa fa-exchange"></i>${i18n("展开/折叠")}</a>
                                         </@table>
                                         JS.函数参数简单说明:
                                         url: 数据请求url
@@ -732,16 +780,16 @@ attrValue="data-spy='scroll' data-target='#navbar-example2' data-offset='5'">
             asynUrl: prefix + "/listChild", // 点击异步请求
             columns: [
                 {field: 'selectItem', radio: true}, //是否需要点击选择
-                {field : 'name',title : '<@ctx.i18n text = "(行政代码)名称"/>',width:'250px', align: 'left',halign:"center",formatter: function(value, row, index) {
+                {field : 'name',title : '${i18n("(行政代码)名称")}',width:'250px', align: 'left',halign:"center",formatter: function(value, row, index) {
                         return "（"+row.areaCode+"）"+value;
                     }
                 }
-                ,{field : 'wholeName',title : '<@ctx.i18n text = "区域全称"/>',width:'300px', align: 'left', formatter: function(value, row, index) {return $.table.tooltip(value,30);}}
-                ,{field : 'level',title : '<@ctx.i18n text = "区域等级"/>', align: 'center', formatter: function(value, row, index) {return $.table.selectDictLabel(datas_type, value);}}
-                ,{field : 'cityCode',title : '<@ctx.i18n text = "电话区号"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-                ,{field : 'zipCode',title : '<@ctx.i18n text = "邮政编码"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-                ,{field : 'lon',title : '<@ctx.i18n text = "本区域经度"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
-                ,{field : 'lat',title : '<@ctx.i18n text = "本区域纬度"/>', align: 'center', formatter: function(value, row, index) {return $.table.tooltip(value,10);}}
+                ,{field : 'wholeName',title : '${i18n("区域全称")}',width:'300px', align: 'left', formatter: function(value, row, index) {return opt.common.tooltip(value,30);}}
+                ,{field : 'level',title : '${i18n("区域等级")}', align: 'center', formatter: function(value, row, index) {return opt.common.selectDictLabel(datas_type, value);}}
+                ,{field : 'cityCode',title : '${i18n("电话区号")}', align: 'center', formatter: function(value, row, index) {return opt.common.tooltip(value,10);}}
+                ,{field : 'zipCode',title : '${i18n("邮政编码")}', align: 'center', formatter: function(value, row, index) {return opt.common.tooltip(value,10);}}
+                ,{field : 'lon',title : '${i18n("本区域经度")}', align: 'center', formatter: function(value, row, index) {return opt.common.tooltip(value,10);}}
+                ,{field : 'lat',title : '${i18n("本区域纬度")}', align: 'center', formatter: function(value, row, index) {return opt.common.tooltip(value,10);}}
             ]
         };
         $.treeTable.init(options);

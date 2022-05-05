@@ -40,6 +40,7 @@ public class SM2Utils{
         return HexUtil.pinJie2(privateKeyEncoded, publicKeyEncoded);
     }
 
+    //加密
     public static byte[] encrypt(byte[] publicKey, byte[] data, int type) //112 - 32 = 80  -- 64 = 16
             throws IOException
     {
@@ -50,6 +51,7 @@ public class SM2Utils{
         if (publicKey.length == 64) {
             publicKey = HexUtil.pinJie2(new byte[] { 4 }, publicKey);
         }
+
         byte[] source = new byte[data.length];
         System.arraycopy(data, 0, source, 0, data.length);
 
@@ -62,7 +64,7 @@ public class SM2Utils{
         byte[] c3 = new byte[32];
         cipher.Dofinal(c3);
         if (1 == type)
-        {
+        {   //112 96 + 16
             return HexUtil.pinJie3(HexUtil.subByte(c1.getEncoded(), 1, 64), c3, source);
         }if (2 == type)
     {

@@ -19,6 +19,7 @@ import com.j2eefast.common.core.config.RabbitmqProducer;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.CheckPassWord;
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
@@ -29,7 +30,6 @@ import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.Global;
 import com.j2eefast.framework.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +69,7 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 		String compId = (String) params.get("compId");
 		String deptId = (String) params.get("deptId");
 		String roleKey = (String) params.get("roleKey");
+		String noId = (String) params.get("noId");
 		Page<SysUserEntity> page = sysUserMapper.findPage(	new Query<SysUserEntity>(params).getPage(),
 															StrUtil.nullToDefault(username,""),
 															StrUtil.nullToDefault(status,""),
@@ -78,6 +79,7 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 															StrUtil.nullToDefault(deptId,""),
 															StrUtil.nullToDefault(name,""),
 															StrUtil.nullToDefault(roleKey,""),
+															StrUtil.nullToDefault(noId,""),
 															(String) params.get(Constant.SQL_FILTER));
 		return new PageUtil(page);
 	}
@@ -147,6 +149,30 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 //	}
 
 	/**
+	 * 通过机构ID 查询角色下用户手机号码
+	 * @param deptId
+	 * @param roleKey
+	 * @return
+	 */
+	public List<String> findMobilesByUserId(Long deptId,
+											String roleKey){
+		return sysUserMapper.findMobilesByUserId(deptId,roleKey);
+	}
+	
+	/**
+	 * 查询手机号码是否存在
+	 * @date 2021-09-23
+	 * @param mobile
+	 * @param tenantId
+	 * @return
+	 */
+	public boolean findIsMobile(String mobile,
+								String tenantId) {
+		return sysUserMapper.findIsMobile(mobile, tenantId) > 0;
+	}
+
+
+	/**
 	 * 保存
 	 * @param user
 	 * @return
@@ -155,11 +181,17 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 	public boolean add(SysUserEntity user) {
 
 		//检查密码安全级别
-		if(user.getPassword().equals(Global.getDbKey("sys.user.initPassword"))){
+		if(user.getPassword().equals(Global.getDbKey("SYS_USER_INITPASSWORD"))){
 			user.setPwdSecurityLevel("0");
 		}else{
 			user.setPwdSecurityLevel(CheckPassWord.getPwdSecurityLevel(user.getPassword()).getValue());
 		}
+
+		SysUserEntity userEntity  = sysUserMapper.findUserByUserNameNoDel(user.getUsername());
+		if(ToolUtil.isNotEmpty(userEntity)){
+			sysUserMapper.cleanUser(userEntity.getId());
+		}
+
 		// sha256加密
 		String salt = UserUtils.randomSalt();
 		user.setSalt(salt);
@@ -292,7 +324,7 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 	}
 
 	public boolean checkUserNameUnique(String username) {
-		int count = this.count(new QueryWrapper<SysUserEntity>().eq("username",username));
+		long count = this.count(new QueryWrapper<SysUserEntity>().eq("username",username));
 		if(count > 0){
 			return false;
 		}
@@ -306,6 +338,14 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 			return  false;
 		}
 		return true;
+	}
+	
+	public boolean checkMobileUnique(String mobile) {
+		long count = this.count(new QueryWrapper<SysUserEntity>().eq("mobile",mobile));
+		if(count > 0){
+			return false;
+		}
+		return  true;
 	}
 
 	/**

@@ -2,8 +2,10 @@ package com.j2eefast.common.core.shiro;
 
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.crypto.digest.MD5;
+import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.ValidatingSession;
@@ -31,8 +33,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     @Autowired
     @Lazy
     private RedisUtil redisUtil;
-    @Value("#{ @environment['fast.csrf.enabled'] ?: false }")
-    private boolean csrfEnabled;
 
     /**
      * doReadSession be called about 10 times when login.
@@ -102,16 +102,13 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      * @throws UnknownSessionException
      */
     private void saveSession(Session session) throws UnknownSessionException {
-        log.info("更新保存:{}",session.getId());
+        log.debug("更新保存saveSession:{}",session.getId());
         if (session == null || session.getId() == null) {
             log.error("session or session id is null");
             throw new UnknownSessionException("session or session id is null");
         }
         String key = getRedisSessionKey(session.getId());
         this.redisUtil.setSession(key, session, (int) (session.getTimeout() / MILLISECONDS_IN_A_SECOND));
-        if(csrfEnabled) {
-            this.redisUtil.setSession("sys_csrfToken:" + key, Base64Encoder.encode(MD5.create().digestHex16(session.getId().toString())) + Base64Encoder.encode(session.getId().toString()), (int) (session.getTimeout() / MILLISECONDS_IN_A_SECOND));
-        }
         return;
     }
 
@@ -125,11 +122,9 @@ public class RedisSessionDAO extends AbstractSessionDAO {
             log.error("session or session id is null");
             return;
         }
+        log.info("删除会话:"+session.getId());
         try {
             redisUtil.delSession(getRedisSessionKey(session.getId()));
-            if(csrfEnabled) {
-                redisUtil.delSession("sys_csrfToken:" + getRedisSessionKey(session.getId()));
-            }
         } catch (SerializationException e) {
             log.error("delete session error. session id= {}",session.getId());
         }
@@ -174,6 +169,7 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      */
     @Override
     protected Serializable doCreate(Session session) {
+        log.debug("创建会话:" + session);
         if (session == null) {
             log.error("session is null");
             throw new UnknownSessionException("session is null");

@@ -5,7 +5,7 @@
  @License：MIT
 
  @author J2eeFAST 二次封装 增强type=2 iframe 层POST可以POST 提交
-                  防CSRF攻击
+ 防CSRF攻击
  @date 2020-10-12
  @version v1.0.2
  */
@@ -200,7 +200,7 @@
 //默认配置
     Class.pt.config = {
         type: 0,
-        shade: 0.4,
+        shade: 0.6,
         fixed: true,
         move: doms[1],
         title: '&#x4FE1;&#x606F;',
@@ -845,7 +845,7 @@
 
         layero.css(options);
         btnHeight = layero.find('.'+doms[6]).outerHeight();
-        console.log("contElem.css('padding-top'):"+contElem.css('padding-top') + "  contElem.css('padding-bottom')：" + contElem.css('padding-bottom'));
+        // console.log("contElem.css('padding-top'):"+contElem.css('padding-top') + "  contElem.css('padding-bottom')：" + contElem.css('padding-bottom'));
         if(type === ready.type[2]){
             layero.find('iframe').css({
                 height: parseFloat(options.height) - titHeight - btnHeight
@@ -853,8 +853,8 @@
         } else {
             contElem.css({
                 height: parseFloat(options.height) - titHeight - btnHeight
-                    //- parseFloat(contElem.css('padding-top'))
-                    //- parseFloat(contElem.css('padding-bottom'))
+                //- parseFloat(contElem.css('padding-top'))
+                //- parseFloat(contElem.css('padding-bottom'))
             })
         }
     };

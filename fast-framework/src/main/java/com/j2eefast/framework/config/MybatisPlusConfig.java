@@ -5,9 +5,10 @@
  */
 package com.j2eefast.framework.config;
 
-import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.datasources.BlockAttackInnerInterceptor;
 import com.j2eefast.common.core.datasources.MybatisPulsMetaObjectHandler;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ToolUtil;
@@ -70,8 +71,10 @@ public class MybatisPlusConfig {
         //控制是否在count时对sql的join进行优化
 		//innerInterceptor.setOptimizeJoin(false);
 
-		//防止全表更新与删除插件: BlockAttackInnerInterceptor
-		BlockAttackInnerInterceptor blockAttackInnerInterceptor = new BlockAttackInnerInterceptor();
+		//防止全表更新与删除插件
+		BlockAttackInnerInterceptor blockAttackInnerInterceptor = new BlockAttackInnerInterceptor(
+				Convert.toInt(PropertiesUtils.getInstance()
+						.getProperty("mybatis-plus.blockattack","0")));
 		interceptor.addInnerInterceptor(blockAttackInnerInterceptor);
 
         return interceptor;

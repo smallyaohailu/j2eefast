@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.j2eefast.web.test.mapper.MssqlTestMapper">
+
+    <!--  实体栏位  --> 
+    <sql id="mssqlTestColumns">
+         a.id AS "id" ,
+         a.name AS "name" ,
+         a.email AS "email" ,
+         a.phone AS "phone" ,
+         a.remark AS "remark" ,
+         a.update_time AS "updateTime" ,
+         a.update_by AS "updateBy" ,
+         a.create_time AS "createTime" ,
+         a.create_by AS "createBy" 
+    </sql>
+
+    <!--  根据主键获取实体   -->
+    <select id="findMssqlTestById"  resultType="com.j2eefast.web.test.entity.MssqlTestEntity" >
+        SELECT
+        <include refid="mssqlTestColumns"/>
+		FROM  mssql_test a
+		WHERE a.id = #{id}
+    </select>
+
+    <!--  根据获取实体List   -->
+    <select id="findList" resultType="com.j2eefast.web.test.entity.MssqlTestEntity">
+        SELECT
+        <include refid="mssqlTestColumns"/>
+        FROM mssql_test a
+		<where>
+            <if test="name != null  and name != ''">
+                AND a.name LIKE
+                CONCAT('%',#{name},'%')
+            </if>
+            <if test="email != null  and email != ''"> AND a.email = #{email} </if>
+            <if test="phone != null  and phone != ''"> AND a.phone = #{phone} </if>
+        </where>
+    </select>
+
+    <!-- 根据获取实体 page -->
+    <select id="findPage" resultType="com.j2eefast.web.test.entity.MssqlTestEntity">
+        SELECT
+        <include refid="mssqlTestColumns"/>
+        FROM mssql_test a
+        <where>
+            <if test="mssqlTest.name != null  and mssqlTest.name != ''">
+                AND a.name LIKE
+                CONCAT('%',#{mssqlTest.name},'%')
+            </if>
+            <if test="mssqlTest.email != null  and mssqlTest.email != ''"> AND a.email = #{mssqlTest.email} </if>
+            <if test="mssqlTest.phone != null  and mssqlTest.phone != ''"> AND a.phone = #{mssqlTest.phone} </if>
+            <if test = "sql_filter !=null and sql_filter!=''">
+                AND ${sql_filter}
+            </if>
+        </where>
+    </select>
+
+</mapper>

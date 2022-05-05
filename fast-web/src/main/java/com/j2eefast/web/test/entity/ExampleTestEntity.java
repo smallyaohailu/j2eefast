@@ -7,6 +7,7 @@ package com.j2eefast.web.test.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import javax.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.baomidou.mybatisplus.annotation.TableLogic;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * example_test
  * @author: ZhouZhou
- * @date 2021-08-16 20:41:56
+ * @date 2021-10-21 09:46:49
  */
 @Getter
 @Setter
@@ -86,6 +87,10 @@ public class ExampleTestEntity extends BaseEntity{
     @TableLogic
     @TableField(value = "del_flag", fill = FieldFill.INSERT)
     private String delFlag;
+
+    /** 测试 */
+    @JsonProperty("tManDd")
+    private String tManDd;
 
     @TableField(exist=false)
     private List<ExampleTestChildEntity> exampleTestChild;

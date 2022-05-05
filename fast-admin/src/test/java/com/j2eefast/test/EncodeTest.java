@@ -6,8 +6,10 @@
 package com.j2eefast.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.json.JSONObject;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.crypto.EnctryptTools;
+import com.j2eefast.common.core.crypto.SoftEncryption;
 import com.j2eefast.common.core.utils.JasyptUtils;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.KeyGenerator;
@@ -121,4 +123,17 @@ public class EncodeTest {
         System.out.println(Base64.encode(deskey.getEncoded()));
     }
 
+    /**
+     * 生成系统非对称密钥
+     * @author ZhouZhou
+     * @date 2022-05-05 10:42
+     */
+    @Test
+    public void getLoginKey(){
+        JSONObject object = SoftEncryption.genSM2Keys();
+        String pubKey = Base64.encode(object.get("pubKeyByte",byte[].class));
+        String priKey = Base64.encode(object.get("priKeyByte",byte[].class));
+        System.out.println("公钥:"+pubKey);
+        System.out.println("私钥:"+priKey);
+    }
 }

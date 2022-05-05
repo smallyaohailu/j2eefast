@@ -5,6 +5,7 @@
  */
 package com.j2eefast.framework.log.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,4 +51,13 @@ public interface SysLoginInfoMapper extends BaseMapper<SysLoginInfoEntity>{
 									  @Param("endTime") String endTime,
 									  @Param("deptId") String deptId,
 									  @Param("sql_filter") String sql_filter);
+
+
+	/**
+	 * 插入
+	 * @param sysLoginInfoEntity
+	 * @return
+	 */
+	@InterceptorIgnore(tenantLine = "true")
+	int insertLogininfor(SysLoginInfoEntity sysLoginInfoEntity);
 }

@@ -7,17 +7,22 @@ package com.j2eefast.framework.config;
 
 import java.io.Serializable;
 import java.util.*;
-
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.IdUtil;
 import com.j2eefast.common.core.shiro.RedisCacheManager;
 import com.j2eefast.common.core.shiro.RedisSessionDAO;
+import com.j2eefast.common.core.shiro.ShiroSessionFactory;
 import com.j2eefast.common.core.shiro.ShiroSessionManager;
+import com.j2eefast.common.core.shiro.filter.InnerSessionFilter;
 import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.framework.shiro.KickoutSessionControlFilter;
-import com.j2eefast.framework.shiro.realm.FreeRealm;
+import com.j2eefast.framework.shiro.RestLogoutFilter;
+import com.j2eefast.framework.shiro.RestAuthorizationFilter;
+import com.j2eefast.framework.shiro.auth.UserModularRealmAuthorizer;
+import com.j2eefast.framework.shiro.realm.OtherRealm;
+import com.j2eefast.framework.shiro.realm.UserNameRealm;
 import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
@@ -29,7 +34,6 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,11 +41,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.j2eefast.framework.shiro.ShiroSessionListener;
-import com.j2eefast.framework.shiro.realm.UserRealm;
+import com.j2eefast.framework.shiro.auth.UserModularRealmAuthenticator;
+import com.j2eefast.framework.shiro.realm.ValideCodeRealm;
 import javax.servlet.Filter;
 
 /**
  * Shiro的配置文件
+ * @author huanzhou
  */
 @Configuration
 public class ShiroConfig {
@@ -61,7 +67,7 @@ public class ShiroConfig {
 	/**
 	 * 设置Cookie的域名
 	 */
-	@Value("${shiro.cookie.domain}")
+	@Value("#{ @environment['shiro.cookie.domain'] ?: '' }")
 	private String domain;
 
 	/**
@@ -77,6 +83,12 @@ public class ShiroConfig {
 	private boolean httpOnly;
 
 	/**
+	 * 登录排挤踢人
+	 */
+	@Value("#{ @environment['shiro.session.kickoutAfter'] ?: false }")
+	private boolean kickoutAfter;
+
+	/**
 	 * 是否开启记住我功能
 	 */
 	@Value("#{ @environment['shiro.rememberMe.enabled'] ?: false }")
@@ -85,7 +97,7 @@ public class ShiroConfig {
 	/**
 	 * 密钥
 	 */
-	@Value("${shiro.rememberMe.cipherKey}")
+	@Value("#{ @environment['shiro.rememberMe.cipherKey'] ?: '' }")
 	private String cipherKey;
 
 	/**
@@ -93,9 +105,28 @@ public class ShiroConfig {
 	 */
 	@Value("#{ @environment['shiro.cookie.maxAge'] ?: 30 }")
 	private int maxAge;
+
+	/**
+	 * 设置会话ID
+	 */
+	@Value("#{ @environment['shiro.session.sessionId'] ?: 'fast.session.id' }")
+	private String sessionId;
 	
 	/**
-	 * Shiro授权认证配置
+	 * 系统是否开启多租户模式
+	 */
+	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
+	private boolean enabled;
+
+
+	/**
+	 * 前端端分离
+	 */
+	@Value("#{ @environment['fast.distributed.enabled'] ?: false }")
+	private boolean distributed;
+
+	/**
+	 * Shiro授权认证配置 系统YML文件配置信息
 	 */
 	@Value("#{${shiro.filterMap}}")
 	private LinkedHashMap<String, String> filterMap ;
@@ -115,22 +146,40 @@ public class ShiroConfig {
 		return redisCacheManager;
 	}
 
+	//-----------------------------  登录Realm ------------------
 	/**
-	 * 自定义Realm
+	 * 账号密码登录 Realm
 	 */
 	@Bean
-	public UserRealm userRealm() {
-		UserRealm userRealm = new UserRealm();
-		userRealm.setCacheManager(getRedisCacheManager());
-		return userRealm;
+	public UserNameRealm userNameRealm() {
+		UserNameRealm userNameRealm = new UserNameRealm();
+		userNameRealm.setCacheManager(getRedisCacheManager());
+		return userNameRealm;
 	}
 
+	/**
+	 * 第三方授权登录 Realm
+	 * @return
+	 */
 	@Bean
-	public FreeRealm freeRealm() {
-		FreeRealm freeRealm = new FreeRealm();
-		freeRealm.setCacheManager(getRedisCacheManager());
-		return freeRealm;
+	public OtherRealm otherRealm() {
+		OtherRealm otherRealm = new OtherRealm();
+		otherRealm.setCacheManager(getRedisCacheManager());
+		return otherRealm;
 	}
+	
+	/**
+	 * 手机验证码 Realm
+	 * @date 2021-09-24
+	 * @return
+	 */
+	@Bean
+	public ValideCodeRealm valideCodeRealm() {
+		ValideCodeRealm valideCodeRealm = new ValideCodeRealm();
+		valideCodeRealm.setCacheManager(getRedisCacheManager());
+		return valideCodeRealm;
+	}
+	//-------------------------------------------------------
 
 	/**
 	 * SessionDAO的作用是为Session提供CRUD并进行持久化的一个shiro组件
@@ -138,24 +187,28 @@ public class ShiroConfig {
 	 * EnterpriseCacheSessionDAO  提供了缓存功能的会话维护，默认情况下使用MapCache实现，内部使用ConcurrentHashMap保存缓存的会话。
 	 * @return
 	 */
-	@Bean
+	@Bean("sessionDAO")
 	public RedisSessionDAO sessionDAO() {
 		RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
 		redisSessionDAO.setSessionIdGenerator(new CustomSessionIdGenerator());
 		return redisSessionDAO;
 	}
 
+	@Bean("sessionFactory")
+	public ShiroSessionFactory sessionFactory(){
+		ShiroSessionFactory sessionFactory = new ShiroSessionFactory();
+		return sessionFactory;
+	}
+
 	/**
 	 * 设置session cookie属性
 	 * @return
 	 */
-	@Bean
-    public Cookie cookieDAO() {
-		Cookie cookie= new org.apache.shiro.web.servlet.SimpleCookie();
-		cookie.setName("fast.session.id");
-		cookie.setDomain(domain);
-		cookie.setPath(path);
-		cookie.setHttpOnly(httpOnly);
+	@Bean("sessionIdCookie")
+    public SimpleCookie sessionIdCookie() {
+		SimpleCookie cookie= new org.apache.shiro.web.servlet.SimpleCookie();
+		cookie.setName(sessionId);
+		cookie.setHttpOnly(true);
 		cookie.setMaxAge(-1);
 		return cookie;
     }
@@ -167,45 +220,66 @@ public class ShiroConfig {
 	}
 
 	/**
-	 *
+	 * session 管理
 	 * @return
 	 */
 	@Bean("sessionManager")
 	public SessionManager sessionManager() {
+		
 		ShiroSessionManager sessionManager = new ShiroSessionManager();
-		Collection<SessionListener> listeners = new ArrayList<SessionListener>();
+		Collection<SessionListener> listeners = new ArrayList<>();
 		// 配置监听
 		listeners.add(sessionListener());
+		
 		sessionManager.setSessionListeners(listeners);
+
+		sessionManager.setSessionIdCookieEnabled(true);
+		
+		sessionManager.setSessionIdCookie(sessionIdCookie());
 		//redis缓存
 		sessionManager.setSessionDAO(sessionDAO());
+
 		sessionManager.setCacheManager(getRedisCacheManager());
+
+		sessionManager.setSessionFactory(sessionFactory());
+		
 		// 设置session过期时间为1小时(单位：毫秒)，默认为30分钟
 		sessionManager.setGlobalSessionTimeout(1000 * 60 * expireTime);
-		// 去掉 JSESSIONID
-		sessionManager.setSessionIdUrlRewritingEnabled(false);
-		sessionManager.setSessionIdCookie(cookieDAO());
 		// 是否开启删除无效的session对象 默认为true
 		sessionManager.setDeleteInvalidSessions(true);
 		// 是否开启定时调度器进行检测过期session 默认为true
 		sessionManager.setSessionValidationSchedulerEnabled(true);
 		// 设置session失效的扫描时间, 清理用户直接关闭浏览器造成的孤立会话 默认为 1个小时
 		sessionManager.setSessionValidationInterval(1000 * 60 * validationTime);
+		// 去掉 JSESSIONID
+		sessionManager.setSessionIdUrlRewritingEnabled(false);
 
 		return sessionManager;
 	}
 
 
 	/**
-	 * 系统自带的Realm管理，主要针对多realm
+	 * 系统自带的Realm管理，主要针对多realm 登录认证
 	 */
 	@Bean
 	public ModularRealmAuthenticator modularRealmAuthenticator(){
-		//自己重写的ModularRealmAuthenticator
+		//使用重写的ModularRealmAuthenticator
 		UserModularRealmAuthenticator modularRealmAuthenticator = new UserModularRealmAuthenticator();
 		modularRealmAuthenticator.setAuthenticationStrategy(new AtLeastOneSuccessfulStrategy());
 		return modularRealmAuthenticator;
 	}
+
+	/**
+	 * 系统自带的Realm管理，主要针对多realm 权限认证
+	 */
+	@Bean
+	public ModularRealmAuthorizer modularRealmAuthorizer() {
+		//自己重写的ModularRealmAuthorizer
+		UserModularRealmAuthorizer modularRealmAuthenticator = new UserModularRealmAuthorizer();
+		return modularRealmAuthenticator;
+	}
+
+
 
 	/**
 	 * 安全管理器
@@ -218,13 +292,19 @@ public class ShiroConfig {
 
 		securityManager.setAuthenticator(modularRealmAuthenticator());
 
-		List<Realm> realms = new ArrayList<>(2);
-		//密码登录realm
-		realms.add(userRealm());
-		//免密登录realm
-		realms.add(freeRealm());
+		securityManager.setAuthorizer(modularRealmAuthorizer());
+
+		List<Realm> realms = new ArrayList<>(3);
+		
+		//账号密码登录realm
+		realms.add(userNameRealm());
+		//第三方授权登录realm
+		realms.add(otherRealm());
+		//手机验证码登录realm
+		realms.add(valideCodeRealm());
 		// 设置realm.
 		securityManager.setRealms(realms);
+
 		
 		// 记住我
 		if(rememberMe){
@@ -233,8 +313,10 @@ public class ShiroConfig {
 			securityManager.setRememberMeManager(null);
 		}
 
+		// 设置缓存管理
         securityManager.setCacheManager(getRedisCacheManager());
 
+        // 设置session管理
         securityManager.setSessionManager(sessionManager());
 
 		return securityManager;
@@ -260,6 +342,8 @@ public class ShiroConfig {
     public CookieRememberMeManager rememberMeManager(){
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
+        
+        // 判断yml文件是否配置密钥没有则随机生成 确保系统安全、禁止使用默认密钥Key
 		if(ToolUtil.isEmpty(cipherKey)){
 			cookieRememberMeManager.setCipherKey(ToolUtil.generateNewKey());
 		}else{
@@ -267,8 +351,6 @@ public class ShiroConfig {
 		}
         return cookieRememberMeManager;
     }
-
-
 
 	/** 
 	 * Shiro连接约束配置,即过滤链的定义
@@ -280,13 +362,49 @@ public class ShiroConfig {
 		shiroFilter.setLoginUrl("/login");
 		//这里的/index是后台的接口名,非页面,登录成功后要跳转的链接
 		shiroFilter.setSuccessUrl("/index");
-		//自定义拦截器限制并发人数,参考博客：
+
 		LinkedHashMap<String, Filter> filtersMap = new LinkedHashMap<>();
-		//限制同一帐号同时在线的个数
-		filtersMap.put("kickout", kickoutSessionControlFilter());
+
+		// ------------------- 系统必须默认
+        filterMap.put("/logout", "anon");
+        filterMap.put("/static/**", "anon");
+		filterMap.put("/swagger/**'", "anon");
+		filterMap.put("/swagger-ui/**", "anon");
+		filterMap.put("/swagger-resources/**", "anon");
+		filterMap.put("/webjars/**", "anon");
+		filterMap.put("/api/trade.receive/**", "anon");
+		filterMap.put("/profile/fileUeditor/upload/image/**", "anon");
+		filterMap.put("/sys/comm/download/**", "anon");
+		filterMap.put("/authInsu", "anon");
+		filterMap.put("/authInsu/uploadLic", "anon");
+		filterMap.put("/ureport/res/**", "anon");
+		filterMap.put("/ureport/shareview/**", "anon");
+		filterMap.put("/v3/api-docs", "anon");
+        filterMap.put("/favicon.ico", "anon");
+		filterMap.put("/captcha.gif", "anon");
+		filterMap.put("/getLoginValideCode", "anon");
+		filterMap.put("/valideCodeLogin", "anon");
+		if(enabled) {
+			filterMap.put("/tenant/list", "anon");
+		}
+		filterMap.put("/captcha/**", "anon");
+		//自定义拦截器限制并发人数
+		filtersMap.put("inner", innerSessionFilter());
+		filtersMap.put("logout", new RestLogoutFilter());
+		if(distributed){
+			//--------------------------------------
+			//自定义过滤器   解决前后台分离的问题
+			filterMap.put("/**", "authc");
+			filtersMap.put("authc", new RestAuthorizationFilter());
+		}else{
+			filterMap.put("/**", "user,inner");
+		}
+		
 		shiroFilter.setFilters(filtersMap);
+		
 		// 权限认证失败，则跳转到指定页面
 		shiroFilter.setUnauthorizedUrl("/");
+
 		//授权认证配置
 		if (null !=filterMap && filterMap.size() != 0) {			
 			  shiroFilter.setFilterChainDefinitionMap(filterMap);
@@ -299,17 +417,16 @@ public class ShiroConfig {
 	 * @return
 	 */
 	@Bean
-	public KickoutSessionControlFilter kickoutSessionControlFilter(){
-		KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
+	public InnerSessionFilter innerSessionFilter(){
+		InnerSessionFilter innerSessionFilter = new InnerSessionFilter();
 		//用于根据会话ID，获取会话进行踢出操作的；
-		kickoutSessionControlFilter.setSessionManager(sessionManager());
-
+		innerSessionFilter.setSessionManager(sessionManager());
 		//是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；
-		kickoutSessionControlFilter.setKickoutAfter(false);
-
+		innerSessionFilter.setKickoutAfter(kickoutAfter);
 		//被踢出后重定向到的地址；
-		kickoutSessionControlFilter.setKickoutUrl("/login?kickout=");
-		return kickoutSessionControlFilter;
+		innerSessionFilter.setKickoutUrl("/login?kickout=");
+
+		return innerSessionFilter;
 	}
 
 	@Bean("lifecycleBeanPostProcessor")

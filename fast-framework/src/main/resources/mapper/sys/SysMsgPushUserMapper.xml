@@ -28,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         <include refid="sysMsgPushUserColumns"/>
 		FROM  sys_msg_push_user a
-		WHERE a.id = '${id}'
+		WHERE a.id = #{id}
     </select>
 
     <!--  根据获取实体List   -->

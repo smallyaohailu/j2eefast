@@ -28,7 +28,7 @@ import com.j2eefast.framework.utils.FileUploadUtils;
 /**
  * 单范例Service接口
  * @author: ZhouZhou
- * @date 2021-08-16 20:41:56
+ * @date 2021-10-21 09:46:49
  */
 @Service
 public class ExampleTestService extends ServiceImpl<ExampleTestMapper,ExampleTestEntity> {
@@ -52,12 +52,14 @@ public class ExampleTestService extends ServiceImpl<ExampleTestMapper,ExampleTes
         queryWrapper.eq(ToolUtil.isNotEmpty(email), "email", email);
 		String phone = (String) params.get("phone");
         queryWrapper.eq(ToolUtil.isNotEmpty(phone), "phone", phone);
-		String sex = (String) params.get("sex");
-        queryWrapper.eq(ToolUtil.isNotEmpty(sex), "sex", sex);
 		String age = (String) params.get("age");
         queryWrapper.eq(ToolUtil.isNotEmpty(age), "age", age);
-		String compId = (String) params.get("compId");
-        queryWrapper.eq(ToolUtil.isNotEmpty(compId), "comp_id", compId);
+		String joinDate = (String) params.get("joinDate");
+        queryWrapper.eq(ToolUtil.isNotEmpty(joinDate), "join_date", joinDate);
+		String leaveDate = (String) params.get("leaveDate");
+        queryWrapper.eq(ToolUtil.isNotEmpty(leaveDate), "leave_date", leaveDate);
+		String deptId = (String) params.get("deptId");
+        queryWrapper.eq(ToolUtil.isNotEmpty(deptId), "dept_id", deptId);
 		Page<ExampleTestEntity> page = exampleTestMapper.selectPage(new Query<ExampleTestEntity>(params).getPage(), queryWrapper);
 		return new PageUtil(page);
     }

@@ -45,63 +45,120 @@ public class AsyncFactory {
 			public void run(){
 				// 远程查询操作地点
 				operLog.setOperLocation(AddressUtil.getRealAddressByIP(operLog.getOperIp()));
-				SpringUtil.getBean(SysOperLogSerice.class).save(operLog);
+				SpringUtil.getBean(SysOperLogSerice.class).insertLog(operLog);
 			}
 		};
 	}
 
-	 /**
-	     * 记录登陆信息
-	     * 
-	     * @param username 用户名
-	     * @param status 状态
-	     * @param message 消息
-	     * @param args 列表
-	     * @return 任务task
-	     */
-	    public static TimerTask recordLogininfor(final String username,
-												 final Long compId,
-												 final Long deptId,
-												 final String status,
-												 final String message,
-												 final Date loginDate,
-												 final String loginType){
-	    	final String bUseraget = ServletUtil.getRequest().getHeader("User-Agent");
-			final UserAgent userAgent =   UserAgentUtil.parse(bUseraget);
-			final String ip = ServletUtil.getIp();
-	        return new TimerTask(){
-	            @Override
-	            public void run(){
-	                // 获取客户端操作系统
-	                String os = userAgent.getOs().toString();
-	                // 获取客户端浏览器
-	                String browser = userAgent.getBrowser().toString();
-	                // 封装对象
-	                SysLoginInfoEntity logininfor = new SysLoginInfoEntity();
-	                logininfor.setUsername(username);
-	                logininfor.setIpaddr(ip);
-	                logininfor.setLoginLocation(AddressUtil.getRealAddressByIP(ip));
-	                logininfor.setBrowser(browser);
-	                logininfor.setUserAgent(HtmlUtil.filter(StrUtil.sub(bUseraget, 0, 500)));
-	                logininfor.setOs(os);
-					logininfor.setCompId(compId);
-					logininfor.setDeptId(deptId);
-	                logininfor.setMsg(message);
-					logininfor.setLoginType(loginType);
-	                if(userAgent.isMobile()) {
-	                	logininfor.setMobile("0");
-	                }else {
-	                	logininfor.setMobile("1");
-	                }
-	                // 日志状态
-	                logininfor.setStatus(status);
-	                logininfor.setLoginTime(loginDate);
-	                // 插入数据
-	                SpringUtil.getBean(SysLoginInfoSerice.class).save(logininfor);
-	                LOG.info("记录登陆信息!");
-	            }
-	        };
-	    }
+	/**
+     * 记录登陆信息
+     * 
+     * @param username 用户名
+     * @param status 状态
+     * @param message 消息
+     * @param args 列表
+     * @return 任务task
+     */
+    public static TimerTask recordLogininfor(final String username,
+											 final Long compId,
+											 final Long deptId,
+											 final String status,
+											 final String message,
+											 final Date loginDate,
+											 final String loginType){
+    	final String bUseraget = ServletUtil.getRequest().getHeader("User-Agent");
+		final String tenantId = ServletUtil.getParameter("tenantId","000000");
+		final UserAgent userAgent =   UserAgentUtil.parse(bUseraget);
+		final String ip = ServletUtil.getIp();
+        return new TimerTask(){
+            @Override
+            public void run(){
+                // 获取客户端操作系统
+                String os = userAgent.getOs().toString();
+                // 获取客户端浏览器
+                String browser = userAgent.getBrowser().toString();
+                // 封装对象
+                SysLoginInfoEntity logininfor = new SysLoginInfoEntity();
+                logininfor.setUsername(username);
+                logininfor.setIpaddr(ip);
+                logininfor.setLoginLocation(AddressUtil.getRealAddressByIP(ip));
+                logininfor.setBrowser(browser);
+                logininfor.setUserAgent(HtmlUtil.filter(StrUtil.sub(bUseraget, 0, 500)));
+                logininfor.setOs(os);
+				logininfor.setCompId(compId);
+				logininfor.setDeptId(deptId);
+                logininfor.setMsg(message);
+				logininfor.setLoginType(loginType);
+				logininfor.setTenantId(tenantId);
+                if(userAgent.isMobile()) {
+                	logininfor.setMobile("0");
+                }else {
+                	logininfor.setMobile("1");
+                }
+                // 日志状态
+                logininfor.setStatus(status);
+                logininfor.setLoginTime(loginDate);
+                // 插入数据
+                SpringUtil.getBean(SysLoginInfoSerice.class).save(logininfor);
+                LOG.info("记录登陆信息!");
+            }
+        };
+    }
+    
+    /**
+     * 退出信息
+     * 
+     * @param username 用户名
+     * @param status 状态
+     * @param message 消息
+     * @param args 列表
+     * @return 任务task
+     */
+    public static TimerTask outLoginInfor(final String username,
+										 final Long compId,
+										 final Long deptId,
+										 final String status,
+										 final String message,
+										 final Date loginDate,
+										 final String loginType,
+										 final String tenantId){
+    	final String bUseraget = ServletUtil.getRequest().getHeader("User-Agent");
+		final UserAgent userAgent =   UserAgentUtil.parse(bUseraget);
+		final String ip = ServletUtil.getIp();
+        return new TimerTask(){
+            @Override
+            public void run(){
+                // 获取客户端操作系统
+                String os = userAgent.getOs().toString();
+                // 获取客户端浏览器
+                String browser = userAgent.getBrowser().toString();
+                // 封装对象
+                SysLoginInfoEntity logininfor = new SysLoginInfoEntity();
+                logininfor.setUsername(username);
+                logininfor.setIpaddr(ip);
+                logininfor.setLoginLocation(AddressUtil.getRealAddressByIP(ip));
+                logininfor.setBrowser(browser);
+                logininfor.setUserAgent(HtmlUtil.filter(StrUtil.sub(bUseraget, 0, 500)));
+                logininfor.setOs(os);
+				logininfor.setCompId(compId);
+				logininfor.setDeptId(deptId);
+                logininfor.setMsg(message);
+				logininfor.setLoginType(loginType);
+				logininfor.setTenantId(tenantId);
+                if(userAgent.isMobile()) {
+                	logininfor.setMobile("0");
+                }else {
+                	logininfor.setMobile("1");
+                }
+                // 日志状态
+                logininfor.setStatus(status);
+                logininfor.setLoginTime(loginDate);
+                // 插入数据
+                SpringUtil.getBean(SysLoginInfoSerice.class).save(logininfor);
+                LOG.info("记录退出信息!");
+            }
+        };
+    }
 
 	/**
 	 * 记录登陆信息
@@ -119,6 +176,7 @@ public class AsyncFactory {
 											 final String message){
 		final String bUseraget = ServletUtil.getRequest().getHeader("User-Agent");
 		final UserAgent userAgent =   UserAgentUtil.parse(bUseraget);
+		final String tenantId = ServletUtil.getParameter("tenantId","000000");
 		final String ip = ServletUtil.getIp();
 		return new TimerTask(){
 			@Override
@@ -138,6 +196,7 @@ public class AsyncFactory {
 				logininfor.setCompId(compId);
 				logininfor.setDeptId(deptId);
 				logininfor.setMsg(message);
+				logininfor.setTenantId(tenantId);
 				if(userAgent.isMobile()) {
 					logininfor.setMobile("0");
 				}else {
@@ -147,7 +206,7 @@ public class AsyncFactory {
 				logininfor.setStatus(status);
 				logininfor.setLoginTime(DateUtil.date());
 				// 插入数据
-				SpringUtil.getBean(SysLoginInfoSerice.class).save(logininfor);
+				SpringUtil.getBean(SysLoginInfoSerice.class).insertLogininfor(logininfor);
 				LOG.info("记录登陆信息!");
 			}
 		};

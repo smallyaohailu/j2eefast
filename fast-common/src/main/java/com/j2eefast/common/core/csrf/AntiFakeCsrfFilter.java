@@ -4,11 +4,16 @@
  */
 package com.j2eefast.common.core.csrf;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.utils.*;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -134,7 +139,28 @@ public class AntiFakeCsrfFilter {
                 }
                 String csrfToken= request.getHeader("X-CSRF-Token");
                 String ipnutCsrfToken = request.getParameter("X-CSRF-Token");
-                String sysCsrfToken = (String) redisUtil.getSession("sys_csrfToken:shiro:session:"+CookieUtil.getCookie(request,ConfigConstant.FAST_SESSION_ID));
+
+                //**********************通过Redis获取用户信息**********************//
+                Session session = ((Session) redisUtil.getSession(ConfigConstant.SHIRO_SESSION_ID
+                        +CookieUtil.getCookie(request,ConfigConstant.FAST_SESSION_ID)));
+
+                PrincipalCollection principalCollection = (PrincipalCollection)session
+                        .getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+
+                LoginUserEntity loginUserEntity =
+                        (LoginUserEntity) principalCollection.getPrimaryPrincipal();
+
+                //检查是否已经登录
+                if(ToolUtil.isEmpty(loginUserEntity)) {
+                    ResponseData r = ResponseData.error("70001", ConfigConstant.REQUEST_PROMPT);
+                    String json = JSONUtil.toJsonStr(r);
+                    response.setStatus(405);
+                    response.setContentType("application/json;charset=utf-8");
+                    response.getWriter().print(json);
+                    return;
+                }
+
+                String sysCsrfToken = Base64Encoder.encode(loginUserEntity.getCsrfToken());
 
                 if( (ToolUtil.isEmpty(csrfToken) && ToolUtil.isEmpty(ipnutCsrfToken))
                         || ToolUtil.isEmpty(sysCsrfToken)){

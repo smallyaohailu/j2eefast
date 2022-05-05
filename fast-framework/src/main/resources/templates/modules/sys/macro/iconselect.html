@@ -58,7 +58,7 @@
         <li><a href="#tab_1_1" data-toggle="tab">Simple Line Icons</a></li>
         <li class="active"><a href="#tab_1_2" data-toggle="tab">Font Awesome Icons</a></li>
         <li><a href="#tab_1_3" data-toggle="tab">Glyphicons</a></li>
-        <li><a href="#tab_1_4" data-toggle="tab">Ionicons<span data-index="_new" class="label label-danger"><@ctx.i18n text = "新"/></span></a></li>
+        <li><a href="#tab_1_4" data-toggle="tab">Ionicons<span data-index="_new" class="label label-danger">${i18n("新")}</span></a></li>
     </ul>
     <#include "/common/icon.html"/>
 </div>
@@ -70,14 +70,14 @@
         this._p = layero;
         this._layer = _layer;
         if(_p.find("#pickIcon").length === 0){
-            layero.find('.layui-layer-btn').append('<font color="red" class="pull-left mt10">提示：请选择图标！' +
+            layero.find('.layui-layer-btn').append('<font color="red" class="pull-left mt10">${i18n("提示: 请选择图标!")}' +
                 '<span style="padding: 2px 8px;font-size: 14px;color: #337ab7;border-radius: 4px;border: solid 1px;">' +
                 '<i class="fa fa-fw ${iconValue}" id="pickIcon"></i></span></font>');
         };
     };
 
     $(function() {
-        opt.modal.alertInfo('<span style="color: red; font-size: 13px; font-weight: bold">单击你可以在左下角预览图标,双击你可以直接选择需要的图标!</span>');
+        opt.modal.alertInfo('<span style="color: red; font-size: 13px; font-weight: bold">${i18n("单击你可以在左下角预览图标,双击你可以直接选择需要的图标!")}</span>');
     })
 
     $("#tab_1_1").find('.fa-hover').click(function() {

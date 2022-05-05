@@ -6,6 +6,7 @@
 package com.j2eefast.framework.sys.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.base.entity.Ztree;
@@ -14,11 +15,15 @@ import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.RedisUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.redis.SysConfigRedis;
+import com.j2eefast.framework.sys.entity.SysDictDataEntity;
 import com.j2eefast.framework.sys.entity.SysDictTypeEntity;
 import com.j2eefast.framework.sys.mapper.SysDictTypeMapper;
 import com.j2eefast.framework.utils.RedisKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +40,8 @@ public class SysDictTypeSerive extends ServiceImpl<SysDictTypeMapper,SysDictType
     private SysDictDataService sysDictDataService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private SysConfigRedis sysConfigRedis;
 
     /**
      * 页面展示查询翻页
@@ -84,6 +91,7 @@ public class SysDictTypeSerive extends ServiceImpl<SysDictTypeMapper,SysDictType
         return sb.toString();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteBatchByIds(Long[] ids) {
         for (Long dictId : ids){
             SysDictTypeEntity dictType = this.getById(dictId);
@@ -93,6 +101,27 @@ public class SysDictTypeSerive extends ServiceImpl<SysDictTypeMapper,SysDictType
             }
         }
        return  this.removeByIds(Arrays.asList(ids));
+    }
+
+    /**
+     * 修改字典Type信息
+     * @param dict
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateDictType(SysDictTypeEntity dict){
+        SysDictTypeEntity sysDictType = this.getById(dict.getId());
+        if(!sysDictType.getDictType().equals(dict.getDictType())){
+            //修改关联信息
+            sysDictDataService.update(new UpdateWrapper<SysDictDataEntity>()
+                    .eq("dict_type",sysDictType.getDictType())
+                    .set("dict_type",dict.getDictType()));
+            sysConfigRedis.delRedisDict(sysDictType.getDictType());
+        }
+        if(this.updateById(dict)){
+            return true;
+        }
+        return false;
     }
 
 

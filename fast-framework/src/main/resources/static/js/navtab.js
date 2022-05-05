@@ -1,108 +1,107 @@
 /*!
  * Copyright (c) 2020-Now http://www.j2eefast.com All rights reserved.
  * No deletion without permission
- * navtab 定义Tab
  * @author ZhouHuan
  * @data 2020-02-20
  * @version 1.0.10
  */
 layui.define(['element'], function(exports){
-		var  element = layui.element,
-        $ = layui.jquery,
+	var  element = layui.element,
+		$ = layui.jquery,
 		layer = parent.layer === undefined ? layui.layer : parent.layer,
 		module_name = 'navtab',
 		globalTabIdIndex = 0,
 		LarryTab = function(){
-	          this.config ={
-	          	  elem: undefined,
-				  closed: true
-	          };
+			this.config ={
+				elem: undefined,
+				closed: true
+			};
 		};
-    var ELEM = {};
-    /**
-     * [参数设置 options]
-     */
-    LarryTab.prototype.set = function(options){
-          var _this = this;
-          $.extend(true, _this.config, options);
-          return _this;
-    };
-    /**
-     * [init 对象初始化]
-     * @return {[type]} [返回对象初始化结果]
-     */
-    LarryTab.prototype.init  = function(){
-         var _this = this;
-         var _config = _this.config;
-         if(typeof(_config.elem) !== 'string' && typeof(_config.elem) !== 'object') {
-		       layer.alert('Tab选项卡错误提示: elem参数未定义或设置出错，具体设置格式请参考文档API.');
-	     }
-	     var $container;
-	     if(typeof(_config.elem) === 'string') {
-		     $container = $('' + _config.elem + '');
-	     }
-	     if(typeof(_config.elem) === 'object') {
-		     $container = _config.elem;
-	     }
-	     if($container.length === 0) {
-		     layer.alert('Tab选项卡错误提示:找不到elem参数配置的容器，请检查.');
-	     }
-	     var filter = $container.attr('lay-filter');
-	     if(filter === undefined || filter === '') {
-		      layer.alert('Tab选项卡错误提示:请为elem容器设置一个lay-filter过滤器');
-	     }
-	     _config.elem = $container;
-	     ELEM.titleBox = $container.children('ul.layui-tab-title');
-	     ELEM.contentBox = $container.children('div.layui-tab-content');
-	     ELEM.tabFilter = filter;
-	     return _this;
-    };
-    /**
-     * [exists 在layui-tab中检查对应layui-tab-title是否存在，如果存在则返回索引值，不存在返回-1]
-     * @param  {[type]} title [description]
-     * @return {[type]}       [description]
-     */
-    LarryTab.prototype.exists = function(id,url,module){
-        var _this = ELEM.titleBox === undefined ? this.init() : this,
-		    tabIndex = -1;
+	var ELEM = {};
+	/**
+	 * [参数设置 options]
+	 */
+	LarryTab.prototype.set = function(options){
+		var _this = this;
+		$.extend(true, _this.config, options);
+		return _this;
+	};
+	/**
+	 * [init 对象初始化]
+	 * @return {[type]} [返回对象初始化结果]
+	 */
+	LarryTab.prototype.init  = function(){
+		var _this = this;
+		var _config = _this.config;
+		if(typeof(_config.elem) !== 'string' && typeof(_config.elem) !== 'object') {
+			layer.alert('Tab选项卡错误提示: elem参数未定义或设置出错，具体设置格式请参考文档API.');
+		}
+		var $container;
+		if(typeof(_config.elem) === 'string') {
+			$container = $('' + _config.elem + '');
+		}
+		if(typeof(_config.elem) === 'object') {
+			$container = _config.elem;
+		}
+		if($container.length === 0) {
+			layer.alert('Tab选项卡错误提示:找不到elem参数配置的容器，请检查.');
+		}
+		var filter = $container.attr('lay-filter');
+		if(filter === undefined || filter === '') {
+			layer.alert('Tab选项卡错误提示:请为elem容器设置一个lay-filter过滤器');
+		}
+		_config.elem = $container;
+		ELEM.titleBox = $container.children('ul.layui-tab-title');
+		ELEM.contentBox = $container.children('div.layui-tab-content');
+		ELEM.tabFilter = filter;
+		return _this;
+	};
+	/**
+	 * [exists 在layui-tab中检查对应layui-tab-title是否存在，如果存在则返回索引值，不存在返回-1]
+	 * @param  {[type]} title [description]
+	 * @return {[type]}       [description]
+	 */
+	LarryTab.prototype.exists = function(id,url,module){
+		var _this = ELEM.titleBox === undefined ? this.init() : this,
+			tabIndex = -1;
 		ELEM.titleBox.find('li').each(function(i, e) {
-		    var $em = $(this).children('em');
-		    if(($(this).attr("lay-id") == id || $em.attr("data-url") == url) && module == $em.attr("data-module")) {
-			      tabIndex = $(this).attr("lay-id");
-		    };
-	    });
-	    return tabIndex;
-    };
+			var $em = $(this).children('em');
+			if(($(this).attr("lay-id") == id || $em.attr("data-url") == url) && module == $em.attr("data-module")) {
+				tabIndex = $(this).attr("lay-id");
+			};
+		});
+		return tabIndex;
+	};
 
 
 	/**
-     * [tabAdd 增加选项卡，如果已存在则增加this样式]
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    LarryTab.prototype.tabAdd = function(data){
-    	if(opt.common.isEmpty(data)) return;
-        var _this = this;
-	    var tabIndex = _this.exists(data.id,data.href,data.module);
-	    // 若不存在
-	    if(tabIndex === -1){
+	 * [tabAdd 增加选项卡，如果已存在则增加this样式]
+	 * @param  {[type]} data [description]
+	 * @return {[type]}      [description]
+	 */
+	LarryTab.prototype.tabAdd = function(data){
+		if(opt.common.isEmpty(data)) return;
+		var _this = this;
+		var tabIndex = _this.exists(data.id,data.href,data.module);
+		// 若不存在
+		if(tabIndex === -1){
 			opt.block('','#content-main');
-	    	var content = '<iframe width="100%" height="100%" src="' + data.href + '" data-id="' + data.id +'"';
+			var content = '<iframe width="100%" height="100%" src="' + data.href + '" data-id="' + data.id +'"';
 			if(typeof(data.module) !== "undefined"){
 				content += ' data-module="'+data.module+'"';
 			}
 			content += ' class="larry-iframe"></iframe>';
-		    var title = '';
-		    // 若icon有定义
-		    if(typeof(data.icon) !== "undefined"){
-                // if(data.icon.indexOf('fa') != -1) {
+			var title = '';
+			// 若icon有定义
+			if(typeof(data.icon) !== "undefined" && data.icon != ''){
+				// if(data.icon.indexOf('fa') != -1) {
 				title += '<i class="' + data.icon + '"></i>';
-			    // } else {
-			    // 	title += '<i class="layui-icon ">' + data.icon + '</i>';
-			    // }
-		    }
+				// } else {
+				// 	title += '<i class="layui-icon ">' + data.icon + '</i>';
+				// }
+			}
 
-		    if(typeof(data.panel) !== "undefined"){
+			if(typeof(data.panel) !== "undefined"){
 				//title += '<em data-url="'+data.href+'" panel-id="'+data.panel+'">&nbsp;' + (data.title.length > 12?(data.title.substr(0, 12) + "..."):data.title) + '</em>';
 				title += '<em data-url="'+data.href+'" panel-id="'+data.panel+'"';
 			}else{
@@ -117,38 +116,39 @@ layui.define(['element'], function(exports){
 			// title += 'title="'+data.title+'">&nbsp;' + (opt.common.getByteLen(data.title) > 12?(data.title.sub(0, 12) + "..."):data.title) + '</em>';
 			title += 'title="'+data.title+'">&nbsp;' + (opt.common.subString(data.title,12,true)) + '</em>';
 
-		    //_this.config.closed &&
-		    if(data.id !== '0') {
-			    //title += '<i class="layui-icon layui-unselect layui-tab-close" data-id="' + data.id + '">&#x1006;</i>';
+			//_this.config.closed &&
+			if(data.id !== '0') {
+				//title += '<i class="layui-icon layui-unselect layui-tab-close" data-id="' + data.id + '">&#x1006;</i>';
 				title += '<i class="fa fa-times-circle-o layui-tab-close" data-id="' + data.id + '"></i>';
-		    }
+			}
 
 
-		    //添加tab
-		    element.tabAdd(ELEM.tabFilter, {
-			    title: title,
-			    content: content,
-			    id: data.id
-		    });
+			//添加tab
+			element.tabAdd(ELEM.tabFilter, {
+				title: title,
+				content: content,
+				id: data.id
+			});
 
 			opt.variable._tabIndex = data.id;
 
-		    // //iframe 自适应
-		    // ELEM.contentBox.find('iframe[data-id=' + globalTabIdIndex + ']').each(function() {
-		    // 	$(this).height(ELEM.contentBox.height());
-		    // });
+			// //iframe 自适应
+			// ELEM.contentBox.find('iframe[data-id=' + globalTabIdIndex + ']').each(function() {
+			// 	$(this).height(ELEM.contentBox.height());
+			// });
 			//
 			//
-		    //适应屏幕高度
-		    //var $content = $('#larry-tab .layui-tab-content');
-	        // var length = $(window).height() - 195;
-	        // $content.height(length);
-	        //$content.find('iframe').each(function () {
+			//适应屏幕高度
+			//var $content = $('#larry-tab .layui-tab-content');
+			// var length = $(window).height() - 195;
+			// $content.height(length);
+			//$content.find('iframe').each(function () {
 			$("#content-main .layui-tab-item").css('height', $(window).height()-$('.main-footer').outerHeight()- $('.main-header').outerHeight() - 40);
-	        //});
+			//});
 
-	        //添加TBA关闭事件
+			//添加TBA关闭事件
 			ELEM.titleBox.find('li').children('i.layui-tab-close[data-id="' + data.id + '"]').on('click', function() {
+
 				var menus =  opt.storage.get("menu");
 				if(menus){
 					menus = JSON.parse(menus);
@@ -165,24 +165,46 @@ layui.define(['element'], function(exports){
 				// 	}
 				// }
 
+				var __id = $(this).attr("data-id");
+
 				//删除的窗口是否有父窗口有父窗口跳转父窗口
 				var $f = false, $index;
-				if(ELEM.titleBox.find('li[lay-id="'+$(this).attr("data-id")+'"]').children('em').attr("panel-id") != "undefined"){
+				var panelId = ELEM.titleBox.find('li[lay-id="'+__id+'"]').children('em').attr("panel-id");
+
+				if(typeof panelId != "undefined" && panelId){
 					$f = true;
-					$index = ELEM.titleBox.find('li[lay-id="'+$(this).attr("data-id")+'"]').children('em').attr("panel-id");
+					$index = panelId;
 				}
 
-				var $t = ELEM.titleBox.find('li[lay-id="'+$(this).attr("data-id")+'"]').prev();
+				//删除获取下一个TAB
+				var $t = ELEM.titleBox.find('li[lay-id="'+__id+'"]').next();
+				//判断是否有下一个右边TAB 排除lay
+				if($t.length == 0 ||
+					$t.attr('lay-stope') == 'tabmore'){
+					$t = ELEM.titleBox.find('li[lay-id="'+__id+'"]').prev();
+				}
+				//element.tabDelete(ELEM.tabFilter, $(this).attr("data-id")).init();
 
-				element.tabDelete(ELEM.tabFilter, $(this).attr("data-id")).init();
+				//删除TAB删除内容
+				$('#content-main').find('.layui-tab-item').each(function () {
+					var __that = $(this);
+					if(__that.children('iframe[data-id="'+__id+'"]').data('id') == __id){
+						__that.remove();
+						ELEM.titleBox.find('li[lay-id="'+__id+'"]').remove();
+					}
+				})
 
 				//解决TBA关闭 失去焦点导致页面空白问题================
 				var flag = true, $j = true;
 
 				ELEM.titleBox.find('li').each(function(){
+
+					//检查是否删除焦点TAB
 					if($(this).hasClass('layui-this')){
 						flag = false;
 					}
+
+					// 检查是否有父TAB
 					if($f){
 						if($(this).attr("lay-id") == $index){
 							$j = false;
@@ -191,7 +213,8 @@ layui.define(['element'], function(exports){
 				});
 
 				if(!$j){ //关闭的是有父窗口 优先跳转
-					element.tabChange(ELEM.tabFilter, $index);
+					//element.tabChange(ELEM.tabFilter, $index);
+					ELEM.titleBox.find('li[lay-id="'+$index+'"]').trigger("click");
 					try{
 						var $win = $('iframe[data-id="' + $index + '"]')[0].contentWindow;
 						if($win.opt.table.options.type == opt.variable.table_type.bootstrapTable){
@@ -203,7 +226,13 @@ layui.define(['element'], function(exports){
 					}
 				}else{
 					if(flag){
-						element.tabChange(ELEM.tabFilter, $t.attr("lay-id"));
+						// element.tabChange(ELEM.tabFilter, $t.attr("lay-id"));
+						//TODO 修复主页可能空白问题
+						if($t.length == 0){
+							ELEM.titleBox.find('li[lay-id="0"]').trigger("click");
+						}else{
+							ELEM.titleBox.find('li[lay-id="'+$t.attr("lay-id")+'"]').trigger("click");
+						}
 					}
 				}
 				////////////////////////=========================================
@@ -216,37 +245,65 @@ layui.define(['element'], function(exports){
 				$(this).children('i.layui-tab-close[data-id="' + $(this).attr("lay-id") + '"]').trigger("click");
 			});
 
-			// ELEM.titleBox.find('li[lay-id=' + data.id + ']').on('click', function() {
-			// 	var _id = $(this).attr('lay-id');
-			// 	$('.sidebar-menu').children('.treeview').each(function (i) {
-			// 		$(this).removeClass("menu-open");
-			// 		if($(this).find('ul').length > 0){
-			// 			$(this).find('ul').css("display","none");
-			// 			$(this).find('ul').children('li').each(function () {
-			// 				var $a = $(this).children('a');
-			// 				if($a.data('id') == _id){
-			// 					$(this).parent('.treeview-menu').parent(".treeview").addClass("menu-open");
-			// 					$(this).parent('.treeview-menu').css("display","block");
-			// 					$(this).addClass("active");
-			// 				}else{
-			// 					$(this).removeClass("active");
-			// 				}
-			// 			});
-			// 		}
-			// 	});
-			// });
+			//点击事件
+			ELEM.titleBox.find('li[lay-id="' + data.id + '"]').off('click').on('click', function(e) {
 
-		    //console.log("iframe 自适应"); //_this.config.closed
-		    /*
-		    if(_this.config.closed) {
-			//监听关闭事件
-		    	console.log("监听关闭事件");
-			    ELEM.titleBox.find('li').children('i.layui-tab-close[data-id=' + globalTabIdIndex + ']').on('click', function() {
-			    	console.log("关闭事件发生:"+$(this).parent('li').index());
-			    	element.tabDelete(ELEM.tabFilter, $(this).parent('li').index()).init();
-			    });
-		    };
-		    */
+				var _id = $(this).attr('lay-id');
+
+				ELEM.titleBox.find('li').each(function () {
+					if($(this).attr('lay-id') == _id){
+						$(this).addClass('layui-this');
+					}else {
+						$(this).removeClass('layui-this');
+					}
+				})
+
+				$('#content-main').find('.layui-tab-item').each(function () {
+					var __that = $(this);
+					if(__that.children('iframe[data-id="'+_id+'"]').data('id') == _id){
+						__that.addClass("layui-show");
+					}else{
+						__that.removeClass("layui-show");
+					}
+				})
+
+				//console.log($(_this));
+				//console.log(__this);
+				// $('#larry-tab').trigger('tab(main-tab)', [this, _id]);
+				//监听
+				layui.event.call(this, 'element', 'tab(main-tab)');
+				//阻止事件往下传播
+				e.stopPropagation();
+				//var iframe = $('#content-main').find('.layui-tab-item > iframe[data-id="'+_id+'"]')
+				// $('.sidebar-menu').children('.treeview').each(function (i) {
+				// 	$(this).removeClass("menu-open");
+				// 	if($(this).find('ul').length > 0){
+				// 		$(this).find('ul').css("display","none");
+				// 		$(this).find('ul').children('li').each(function () {
+				// 			var $a = $(this).children('a');
+				// 			if($a.data('id') == _id){
+				// 				$(this).parent('.treeview-menu').parent(".treeview").addClass("menu-open");
+				// 				$(this).parent('.treeview-menu').css("display","block");
+				// 				$(this).addClass("active");
+				// 			}else{
+				// 				$(this).removeClass("active");
+				// 			}
+				// 		});
+				// 	}
+				// });
+			});
+
+			//console.log("iframe 自适应"); //_this.config.closed
+			/*
+            if(_this.config.closed) {
+            //监听关闭事件
+                console.log("监听关闭事件");
+                ELEM.titleBox.find('li').children('i.layui-tab-close[data-id=' + globalTabIdIndex + ']').on('click', function() {
+                    console.log("关闭事件发生:"+$(this).parent('li').index());
+                    element.tabDelete(ELEM.tabFilter, $(this).parent('li').index()).init();
+                });
+            };
+            */
 			/***/
 			// if($(".layui-tab-title li[lay-id='"+data.id+"']").unbind("mousedown").bind("mousedown", function (event) {
 			// 	if (event.which == 1) {
@@ -287,13 +344,30 @@ layui.define(['element'], function(exports){
 					opt.storage.set("menu",JSON.stringify(_m));
 				}
 			}
-
 		}else {
-			element.tabChange(ELEM.tabFilter, tabIndex);
+			//element.tabChange(ELEM.tabFilter, tabIndex);
+			ELEM.titleBox.find('li[lay-id="'+tabIndex+'"]').trigger("click");
 		}
-    };
-    var navtab = new LarryTab();
-    exports(module_name, function(options) {
+	};
+
+
+	LarryTab.prototype.tabChange = function(tabIndex){
+		ELEM.titleBox.find('li[lay-id="'+tabIndex+'"]').trigger("click");
+	}
+
+	LarryTab.prototype.tabDelete = function(tabIndex){
+		//删除TAB删除内容
+		$('#content-main').find('.layui-tab-item').each(function () {
+			var __that = $(this);
+			if(__that.children('iframe[data-id="'+tabIndex+'"]').data('id') == tabIndex){
+				__that.remove();
+				ELEM.titleBox.find('li[lay-id="'+tabIndex+'"]').remove();
+			}
+		})
+	}
+
+	var navtab = new LarryTab();
+	exports(module_name, function(options) {
 		return navtab.set(options);
 	});
 });

@@ -52,7 +52,8 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 	/**
 	 * 页面展示查询翻页
 	 */
-	@DataFilter(deptAlias = "c")
+//	@DataFilter(deptAlias = "c")
+	@DataFilter(deptAlias = "u.dept_id",compAlias = "u.comp_id")
 	public PageUtil findPage(Map<String, Object> params) {
 		String roleName = (String) params.get("roleName");
 		String roleKey = (String) params.get("roleKey");
@@ -63,7 +64,8 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 		return new PageUtil(page);
 	}
 
-	@DataFilter(deptAlias = "c")
+//	@DataFilter(deptAlias = "c")
+	@DataFilter(deptAlias = "u.dept_id",compAlias = "u.comp_id")
 	public List<SysRoleEntity> getRoleList(Map<String, Object> params){
 		String roleName = (String) params.get("roleName");
 		String roleKey = (String) params.get("roleKey");
@@ -85,6 +87,7 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public boolean add(SysRoleEntity role){
+
 		if(this.save(role)){
 
 			// 保存角色与菜单关系

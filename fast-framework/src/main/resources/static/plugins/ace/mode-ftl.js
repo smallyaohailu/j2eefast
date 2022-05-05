@@ -1179,6 +1179,10 @@ oop.inherits(Mode, TextMode);
 
 (function() {
 
+    this.lineCommentStart = "//";
+    this.blockComment = {start: "<#--", end: "-->"};
+    this.$quotes = {'"': '"', "'": "'", "`": "`"};
+
     this.$id = "ace/mode/ftl";
     this.snippetFileId = "ace/snippets/ftl";
 }).call(Mode.prototype);

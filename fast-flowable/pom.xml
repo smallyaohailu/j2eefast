@@ -6,13 +6,29 @@
     <parent>
         <groupId>com.j2eefast</groupId>
         <artifactId>fast</artifactId>
-        <version>2.5.0</version>
+        <version>2.6.0</version>
     </parent>
 
     <artifactId>fast-flowable</artifactId>
     <name>fast 工作流</name>
     <url>http://www.j2eefast.com</url>
 
+    <developers>  
+		<developer>
+			<id>J2eeFAST</id>
+			<name>ZHOUZHOU</name>
+			<email>loveingowp at 163.com</email>
+			<url>http://www.j2eefast.com</url>
+		</developer>
+	</developers>
+	
+	<licenses>
+	    <license>
+	      <name>Apache-2.0</name>
+	      <url>https://gitee.com/zhouhuanOGP/J2EEFAST/blob/master/LICENSE</url>
+	    </license>
+	</licenses>
+	
     <properties>
         <flowable.version>6.6.0</flowable.version>
         <liquibase.version>3.6.2</liquibase.version>
@@ -87,6 +103,12 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable5-spring-compatibility</artifactId>
             <version>${flowable.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.flowable/flowable-ui-idm-rest -->
@@ -138,12 +160,11 @@
 
     <build>
         <plugins>
-            <!-- 打jar包的插件 -->
+            <!-- 打jar包的插件  不打包资源文件（配置文件和依赖包分开）
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <!-- 不打包资源文件（配置文件和依赖包分开）-->
                     <excludes>
                         <exclude>templates/**</exclude>
                         <exclude>mapper/**</exclude>
@@ -153,6 +174,14 @@
                     </excludes>
                 </configuration>
             </plugin>
+            -->
+
+            <!-- 资源打包不分离-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+
         </plugins>
     </build>
 
