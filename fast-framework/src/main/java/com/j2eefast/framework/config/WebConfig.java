@@ -8,6 +8,7 @@ package com.j2eefast.framework.config;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.j2eefast.common.core.adapter.SecurityKeyInterceptorAdapter;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.request.RequestContextListener;
@@ -45,6 +47,10 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Value("#{ @environment['fast.messages.defaultLocale'] ?: 'zh_CN' }")
 	private String defaultLocale;
+	@Value("#{ @environment['web.staticPrefix'] ?: 'classpath:/static/' }")
+	private String staticPrefix;
+	@Value("#{ @environment['web.cacheTime'] ?: 25 }")
+    private int cacheTime;
 
 	@Value("#{${web.adapter.registry} ?: null}")
 	private LinkedHashMap<String, String> adapterRegistry ;
@@ -66,7 +72,9 @@ public class WebConfig implements WebMvcConfigurer {
 
 		//TODO 2.5.1 版本去除
 	    //registry.addResourceHandler("/i18n/**").addResourceLocations("classpath:/i18n/");
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/static/**").addResourceLocations(staticPrefix)
+				.setCacheControl(CacheControl.maxAge(cacheTime, TimeUnit.DAYS).cachePublic());
+
         /**工作流资源拦截 若不用可以屏蔽*/
 		registry.addResourceHandler("/flowable/**").addResourceLocations("classpath:/flowable/");
         /** 本地文件上传路径 */
