@@ -33,6 +33,10 @@ public class JvmEntity
      */
     private String home;
 
+    private String startTime;
+
+    private String runTime;
+
     public double getTotal()
     {
         return NumberUtil.div(total, (1024 * 1024), 2);
@@ -101,21 +105,20 @@ public class JvmEntity
         this.home = home;
     }
 
-    /**
-     * JDK启动时间
-     */
-    public String getStartTime()
-    {
-    	long time = ManagementFactory.getRuntimeMXBean().getStartTime();
-    	return DateUtil.formatDateTime(new Date(time));
+
+    public String getStartTime() {
+        return startTime;
     }
 
-    /**
-     * JDK运行时间
-     */
-    public String getRunTime()
-    {
-    	long time = ManagementFactory.getRuntimeMXBean().getStartTime();
-        return DateUtil.formatBetween(new Date(time),DateUtil.date(),Level.MILLISECOND);
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(String runTime) {
+        this.runTime = runTime;
     }
 }

@@ -42,6 +42,7 @@ public class SysEntity
      */
     private String osArch;
 
+
     public String getComputerName()
     {
         return computerName;
