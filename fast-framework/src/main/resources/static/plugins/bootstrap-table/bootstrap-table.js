@@ -2485,56 +2485,57 @@
         this.resetView();
 
         //TODO 监听窗体变化重置表格大小
-        if($(document.body).width() != 0 && $(document.body).height() != 0){
-            this.__win_width = $(document.body).width();
+        if($(document.body).width() != 0 &&
+            $(document.body).height() != 0){
             this.__win_height = $(document.body).height();
         }
 
-        this.__view_flge = '0';
-
         //TODO 监听窗体变化重置表格大小
         this.$tableBodyResizeWidth = this.$el.width();
+        this.$__index = 0;
 
         this.$el.off('resize').on('resize',function(){
-
-            if($(this).width() == 0 ||
-                that.$tableBodyResizeWidth == $(this).width() ||
-                this.__view_flge == '2' ){
+            // console.log("$el>>>>>");
+            // console.log(that.options.id+"-->"+"$(this).width():"+$(this).width());
+            // console.log("$el<<<<<<");
+            var w = $(this).width();
+            if(w == 0 || w < 0 ||
+                that.$tableBodyResizeWidth == w){
                 return;
             }
 
-            that.$tableBodyResizeWidth = $(this).width();
+            that.$tableBodyResizeWidth = w;
 
-            this.__view_flge = '1';
-
+            window.clearTimeout(that.$__index);
             //重置视图
-            setTimeout(function(){
+            that.$__index =  setTimeout(function(){
                 that.resetView();
-                this.__view_flge = '0';
             }, 100);
 
         });
-
 
         $(document.body).off('resize').on('resize',function(){
 
             var w = $(document.body).width();
             var h = $(document.body).height();
 
+            // console.log("document.body>>>>>");
+            // console.log(that.options.id+"-->"+"that.__win_height:"+that.__win_height);
+            // console.log(that.options.id+"-->"+"w:"+w);
+            // console.log(that.options.id+"-->"+"h:"+h);
+            // console.log("document.body<<<<<<");
+
             //窗口因为动画没变化不中断重置大小
-            if((w ==0 && h ==0) || (that.__win_width == w
-                && that.__win_height == h) || this.__view_flge == '1'){
+            if((w ==0 && h ==0) || (that.__win_height == h)){
                 return;
             }
 
-            this.__view_flge == '2'
+            that.__win_height = h;
 
-            that.__win_width = $(document.body).width();
-            that.__win_height = $(document.body).height();
+            window.clearTimeout(that.$__index);
             //重置视图
-            setTimeout(function(){
+            that.$__index =  setTimeout(function(){
                 that.resetView();
-                this.__view_flge = '0';
             }, 100);
 
         });

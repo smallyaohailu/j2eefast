@@ -67,7 +67,7 @@
 			sortName: "operTime",
 			sortOrder: "desc",
 			uniqueId: "id", /* 唯一ID */
-			height: $(window).height() - 125,
+			height: function(){ return $(window).height() - 114},
 			modalName: "${i18n("日志")}",
 			escape: true,
 			fixedColumns: true,

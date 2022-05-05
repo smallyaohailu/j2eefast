@@ -110,7 +110,8 @@
             });
 
             function func_<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>doSubmit(index, layero,selfLayer) {
-                var nodes = $.tree.callBackTree(layero,index);
+                var $tree = layero.find("iframe")[0].contentWindow.$.tree;
+                var nodes = $tree.callBackTree(layero,index);
                 nodes._oldId = $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").val();
                 <#if keyId != "id">
                 $("#<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>").attr('data-id',nodes.id);

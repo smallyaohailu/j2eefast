@@ -703,7 +703,6 @@
                 var $td = $(this),
                     $tr = $td.parent();
                 var index = $tr.data('index');
-                console.log('-->>>>index:',index);
                 if (e.type === 'click') {
                     if(that.options.fixedColumns){
                         var tr = that.$fixedBody.find('tr[data-index="' + index + '"] >td')

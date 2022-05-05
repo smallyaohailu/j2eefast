@@ -45,6 +45,7 @@
                 dataFormat = "" <#-- 时间格式化-->
                 dataType = "date" <#-- 控件显示-->
                 dateMark = "" <#-- 重要显示标志-->
+                maxDate = "" <#-- 最大日期-->
                 dataCallback = "" <#-- 日期控件回调函数-->
                 required=false <#-- 是否必输-->
                 class = "form-control" <#-- 输入框样式-->
@@ -117,6 +118,7 @@
                     trigger: 'click',
                     type: type,
                     <#if dateMark!="">mark: ${dateMark},</#if>
+                    <#if maxDate!="">max: '${maxDate}',</#if>
                     format: format,
                     btns: newBtnArr,
                     done: function (value, data) {

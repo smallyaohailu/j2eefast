@@ -20,9 +20,9 @@
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/select2/select2-bootstrap.css"/>
 </#if>
 <#if verification>
-<link rel="stylesheet" href="${ctxStatic}/static/plugins/captcha/css/verify.min.css">
+<link rel="stylesheet" href="${ctxStatic}/static/plugins/captcha/css/verify.css">
 </#if>
-<link rel="stylesheet" href="${ctxStatic}/static/css/login2.min.css?V=${config.getDvVersion()}">
+<link rel="stylesheet" href="${ctxStatic}/static/css/login2.css?V=${config.getDvVersion()}">
 <style>[v-cloak]{display:none !important;}
 <#--.login-body {-->
 <#--    background-image: url(${ctxStatic}/static/img/login/bg4.jpg);-->
@@ -244,11 +244,11 @@
 <script src="${ctxStatic}/static/libs/icheck.min.js"></script>
 <script src="${ctxStatic}/static/libs/vue.min.js"></script>
 <#if verification>
-<script src="${ctxStatic}/static/plugins/captcha/crypto-js.min.js"></script>
+<script src="${ctxStatic}/static/plugins/captcha/crypto-js.js"></script>
 <script src="${ctxStatic}/static/plugins/captcha/ase.min.js"></script>
-<script src="${ctxStatic}/static/plugins/captcha/verify.min.js"></script>
+<script src="${ctxStatic}/static/plugins/captcha/verify.js"></script>
 <#else>
-<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.min.js"></script>
+<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.js"></script>
 </#if>
 <script>
     var vm = new Vue({

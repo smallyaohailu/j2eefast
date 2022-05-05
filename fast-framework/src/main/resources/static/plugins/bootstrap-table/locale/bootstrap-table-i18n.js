@@ -26,6 +26,9 @@
         formatPaginationSwitch: function () {
             return  $.i18n.prop('隐藏/显示分页');
         },
+        formatDetailPagination: function (totalRows) {
+            return $.i18n.prop('一共 {0} 条记录',totalRows);
+        },
         formatRefresh: function () {
             return $.i18n.prop('刷新');
         },

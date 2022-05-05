@@ -845,7 +845,7 @@
 
         layero.css(options);
         btnHeight = layero.find('.'+doms[6]).outerHeight();
-        console.log("contElem.css('padding-top'):"+contElem.css('padding-top') + "  contElem.css('padding-bottom')：" + contElem.css('padding-bottom'));
+        // console.log("contElem.css('padding-top'):"+contElem.css('padding-top') + "  contElem.css('padding-bottom')：" + contElem.css('padding-bottom'));
         if(type === ready.type[2]){
             layero.find('iframe').css({
                 height: parseFloat(options.height) - titHeight - btnHeight

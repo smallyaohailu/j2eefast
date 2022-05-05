@@ -320,8 +320,8 @@
             callBackTree:function (_p,_m) {
                 var tree = _p.find("iframe")[0].contentWindow.$._tree;
                 if ($.tree.notAllowParents(tree)) {
-                    var body = layer.getChildFrame('body', _m);
-                    var treeId = body.find('#treeId').val()
+                    var body = $(_p.find('iframe')[0].contentWindow.document);
+                    var treeId = body.find('#treeId').val();
                     var treeName = body.find('#treeName').val();
                     var parentIds = body.find('#parentIds').val();
                     var treeTitle = body.find('#treeTitle').val();
