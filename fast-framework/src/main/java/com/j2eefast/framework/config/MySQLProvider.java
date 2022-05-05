@@ -1,6 +1,5 @@
 package com.j2eefast.framework.config;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,12 +9,13 @@ import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.bussiness.aop.DataFilterAspect;
+import com.j2eefast.framework.sys.entity.SysDictDataEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.entity.SysUreportFileEntity;
+import com.j2eefast.framework.sys.service.SysDictDataService;
 import com.j2eefast.framework.sys.service.SysRoleService;
 import com.j2eefast.framework.sys.service.SysUreportFileService;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.ServerUtil;
 import com.j2eefast.framework.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +65,17 @@ public class MySQLProvider implements ReportProvider {
         SysUreportFileEntity sysUreportFileEntity = sysUreportFileService.getOne(new
                 QueryWrapper<SysUreportFileEntity>().eq("name",name).select("file_name"));
         return StrUtil.blankToDefault(sysUreportFileEntity.getFileName(),name);
+    }
+
+
+    @Override
+    public Map<String, String> getTypeDict(String dictType) {
+        List<SysDictDataEntity>  listDict =  SpringUtil.getBean(SysDictDataService.class).selectDictDataByType(dictType);
+        Map<String, String> map = new HashMap<>();
+        for(SysDictDataEntity dict: listDict){
+            map.put(dict.getDictValue(),dict.getDictLabel());
+        }
+        return map;
     }
 
     /**
