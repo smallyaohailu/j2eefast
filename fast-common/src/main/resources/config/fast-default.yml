@@ -48,6 +48,7 @@ spring:
   freemarker:
     suffix: .html
     request-context-attribute: request
+    debug: true
     #cache: true
 
   #redis数据库服务器

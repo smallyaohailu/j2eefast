@@ -6,6 +6,8 @@
 package com.j2eefast.common.core.config;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,6 +19,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,12 +32,12 @@ import java.util.Map;
 @ConditionalOnProperty(prefix = "shiro.cors", name = "enabled", havingValue="true")
 public class CorsConfig{
 
-
     /**
      * #设置允许的方法
      */
     @Value("#{ @environment['shiro.cors.allowedMethods'] ?: 'GET,POST,DELETE,PUT' }")
     private String allowedMethods;
+
 
     /**
      * 允许跨域请求的域名
@@ -61,7 +64,6 @@ public class CorsConfig{
 
     @Value("#{ @environment['shiro.cors.credentials'] ?: true }")
     private Boolean credentials;
-
 
 
     @Bean
@@ -115,6 +117,7 @@ public class CorsConfig{
 
         @Override
         public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain){
+
             HttpServletResponse response = (HttpServletResponse) res;
             HttpServletRequest request = (HttpServletRequest) req;
 
@@ -134,6 +137,7 @@ public class CorsConfig{
             response.setHeader("Access-Control-Max-Age", maxAge);
             //需要放行header头部字段 如需鉴权字段，自行添加，如Authorization
             response.setHeader("Access-Control-Allow-Headers", allowedHeaders);
+
             try {
                 chain.doFilter(request, response);
             } catch (Exception e) {
