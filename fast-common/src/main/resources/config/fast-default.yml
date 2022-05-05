@@ -6,20 +6,23 @@
 productName: J2eeFAST 开源版本
 
 # ¢此版本号最好不要改动、有助于你后期维修解决问题都会用到当前版本¢
-version: 2.5.1
+version: 2.6.0
 
 server:
   tomcat:
     uri-encoding: UTF-8
     max-threads: 1000
     min-spare-threads: 30
-    #如果使用Nginx反向代理, 获取真实IP 需要开启
-    remote-ip-header: X-FORWARDED-FOR
-    protocol-header: X-Forwarded-Proto
-    port-header: X-Forwarded-Port
     #设置表单提交数据最大大小,解决头像base64太大问题
     max-http-form-post-size: 20MB
-  use-forward-headers: true
+    #如果使用Nginx反向代理, 获取真实IP 需要开启
+    remote-ip-header: X-Forwarded-For
+    protocol-header: X-Forwarded-Proto
+    port-header: X-Forwarded-Port
+  #如果使用Nginx反向代理, 获取真实IP 需要开启
+  use-forward-headers: false
+  # 当 Nginx 为 https，tomcat 为 http 时，设置该选项为 true
+  schemeHttps: fasle
   #########################################
   servlet:
     context-path: /fast
