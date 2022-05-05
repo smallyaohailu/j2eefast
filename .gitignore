@@ -21,3 +21,4 @@ target/
 dbmysqlgen
 *.erm
 *.lck
+/bin/
