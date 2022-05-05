@@ -29,8 +29,7 @@ public class DictConfig {
      * @param dictType 字典类型
      * @return 参数键值
      */
-    public List<SysDictDataEntity> getType(String dictType)
-    {
+    public List<SysDictDataEntity> getType(String dictType){
         return SpringUtil.getBean(SysDictDataService.class).selectDictDataByType(dictType);
     }
 

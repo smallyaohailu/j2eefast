@@ -116,7 +116,7 @@ public class SysDictTypeSerive extends ServiceImpl<SysDictTypeMapper,SysDictType
             sysDictDataService.update(new UpdateWrapper<SysDictDataEntity>()
                     .eq("dict_type",sysDictType.getDictType())
                     .set("dict_type",dict.getDictType()));
-            sysConfigRedis.delRedisDict(dict.getDictType());
+            sysConfigRedis.delRedisDict(sysDictType.getDictType());
         }
         if(this.updateById(dict)){
             return true;

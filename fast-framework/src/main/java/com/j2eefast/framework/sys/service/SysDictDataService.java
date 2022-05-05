@@ -5,8 +5,13 @@
  */
 package com.j2eefast.framework.sys.service;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -14,12 +19,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.redis.SysConfigRedis;
 import com.j2eefast.framework.sys.entity.SysDictDataEntity;
 import com.j2eefast.framework.sys.mapper.SysDictDataMapper;
+import com.j2eefast.framework.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +53,46 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 		return new PageUtil(page);
 	}
 
+//	public List<SysDictDataEntity> selectDictDataByType(String dictType) {
+//		List<SysDictDataEntity>  list = sysConfigRedis.getRedisDict(dictType);
+//		if(ToolUtil.isEmpty(list)){
+//			list =  this.list(new QueryWrapper<SysDictDataEntity>().eq("dict_type",dictType).
+//					eq("status","0").orderBy(true, true, "dict_sort"));
+//			sysConfigRedis.saveOrUpdateDict(dictType,list);
+//			return list;
+//		}else{
+//			com.alibaba.fastjson.JSONArray array= com.alibaba.fastjson.JSONArray.parseArray(JSON.toJSONString(list));
+//			list = JSONObject.parseArray(array.toJSONString(), SysDictDataEntity.class);
+//			return list;
+//		}
+//	}
+//
+//	public String selectDictLabel(String dictType, String dictValue) {
+//		List<SysDictDataEntity>  list = sysConfigRedis.getRedisDict(dictType);
+//		if(ToolUtil.isEmpty(list)){
+//			return this.baseMapper.selectDictLabel(dictType,dictValue);
+//		}else{
+//			String r = "";
+//			JSONArray jsonArray = JSONUtil.parseArray(list,false);
+//			List<SysDictDataEntity> list1 = jsonArray.toList(SysDictDataEntity.class);
+//			for(SysDictDataEntity dict: list1){
+//				if(dict.getDictValue().equals(dictValue)){
+//					r = dict.getDictLabel();
+//					break;
+//				}
+//			}
+//			return r;
+//		}
+//	}
+
 	public List<SysDictDataEntity> selectDictDataByType(String dictType) {
-		List<SysDictDataEntity>  list = sysConfigRedis.getRedisDict(dictType);
+		//1.先获取系统字典
+		List<SysDictDataEntity>  list = Constant.SYS_DICT.get(dictType);
+		if(ToolUtil.isNotEmpty(list)){
+			return list;
+		}
+		//2.获取缓存
+		list = sysConfigRedis.getRedisDict(dictType);
 		if(ToolUtil.isEmpty(list)){
 			list =  this.list(new QueryWrapper<SysDictDataEntity>().eq("dict_type",dictType).
 					eq("status","0").orderBy(true, true, "dict_sort"));
@@ -60,22 +105,79 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 		}
 	}
 
-	public String selectDictLabel(String dictType, String dictValue) {
-		List<SysDictDataEntity>  list = sysConfigRedis.getRedisDict(dictType);
+	/**
+	 * 添加/更新 系统缓存字典
+	 * @param dictType
+	 * @param dictData
+	 */
+	public void saveOrUpdateSysDict(String dictType, SysDictDataEntity dictData){
+		ConfigConstant.DICT_TAG = RandomUtil.randomString(5);
+		List<SysDictDataEntity>  list = Constant.SYS_DICT.get(dictType);
 		if(ToolUtil.isEmpty(list)){
-			return this.baseMapper.selectDictLabel(dictType,dictValue);
+			list = new ArrayList<>();
+			if(dictData.getStatus().equals("0")){
+				list.add(dictData);
+				Constant.SYS_DICT.put(dictType,list);
+			}
 		}else{
-			String r = "";
-			JSONArray jsonArray = JSONUtil.parseArray(list,false);
-			List<SysDictDataEntity> list1 = jsonArray.toList(SysDictDataEntity.class);
-			for(SysDictDataEntity dict: list1){
-				if(dict.getDictValue().equals(dictValue)){
-					r = dict.getDictLabel();
-					break;
+			//循环匹配找到删除
+			for (Iterator<SysDictDataEntity> dicts = list.iterator(); dicts.hasNext();) {
+				SysDictDataEntity dict =  dicts.next();
+				if(StrUtil.equalsIgnoreCase(dict.getDictValue(), dictData.getDictValue())){
+					dicts.remove();
 				}
 			}
-			return r;
+			if(dictData.getStatus().equals("0")){
+				list.add(dictData);
+				Constant.SYS_DICT.put(dictType,list);
+			}
 		}
+	}
+
+	public void delByIdSysDict(String dictType, Long id){
+		ConfigConstant.DICT_TAG = RandomUtil.randomString(5);
+		List<SysDictDataEntity>  list = Constant.SYS_DICT.get(dictType);
+		if(ToolUtil.isNotEmpty(list)){
+			for (Iterator<SysDictDataEntity> dicts = list.iterator(); dicts.hasNext();) {
+				SysDictDataEntity dict =  dicts.next();
+				if(id.equals(dict.getId())){
+					dicts.remove();
+				}
+			}
+		}
+	}
+
+	public void delByValueSysDict(String dictType, String dictValue){
+		ConfigConstant.DICT_TAG = RandomUtil.randomString(5);
+		List<SysDictDataEntity>  list = Constant.SYS_DICT.get(dictType);
+		if(ToolUtil.isNotEmpty(list)){
+			for (Iterator<SysDictDataEntity> dicts = list.iterator(); dicts.hasNext();) {
+				SysDictDataEntity dict =  dicts.next();
+				if(dictValue.equals(dict.getDictValue())){
+					dicts.remove();
+				}
+			}
+		}
+	}
+
+	public String selectDictLabel(String dictType, String dictValue) {
+		List<SysDictDataEntity>  list = Constant.SYS_DICT.get(dictType);
+		if(ToolUtil.isEmpty(list)){
+			list = sysConfigRedis.getRedisDict(dictType);
+			if(ToolUtil.isEmpty(list)){
+				return this.baseMapper.selectDictLabel(dictType,dictValue);
+			}
+		}
+		String r = "";
+		JSONArray jsonArray = JSONUtil.parseArray(list,false);
+		List<SysDictDataEntity> list1 = jsonArray.toList(SysDictDataEntity.class);
+		for(SysDictDataEntity dict: list1){
+			if(dict.getDictValue().equals(dictValue)){
+				r = dict.getDictLabel();
+				break;
+			}
+		}
+		return r;
 	}
 
 	public long countDictDataByType(String dictType) {
