@@ -70,8 +70,10 @@ public class MybatisPlusConfig {
         //控制是否在count时对sql的join进行优化
 		//innerInterceptor.setOptimizeJoin(false);
 
-		//防止全表更新与删除插件: BlockAttackInnerInterceptor
-		BlockAttackInnerInterceptor blockAttackInnerInterceptor = new BlockAttackInnerInterceptor();
+		//防止全表更新与删除插件
+		BlockAttackInnerInterceptor blockAttackInnerInterceptor = new BlockAttackInnerInterceptor(
+				Convert.toInt(PropertiesUtils.getInstance()
+						.getProperty("mybatis-plus.blockattack","0")));
 		interceptor.addInnerInterceptor(blockAttackInnerInterceptor);
 
         return interceptor;

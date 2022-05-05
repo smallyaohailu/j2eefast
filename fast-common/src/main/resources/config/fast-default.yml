@@ -162,6 +162,8 @@ shiro:
 #mybatis 配置
 mybatis-plus:
   mapper-locations: classpath*:mapper/**/*.xml
+  # 0 防止全表更新与删除 1 防止全部删除 2 防止全部更新
+  blockattack: 0
   global-config:
     banner: false
     db-config:
