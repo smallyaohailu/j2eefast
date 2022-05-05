@@ -52,6 +52,18 @@ public class SysDemoController extends BaseController {
         return urlPrefix + "/table";
     }
 
+    /**
+     * 卡片表格
+     * @author ZhouZhou
+     * @date 2022-04-29 15:58
+     * @return
+     */
+    @GetMapping("/cardTable")
+    public String cardTable(){
+        return urlPrefix + "/cardTable";
+    }
+    
+    
     @GetMapping("/fromTable")
     public String fromTable(){
         return urlPrefix + "/fromTable";
