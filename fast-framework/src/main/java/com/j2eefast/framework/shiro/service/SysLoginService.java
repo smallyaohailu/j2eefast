@@ -47,11 +47,11 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * 
+ *
  * @Description:登陆验证
  * @author zhouzhou loveingowp@163.com
  * @time 2019-04-09 15:10
- * @version V1.0 
+ * @version V1.0
  *
  */
 @Component
@@ -59,8 +59,8 @@ import java.util.*;
 public class SysLoginService implements AuthService {
 
 	public static final String DEFAULT_KICKOUT_CACHE_KEY_PREFIX = "shiro:cache:kickout:";
-    private String keyPrefix = DEFAULT_KICKOUT_CACHE_KEY_PREFIX;
-    
+	private String keyPrefix = DEFAULT_KICKOUT_CACHE_KEY_PREFIX;
+
 	@Resource
 	private RedisUtil redisUtil;
 
@@ -75,19 +75,19 @@ public class SysLoginService implements AuthService {
 
 	@Resource
 	private SysTenantMapper sysTenantMapper;
-	
+
 	@Resource
 	private CaptchaService captchaService;
-	
-    @Resource
-    private RedisSessionDAO sessionDAO;
-	
+
+	@Resource
+	private RedisSessionDAO sessionDAO;
+
 	/**
 	 * 系统是否开启多租户模式
 	 */
 	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
 	private boolean enabled;
-	
+
 	@Value("#{ @environment['shiro.session.kickoutAfter'] ?: false }")
 	private boolean kickoutAfter;
 
@@ -151,11 +151,11 @@ public class SysLoginService implements AuthService {
 		//前端传入账号密码
 		String username = taken.getUsername();
 		String password = new String(taken.getPassword());
-		
+
 		if(ToolUtil.isEmpty(username) || ToolUtil.isEmpty(password)) {
 			throw new RxcException("账号密码不能为空!", "50001");
 		}
-		
+
 		//建议图形验证码
 		if(Global.getDbKey(ConfigConstant.SYS_LOGIN_VERIFICATION,Constant.SYS_DEFAULT_VALUE_ONE)
 				.equals(Constant.SYS_DEFAULT_VALUE_ONE)){
@@ -166,7 +166,7 @@ public class SysLoginService implements AuthService {
 				throw new RxcException("图形验证码不正确!","50004");
 			}
 		}
-		
+
 		//解密数据
 		String kg4 = ServletUtil.getRequest().getParameter("kg4");
 		log.debug("kg4:{}",kg4);
@@ -182,27 +182,27 @@ public class SysLoginService implements AuthService {
 			//校验签名失败
 			throw new RxcException("加密校验失败","50001");
 		}
-		
+
 		//获得明文kg4
 		kg4 = SoftEncryption.decryptBySM2(Base64.decode(kg4),
 				ConfigConstant.PRIVKEY).getStr("hex");
-		
+
 		//前端账号密码解密
 		username =new String(SoftEncryption.decryptBySM4(Base64.decode(username),
 				HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
 		password =new String(SoftEncryption.decryptBySM4(Base64.decode(password),
 				HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
-		
+
 		//赋值回去
 		taken.setPassword(password.toCharArray());
-		
+
 		Integer number = this.loginBeforeVerify(username,password);
-		
+
 		//获取请求租户号
 		String tenantId = StrUtil.EMPTY;
 		if(enabled){
 			tenantId  = StrUtil.blankToDefault(ServletUtil.getRequest()
-				.getParameter(Constant.TENANT_PARAMETER),StrUtil.EMPTY);
+					.getParameter(Constant.TENANT_PARAMETER),StrUtil.EMPTY);
 		}
 
 		SysUserEntity user = this.sysUserMapper.findUserByUserName(username,
@@ -222,7 +222,7 @@ public class SysLoginService implements AuthService {
 			AsyncManager.me().execute(AsyncFactory.recordLogininfor(username,-1L,-1L, "50001","账号或密码错误,请重试."));
 			throw new RxcException(ToolUtil.message("sys.login.failure"),"50001");
 		}
-		
+
 		//user status : 1 disable
 		if ("1".equals(user.getStatus())) {
 			throw new RxcException(ToolUtil.message("sys.login.accountDisabled"),"50001");
@@ -254,7 +254,7 @@ public class SysLoginService implements AuthService {
 
 		//检测是否排挤登录
 		this.excludeLogin(loginUser);
-		
+
 		//设置授权
 		this.authorization(loginUser,user.getId());
 
@@ -274,7 +274,7 @@ public class SysLoginService implements AuthService {
 	 */
 	@Override
 	public LoginUserEntity freeLoginVerify(String openId, String tenantId) {
-		
+
 		//检查第三方账号是否有绑定用户ID
 		SysUserEntity user = this.sysUserMapper.findAuthByUuid(openId,tenantId);
 
@@ -300,7 +300,7 @@ public class SysLoginService implements AuthService {
 
 		//检测是否排挤登录
 		this.excludeLogin(loginUser);
-				
+
 		//设置授权
 		this.authorization(loginUser,user.getId());
 
@@ -313,13 +313,13 @@ public class SysLoginService implements AuthService {
 
 		return loginUser;
 	}
-	
+
 	/**
 	 * 手机验证码登录
 	 */
 	@Override
 	public LoginUserEntity valideCodeLoginVerify(String mobile,String valideCode) {
-		
+
 		//获取请求租户号
 		String tenantId = StrUtil.EMPTY;
 		if(enabled){
@@ -329,7 +329,7 @@ public class SysLoginService implements AuthService {
 
 		//校验 手机号码 与 验证码是否匹配
 		String sysValidCode = redisUtil.get(RedisKeys.getLoginValidKey(mobile),String.class);
-		
+
 		if(ToolUtil.isEmpty(valideCode) || !StrUtil.equals(sysValidCode, valideCode)) {
 			AsyncManager.me().execute(AsyncFactory.recordLogininfor(mobile,-1L,-1L, "60002","验证码错误."));
 			throw new RxcException("验证码错误!","60002");
@@ -340,21 +340,21 @@ public class SysLoginService implements AuthService {
 
 		//通过手机获取用户信息
 		SysUserEntity user = this.sysUserMapper.findUserByMobile(mobile, tenantId);
-		
+
 		if(ToolUtil.isEmpty(user)){
 			AsyncManager.me().execute(AsyncFactory.recordLogininfor(mobile,-1L,-1L, "60003","手机验证码登录失败,手机号码不存在系统."));
 			throw new RxcException("手机验证码登录失败,手机号码不存在系统","60001");
 		}
-		
+
 		//转换成用户登录信息
 		LoginUserEntity loginUser = UserFactory.createLoginUser(user);
-		
+
 		//检测是否排挤登录
 		this.excludeLogin(loginUser);
-		
+
 		//设置授权
 		this.authorization(loginUser,user.getId());
-				
+
 		//设置登陆
 		this.setLoginDetails(loginUser,user.getId(),LogType.MOBILE.getVlaue());
 
@@ -424,9 +424,9 @@ public class SysLoginService implements AuthService {
 				source));
 
 	}
-	
+
 	private String getRedisKickoutKey(String username) {
-	    return this.keyPrefix + username;
+		return this.keyPrefix + username;
 	}
 
 	@Override
@@ -435,7 +435,7 @@ public class SysLoginService implements AuthService {
 		int maxSession = -1;
 		//获取系统配置参数
 		try{
-			 maxSession = Integer.parseInt(Global.getDbKey(ConfigConstant.SYS_IS_LOGIN));
+			maxSession = Integer.parseInt(Global.getDbKey(ConfigConstant.SYS_IS_LOGIN));
 		}catch (Exception e){
 			log.error("error getting system parameter [SYS_IS_LOGIN]",e);
 		}
@@ -448,20 +448,21 @@ public class SysLoginService implements AuthService {
 			if(deque.size() == maxSession) {
 				int tmepNum = deque.size();
 				//检测之前用户是否为登录状态
-				for(Serializable s :deque) {
+				for (Iterator<Serializable> q = deque.iterator(); q.hasNext();) {
 					try{
+						Serializable s = q.next();
 						Session session = sessionDAO.readSession(s);
 						if(ToolUtil.isEmpty(session)) {
-							deque.removeLast();
+							q.remove();
 						}else {
 							PrincipalCollection existingPrincipals =
 									(PrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
 							if(existingPrincipals == null){
-							   deque.removeLast();
+								q.remove();
 							}
 						}
 					}catch (Exception e){
-						deque.removeLast();
+						q.remove();
 					}
 				}
 				if(tmepNum != deque.size()) {
@@ -473,6 +474,6 @@ public class SysLoginService implements AuthService {
 				throw new RxcException(ToolUtil.message("用户已经登录,禁止登录"),"50006");
 			}
 		}
-		
+
 	}
 }

@@ -53,7 +53,7 @@ public class UserModularRealmAuthorizer extends ModularRealmAuthorizer {
             if(realm instanceof OtherRealm){
                 if(user.getLoginType().getDesc()
                         .equals(LoginType.OTHER.getDesc())){
-                    return ((UserNameRealm) realm).isPermitted(principals,permission);
+                    return ((OtherRealm) realm).isPermitted(principals,permission);
                 }
             }
 
@@ -93,7 +93,7 @@ public class UserModularRealmAuthorizer extends ModularRealmAuthorizer {
             if(realm instanceof OtherRealm){
                 if(user.getLoginType().getDesc()
                         .equals(LoginType.OTHER.getDesc())){
-                    return ((ValideCodeRealm) realm).hasRole(principals,roleIdentifier);
+                    return ((OtherRealm) realm).hasRole(principals,roleIdentifier);
                 }
             }
 
@@ -128,7 +128,7 @@ public class UserModularRealmAuthorizer extends ModularRealmAuthorizer {
             if(realm instanceof OtherRealm){
                 if(user.getLoginType().getDesc()
                         .equals(LoginType.OTHER.getDesc())){
-                    return ((ValideCodeRealm) realm).isPermitted(principals,permission);
+                    return ((OtherRealm) realm).isPermitted(principals,permission);
                 }
             }
 
