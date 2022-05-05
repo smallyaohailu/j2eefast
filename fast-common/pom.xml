@@ -145,6 +145,11 @@
            <artifactId>shiro-spring</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+
           
 		<!-- SpringWeb模块 -->
 		<dependency>
@@ -285,7 +290,7 @@
               </exclusions>
           </dependency>
 
-        <!-- 导入JU报表-->
+        <!-- 导入JU报表 -->
         <dependency>
             <groupId>com.j2eefast</groupId>
             <artifactId>ureport2-consol</artifactId>
@@ -302,6 +307,10 @@
                 <exclusion>
                     <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>cn.hutool</groupId>
+                    <artifactId>hutool-all</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -351,9 +360,13 @@
                  </exclusion>
              </exclusions>
         </dependency>
-        
-  </dependencies>
-  <!-- 
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+
+    </dependencies>
+  <!--
   <build>
 	  <plugins>
 			<plugin>
@@ -381,5 +394,5 @@
 			</plugin>
 		</plugins>
 	</build>  
-	-->
+    -->
 </project>
