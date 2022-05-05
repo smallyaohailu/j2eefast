@@ -111,8 +111,9 @@ public class ResourceLoaderServlet extends HttpServlet {
 			String scheme = req.getScheme();
 			String serverName = req.getServerName();
 			int port = req.getServerPort();
+			port = (port == 443 || port == 80) ? 0 : port;
 			String path = req.getContextPath();
-			String basePath = scheme + "://" + serverName + ":" + port + path;
+			String basePath = scheme + "://" + serverName  + (port == 0? "": (":" + port)) + path;
 			Subject subject = SecurityUtils.getSubject();
 			LoginUserEntity loginUserEntity = (LoginUserEntity) subject
 					.getPrincipal();
@@ -184,7 +185,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 		}
 		
 		InputStream input= new ByteArrayInputStream(outBytes);
-		OutputStream output=resp.getOutputStream();
+		OutputStream output= resp.getOutputStream();
 		try{
 			IoUtil.copy(input,output);
 		}finally{

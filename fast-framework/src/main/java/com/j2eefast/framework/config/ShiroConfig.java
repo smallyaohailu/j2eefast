@@ -13,8 +13,8 @@ import com.j2eefast.common.core.shiro.RedisCacheManager;
 import com.j2eefast.common.core.shiro.RedisSessionDAO;
 import com.j2eefast.common.core.shiro.ShiroSessionFactory;
 import com.j2eefast.common.core.shiro.ShiroSessionManager;
+import com.j2eefast.common.core.shiro.filter.InnerSessionFilter;
 import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.framework.shiro.KickoutSessionControlFilter;
 import com.j2eefast.framework.shiro.RestLogoutFilter;
 import com.j2eefast.framework.shiro.RestAuthorizationFilter;
 import com.j2eefast.framework.shiro.auth.UserModularRealmAuthorizer;
@@ -362,10 +362,11 @@ public class ShiroConfig {
 		shiroFilter.setLoginUrl("/login");
 		//这里的/index是后台的接口名,非页面,登录成功后要跳转的链接
 		shiroFilter.setSuccessUrl("/index");
-		//自定义拦截器限制并发人数
+
 		LinkedHashMap<String, Filter> filtersMap = new LinkedHashMap<>();
 
 		// ------------------- 系统必须默认
+        filterMap.put("/logout", "anon");
         filterMap.put("/static/**", "anon");
 		filterMap.put("/swagger/**'", "anon");
 		filterMap.put("/swagger-ui/**", "anon");
@@ -387,23 +388,20 @@ public class ShiroConfig {
 			filterMap.put("/tenant/list", "anon");
 		}
 		filterMap.put("/captcha/**", "anon");
+		//自定义拦截器限制并发人数
+		filtersMap.put("inner", innerSessionFilter());
+		filtersMap.put("logout", new RestLogoutFilter());
 		if(distributed){
 			//--------------------------------------
 			//自定义过滤器   解决前后台分离的问题
 			filterMap.put("/**", "authc");
 			filtersMap.put("authc", new RestAuthorizationFilter());
 		}else{
-			filterMap.put("/**", "kickout,user");
+			filterMap.put("/**", "user,inner");
 		}
-
-		//限制同一帐号同时在线的个数
-		filtersMap.put("kickout", kickoutSessionControlFilter());
-
-		RestLogoutFilter logoutFilter = new RestLogoutFilter();
-
-		filtersMap.put("logout", logoutFilter);
-
+		
 		shiroFilter.setFilters(filtersMap);
+		
 		// 权限认证失败，则跳转到指定页面
 		shiroFilter.setUnauthorizedUrl("/");
 
@@ -419,17 +417,16 @@ public class ShiroConfig {
 	 * @return
 	 */
 	@Bean
-	public KickoutSessionControlFilter kickoutSessionControlFilter(){
-		KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
+	public InnerSessionFilter innerSessionFilter(){
+		InnerSessionFilter innerSessionFilter = new InnerSessionFilter();
 		//用于根据会话ID，获取会话进行踢出操作的；
-		kickoutSessionControlFilter.setSessionManager(sessionManager());
-
+		innerSessionFilter.setSessionManager(sessionManager());
 		//是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；
-		kickoutSessionControlFilter.setKickoutAfter(kickoutAfter);
-
+		innerSessionFilter.setKickoutAfter(kickoutAfter);
 		//被踢出后重定向到的地址；
-		kickoutSessionControlFilter.setKickoutUrl("/login?kickout=");
-		return kickoutSessionControlFilter;
+		innerSessionFilter.setKickoutUrl("/login?kickout=");
+
+		return innerSessionFilter;
 	}
 
 	@Bean("lifecycleBeanPostProcessor")
