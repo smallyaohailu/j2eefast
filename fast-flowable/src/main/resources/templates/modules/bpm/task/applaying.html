@@ -51,9 +51,9 @@
                 {field : 'userName',title : '${i18n("发起人")}'},
                 {field : 'startTime',title : '${i18n("开始时间")}',width: 170}
                 ,{field : 'priority',title : '${i18n("优先级")}',formatter: function(value, row, index) {
-                        return $.table.selectDictLabel(priorityDatas, value);}},
+                        return opt.common.selectDictLabel(priorityDatas, value);}},
                 {field : 'status',title : '${i18n("状态")}',formatter: function(value, row, index) {
-                        return $.table.selectDictLabel(statusDatas, value);}},
+                        return opt.common.selectDictLabel(statusDatas, value);}},
                 {title:"${i18n("操作")}",class:'action',formatter: function(value, row, index) {
                         var actions = [];
                         actions.push('<a class="" href="javascript:void(0)" title="${i18n("流程跟踪")}" onclick="preview(\'' + row.processInstanceId + '\')"><i class="fa icon-picture"></i></a> ');

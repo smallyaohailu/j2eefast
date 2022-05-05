@@ -1,0 +1,62 @@
+<!-- 系统自动生成 Date:2021-08-31 22:02 -->
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="修改数据库测试" bodyClass="white-bg" libs=["bootstrapSelect"]/>
+<div class="wrapper wrapper-content ibox-content">
+<@f.form id="form-test-edit"  class="form-horizontal">
+    <@f.hidden name="id" value="${mssqlTest.id?default('')}"/>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">
+            ${i18n("姓名"/>：
+        </label>
+        <div class="col-sm-8">
+            <@f.input name="name" value="${mssqlTest.name?default('')}"   />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">
+            ${i18n("电子邮件"/>：
+        </label>
+        <div class="col-sm-8">
+            <@f.input name="email" value="${mssqlTest.email?default('')}"   />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">
+            ${i18n("电话"/>：
+        </label>
+        <div class="col-sm-8">
+            <@f.input name="phone" value="${mssqlTest.phone?default('')}"   />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">
+            ${i18n("remark"/>：
+        </label>
+        <div class="col-sm-8">
+            <@f.input name="remark" value="${mssqlTest.remark?default('')}"   />
+        </div>
+    </div>
+</@f.form>
+</div>
+<@footer>
+<script type="text/javascript">
+    var prefix = baseURL + "mssql/test";
+    /**表单验证*/
+    <@compress single_line=true>
+    $("#form-test-edit").validate({
+        focusCleanup: true
+    });
+    </@compress>
+
+    /**
+     * 点击确定回调事件
+     */
+    function submitHandler() {
+        if (opt.validate.form()) {
+            opt.operate.save(prefix + "/edit", $('#form-test-edit').serialize());
+        }
+    }
+</script>
+</@footer>
+</@pageTheme>

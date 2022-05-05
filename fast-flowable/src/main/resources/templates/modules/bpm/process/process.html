@@ -50,7 +50,7 @@
                     {field : 'modelKey',title : '${i18n("流程Key")}'},
                     {field : 'version',title : '${i18n("版本号")}'},
                     {field : 'suspensionState',title : '${i18n("状态")}',formatter: function(value, row, index) {
-                            return $.table.selectDictLabel(statusDatas, value);}},
+                            return opt.common.selectDictLabel(statusDatas, value);}},
                     {title:"${i18n("操作")}",class:'action',width:100,formatter: function(value, row, index) {
                             var actions = [];
                             if(row.suspensionState == "1"){

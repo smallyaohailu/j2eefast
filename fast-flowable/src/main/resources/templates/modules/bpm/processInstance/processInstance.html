@@ -52,9 +52,9 @@
                 {field : 'startTime',title : '${i18n("发起时间")}',width: 170},
                 {field : 'endTime',title : '${i18n("结束时间")}',width: 170},
                 {field : 'status',title : '${i18n("流程状态")}',formatter: function(value, row, index) {
-                        return $.table.selectDictLabel(insStatusDatas, value);}},
+                        return opt.common.selectDictLabel(insStatusDatas, value);}},
                 {field : 'suspensionState',title : '${i18n("状态")}',formatter: function(value, row, index) {
-                        return $.table.selectDictLabel(statusDatas, value);}},
+                        return opt.common.selectDictLabel(statusDatas, value);}},
                 {title:"${i18n("操作")}",align: 'left',width:150, class:'action',formatter: function(value, row, index) {
                         var actions = [];
                         actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("流程跟踪")}" onclick="preview(\'' + row.processInstanceId + '\')"><i class="fa icon-picture"></i></a> ');

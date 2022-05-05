@@ -1,0 +1,85 @@
+<!-- 系统自动生成 Date:2021-08-31 22:02 -->
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="数据库测试列表" bodyClass="gray-bg animated fadeInRight" isAnimation=false libs=["table","zTree"]/>
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <@f.form id="test-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label> ${i18n("姓名"/>：</label>
+                            <@f.input placeholder="姓名" name="name"/>
+                        </li>
+                        <li>
+                            <label> ${i18n("电子邮件"/>：</label>
+                            <@f.input placeholder="电子邮件" name="email"/>
+                        </li>
+                        <li>
+                            <label> ${i18n("电话"/>：</label>
+                            <@f.input placeholder="电话" name="phone"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;${i18n("查询"/></a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置"/></a>
+                        </li>
+                    </ul>
+                </div>
+            </@f.form>
+        </div>
+        <@table id="bootstrap-table">
+            <@shiro.hasPermission name="mssql:test:add">
+                <a class="btn btn-success" onclick=" opt.operate.add()"><i class="fa fa-plus"></i>&nbsp;${i18n("新增"/></a>
+            </@shiro.hasPermission>
+            <@shiro.hasPermission name="mssql:test:edit">
+                <a class="btn btn-primary single disabled" onclick=" opt.operate.edit()"><i class="fa fa-pencil-square-o"></i>&nbsp;${i18n("修改"/></a>
+            </@shiro.hasPermission>
+            <@shiro.hasPermission name="mssql:test:del">
+                <a class="btn btn-danger multiple disabled" onclick="opt.operate.delAll()"><i class="fa fa-remove"></i> ${i18n("删除"/></a>
+            </@shiro.hasPermission>
+        </@table>
+    </div>
+</div>
+<@footer>
+<script type="text/javascript">
+    var editFlag = "${permission.hasPermi("mssql:test:edit")}";
+    var listFlag = "${permission.hasPermi("mssql:test:add")}";
+    var delFlag = "${permission.hasPermi("mssql:test:del")}";
+    var visible = ${permission.isPermitteds("mssql:test:edit,mssql:test:del,mssql:test:add")?string('true', 'false')};
+    var prefix = baseURL + "mssql/test";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            addUrl: prefix + "/add",
+            editUrl: prefix + "/edit/{id}",
+            delUrl: prefix + "/del",
+            modalName: "数据库测试",
+            uniqueId:  'id',/* 唯一ID */
+            escape: true,/* 分页设置 */
+            showPageGo: true,/* 分页设置 */
+            pageSize: 10,/* 分页设置 */
+            pageList: [10, 30, 50],/* 分页设置 */
+            columns:[
+                {title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
+                    return $.table.serialNumber(index);
+                }}
+                ,{field : 'id',title : '${i18n("主键"/>',visible: false}
+                ,{field : 'name',title : '${i18n("姓名"/>'}
+                ,{field : 'email',title : '${i18n("电子邮件"/>'}
+                ,{field : 'phone',title : '${i18n("电话"/>'}
+                ,{field : 'remark',title : '${i18n("remark"/>'}
+                ,{title:"${i18n("操作"/>",align: 'center',visible:visible,formatter: function(value, row, index) {
+                    var actions = [];
+                    actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick=" opt.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                    actions.push('<a class="btn btn-danger btn-xs ' + delFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                    return actions.join('');
+                }}
+            ]
+        };
+        $.table.init(options);
+    });
+</script>
+</@footer>
+</@pageTheme>

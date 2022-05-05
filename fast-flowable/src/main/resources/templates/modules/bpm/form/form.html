@@ -98,14 +98,14 @@
                     field : 'leaveType'
                     ,title : '${i18n("请假类型")}'
                     ,formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(leaveTypeDatas, value);
+                       return opt.common.selectDictLabel(leaveTypeDatas, value);
                     }
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{
                     field : 'leaveReason'
                     ,title : '${i18n("请假原因")}'
                     ,formatter: function(value, row, index) {
-                        return $.table.tooltip(value, 20);
+                        return opt.common.tooltip(value, 20);
                     }
                 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,{

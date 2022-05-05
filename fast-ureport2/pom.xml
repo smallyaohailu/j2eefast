@@ -8,7 +8,7 @@
         <artifactId>fast</artifactId>
         <groupId>com.j2eefast</groupId>
         <version>2.6.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>fast-ureport2</artifactId>

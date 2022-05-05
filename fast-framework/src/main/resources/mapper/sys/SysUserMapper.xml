@@ -7,7 +7,7 @@
     <!--分页查询 -->
     <sql id="sqlpage">
         SELECT u.id,
-        u.username, u.name,u.password,u.salt,u.email,u.mobile,u.status,u.card_id,u.create_time,
+        u.username, u.name,u.password,u.salt,u.email,u.mobile,u.status,u.card_id,u.avatar,u.create_time,
         u.dept_id,u.comp_id,d.name AS deptName,
         <if test="_databaseId == 'oracle'">
             NVL(c.name,'总公司') AS comp_name,
