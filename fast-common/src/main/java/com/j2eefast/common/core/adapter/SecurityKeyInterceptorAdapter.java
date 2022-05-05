@@ -8,13 +8,11 @@ import com.j2eefast.common.core.config.ResourceLoaderServlet;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.utils.CookieUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,7 +28,8 @@ public class SecurityKeyInterceptorAdapter implements HandlerInterceptor{
 	 */
 	@Value("#{ @environment['shiro.selfIframe.enabled'] ?: false }")
 	private boolean enabled;
-	
+
+
 	public static final String X_FRAME_OPTIONS = "X-Frame-Options";
 	
 	public enum Mode {
@@ -50,6 +49,7 @@ public class SecurityKeyInterceptorAdapter implements HandlerInterceptor{
 		 */
 		SAMEORIGIN
 	}
+
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -73,17 +73,20 @@ public class SecurityKeyInterceptorAdapter implements HandlerInterceptor{
 		
 		String scheme = request.getScheme();
         String serverName = request.getServerName();
-        int port = request.getServerPort();
+		int port = request.getServerPort();
+		port = (port == 443 || port == 80) ? 0 : port;
         String path = request.getContextPath();
-        String basePath = scheme + "://" + serverName + ":" + port + path;
+		String basePath = scheme + "://" + serverName  + (port == 0? "": (":" + port)) + path;
         //修改绝对地址
-//      request.setAttribute(ConfigConstant.BASE_PATH, path);
-//		request.setAttribute(ConfigConstant.CTX_STATIC, basePath);
+ 	    //request.setAttribute(ConfigConstant.BASE_PATH, path);
+		//request.setAttribute(ConfigConstant.CTX_STATIC, basePath);
         request.setAttribute(ConfigConstant.CTX_STATIC, path);
 		request.setAttribute(ConfigConstant.BASE_PATH, basePath);
+		
 		if(!enabled) {
 			response.addHeader(X_FRAME_OPTIONS, Mode.SAMEORIGIN.name());
 		}
+		
         return true;
 	}
 
