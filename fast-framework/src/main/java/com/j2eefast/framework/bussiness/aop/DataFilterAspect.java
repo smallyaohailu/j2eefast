@@ -1,5 +1,5 @@
 /*
- * All content copyright http://www.j2eefast.com, unless 
+ * All content copyright http://www.j2eefast.com, unless
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
@@ -43,49 +43,49 @@ public class DataFilterAspect {
 	public void dataFilter(JoinPoint point) throws Throwable {
 		Object params = point.getArgs()[0];
 		if (params != null && params instanceof Map) {
-			
+
 			Map map = (Map) params;
 			// 先清空防止前端注入
 			map.put(Constant.SQL_FILTER,StrUtil.EMPTY);
-			
-		    // 特除业务 不需要数据过滤
+
+			// 特除业务 不需要数据过滤
 			boolean _isADMIN =  ToolUtil.isEmpty(map.get("__ISADMIN"))?false: (boolean) map.get("__ISADMIN");
-			
+
 			LoginUserEntity user = UserUtils.getUserInfo();
 			// 如果不是超级管理员，则进行数据过滤
 			if (!user.getId().equals(Constant.SUPER_ADMIN)) {
-				
-					// 不需要数据过滤
-					if(_isADMIN){
-						return;
-					}
-					
-					MethodSignature signature = (MethodSignature) point.getSignature();
-					DataFilter dataFilter = signature.getMethod().getAnnotation(DataFilter.class);
-					// 获取表的别名
-					String compAlias = dataFilter.compAlias();
-					String deptAlias = dataFilter.deptAlias();
-					String userAlias = dataFilter.userAlias();
-					boolean isDeptTable = dataFilter.isDeptTable();
-					//特殊角色特殊处理
-					AuthData[]	authData = dataFilter.auths();
-					if(ToolUtil.isNotEmpty(authData)) {
-						lableB:
-						for(AuthData a: authData){
-							for(Object o: user.getRoles()){
-								SysRoleEntity role = (SysRoleEntity) o;
-								if(role.getRoleKey().equals(a.auth())){
-									compAlias = a.compAlias();
-									deptAlias = a.deptAlias();
-									userAlias = a.userAlias();
-									break lableB;
-								}
+
+				// 不需要数据过滤
+				if(_isADMIN){
+					return;
+				}
+
+				MethodSignature signature = (MethodSignature) point.getSignature();
+				DataFilter dataFilter = signature.getMethod().getAnnotation(DataFilter.class);
+				// 获取表的别名
+				String compAlias = dataFilter.compAlias();
+				String deptAlias = dataFilter.deptAlias();
+				String userAlias = dataFilter.userAlias();
+				boolean isDeptTable = dataFilter.isDeptTable();
+				//特殊角色特殊处理
+				AuthData[]	authData = dataFilter.auths();
+				if(ToolUtil.isNotEmpty(authData)) {
+					lableB:
+					for(AuthData a: authData){
+						for(Object o: user.getRoles()){
+							SysRoleEntity role = (SysRoleEntity) o;
+							if(role.getRoleKey().equals(a.auth())){
+								compAlias = a.compAlias();
+								deptAlias = a.deptAlias();
+								userAlias = a.userAlias();
+								break lableB;
 							}
 						}
 					}
-					map.put(Constant.SQL_FILTER, getSQLFilter(user,
-							compAlias,deptAlias,userAlias,
-							(String[])map.get(Constant.REQUIRES_PERMISSIONS),isDeptTable));
+				}
+				map.put(Constant.SQL_FILTER, getSQLFilter(user,
+						compAlias,deptAlias,userAlias,
+						(String[])map.get(Constant.REQUIRES_PERMISSIONS),isDeptTable));
 			}
 			return;
 		}
@@ -100,7 +100,7 @@ public class DataFilterAspect {
 	 */
 	public static String getSQLFilter(LoginUserEntity user,String compAlias,
 									  String deptAlias,String userAlias
-									  ,String[] permissions, boolean isDeptTable) {
+			,String[] permissions, boolean isDeptTable) {
 
 		StringBuilder sqlFilter = new StringBuilder(StrUtil.EMPTY);
 		if (ToolUtil.isEmpty(compAlias)) {
@@ -159,7 +159,7 @@ public class DataFilterAspect {
 					|| UserUtils.hasRole(Constant.SU_ADMIN)){
 				sqlFilter.append(StrUtil.format(
 						(isDeptTable? " OR ({} IN ( SELECT id FROM sys_comp WHERE del_flag = '0' AND (id = {} OR FIND_IN_SET( {} , parent_ids ))))"
-						:" OR ({} = {})"),
+								:" OR ({} = {})"),
 						StrUtil.contains(compAlias,StrUtil.DOT)?compAlias:compAlias+".id", user.getCompId(),user.getCompId()));
 				if(UserUtils.hasRole(Constant.SU_ADMIN)) {
 					break;
@@ -206,14 +206,14 @@ public class DataFilterAspect {
 		if(ToolUtil.isNotEmpty(userAlias)
 				&& !UserUtils.hasRole(Constant.SU_ADMIN)){
 			sqlFilter.append(StrUtil.format(" AND ({} NOT IN( SELECT user_id FROM sys_user_role WHERE role_id = 1 ))"
-					,StrUtil.contains(userAlias,StrUtil.DOT)?deptAlias:userAlias+".id"));
+					,StrUtil.contains(userAlias,StrUtil.DOT)?userAlias:userAlias+".id"));
 		}
 
 		//角色是ADMIN 用户 排除 SUP_ADMIN
 		if(ToolUtil.isNotEmpty(userAlias) &&
 				UserUtils.hasRole(Constant.SU_ADMIN)){
 			sqlFilter.append(StrUtil.format(" AND ({} != 1)"
-					,StrUtil.contains(userAlias,StrUtil.DOT)?deptAlias:userAlias+".id"));
+					,StrUtil.contains(userAlias,StrUtil.DOT)?userAlias:userAlias+".id"));
 		}
 
 		if(ToolUtil.isNotEmpty(sqlFilter.toString())){

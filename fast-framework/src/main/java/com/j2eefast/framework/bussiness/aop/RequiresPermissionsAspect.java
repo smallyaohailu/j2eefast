@@ -53,6 +53,7 @@ public class RequiresPermissionsAspect {
             if (o != null && o instanceof Map) {
                 Map map = (Map) o;
                 map.put(Constant.REQUIRES_PERMISSIONS,dataFilter.value());
+                ServletUtil.getRequest().setAttribute(Constant.REQUIRES_PERMISSIONS,dataFilter.value());
                 List<String> tempExcludes = new ArrayList<>();
                 if(ToolUtil.isNotEmpty(excludes)){
                     String[] url = excludes.split(",");

@@ -5,9 +5,10 @@
  */
 package com.j2eefast.framework.config;
 
-import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.datasources.BlockAttackInnerInterceptor;
 import com.j2eefast.common.core.datasources.MybatisPulsMetaObjectHandler;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ToolUtil;
