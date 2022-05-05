@@ -6,6 +6,8 @@
 package com.j2eefast.common.core.utils;
 import java.io.Serializable;
 import java.util.List;
+
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 
@@ -40,8 +42,12 @@ public class PageUtil implements Serializable {
 	 * 数据列表
 	 */
 	private List<?> 							list;
-	
-	
+
+	/**
+	 * 备注数据(可以为表格添数据)
+	 */
+	private Object 								__JSON__;
+
 	/**
 	 * 分页
 	 * @param list 列表数据
@@ -66,5 +72,19 @@ public class PageUtil implements Serializable {
 		this.pageSize = page.getSize();
 		this.currPage = page.getCurrent();
 		this.totalPage = page.getPages();
+	}
+
+	/**
+	 * 分页与添加表格附加数据,主要为统计合计数据
+	 * @param page
+	 * @param __JSON__
+	 */
+	public PageUtil(Page<?> page,Object __JSON__) {
+		this.list = page.getRecords();
+		this.totalCount = page.getTotal();
+		this.pageSize = page.getSize();
+		this.currPage = page.getCurrent();
+		this.totalPage = page.getPages();
+		this.__JSON__ = JSONUtil.parseObj(__JSON__);
 	}
 }
