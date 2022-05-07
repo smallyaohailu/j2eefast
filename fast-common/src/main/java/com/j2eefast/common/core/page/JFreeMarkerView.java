@@ -50,6 +50,7 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -91,6 +92,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  * @see FreeMarkerConfig
  * @see FreeMarkerConfigurer
  */
+@Slf4j
 public class JFreeMarkerView extends AbstractTemplateView {
 
     private static final String DEBUG = "spring.freemarker.debug";
@@ -229,7 +231,6 @@ public class JFreeMarkerView extends AbstractTemplateView {
     public boolean checkResource(Locale locale) throws Exception {
         String url = getUrl();
         Assert.state(url != null, "'url' not set");
-
         try {
             // Check that we can get the template, even if we might subsequently get it again.
             getTemplate(url, locale);
@@ -240,9 +241,11 @@ public class JFreeMarkerView extends AbstractTemplateView {
             return false;
         }
         catch (ParseException ex) {
+        	log.error("Freemarker 模板引擎报错,请检查["+url+"]路径是否书写规范,报错具体信息", ex);
             throw new ApplicationContextException("Failed to parse [" + url + "]", ex);
         }
         catch (IOException ex) {
+        	log.error("Freemarker 模板加载异常,请检查["+url+"]路径文件是否存在,报错具体信息", ex);
             throw new ApplicationContextException("Failed to load [" + url + "]", ex);
         }
     }
