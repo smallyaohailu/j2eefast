@@ -455,9 +455,19 @@
         }
 
         //如果宽度不够
-        if(this.$el.outerWidth() <= this.$tableContainer.innerWidth() ){
+        if(this._$pywh < this.$tableContainer.innerWidth() ){
+            if(this.$fixedBodyColumns != undefined){
+                this.$fixedBody.hide();
+            }
+            //$fixedBody
+            if(this.$rightfixedBody != undefined){
+                this.$rightfixedBody.hide();
+            }
             return;
         }
+
+
+
 
         clearTimeout(this.timeoutHeaderColumns_);
         this.timeoutHeaderColumns_ = setTimeout($.proxy(this.fitHeaderColumns, this), this.$el.is(':hidden') ? 1000 : 100);
@@ -472,7 +482,7 @@
             headerWidth = 0;
         if (that.options.fixedColumns) {
             if(this.$body.find('tr:eq(0)').find('td').length == 1){
-                this.$fixedBody.hide();
+                if(!this.__custom) this.$fixedBody.hide();
             }else{
 
                 this.$body.find('tr:eq(0)').find('td').each(function (i) {
@@ -495,7 +505,7 @@
             headerWidth = 0;
             var totalLength = this.$body.find('tr:eq(0)').find('td').length;
             if(totalLength == 1){
-                this.$rightfixedBody.hide();
+                if(!this.__custom) this.$rightfixedBody.hide();
             }else{
                 var index = 0
                 this.$body.find('tr:eq(0)').find('td').each(function (i) {
@@ -511,6 +521,7 @@
 
                 if (this.options.height) {
                     var height = this.$tableBody.height();
+                    console.log("this.$tableBody.height():"+height );
                     this.$rightfixedBody.find('.fixed-table-body').css('height',height+'px');
                 }
 
@@ -530,7 +541,7 @@
                     }
                 });
 
-                this.$rightfixedBody.width(headerWidth + 10).show();
+                if(!this.__custom) this.$rightfixedBody.width(headerWidth + 10).show();
             }
         }
     };
@@ -569,7 +580,7 @@
             var visibleFields = that.getVisibleFields();
 
             if (!this.$body.find('> tr[data-index]').length) {
-                this.$fixedBody.hide();
+                if(!this.__custom) this.$fixedBody.hide();
                 return;
             }
 
@@ -583,12 +594,13 @@
                 }
             });
 
-
-            this.$fixedBody.css({
-                // width: width,
-                // height: height,
-                top: '0px'
-            }).show();
+            if(!this.__custom){
+                this.$fixedBody.css({
+                    // width: width,
+                    // height: height,
+                    top: '0px'
+                }).show();
+            }
 
             this.$body.find('>tr:first-child:not(.no-records-found) > *').each(function (i) {
                 var $this = $(this),
@@ -658,7 +670,7 @@
             }
 
             if (!this.$body.find('> tr[data-index]').length) {
-                this.$rightfixedBody.hide();
+                if(!this.__custom) this.$rightfixedBody.hide();
                 return;
             }
 
