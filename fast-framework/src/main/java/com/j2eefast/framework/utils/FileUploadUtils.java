@@ -73,6 +73,16 @@ public class FileUploadUtils {
             }
         }
     }
+
+    /**
+     * 根据业务ID,业务类型 获取文件列表集合
+     * @param bizId
+     * @param bizType
+     * @return
+     */
+    public static List<SysFilesEntity> getBizIdByFileList(Long bizId,String bizType){
+        return ConstantFactory.me().getSysFileService().selectSysFilesList(Convert.toStr(bizId),bizType);
+    }
     
     /**
     * @Title: removeFileUpload 
