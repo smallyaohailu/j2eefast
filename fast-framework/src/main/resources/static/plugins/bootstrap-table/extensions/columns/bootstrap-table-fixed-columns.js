@@ -507,11 +507,12 @@
             if(totalLength == 1){
                 if(!this.__custom) this.$rightfixedBody.hide();
             }else{
+
                 var index = 0
                 this.$body.find('tr:eq(0)').find('td').each(function (i) {
                     for(var k=0; k<that.options.rightFixedNumber; k++){
                         if(i == (totalLength -k -1)){
-                            headerWidth += parseInt($(this).outerWidth(),10);
+                            headerWidth += $(this).outerWidth();
                             index ++;
                         }
                     }
@@ -521,7 +522,6 @@
 
                 if (this.options.height) {
                     var height = this.$tableBody.height();
-                    console.log("this.$tableBody.height():"+height );
                     this.$rightfixedBody.find('.fixed-table-body').css('height',height+'px');
                 }
 
@@ -540,8 +540,11 @@
                         }
                     }
                 });
-
-                if(!this.__custom) this.$rightfixedBody.width(headerWidth + 10).show();
+                if(this.$tableBody.height() < this.$el.find('>tbody').outerHeight()){
+                    if(!this.__custom) this.$rightfixedBody.width(headerWidth + 10).show();
+                }else{
+                    if(!this.__custom) this.$rightfixedBody.css("width","").show();
+                }
             }
         }
     };
@@ -617,10 +620,16 @@
             });
 
 
-
+            //fix: 组合表头切换自定义表格表头错乱问题
+            var __h = 0;
             this.$header.find('> tr').each(function (i) {
-                that.$fixedHeaderColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
+                __h += $(this).outerHeight();
             });
+            that.$fixedHeaderColumns.height(__h);
+
+            // this.$header.find('> tr').each(function (i) {
+            //     that.$fixedHeaderColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
+            // });
 
             this.$body.find('> tr').each(function (i) {
                 that.$fixedBodyColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
@@ -674,9 +683,17 @@
                 return;
             }
 
+            //fix: 组合表头切换自定义表格表头错乱问题
+            var __h = 0;
             this.$header.find('> tr').each(function (i) {
-                that.$rightfixedHeaderColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
+                __h += $(this).outerHeight();
             });
+            that.$rightfixedHeaderColumns.height(__h);
+
+            // this.$header.find('> tr').each(function (i) {
+            //     that.$rightfixedHeaderColumns.find('tr:eq(' + i + ')').height($(this).outerHeight());
+            // });
+
 
             this.$body.find('> tr').each(function (i) {
                 that.$rightfixedBodyColumns.find('tr:eq(' + i + ')').height($(this).height());

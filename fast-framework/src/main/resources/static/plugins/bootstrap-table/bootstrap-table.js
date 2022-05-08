@@ -374,6 +374,7 @@
         showBorder: false,
         showToggle: false,
         showExport: false,
+        exportTxt: undefined,
         buttonsAlign: 'right',
         smartDisplay: true,
         escape: false,
@@ -389,6 +390,7 @@
         showCustomView: false,
         //图标
         customVIcon: undefined,
+        customTxt: undefined,
         //初始化显示表格
         showCustomTalbe: false,
         customViewFormatter: function(data){
@@ -519,6 +521,9 @@
         },
         onResetView: function () {
             return false;
+        },
+        onCustom: function(args){
+            return false;
         }
     };
 
@@ -632,7 +637,8 @@
         'collapse-row.bs.table': 'onCollapseRow',
         'refresh-options.bs.table': 'onRefreshOptions',
         'reset-view.bs.table': 'onResetView',
-        'refresh.bs.table': 'onRefresh'
+        'refresh.bs.table': 'onRefresh',
+        'custom.bs.table':'onCustom'
     };
 
     BootstrapTable.prototype.init = function () {
@@ -1226,7 +1232,8 @@
                 '" type="button" name="export" title="%s">',
                 this.options.formatExport()),
                 sprintf('<i class="%s %s"></i>', this.options.iconsPrefix, this.options.icons.exportIcon),
-                '</button>');
+                (this.options.exportTxt != undefined && this.options.exportTxt != '')?
+                    (this.options.exportTxt + '</button>'): '</button>');
         }
 
         if(this.options.showCustomView){
@@ -1238,7 +1245,8 @@
                 this.options.formatCardView()),
                 this.options.customVIcon == undefined ? sprintf('<i class="%s %s"></i>', this.options.iconsPrefix, this.options.icons.cardView):
                     sprintf('<i class="%s"></i>',this.options.customVIcon),
-                '</button>');
+                (this.options.customTxt != undefined && this.options.customTxt != '')?
+                    (this.options.customTxt + '</button>'): '</button>');
         }
 
         if (this.options.showSearch) {
@@ -1281,8 +1289,7 @@
         }
 
         //TODO 是否隐藏列下拉工具 如果是复杂表头不显示
-        if (!this.options.showCustomView &&
-            this.options.showColumns && this.options.columns.length == 1) {
+        if (this.options.showColumns && this.options.columns.length == 1) {
             html.push(sprintf('<div class="keep-open btn-group" title="%s">',
                 this.options.formatColumns()),
                 '<button type="button" class="btn' +
@@ -1363,7 +1370,7 @@
             })
         }
 
-        if (!this.options.showCustomView && this.options.showColumns) {
+        if (this.options.showColumns) {
             $keepOpen = this.$toolbar.find('.keep-open');
 
             if (switchableCount <= this.options.minimumCountColumns) {
@@ -3840,8 +3847,7 @@
         this.initSearch();
         this.initPagination();
         this.initBody();
-        if (!this.options.showCustomView &&
-            this.options.showColumns) {
+        if (this.options.showColumns) {
             var $items = this.$toolbar.find('.keep-open input').prop('disabled', false);
 
             if ($items.filter(':checked').length <= this.options.minimumCountColumns) {
@@ -3967,6 +3973,8 @@
                 }
             });
         }
+
+        that.trigger('custom', this.__custom);
     };
 
 
