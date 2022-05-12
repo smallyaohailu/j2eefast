@@ -118,6 +118,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 			LoginUserEntity loginUserEntity = (LoginUserEntity) subject
 					.getPrincipal();
 			String userName = loginUserEntity == null? "":loginUserEntity.getUsername();
+			String name = loginUserEntity == null? "":loginUserEntity.getName();
 			String userId = loginUserEntity == null? "":Convert.toStr(loginUserEntity.getId());
 			// 不同参数处理
 			if(__ajax != null) {
@@ -131,6 +132,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 					paramIn.set("_lang", StrUtil.nullToDefault(CookieUtil.getCookie(req,ConfigConstant.LANGUAGE)
 							,LocaleContextHolder.getLocale().toString()));
 					paramIn.set("_username", userName);
+					paramIn.set("__NAME__", name);
 					paramIn.set("userId", userId);
 					paramIn.set("_secretkey", ConfigConstant.PUBKEY);
 					paramIn.set("_i18n_tag", ConfigConstant.I18N_ATG);
@@ -145,7 +147,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 				}
 			}else {
 				StringBuffer _default = _default(path, StrUtil.nullToDefault(CookieUtil.getCookie(req,ConfigConstant.LANGUAGE)
-						,LocaleContextHolder.getLocale().toString()),userName,userId)
+						,LocaleContextHolder.getLocale().toString()),userName,name,userId)
 						.append(StrUtil.format(",basePath='{}';",basePath));
 				// 无头像设置默认
 				_default.append("function imgUserError(){var img=event.srcElement;img.src=baseURL+\"static/img/user2-160x160.jpg\"; img.onerror=null;};");
@@ -198,7 +200,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 	 * 默认返回信息
 	 * @return
 	 */
-	public StringBuffer _default(String baseURL,String lang, String _username, String userId) {
+	public StringBuffer _default(String baseURL,String lang, String _username,String name, String userId) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("/*!\n" + 
 				" * Copyright (c) 2020-Now http://www.j2eefast.com All rights reserved.\n" + 
@@ -208,7 +210,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 				" */\n");
 		sb.append(StrUtil.format("var baseURL='{}/',ctx='{}',__LANG__='{}',", baseURL,baseURL,
 				lang));
-		sb.append(StrUtil.format("__USERNAME__='{}',__USERID__='{}',", _username,userId));
+		sb.append(StrUtil.format("__USERNAME__='{}',__NAME__='{}',__USERID__='{}',", _username,name,userId));
 		sb.append(StrUtil.format("__SECRETKEY__='{}',", ConfigConstant.PUBKEY));
 		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
 		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));

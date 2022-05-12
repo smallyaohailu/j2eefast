@@ -19,6 +19,7 @@ import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 分布式锁
  * @ClassName DistributedLockAop
  * @Description
  * @author mfksn001@163.com
