@@ -649,6 +649,10 @@
     color: #fff;
 }
 
+.skin-black .ibox-title i{
+    color:#1E9FFF
+}
+
 /*TAB默认*/
 .skin-black .larry-tab-box>.layui-tab-title .layui-this.layui-this:after {
     background-color: #0a0a0a;
@@ -1109,6 +1113,9 @@
     color: #00a65a;
 }
 
+.skin-green .ibox-title i{
+    color:#00a65a
+}
 
 .skin-green .fontawesome-icon-list .fa-hover:hover {
     background-color: #00a65a !important;
@@ -1637,6 +1644,11 @@
 .skin-red-light   .btn-notadd{
     background: #d73925;
 }
+
+.skin-red-light .ibox-title i{
+    color:#d73925
+}
+
 /*TAB默认*/
 .skin-red-light .larry-tab-box>.layui-tab-title .layui-this.layui-this:after {
     background-color: #000;
@@ -2104,6 +2116,10 @@
     color: #f39c12 !important;
 }
 
+.skin-yellow-light .ibox-title i{
+    color:#f39c12
+}
+
 .skin-yellow-light .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
     background-color: #f39c12 !important;
 }
@@ -2519,6 +2535,10 @@
 .skin-purple-light .fontawesome-icon-list .fa-hover:hover {
     background-color: #605ca8 !important;
 }
+.skin-purple-light .ibox-title i{
+    color:#605ca8
+}
+
 .skin-purple-light .treeview-menu>li.active>a,.skin-purple-light .treeview-menu>li>a:hover {
     color:#000
 }
@@ -2829,4 +2849,8 @@
 }
 .skin-blue-dark .main-footer {
     border-top-color:#d2d6de
+}
+
+.skin-blue-dark .ibox-title i{
+    color:#1951be;
 }
