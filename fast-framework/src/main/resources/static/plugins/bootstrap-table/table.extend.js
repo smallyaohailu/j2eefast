@@ -794,7 +794,6 @@
                 opt.layer.open({
                     type: 1,
                     area: ['580px', '200px'],
-                    shadeClose: true,
                     resize: false,
                     scrollbar: true,
                     //shade: 0.3,

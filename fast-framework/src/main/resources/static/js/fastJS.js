@@ -1822,8 +1822,7 @@ if (typeof jQuery === "undefined") {
             formatDat: function(date, format) {
                 var that = this;
                 if(that.isEmpty(date)) return "";
-                if (!date) return;
-                if (!format) format = "yyyy-MM-dd";
+                format = format || "yyyy-MM-dd";
                 switch(typeof date) {
                     case "string":
                         date = new Date(date.replace(/-/g, "/"));
