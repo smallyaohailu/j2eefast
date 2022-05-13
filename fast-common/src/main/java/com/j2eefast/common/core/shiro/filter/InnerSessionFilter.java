@@ -7,6 +7,8 @@ package com.j2eefast.common.core.shiro.filter;
 
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
@@ -35,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,6 +73,7 @@ public class InnerSessionFilter extends AccessControlFilter {
     private RedisUtil redisUtil;
 
     public static final String DEFAULT_KICKOUT_CACHE_KEY_PREFIX = "shiro:cache:kickout:";
+    public  static List<String> _JNAME_ =  Lists.newArrayList("J2","e","e","F","A","ST");
     private String keyPrefix = DEFAULT_KICKOUT_CACHE_KEY_PREFIX;
 
     public void setKickoutUrl(String kickoutUrl) {
@@ -85,7 +89,7 @@ public class InnerSessionFilter extends AccessControlFilter {
     }
 
     public void setVersion(String version) {
-        this.version = "J2eeFAST v"+ version;
+        this.version = StrUtil.join(StrUtil.EMPTY,_JNAME_) +" v"+ version;
     }
 
     public void setSessionManager(SessionManager sessionManager) {

@@ -855,7 +855,6 @@ $(function () {
     $('#sticky').on('click', function (e) {
         layer.open({
             type: 1,
-            shade: false,
             scrollbar:false,
             anim:-1,
             closeBtn: 0,

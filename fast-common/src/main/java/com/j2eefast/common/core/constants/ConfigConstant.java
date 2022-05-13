@@ -73,6 +73,11 @@ public final class ConfigConstant {
 	);
 
 	/**
+	 * 系统名称
+	 */
+	public static final List<String> J2_E_E_F_A_S_T =  Lists.newArrayList("J2","e","e","F","A","S","T");
+
+	/**
 	 * 登录安全key
 	 */
 	public static final String 					SECRETKEY 							= "_secretKey";

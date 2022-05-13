@@ -93,7 +93,7 @@
 
         <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
                 <charset>utf-8</charset>
             </encoder>
         </appender>

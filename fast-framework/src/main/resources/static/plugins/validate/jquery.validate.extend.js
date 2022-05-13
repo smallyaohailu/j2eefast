@@ -3,7 +3,7 @@
  * @author J2eeFAST
  * @version 2020-09-30
  */
-opt.domReady(function(){
+$(function () {
 
 	//配置通用的默认提示语
 	var icon = "<i class='fa fa-times-circle'></i>  ";

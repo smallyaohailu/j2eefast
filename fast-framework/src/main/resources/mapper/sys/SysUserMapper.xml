@@ -238,6 +238,23 @@
         </if>
     </select>
 
+    <!--查询机构下角色的邮箱 -->
+    <select id="findEmailsByUserId" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
+        SELECT u.id AS id,
+        u.username, u.name,u.password,u.salt,u.email,u.mobile,u.status,u.card_id,u.create_time,
+        u.dept_id,u.comp_id
+        FROM  sys_user u
+        LEFT JOIN sys_user_role r ON u.id = r.user_id
+        LEFT JOIN sys_role l ON r.role_id = l.id
+        WHERE  u.del_flag != '1'
+        <if test = "deptId !=null and deptId!=''">
+            AND u.dept_id = #{deptId}
+        </if>
+        <if test = "roleKey !=null and roleKey!=''">
+            AND l.role_key = #{roleKey}
+        </if>
+    </select>
+
     <!-- 用户页面表格 分页查询-->
     <select id="findPage" resultType="com.j2eefast.framework.sys.entity.SysUserEntity">
         <include refid="sqlpage"/>

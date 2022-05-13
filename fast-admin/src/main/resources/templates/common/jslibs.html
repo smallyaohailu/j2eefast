@@ -13,10 +13,10 @@
 <script src="${ctxStatic}/static/plugins/select2/select2.min.js"></script>
 <script src="${ctxStatic}/static/libs/jquery.i18n.properties.js"></script>
 <#--全局遮罩-->
-<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.js"></script>
+<script src="${ctxStatic}/static/plugins/blockUI/jquery.blockUI.js?V=${config.getDvVersion()}"></script>
 <#-- layui-->
-<script src="${ctxStatic}/static/plugins/layer/layer.js"></script>
-<script src="${ctxStatic}/static/plugins/laydate/laydate.js"></script>
+<script src="${ctxStatic}/static/plugins/layer/layer.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/plugins/laydate/laydate.js?V=${config.getDvVersion()}"></script>
 <script src="${ctxStatic}/static/plugins/iCheck/icheck.min.js"></script>
 <#compress>
 <#if !(Libs?is_string) && Libs?? && (Libs?size > 0) >
@@ -25,7 +25,7 @@
                 <#--bootstrap-table 表格插件-->
                 <script src="${ctxStatic}/static/plugins/bootstrap-table/bootstrap-table.js?V=${config.getDvVersion()}"></script>
                 <script src="${ctxStatic}/static/plugins/bootstrap-table/locale/bootstrap-table-i18n.js"></script>
-                <script src="${ctxStatic}/static/plugins/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.js"></script>
+                <script src="${ctxStatic}/static/plugins/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.js?V=${config.getDvVersion()}"></script>
                 <script src="${ctxStatic}/static/libs/jquery.contextMenu.min.js"></script>
                 <#if Libs?seq_contains("resizable")>
                 <script src="${ctxStatic}/static/plugins/bootstrap-table/extensions/resizable/bootstrap-table-resizable.js"></script>
@@ -120,7 +120,7 @@
             </#if>
             <#-- 评论-->
             <#if x == "comments">
-                <script src="${ctxStatic}/static/plugins/comments/comments.js"></script>
+                <script src="${ctxStatic}/static/plugins/comments/comments.js?V=${config.getDvVersion()}"></script>
             </#if>
             <#--百度 ECharts-->
             <#if x == "echarts">
@@ -134,8 +134,8 @@
 </#if>
 <script src="${ctxStatic}/static/js/fastJS.js?V=${config.getDvVersion()}"></script>
 <#-- jquery-validate 表单验证插件 -->
-<script src="${ctxStatic}/static/plugins/validate/jquery.validate.min.js"></script>
-<script src="${ctxStatic}/static/plugins/validate/jquery.validate.extend.min.js"></script>
+<script src="${ctxStatic}/static/plugins/validate/jquery.validate.min.js?V=${config.getDvVersion()}"></script>
+<script src="${ctxStatic}/static/plugins/validate/jquery.validate.extend.js?V=${config.getDvVersion()}"></script>
 <#--VUE-->
 <script src="${ctxStatic}/static/libs/vue.min.js"></script>
 <#if !(Libs?is_string) && Libs?? && (Libs?size > 0) >
@@ -143,7 +143,7 @@
         <#if x == "code">
             <script src="${ctxStatic}/static/plugins/ace/ace.js"></script>
             <script src="${ctxStatic}/static/plugins/ace/ext-language_tools.js"></script>
-            <script src="${ctxStatic}/static/plugins/ace/aceEditor.js"></script>
+            <script src="${ctxStatic}/static/plugins/ace/aceEditor.js?V=${config.getDvVersion()}"></script>
             <script src="${ctxStatic}/static/libs/base64.js"></script>
         </#if>
         <#if x == "table">

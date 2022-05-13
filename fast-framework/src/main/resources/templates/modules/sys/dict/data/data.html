@@ -84,6 +84,7 @@
                 editUrl: prefix + "/edit/{id}",
                 delUrl: prefix + "/del",
                 sortName: "dictSort",
+                height: function(){ return $(window).height() - 114},
                 queryParams: this.queryParams, /*初始化请求参数*/
                 modalName: "${i18n("字典")}",
                 columns: [

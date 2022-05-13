@@ -185,8 +185,29 @@ if (typeof jQuery === "undefined") {
             return null
         }(),
 
-        error: function (msg,callback) {
+        /**
+         * 第一个参数必输 提示内容
+         * 第二个参数 第三个参数 非必输循序随意 代表 显示时间、回调函数
+         * 支持动态参数 3个
+         * @param msg
+         */
+        error: function (msg) {
+            var __arguments = arguments;
+            var callback = '';
+            var hideTime = 8000;
+            var __callback = __arguments.length > 1;
+            if(__callback){
+                for(var i = 1; i<__arguments.length; i++){
+                    if(typeof __arguments[i] == 'number'){
+                        hideTime = __arguments[i];
+                    }
+                    if(typeof __arguments[i] == 'function'){
+                        callback = __arguments[i];
+                    }
+                }
+            }
             opt.modal.enable(); //显示提交按钮
+            hideTime = hideTime || 8000;
             if(opt.toast){
                 var position = {
                     right: 7,
@@ -201,7 +222,7 @@ if (typeof jQuery === "undefined") {
                 opt.toast({
                     heading: $.i18n.prop('警告'),
                     text: msg,
-                    hideAfter:8000,
+                    hideAfter: hideTime,
                     position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
@@ -217,7 +238,21 @@ if (typeof jQuery === "undefined") {
             }
         },
 
-        info: function(msg,callback){
+        info: function(msg){
+            var __arguments = arguments;
+            var callback = '';
+            var hideTime = 4000;
+            var __callback = __arguments.length > 1;
+            if(__callback){
+                for(var i = 1; i<__arguments.length; i++){
+                    if(typeof __arguments[i] == 'number'){
+                        hideTime = __arguments[i];
+                    }
+                    if(typeof __arguments[i] == 'function'){
+                        callback = __arguments[i];
+                    }
+                }
+            }
             if(opt.toast){
                 var position = {
                     right: 7,
@@ -232,7 +267,7 @@ if (typeof jQuery === "undefined") {
                 opt.toast({
                     heading: $.i18n.prop('提示'),
                     text: msg,
-                    hideAfter:4000,
+                    hideAfter:hideTime,
                     position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
@@ -250,7 +285,22 @@ if (typeof jQuery === "undefined") {
             }
         },
 
-        success: function (msg,callback) {
+        success: function (msg) {
+            var __arguments = arguments;
+            var callback = '';
+            var hideTime = 4000;
+            var __callback = __arguments.length > 1;
+            if(__callback){
+                for(var i = 1; i<__arguments.length; i++){
+                    if(typeof __arguments[i] == 'number'){
+                        hideTime = __arguments[i];
+                    }
+                    if(typeof __arguments[i] == 'function'){
+                        callback = __arguments[i];
+                    }
+                }
+            }
+            debugger;
             if(opt.toast){
                 var position = {
                     right: 7,
@@ -265,7 +315,7 @@ if (typeof jQuery === "undefined") {
                 opt.toast({
                     heading: $.i18n.prop('成功'),
                     text: msg,
-                    hideAfter:4000,
+                    hideAfter: hideTime,
                     position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
@@ -290,7 +340,21 @@ if (typeof jQuery === "undefined") {
 
         },
 
-        warning:function(text,callback){
+        warning:function(text){
+            var __arguments = arguments;
+            var callback = '';
+            var hideTime = 4000;
+            var __callback = __arguments.length > 1;
+            if(__callback){
+                for(var i = 1; i<__arguments.length; i++){
+                    if(typeof __arguments[i] == 'number'){
+                        hideTime = __arguments[i];
+                    }
+                    if(typeof __arguments[i] == 'function'){
+                        callback = __arguments[i];
+                    }
+                }
+            }
             if(opt.toast){
                 var position = {
                     right: 7,
@@ -305,7 +369,7 @@ if (typeof jQuery === "undefined") {
                 opt.toast({
                     heading: $.i18n.prop('警告'),
                     text: text,
-                    hideAfter:4000,
+                    hideAfter: hideTime,
                     position: position,
                     showHideTransition: 'slide',
                     afterHidden: function () {
@@ -1758,8 +1822,7 @@ if (typeof jQuery === "undefined") {
             formatDat: function(date, format) {
                 var that = this;
                 if(that.isEmpty(date)) return "";
-                if (!date) return;
-                if (!format) format = "yyyy-MM-dd";
+                format = format || "yyyy-MM-dd";
                 switch(typeof date) {
                     case "string":
                         date = new Date(date.replace(/-/g, "/"));

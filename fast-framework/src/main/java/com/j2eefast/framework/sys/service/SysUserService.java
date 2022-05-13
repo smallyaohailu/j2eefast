@@ -158,6 +158,17 @@ public class SysUserService  extends ServiceImpl<SysUserMapper,SysUserEntity> {
 											String roleKey){
 		return sysUserMapper.findMobilesByUserId(deptId,roleKey);
 	}
+
+	/**
+	 * 通过机构ID 查询角色下用户电子邮件
+	 * @param deptId
+	 * @param roleKey
+	 * @return
+	 */
+	public List<SysUserEntity> findEmailsByUserId(Long deptId,
+											String roleKey){
+		return sysUserMapper.findEmailsByUserId(deptId,roleKey);
+	}
 	
 	/**
 	 * 查询手机号码是否存在

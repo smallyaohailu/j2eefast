@@ -118,6 +118,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 			LoginUserEntity loginUserEntity = (LoginUserEntity) subject
 					.getPrincipal();
 			String userName = loginUserEntity == null? "":loginUserEntity.getUsername();
+			String name = loginUserEntity == null? "":loginUserEntity.getName();
 			String userId = loginUserEntity == null? "":Convert.toStr(loginUserEntity.getId());
 			// 不同参数处理
 			if(__ajax != null) {
@@ -131,6 +132,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 					paramIn.set("_lang", StrUtil.nullToDefault(CookieUtil.getCookie(req,ConfigConstant.LANGUAGE)
 							,LocaleContextHolder.getLocale().toString()));
 					paramIn.set("_username", userName);
+					paramIn.set("__NAME__", name);
 					paramIn.set("userId", userId);
 					paramIn.set("_secretkey", ConfigConstant.PUBKEY);
 					paramIn.set("_i18n_tag", ConfigConstant.I18N_ATG);
@@ -145,7 +147,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 				}
 			}else {
 				StringBuffer _default = _default(path, StrUtil.nullToDefault(CookieUtil.getCookie(req,ConfigConstant.LANGUAGE)
-						,LocaleContextHolder.getLocale().toString()),userName,userId)
+						,LocaleContextHolder.getLocale().toString()),userName,name,userId)
 						.append(StrUtil.format(",basePath='{}';",basePath));
 				// 无头像设置默认
 				_default.append("function imgUserError(){var img=event.srcElement;img.src=baseURL+\"static/img/user2-160x160.jpg\"; img.onerror=null;};");
@@ -153,7 +155,8 @@ public class ResourceLoaderServlet extends HttpServlet {
 					_default.append(";$(function() {" +
 							"var lic = $('<div id=\""+ RandomUtil.randomString(5) +"\" style=\"position: fixed;right: 100px;overflow: hidden;z-index: 19920219;" +
 							"pointer-events: none;opacity: 0.2;font-size: 14px;font-family: Microsoft YaHei UI,Microsoft YaHei;color: rgb(255 0 0);" +
-							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">(J2eeFAST)</span></div>');" +
+							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">("
+							+StrUtil.join(StrUtil.EMPTY,ConfigConstant.J2_E_E_F_A_S_T)+")</span></div>');" +
 							"if(!(self.frameElement && self.frameElement.tagName == \"IFRAME\")){" +
 							"if($('.wrapper > footer').length == 0){" +
 							"lic.css('bottom','');"+
@@ -198,7 +201,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 	 * 默认返回信息
 	 * @return
 	 */
-	public StringBuffer _default(String baseURL,String lang, String _username, String userId) {
+	public StringBuffer _default(String baseURL,String lang, String _username,String name, String userId) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("/*!\n" + 
 				" * Copyright (c) 2020-Now http://www.j2eefast.com All rights reserved.\n" + 
@@ -208,7 +211,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 				" */\n");
 		sb.append(StrUtil.format("var baseURL='{}/',ctx='{}',__LANG__='{}',", baseURL,baseURL,
 				lang));
-		sb.append(StrUtil.format("__USERNAME__='{}',__USERID__='{}',", _username,userId));
+		sb.append(StrUtil.format("__USERNAME__='{}',__NAME__='{}',__USERID__='{}',", _username,UnicodeUtil.toUnicode(name),userId));
 		sb.append(StrUtil.format("__SECRETKEY__='{}',", ConfigConstant.PUBKEY));
 		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
 		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));

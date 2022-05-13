@@ -183,6 +183,16 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
                                      @Param("roleKey") String roleKey);
 
     /**
+     * 通过部门ID 角色获取邮箱号码
+     * @param deptId
+     * @param roleKey
+     * @return
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    List<SysUserEntity> findEmailsByUserId(@Param("deptId") Long deptId,
+                                     @Param("roleKey") String roleKey);
+
+    /**
      * 查询手机号码是否存在
      * @date 2021-09-23
      * @param mobile

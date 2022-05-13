@@ -178,6 +178,9 @@
                     pageNumber: 1,                                      // 初始化加载第一页，默认第一页
                     pageSize: options.pageSize,                         // 每页的记录行数（*）
                     showCustomView: options.showCustomView,             // 是否开启自定义表格
+                    showCustomTalbe: options.showCustomTalbe,           // 初始化显示表格 默认false 显示自定义
+                    customVIcon: options.customVIcon,                   // 右上角自定义图标
+                    customTxt: options.customTxt,                       // 自定义图标按钮文字
                     customViewFormatter: options.customViewFormatter,   //
                     pageList: options.pageList,                         // 可供选择的每页的行数（*）
                     showCheckNumber: options.showCheckNumber,           // 勾选显示勾选的总数
@@ -209,6 +212,8 @@
                     showColumns: options.showColumns,                   // 是否显示隐藏某列下拉框
                     showToggle: options.showToggle,                     // 是否显示详细视图和列表视图的切换按钮
                     showExport: options.showExport,                     // 是否支持导出文件
+                    exportTxt: options.exportTxt,                       // 导出图标按钮文字
+                    onCustom: options.onCustom,                         // 点击视图切换图标事件
                     cardView: options.cardView,                         // 卡片视图
                     exportData: $.table.exportData,                     // 导出函数
                     uniqueId: options.uniqueId,                         // 唯 一的标识符
@@ -789,7 +794,6 @@
                 opt.layer.open({
                     type: 1,
                     area: ['580px', '200px'],
-                    shadeClose: true,
                     resize: false,
                     scrollbar: true,
                     //shade: 0.3,
