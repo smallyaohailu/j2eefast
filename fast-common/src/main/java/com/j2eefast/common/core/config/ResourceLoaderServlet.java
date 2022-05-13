@@ -155,7 +155,8 @@ public class ResourceLoaderServlet extends HttpServlet {
 					_default.append(";$(function() {" +
 							"var lic = $('<div id=\""+ RandomUtil.randomString(5) +"\" style=\"position: fixed;right: 100px;overflow: hidden;z-index: 19920219;" +
 							"pointer-events: none;opacity: 0.2;font-size: 14px;font-family: Microsoft YaHei UI,Microsoft YaHei;color: rgb(255 0 0);" +
-							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">(J2eeFAST)</span></div>');" +
+							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">("
+							+StrUtil.join(StrUtil.EMPTY,ConfigConstant.J2_E_E_F_A_S_T)+")</span></div>');" +
 							"if(!(self.frameElement && self.frameElement.tagName == \"IFRAME\")){" +
 							"if($('.wrapper > footer').length == 0){" +
 							"lic.css('bottom','');"+
@@ -210,7 +211,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 				" */\n");
 		sb.append(StrUtil.format("var baseURL='{}/',ctx='{}',__LANG__='{}',", baseURL,baseURL,
 				lang));
-		sb.append(StrUtil.format("__USERNAME__='{}',__NAME__='{}',__USERID__='{}',", _username,name,userId));
+		sb.append(StrUtil.format("__USERNAME__='{}',__NAME__='{}',__USERID__='{}',", _username,UnicodeUtil.toUnicode(name),userId));
 		sb.append(StrUtil.format("__SECRETKEY__='{}',", ConfigConstant.PUBKEY));
 		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
 		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));

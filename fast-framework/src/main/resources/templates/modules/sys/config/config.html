@@ -55,6 +55,7 @@
 			pageSize: 12,
 			pageList: [12, 24, 36],
             modalName: "${i18n("参数")}",
+            height: function(){ return $(window).height() - 114},
             columns: [
 	 		/* {checkbox: true}, */
 					{field: 'id', title: "${i18n("参数主键")}"},
