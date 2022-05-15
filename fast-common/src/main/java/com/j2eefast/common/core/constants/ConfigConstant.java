@@ -48,6 +48,7 @@ public final class ConfigConstant {
 	public static final String 				    SERVER_SERVLET_CONTEXTPATH          = "server.servlet.context-path";
 	public static final String					FAST_LOGIN_CSRF_TOKEN				= "FAST_LOGIN_CSRF_TOKEN";
 	public static final String					SHIRO_SESSION_ID					= "shiro:session:";
+	public static String						F_VSRION							= "2.6.0";
 	public static final String 					SQLFILTER 							= "sqlFilter";
 	public static final String 					SQL_FILTER 							= "sql_filter";
 	public static byte[]                  		PRIVKEY								= HexUtil.decodeHex("a1ab63f9b726482d47d7529b4bdb57fbdd68c492d19cf8e3f1140fb68d193f7b");
@@ -58,7 +59,7 @@ public final class ConfigConstant {
 	/**
 	 * 错误页面
 	 */
-	public static String						ERR_PAGE							= "__ERRPAGE__";
+	public static final String					ERR_PAGE							= "__ERRPAGE__";
 	
 	/**
 	 *  系统多租户忽略添加租户ID的表

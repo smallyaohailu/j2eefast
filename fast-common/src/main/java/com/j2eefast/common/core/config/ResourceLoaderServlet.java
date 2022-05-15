@@ -139,7 +139,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 					paramIn.set("_secretkey", ConfigConstant.PUBKEY);
 					paramIn.set("_i18n_tag", ConfigConstant.I18N_ATG);
 					paramIn.set("__DICTTAG__", ConfigConstant.DICT_TAG);
-					paramIn.set("_VERSION", PropertiesUtils.getInstance().get("version"));
+					paramIn.set("_VERSION", ConfigConstant.F_VSRION);
 					paramIn.set("title", Global.getConfig("SYS_CONFIG_TITLE"));
 					paramIn.set("sysConfig", JSONUtil.parseObj(Global.getConfig(ConfigConstant.SYS_CONFIG_KEY)));
 					paramIn.set("tenantModel",PropertiesUtils.getInstance().get("fast.tenantModel.enabled"));
@@ -218,7 +218,7 @@ public class ResourceLoaderServlet extends HttpServlet {
 		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
 		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));
 		sb.append(StrUtil.format("__DICTTAG__='{}',", ConfigConstant.DICT_TAG));
-		sb.append(StrUtil.format("__VERSION__='{}'", PropertiesUtils.getInstance().get("version")));
+		sb.append(StrUtil.format("__VERSION__='{}'", ConfigConstant.F_VSRION));
 		return sb;
 	}
 	
