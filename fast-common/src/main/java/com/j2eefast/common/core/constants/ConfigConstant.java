@@ -29,6 +29,7 @@ public final class ConfigConstant {
 	public static final String 					GET									= "GET";
 	public static byte[] 						FAST_MAC_KEY						= HexUtil.decodeHex("BF8F83A656BD75925379384E454DD174");
 	public static byte[] 						FAST_KEY							= HexUtil.decodeHex("62D95F5BA8E44064231018DF8A9EE027");
+	public static final List<String> 			J_2__E_E 							=  Lists.newArrayList("J2","e","e","F","A","S","T");
 	public static String 						KEY									= "D605C20574179E9F3526BC9076D77AE9";
 	public static byte[] 						FAST_VERIFY_KEY						= HexUtil.decodeHex("00000000000000000000000000000000");
 	public static String 						AUTHORIZATION_TIME					= "";
@@ -54,6 +55,10 @@ public final class ConfigConstant {
 	public static String						I18N_ATG							= "";
 	public static String						DICT_TAG							= "";
 	public static String 						LIC_TAG								= "NULL";
+	/**
+	 * 错误页面
+	 */
+	public static String						ERR_PAGE							= "__ERRPAGE__";
 	
 	/**
 	 *  系统多租户忽略添加租户ID的表
@@ -75,7 +80,7 @@ public final class ConfigConstant {
 	/**
 	 * 系统名称
 	 */
-	public static final List<String> J2_E_E_F_A_S_T =  Lists.newArrayList("J2","e","e","F","A","S","T");
+
 
 	/**
 	 * 登录安全key

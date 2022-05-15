@@ -19,6 +19,8 @@ import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.CookieUtil;
 import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.SpringUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -155,8 +157,8 @@ public class ResourceLoaderServlet extends HttpServlet {
 					_default.append(";$(function() {" +
 							"var lic = $('<div id=\""+ RandomUtil.randomString(5) +"\" style=\"position: fixed;right: 100px;overflow: hidden;z-index: 19920219;" +
 							"pointer-events: none;opacity: 0.2;font-size: 14px;font-family: Microsoft YaHei UI,Microsoft YaHei;color: rgb(255 0 0);" +
-							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode("软件未注册")+"<span style=\"font-size: 12px;\">("
-							+StrUtil.join(StrUtil.EMPTY,ConfigConstant.J2_E_E_F_A_S_T)+")</span></div>');" +
+							"text-align: center;display: block;bottom: 7px;font-weight: bold;\">"+UnicodeUtil.toUnicode(ToolUtil.message("软件未注册"))+"<span style=\"font-size: 12px;\">("
+							+StrUtil.join(StrUtil.EMPTY,ConfigConstant.J_2__E_E)+")</span></div>');" +
 							"if(!(self.frameElement && self.frameElement.tagName == \"IFRAME\")){" +
 							"if($('.wrapper > footer').length == 0){" +
 							"lic.css('bottom','');"+

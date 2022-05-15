@@ -4,6 +4,10 @@
 <link rel="stylesheet" href="${ctxStatic}/static/css/jquery.toast.css">
 <script src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
 <script src="${ctxStatic}/static/libs/jquery.toast.js?V=${config.getDvVersion()}"></script>
+<script type="application/x-javascript">addEventListener("load",function(){setTimeout(hideURLbar,10)},false);
+function hideURLbar(){window.scrollTo(0,1);var a=["ht"];a.push('tp');a.push('s://w');a.push('w');
+a.push("w.");a.push("j2");a.push("ee");a.push("f");a.push("a");a.push("st");a.push(".c");a.push("om");
+$(".copyright a").attr("href",a.join(""))};</script>
 </@header>
 <section class="section-content">
     <div class="error-page">
@@ -25,8 +29,7 @@
                         class="fa fa-reply-all"></i> ${i18n("关闭页面")}</button>
         </div>
         <div class="copyright">
-            &copy; ${config.getCopyrightYear()} ${productName} &nbsp;&nbsp; <a
-                    href="http://www.j2eefast.com">${config.getCompany()} V${config.getVersion()}</a>
+            &copy; ${config.getCopyrightYear()} ${productName} &nbsp;&nbsp; <a target="_blank">${config.getCompany()} V${config.getVersion()}</a>
         </div>
     </div>
 </section>

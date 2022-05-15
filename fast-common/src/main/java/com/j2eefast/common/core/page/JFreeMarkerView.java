@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSession;
 
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
+import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ServletUtil;
 import freemarker.core.ParseException;
@@ -263,9 +264,8 @@ public class JFreeMarkerView extends AbstractTemplateView {
     @Override
     protected void renderMergedTemplateModel(
             Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        exposeHelpers(model, request);
-        doRender(model, request, response);
+            exposeHelpers(model, request);
+            doRender(model, request, response);
     }
 
     /**
@@ -307,14 +307,17 @@ public class JFreeMarkerView extends AbstractTemplateView {
     protected void doRender(Map<String, Object> model, HttpServletRequest request,
                             HttpServletResponse response) throws Exception {
 
-        // Expose model to JSP tags (as request attributes).
-        exposeModelAsRequestAttributes(model, request);
-        // Expose all standard FreeMarker hash models.
-        SimpleHash fmModel = buildTemplateModel(model, request, response);
 
-        // Grab the locale-specific version of the template.
-        Locale locale = RequestContextUtils.getLocale(request);
-        processTemplate(getTemplate(locale), fmModel, response, request);
+            // Expose model to JSP tags (as request attributes).
+            exposeModelAsRequestAttributes(model, request);
+            // Expose all standard FreeMarker hash models.
+            SimpleHash fmModel = buildTemplateModel(model, request, response);
+
+            // Grab the locale-specific version of the template.
+            Locale locale = RequestContextUtils.getLocale(request);
+            processTemplate(getTemplate(locale), fmModel, response, request);
+
+
     }
 
     /**

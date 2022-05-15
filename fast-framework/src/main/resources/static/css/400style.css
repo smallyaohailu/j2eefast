@@ -23,65 +23,78 @@ img{max-width:100%;}
 /*end reset*/
 
 body p,h1,h2,h3,h4,h5,h6{
-	font-family: 'Open Sans', sans-serif;
+  font-family: "open sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
+
 body {
-    background: #e64c65;
+    background:#e3e7ec;
 	text-align:center;
 }
 /*--header--*/
 .header h1 {
     font-size: 51px;
     text-transform: uppercase;
-    letter-spacing: 11px;
-    color: white;
+    /* letter-spacing: 11px; */
+    color: #000;
     font-weight: 100;
-    margin: 0.7em 0em;
+    margin: 1em 0em;
+    padding-top: 5%;
 }
 /*--//header--*/
 
 /*--main--*/
 .w3-main {
-    background:#f76a81;
-    width: 53%;
+    background:#ffffff;
+    width: 43%;
 	margin: 2em auto;
-	-webkit-box-shadow: -2px 11px 32px -13px rgba(0,0,0,0.45);
-	-moz-box-shadow: -2px 11px 32px -13px rgba(0,0,0,0.45);
-	box-shadow: -2px 11px 32px -13px rgba(0,0,0,0.45);
-} 
+    border-radius: 4px;
+	-webkit-box-shadow: 5px 5px 12px -10px rgba(0,0,0,0.45);
+	-moz-box-shadow: 5px 5px 12px -10px rgba(0,0,0,0.45);
+	box-shadow: 5px 5px 12px -10px rgba(0,0,0,0.45);
+}
 .agile-info {
     padding: 60px 0px;
 }
 .agile-info h2 {
-    font-size: 12em;
-    color: black;
+    font-size: 9em;
+    color: tomato;
     line-height: 1;
     font-weight: 100;
     letter-spacing: 20px;
 }
+
 .agile-info h3 {
-    font-size: 38px;
-    text-transform: uppercase;
-    color: white;
+    font-size: 14px;
+    /* text-transform: uppercase; */
+    color: rgba(0, 0, 0, 0.71);
     line-height: 1.5;
-    font-weight: 100;
-    letter-spacing: 2px;
-    margin-top: 12px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
 }
+
+.agile-info .link{
+	letter-spacing: 0px;
+    font-size: 13px;
+    font-weight: 500;
+    border-bottom: 1px dashed #bdc5de;   
+}
+
  .agile-info p {
-    font-size: 18px;
+    font-size: 16px;
 	color: rgba(0, 0, 0, 0.71);
     text-transform: capitalize;
-    letter-spacing: 6px;
-    margin-bottom: 46px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
 }
+
 .agile-info a {
     font-size: 15px;
     text-transform: uppercase;
     color: white;
     border: 1px solid #3b5998;
-    padding: 10px 40px;
-    border-radius: 20px;
+    padding: 4px 30px;
+    border-radius: 15px;
     letter-spacing: 1px;
     display: inline-block;
     margin-top: 8px;
@@ -157,17 +170,25 @@ body {
 
 /*--footer--*/
 .footer-w3l p {
-    margin: 2.8em 0em;
-    color: #fff;
-    font-size: 15px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Liberation Sans", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, SimSun, "WenQuanYi Zen Hei Sharp", sans-serif;
+    color: rgba(0, 0, 0, 0.71);
+    font-size: 13px;
     font-weight: 100;
-    letter-spacing: 2px;
+    /* letter-spacing: 2px; */
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    bottom: 7px;
+    line-height: 1.33;
 }
-.footer-w3l a {
+/* .footer-w3l a {
     color: #fff;
-}
+} */
 .footer-w3l a:hover {
-    color: rgb(36, 228, 219);
+    color: rgb(0, 0, 0);
     text-decoration: underline;
 }
 /*--//footer--*/
@@ -262,8 +283,7 @@ body {
 	}
 	
 	.footer-w3l p {
-		margin: 2em 0.8em;
-		line-height: 26px;
+		display: none;
 	}
 }
 @media(max-width:480px){
@@ -285,8 +305,7 @@ body {
 		margin-top: 0px;
 	}
 	.footer-w3l p {
-		margin: 1.9em 0.8em;
-		line-height: 27px;
+		display: none;
 	}
 }
 @media(max-width:414px){
@@ -305,8 +324,7 @@ body {
 		padding: 58px 0px;
 	}
 	.footer-w3l p {
-		margin: 1.4em 0.7em;
-		line-height: 27px;
+		display: none;
 	}
 }
 @media(max-width:384px){
@@ -326,8 +344,7 @@ body {
 		padding: 47px 0px;
 	}
 	.footer-w3l p {
-		margin: 1.4em 0.3em;
-		line-height: 23px;
+		display: none;
 	}
 }
 @media(max-width:375px){
@@ -355,6 +372,11 @@ body {
 	.agile-info p {
 		font-size: 16px;
 		letter-spacing:3px;
+	}
+}
+@media(max-height:750px){
+	.footer-w3l p {
+		display: none;
 	}
 }
 /*--//responsive--*/

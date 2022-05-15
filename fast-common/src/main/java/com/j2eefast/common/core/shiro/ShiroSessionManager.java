@@ -1,7 +1,6 @@
 package com.j2eefast.common.core.shiro;
 
 import com.j2eefast.common.core.utils.ToolUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -11,18 +10,16 @@ import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.util.WebUtils;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 
 /**
  * @author: wangsaichao/J2eeFAST
  * @description: 解决单次请求需要多次访问redis, 降低Session更新的频率
+ * 支持sId访问
  */
-@Slf4j
 public class ShiroSessionManager extends DefaultWebSessionManager {
 
     private static final long DEFAULT_SESSION_IN_MEMORY_TIMEOUT = 1000L * 60 * 3;
@@ -30,10 +27,7 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
     private static final String HEADER_TAG = "__ajax";
     private static final String HEADER_JSON = "json";
 
-    private boolean sessionIdCookieEnabled;
-
     public ShiroSessionManager(){
-        sessionIdCookieEnabled = true;
     }
 
     @Override

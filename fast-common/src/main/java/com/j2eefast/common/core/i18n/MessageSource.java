@@ -15,6 +15,7 @@ import cn.hutool.setting.dialect.Props;
 import com.j2eefast.common.config.entity.SysLangEntity;
 import com.j2eefast.common.config.service.SysLangService;
 import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.utils.CookieUtil;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,10 +205,16 @@ public class MessageSource extends AbstractMessageSource implements ResourceLoad
      * @return
      */
     public String getSourceFromCache(String code, Locale locale) {
-        // 获取系统设置的语言编码
-        String language = locale == null ? RequestContextUtils.getLocale(ServletUtil.getRequest()).getLanguage() + "_"
-                + RequestContextUtils.getLocale(ServletUtil.getRequest()).getCountry()
-                : locale.getLanguage() + "_" + locale.getCountry();
+
+        String language = CookieUtil.getCookie(ServletUtil.getRequest(),"_lang");
+
+        if(ToolUtil.isEmpty(language)){
+            // 获取系统设置的语言编码
+            language = locale == null ? RequestContextUtils.getLocale(ServletUtil.getRequest()).getLanguage() + "_"
+                    + RequestContextUtils.getLocale(ServletUtil.getRequest()).getCountry()
+                    : locale.getLanguage() + "_" + locale.getCountry();
+        }
+
         // 获取缓存中对应语言的所有数据项
         Map<String, String> props = LOCAL_CACHE.get(language);
         if (null != props && props.containsKey(code)) {

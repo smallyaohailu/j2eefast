@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.Objects;
 
 /**
@@ -24,6 +27,16 @@ import java.util.Objects;
  * @version: 1.0.1
  */
 public class BaseController {
+	
+	/**
+	 * 登录
+	 */
+	@Value("#{ @environment['shiro.loginUrl'] ?: '/login' }")
+	protected String loginUrl;
+	
+	@Value("#{ @environment['shiro.successUrl'] ?: '/index' }")
+	protected String successUrl;
+	
     protected final String                  REDIRECT                        = "redirect:";
     protected final String                  FORWARD                         = "forward:";
 
