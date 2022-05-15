@@ -100,9 +100,10 @@ public class PropertiesUtils {
 					}
 				}
 			}
+			
 			configFiles = configSet.toArray(new String[configSet.size()]);
+			
 			INSTANCE = new PropertiesUtils(configFiles);
-
 
 			// J2eeFAST 赋值系统加密数据
 			if(ToolUtil.isEmpty(INSTANCE.get("machineCode"))){
@@ -164,7 +165,8 @@ public class PropertiesUtils {
 				Resource resource = ResourceUtils.getResource(location);
 				if (resource.exists()){
         			if (location.endsWith(".properties")){
-        				try (InputStreamReader is = new InputStreamReader(resource.getInputStream(), "UTF-8")){
+        				try{
+        					InputStreamReader is = new InputStreamReader(resource.getInputStream(), "UTF-8");
 	    					properties.load(is);
 	    					configSet.add(location);
 	        			} catch (IOException ex) {
@@ -178,6 +180,10 @@ public class PropertiesUtils {
         				for (Map.Entry<Object,Object> entry : bean.getObject().entrySet()){
         					properties.put(StringUtils.defaultString(String.valueOf(entry.getKey())),
 									entry.getValue());
+        					if(location.endsWith("fast-default.yml") &&
+        							"version".equals(String.valueOf(entry.getKey()))) {
+            					ConfigConstant.F_VSRION = (String) entry.getValue();
+            				}
         				}
     					configSet.add(location);
         			}
