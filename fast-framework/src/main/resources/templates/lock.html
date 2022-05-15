@@ -15,10 +15,8 @@
 <link rel="stylesheet" href="${ctxStatic}/static/css/Ionicons/css/ionicons.css">
 <#-- Theme style -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/AdminLTE.css?V=${config.getDvVersion()}">
-
 <#-- jQuery toast 提示框  -->
 <link rel="stylesheet" href="${ctxStatic}/static/css/jquery.toast.css">
-
 <link rel="stylesheet" href="${ctxStatic}/static/plugins/flipcountdown/jquery.flipcountdown.css">
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -107,7 +105,6 @@
 <script type="text/javascript" src="${ctxStatic}/static/libs/crypto-SM.min.js?V=${config.getDvVersion()}"></script>
 <script type="text/javascript">
     (function ($) {
-
         /*扩展Date*/
         if (!$.isFunction(Date.prototype.format)) {
             Date.prototype.format = function (format) {
@@ -297,7 +294,7 @@
             success: function(result) {
                 $(window).unblock();
                 if(result.code === "00000"){
-                    location.href = '../index';
+                    location.href = result.index;
                     return;
                 }if(result.code === "50004"){
                     $("input[name='password']").val("");

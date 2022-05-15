@@ -47,6 +47,8 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Value("#{ @environment['fast.messages.defaultLocale'] ?: 'zh_CN' }")
 	private String defaultLocale;
+	@Value("#{ @environment['fast.messages.enabled'] ?: false }")
+	private boolean msgEnabled;
 	@Value("#{ @environment['web.staticPrefix'] ?: 'classpath:/static/' }")
 	private String staticPrefix;
 	@Value("#{ @environment['web.cacheTime'] ?: 25 }")
@@ -90,7 +92,8 @@ public class WebConfig implements WebMvcConfigurer {
 	 */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(LicenseCheckInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(LicenseCheckInterceptor).addPathPatterns("/**")
+        .excludePathPatterns("/static/**","/authInsu/**");
     	registry.addInterceptor(securityKeyInterceptorAdapter).addPathPatterns("/**");
         registry.addInterceptor(lockHandlerInterceptorAdapter).addPathPatterns("/**");
         registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/**");
@@ -123,7 +126,7 @@ public class WebConfig implements WebMvcConfigurer {
 	 */
 	@Bean
     public LocaleResolver localeResolver(){
-        return new NativeLocaleResolver(defaultLocale);
+        return new NativeLocaleResolver(defaultLocale,msgEnabled);
     }
 
 	/**
@@ -140,32 +143,43 @@ public class WebConfig implements WebMvcConfigurer {
 		 * 默认配置
 		 */
 		private String defaultLocale;
+		private boolean enabled;
 
-		public NativeLocaleResolver(String defaultLocale){
+		public NativeLocaleResolver(String defaultLocale, boolean msgEnabled){
 			this.defaultLocale = defaultLocale;
+			this.enabled  = msgEnabled;
 		}
 
         @Override
         public Locale resolveLocale(HttpServletRequest request) {
-			String language = request.getParameter(ConfigConstant.LANGUAGE);
+        	Locale locale = null;
 			String cookie_language = CookieUtil.getCookie(request,ConfigConstant.LANGUAGE);
-			Locale locale = null;
-			if(ToolUtil.isNotEmpty(language)){
-				String[] split = language.split("_");
-				locale = new Locale(split[0],split[1]);
-				if(!language.equals(cookie_language)) {
-					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,language,60*60*24*7);
-				}
-			}else {
-				if(ToolUtil.isNotEmpty(cookie_language)){
-					String[] split = cookie_language.split("_");
-					locale = new Locale(split[0],split[1]);
-				}else{
+        	if(enabled) {
+        		String language = request.getParameter(ConfigConstant.LANGUAGE);
+    			if(ToolUtil.isNotEmpty(language)){
+    				String[] split = language.split("_");
+    				locale = new Locale(split[0],split[1]);
+    				if(!language.equals(cookie_language)) {
+    					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,language,60*60*24*7);
+    				}
+    			}else {
+    				if(ToolUtil.isNotEmpty(cookie_language)){
+    					String[] split = cookie_language.split("_");
+    					locale = new Locale(split[0],split[1]);
+    				}else{
+    					String[] split = defaultLocale.split("_");
+    					locale = new Locale(split[0],split[1]);
+    					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,defaultLocale,60*60*24*7);
+    				}
+    			}
+        	}else {
+        		if(ToolUtil.isEmpty(cookie_language) ||
+						!defaultLocale.equals(cookie_language)){
 					String[] split = defaultLocale.split("_");
 					locale = new Locale(split[0],split[1]);
 					CookieUtil.setReadCookie(ServletUtil.getResponse(),ConfigConstant.LANGUAGE,defaultLocale,60*60*24*7);
 				}
-			}
+        	}
 			return locale;
         }
 

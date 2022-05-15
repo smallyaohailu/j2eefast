@@ -16,7 +16,7 @@ import com.j2eefast.common.core.shiro.ShiroSessionManager;
 import com.j2eefast.common.core.shiro.filter.InnerSessionFilter;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.shiro.RestLogoutFilter;
-import com.j2eefast.framework.shiro.RestAuthorizationFilter;
+import com.j2eefast.framework.shiro.UserFilter;
 import com.j2eefast.framework.shiro.auth.UserModularRealmAuthorizer;
 import com.j2eefast.framework.shiro.realm.OtherRealm;
 import com.j2eefast.framework.shiro.realm.UserNameRealm;
@@ -69,6 +69,15 @@ public class ShiroConfig {
 	 */
 	@Value("#{ @environment['shiro.cookie.domain'] ?: '' }")
 	private String domain;
+	
+	/**
+	 * 登录
+	 */
+	@Value("#{ @environment['shiro.loginUrl'] ?: '/login' }")
+	private String loginUrl;
+	
+	@Value("#{ @environment['shiro.successUrl'] ?: '/index' }")
+	private String successUrl;
 
 	/**
 	 * 设置cookie的有效访问路径设置与项目路径一直
@@ -88,6 +97,8 @@ public class ShiroConfig {
 	@Value("#{ @environment['shiro.session.kickoutAfter'] ?: false }")
 	private boolean kickoutAfter;
 
+//	@Value("#{ @environment['shiro.isHideLoginUrl'] ?: false }")
+//	private boolean isHideLoginUrl;
 	/**
 	 * 是否开启记住我功能
 	 */
@@ -117,13 +128,6 @@ public class ShiroConfig {
 	 */
 	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
 	private boolean enabled;
-
-
-	/**
-	 * 前端端分离
-	 */
-	@Value("#{ @environment['fast.distributed.enabled'] ?: false }")
-	private boolean distributed;
 
 	/**
 	 * Shiro授权认证配置 系统YML文件配置信息
@@ -359,14 +363,15 @@ public class ShiroConfig {
 	public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
 		ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
 		shiroFilter.setSecurityManager(securityManager);
-		shiroFilter.setLoginUrl("/login");
+		//登录认证失败
+		shiroFilter.setLoginUrl(loginUrl);
 		//这里的/index是后台的接口名,非页面,登录成功后要跳转的链接
-		shiroFilter.setSuccessUrl("/index");
+		shiroFilter.setSuccessUrl(successUrl);
 
 		LinkedHashMap<String, Filter> filtersMap = new LinkedHashMap<>();
 
 		// ------------------- 系统必须默认
-        filterMap.put("/logout", "anon");
+        filterMap.put("/login", "anon");
         filterMap.put("/static/**", "anon");
 		filterMap.put("/swagger/**'", "anon");
 		filterMap.put("/swagger-ui/**", "anon");
@@ -391,19 +396,9 @@ public class ShiroConfig {
 		//自定义拦截器限制并发人数
 		filtersMap.put("inner", innerSessionFilter());
 		filtersMap.put("logout", new RestLogoutFilter());
-		if(distributed){
-			//--------------------------------------
-			//自定义过滤器   解决前后台分离的问题
-			filterMap.put("/**", "authc");
-			filtersMap.put("authc", new RestAuthorizationFilter());
-		}else{
-			filterMap.put("/**", "user,inner");
-		}
-		
+		filtersMap.put("user", new UserFilter());
+		filterMap.put("/**", "user,inner");
 		shiroFilter.setFilters(filtersMap);
-		
-		// 权限认证失败，则跳转到指定页面
-		shiroFilter.setUnauthorizedUrl("/");
 
 		//授权认证配置
 		if (null !=filterMap && filterMap.size() != 0) {			
@@ -424,7 +419,7 @@ public class ShiroConfig {
 		//是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；
 		innerSessionFilter.setKickoutAfter(kickoutAfter);
 		//被踢出后重定向到的地址；
-		innerSessionFilter.setKickoutUrl("/login?kickout=");
+		innerSessionFilter.setKickoutUrl(loginUrl+"?kickout=");
 
 		return innerSessionFilter;
 	}

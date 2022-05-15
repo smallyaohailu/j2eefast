@@ -108,7 +108,8 @@ var vm = new Vue({
                         $('#loginValidCode').attr("placeholder",SENDOW);
                         vm.sendValid = false;
                         that.setValidCodeTime(60);
-                        //vm.errrInfo("模拟测试验证码:"+result.valideCode);
+                        //演示
+                        //vm.errrInfo("模拟测试验证码:"+result.valideCode,10000);
                     }
                     else{
                         vm.errrInfo(result.msg);
@@ -155,7 +156,7 @@ var vm = new Vue({
 		                if(result.code == 0){
 		                    setTimeout(
 		                        function () {
-		                            location.href = baseURL +'index';
+		                            location.href = result.index;
 		                        }
 		                        , 100);
 		                }
@@ -245,7 +246,7 @@ var vm = new Vue({
                         };
                         setTimeout(
                             function () {
-                                location.href = baseURL +'index';
+                            	location.href = result.index;
                             }
                             , 100);
                     }else if(result.code == '50004' || result.code == '50006'){

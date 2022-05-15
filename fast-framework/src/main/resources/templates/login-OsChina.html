@@ -96,6 +96,7 @@
                                 </div>
                                 <div class="form-item box vertical">
                                     <div class="box-aw"></div>
+                                    <#if msgEnabled>
                                     <div class="dropdown box-fr">
                                         <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
                                             <i class="fa fa-language"></i>&nbsp;${i18n("中文(简体)")}
@@ -105,15 +106,15 @@
                                             <#list dict.getType('sys_lang_type')>
                                                 <#items as d>
                                                     <#if d.status =='0' >
-                                                        <li><a href="${ctxStatic}/login?_lang=${d.dictValue}&view=${loginView}">${d.dictLabel}</a></li>
+                                                        <li><a href="${ctxStatic+login}?_lang=${d.dictValue}">${d.dictLabel}</a></li>
                                                     </#if>
                                                 </#items>
                                             </#list>
                                             <li class="mt5"></li>
                                         </ul>
                                     </div>
+                                    </#if>
                                 </div>
-
                                 <div class="form-item">
                                     <div class="social-auth-links text-center">
                                         <#if config.getKey("SYS_IS_OAUTH") == "0">
@@ -164,7 +165,7 @@
                 <#list dict.getType('sys_login_view')>
                     <#items as d>
                         <#if d.status =='0' >
-                                <a href="${ctxStatic}/login?view=${d.dictValue}" class="btn-link">${d.dictLabel}</a> |
+                                <a href="${ctxStatic+login}?view=${d.dictValue}" class="btn-link">${d.dictLabel}</a> |
                         </#if>
                     </#items>
                 </#list>
@@ -292,7 +293,7 @@
                             };
                             setTimeout(
                                 function () {
-                                    location.href =ctx + '/index';
+                                    location.href = result.index;
                                 }
                                 , 100);
                         }else if(result.code == '50004' || result.code == '50006'){

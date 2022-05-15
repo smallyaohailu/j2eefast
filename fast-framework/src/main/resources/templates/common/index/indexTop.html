@@ -170,7 +170,7 @@
 <#--                        ${ctxStatic}/sys/msg/userMsg-->
                     </ul>
                 </li>
-                <!--  -->
+               <#if msgEnabled>
                 <li class="dropdown tasks-menu">
                     <a href="javascript:void(0);" class="dropdown-toggle">
                         <i class="fa fa-language"></i>
@@ -181,7 +181,7 @@
                         <#list dict.getType('sys_lang_type')>
                             <#items as d>
                                 <#if d.status =='0' >
-                                    <li><a onclick="__clearLang();" href="${ctxStatic}/index?_lang=${d.dictValue}">${d.dictLabel}</a></li>
+                                    <li><a onclick="__clearLang();" href="${ctxStatic+successUrl}?_lang=${d.dictValue}">${d.dictLabel}</a></li>
                                 </#if>
                             </#items>
                         </#list>
@@ -193,6 +193,7 @@
                         }
                     </script>
                 </li>
+                </#if>
                 <!-- User Account: style can be found in dropdown.less -->
                 <li class="dropdown user user-menu">
 <#--                    <a href="javascript:void(0);" class="dropdown-toggle">-->
