@@ -5,8 +5,15 @@
  */
 package com.j2eefast.framework.exception;
 
+import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.mybatis.spring.MyBatisSystemException;
@@ -15,13 +22,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.j2eefast.common.core.exception.RxcException;
 import freemarker.core.InvalidReferenceException;
+import org.springframework.web.util.UrlPathHelper;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * 项目全局异常处理器
@@ -67,9 +81,15 @@ public class RxcExceptionHandler {
 
 	@ExceptionHandler(AuthorizationException.class)
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	public ResponseData handleAuthorizationException(AuthorizationException e) {
+	public Object handleAuthorizationException(AuthorizationException e, HttpServletRequest request) {
 		logger.error("没有权限，请联系管理员授权---->" + e.getMessage());
-		return ResponseData.error("50001","没有权限，请联系管理员授权");
+		if(ServletUtil.isAjaxRequest(request)) {
+			return ResponseData.error("50001","没有权限，请联系管理员授权");
+		}else {
+			Map<String, Object> model = new ModelMap();
+			model.put(ConfigConstant.ERR_PAGE, UrlPathHelper.defaultInstance.getOriginatingRequestUri(request));
+			return new ModelAndView("error/401",model);
+		}
 	}
 	
 	@ExceptionHandler(InvalidReferenceException.class)
@@ -79,12 +99,33 @@ public class RxcExceptionHandler {
 		return ResponseData.error("Freemarker报错,检查HTML页面标签");
 	}
 
+	/**
+	 * 请求方式异常
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public Object handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
+													  HttpServletRequest request,
+													  HttpServletResponse response) {
+		String requestURI = request.getRequestURI();
+		logger.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
+		if(ServletUtil.isAjaxRequest(request)) {
+			return ResponseData.error("20000","请求不可用");
+		}else {
+			//Web 请求转html
+			try{
+				request.getRequestDispatcher(PropertiesUtils
+						.getInstance().getProperty("server.error.path","/error")).forward(request, response);
+			}catch (Exception e1){}
+			return null;
+		}
+	}
+
+
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseData ResponseDatahandleException(Exception e) {
-		if(("Request method 'GET' not supported").equals(e.getMessage())) {
-			return ResponseData.error("20000","请求不可用");
-		}
 		logger.error(e.getMessage(),e);
 		if(ToolUtil.isEmpty(e.getMessage())){
 			return ResponseData.error("服务器异常!");

@@ -189,18 +189,18 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                                         // 手机号码隐藏转换
                                         if(value.equals(ConvertType.PHONE)){
                                             if(!ToolUtil.isEmpty(str.getStr(key))){
-                                                str.put(key,str.getStr(key).replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+                                                str.set(key,str.getStr(key).replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
                                             }else {
-                                                str.put(key, StrUtil.EMPTY);
+                                                str.set(key, StrUtil.EMPTY);
                                             }
 
                                         }
                                         // 邮箱隐藏转换
                                         if(value.equals(ConvertType.EMAIL)){
                                             if(!ToolUtil.isEmpty(str.getStr(key))){
-                                                str.put(key,str.getStr(key).replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4"));
+                                                str.set(key,str.getStr(key).replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4"));
                                             }else {
-                                                str.put(key, StrUtil.EMPTY);
+                                                str.set(key, StrUtil.EMPTY);
                                             }
                                         }
                                     }

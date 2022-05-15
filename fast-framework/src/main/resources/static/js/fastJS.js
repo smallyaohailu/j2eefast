@@ -2209,7 +2209,7 @@ if (typeof jQuery === "undefined") {
                     }
                 }
 
-                opt.modal.loading($.i18n.prop("数据加载中，请稍后..."));
+                //opt.modal.loading($.i18n.prop("数据加载中，请稍后..."));
 
                 var index = opt.selfLayer.open({
                     type: type,
@@ -2233,13 +2233,13 @@ if (typeof jQuery === "undefined") {
                             iframeWin.contentWindow.onLoadSuccess(index,layero,opt.selfLayer);
                         }
                         // }
-                        opt.modal.closeLoading();
+                        //opt.modal.closeLoading();
                     },
                     cancel: function(index) {
                         return true;
                     },
                     end: function(){
-                        opt.modal.closeLoading();
+                        //opt.modal.closeLoading();
                     }
                 });
 

@@ -28,7 +28,7 @@
  * 
  **/
  
-﻿Ext.PagingToolbar.prototype.firstText = "Erste Seite";
+Ext.PagingToolbar.prototype.firstText = "Erste Seite";
 Ext.PagingToolbar.prototype.prevText = "Vorherige Seite";
 Ext.PagingToolbar.prototype.nextText = "Nächste Seite";
 Ext.PagingToolbar.prototype.lastText  = "Letzte Seite";

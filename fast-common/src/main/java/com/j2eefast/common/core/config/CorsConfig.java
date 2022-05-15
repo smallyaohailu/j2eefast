@@ -6,8 +6,6 @@
 package com.j2eefast.common.core.config;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -19,7 +17,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -121,13 +118,15 @@ public class CorsConfig{
             HttpServletResponse response = (HttpServletResponse) res;
             HttpServletRequest request = (HttpServletRequest) req;
 
-            log.info("----------------CORS跨域访问信息----------------");
-            log.info("Origin:{}",request.getHeader("Origin"));
-            log.info("Referer:{}",request.getHeader("Referer"));
-            log.info("User-Agent:{}",request.getHeader("User-Agent"));
-            log.info("URL:{}",request.getRequestURI());
-            log.info("Method:{}",request.getMethod());
-            log.info("----------------CORS跨域访问信息----------------");
+            if(log.isDebugEnabled()){
+                log.debug("----------------CORS跨域访问信息----------------");
+                log.debug("Origin:{}",request.getHeader("Origin"));
+                log.debug("Referer:{}",request.getHeader("Referer"));
+                log.debug("User-Agent:{}",request.getHeader("User-Agent"));
+                log.debug("URL:{}",request.getRequestURI());
+                log.debug("Method:{}",request.getMethod());
+                log.debug("----------------CORS跨域访问信息----------------");
+            }
 
             //放行所有,类似*,这里*无效
             response.setHeader("Access-Control-Allow-Origin", allowedOrigins);

@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import cn.hutool.core.exceptions.ExceptionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.PropertyPreFilters;
@@ -73,9 +72,7 @@ public class BussinessLogAop {
 	 * @date 2020-03-12 14:55
 	 */
 	@Pointcut("@annotation(com.j2eefast.common.core.business.annotaion.BussinessLog)")
-	public void logCut() {
-	}
-
+	public void logCut() {}
 	
 	/**
 	 * 处理前调用
@@ -205,6 +202,7 @@ public class BussinessLogAop {
 			
 			// 3、获取执行时间
 			long executeTime = endTime - startTime;	
+			
 			operLog.setTime(executeTime);
 
 			// 异步保存数据库

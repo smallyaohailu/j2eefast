@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.j2eefast.common.core.io.PropertiesUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
@@ -160,6 +159,22 @@ public class ServletUtil {
         return null;
     }
 
+    /**
+	 * 支持AJAX的页面跳转
+	 */
+	public static void redirectUrl(HttpServletRequest request, HttpServletResponse response, String url){
+		try {
+			if (isAjaxRequest(request)){
+				//AJAX不支持Redirect改用Forward
+				request.getRequestDispatcher(url).forward(request, response); 
+			}else{
+				response.sendRedirect(request.getContextPath() + url);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
     /**
      * 是否是Ajax异步请求
      */

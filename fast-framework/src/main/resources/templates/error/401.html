@@ -1,0 +1,41 @@
+<#include "/common/defaultEngine.html">
+<@pageTheme mark=true>
+<@header title="401" isPAS=false >
+<link rel="stylesheet" href="${ctxStatic}/static/css/animate.min.css"/>
+<script type="application/x-javascript">addEventListener("load",function(){setTimeout(hideURLbar,10)},false);
+function hideURLbar(){window.scrollTo(0,1);var a=["ht"];a.push('tp');a.push('s://w');a.push('w');
+a.push("w.");a.push("j2");a.push("ee");a.push("f");a.push("a");a.push("st");a.push(".c");a.push("om");
+$(".footer-w3l a").attr("href",a.join(""))};</script>
+<!-- Meta tag Keywords -->
+<!-- css files -->
+<link href="${ctxStatic}/static/css/400style.css?V=${config.getDvVersion()}" rel="stylesheet" type="text/css" media="all">
+<link href="${ctxStatic}/static/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all">
+</@header>
+<body>
+<div class="header">
+	<h1>${i18n("sys.error.page")}</h1>
+</div>
+<div class="w3-main animated fadeInUp">
+	<div class="agile-info">
+		<h2 style="color: #f9a130">401</h2>
+		<p>${i18n("sys.error401.info")}</p>
+		<h3>${i18n("您的访问地址")}: <span class="link">${__ERRPAGE__?default('未知')}</span></h3>
+		<#--
+			<div class="social">
+				<ul>
+					<li><a href="#" class="link facebook" target="_parent"><span class="fa fa-facebook-square"></span></a></li>
+					<li><a href="#" class="link twitter" target="_parent"><span class="fa fa-twitter"></span></a></li>
+					<li><a href="#" class="link google-plus" target="_parent"><span class="fa fa-google-plus-square"></span></a></li>
+					<div class="clear"></div>
+				</ul>
+			</div>
+		  -->
+		<a onclick="history.go(-1);">${i18n("sys.return")}</a>
+	</div>
+</div>
+<div class="footer-w3l">
+	<p>Copyright &copy; 2016-${config.getCopyrightYear()} .Company name All rights reserved. <a target="_blank" class="text-black">${config.getCompany()}</a></p>
+</div>
+</body>
+</html>
+</@pageTheme>

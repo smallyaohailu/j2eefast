@@ -12,6 +12,7 @@ target/
 .springBeans
 .sts4-cache
 .vscode
+.temp
 /doc/v.txt
 /fast-admin/src/test/java/**
 /fast-admin/src/main/resources/application-Test.yml

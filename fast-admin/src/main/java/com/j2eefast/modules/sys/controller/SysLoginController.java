@@ -9,15 +9,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import cn.hutool.core.codec.Base64Encoder;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
@@ -39,14 +35,14 @@ import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.base.Captcha;
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
-import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bind.annotation.Super;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -54,13 +50,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.j2eefast.common.core.crypto.SoftEncryption;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.exception.ServiceException;
+import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.io.file.MimeType;
 import com.j2eefast.common.core.manager.AsyncManager;
 import com.j2eefast.framework.utils.RedisKeys;
@@ -92,11 +88,17 @@ public class SysLoginController extends BaseController {
 	@Value("#{ @environment['shiro.rememberMe.enabled'] ?: false }")
 	private boolean rememberMe;
 	
+	@Value("#{ @environment['fast.messages.enabled'] ?: false }")
+	private boolean msgEnabled;
+	
 	/**
 	 * 系统是否开启多租户模式
 	 */
 	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
 	private boolean enabled;
+
+	@Value("#{ @environment['shiro.isAllowRefreshIndex'] ?: false }")
+	private boolean isAllowRefreshIndex;
 
 	/**
 	 * 个性化登录页面
@@ -257,7 +259,7 @@ public class SysLoginController extends BaseController {
 		if(Global.isValidationCode()){
 			//后台二次认证 图形验证码
 			CaptchaVO captchaVO = new CaptchaVO();
-			captchaVO.setCaptchaVerification(ServletUtil.getRequest().getParameter("__captchaVerification"));
+			captchaVO.setCaptchaVerification(getPara("__captchaVerification"));
 			if(!captchaService.verification(captchaVO).isSuccess()){
 				return error(ToolUtil.message("验证码有误"));
 			}
@@ -285,19 +287,33 @@ public class SysLoginController extends BaseController {
 		
 	}
 	
-	
-
 
 	/**
 	 * 后台登录页面
 	 * @param mmp
 	 * @return
 	 */
-	@RequestMapping("login")
-	public String login(ModelMap mmp) throws IOException {
-		if(UserUtils.isLogin()){
-			UserUtils.logout();
+	@RequestMapping("${shiro.loginUrl}")
+	public String login(ModelMap mmp){
+
+		// 刷新主页退出
+		if(isAllowRefreshIndex){
+			String logined = super.getCookie("__LOGINED__");
+			if (ToolUtil.isEmpty(logined) || "true".equals(logined)){
+				CookieUtil.setCookie(getHttpServletResponse(), "__LOGINED__", "false");
+			}
+			if(UserUtils.isLogin()){
+				UserUtils.logout();
+			}
 		}
+
+		if(UserUtils.isLogin()){
+			//UserUtils.logout();
+			ServletUtil.redirectUrl(super.getHttpServletRequest(),
+					super.getHttpServletResponse(), super.successUrl);
+			return null;
+		}
+		
 		String view = super.getPara("view");
 		if(ToolUtil.isEmpty(view)){
 			view = Global.getDbKey(ConfigConstant.SYS_LOGIN_DEFAULT_VIEW,Constant.ADMIN_LTE);
@@ -320,6 +336,8 @@ public class SysLoginController extends BaseController {
 		mmp.put("rememberMe",rememberMe);
 		mmp.put("tenantModel",enabled);
 		mmp.put("valideLogin",Global.isValidCode());
+		mmp.put("login",this.loginUrl);
+		mmp.put("msgEnabled",msgEnabled);
 		mmp.put("isValidationCode",Global.isValidationCode());
 		List<LoginTenantEntity>  loginTenantList = sysTenantService.getLoginTenantList();
 		mmp.put("loginTenantList",loginTenantList);
@@ -355,6 +373,11 @@ public class SysLoginController extends BaseController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseData login(String username, String password,Boolean rememberMe) {
 		try {
+			if(ToolUtil.isEmpty(username) || 
+					ToolUtil.isEmpty(password) || 
+					ToolUtil.isEmpty(rememberMe)) {
+				return error("50003",ToolUtil.message("用户名或者密码不正确.")); 
+			}
 			//账号密码登录
 			UsernamePasswordToken token = new UsernamePasswordToken(username, password,rememberMe);
 			Subject subject = UserUtils.getSubject();
@@ -379,11 +402,11 @@ public class SysLoginController extends BaseController {
 			.put("token", Base64Encoder.encode(UserUtils.getUserInfo().getCsrfToken()))
 			.put("expires_in",UserUtils.getSession().getTimeout() / (1000 * 60));
 		}else{
-			return success("登录成功!");
+			return success("登录成功!").put("index", this.successUrl);
 		}
 	}
 	
-	//@FastLicense(vertifys = {"online","detection"})
+	@FastLicense(vertifys = {"online","detection"})
 	@ResponseBody
 	@RequestMapping(value = "/valideCodeLogin", method = RequestMethod.POST)
 	public ResponseData valideCodeLogin(String mobile, String valideCode,Boolean rememberMe) {
@@ -480,7 +503,7 @@ public class SysLoginController extends BaseController {
 					UserUtils.getSession().setAttribute("__unlock","unlock");
 					//删除登陆错误
 					redisUtil.delete(RedisKeys.getUserLoginKey(username));
-					return success();
+					return success().put("index", this.successUrl);
 				}else{
 					if(number == null) {
 						number = 1;
@@ -511,7 +534,7 @@ public class SysLoginController extends BaseController {
 	public String logout() {
 		UserUtils.getSession().stop();
 		UserUtils.logout();
-		return REDIRECT+"login";
+		return REDIRECT + PropertiesUtils.getInstance().getProperty("shiro.loginUrl");
 	}
 
 	@ResponseBody

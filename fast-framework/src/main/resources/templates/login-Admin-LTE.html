@@ -79,8 +79,9 @@
 <#include "/common/upgrade.html"><!-- 如果客户浏览器版本过低，则显示浏览器升级提示-->
 <div id="canvas" style="position: absolute; z-index: -100; top: 0px;width: 100%; height: 98%">
 </div>
-<div id="verfyImg">
-</div>
+<#if verification || isValidationCode>
+<div id="verfyImg"></div>
+</#if>
 <div class="login-box animated fadeInLeft" id="__app" v-cloak>
   <div class="login-logo">
     <a href="#">${config.getTitle()}</a>
@@ -168,22 +169,25 @@
             </#if>  
           </div>
 		  <div class="col-xs-6">
-					<div class="dropdown pull-right">
-						<a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
-							<i class="fa fa-language"></i>&nbsp;${dict.getLabel("sys_lang_type","${config.getSysLang()}")}
-						</a>
-						<ul class="dropdown-menu">
-                            <li class="mt5"></li>
-                            <#list dict.getType('sys_lang_type')>
-                                <#items as d>
-                                    <#if d.status =='0' >
-                                        <li><a @click="__clearLang" href="${ctxStatic}/login?_lang=${d.dictValue}&view=${loginView}">${d.dictLabel}</a></li>
-                                    </#if>
-                                </#items>
-                            </#list>
-                            <li class="mt5"></li>
-						</ul>
-					</div>
+                <#if msgEnabled>
+                <div class="dropdown pull-right">
+                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+                        <i class="fa fa-language"></i>&nbsp;${dict.getLabel("sys_lang_type","${config.getSysLang()}")}
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li class="mt5"></li>
+                        <#list dict.getType('sys_lang_type')>
+                            <#items as d>
+                                <#if d.status =='0' >
+                                    <li><a @click="__clearLang" href="${ctxStatic+login}?_lang=${d.dictValue}">${d.dictLabel}</a></li>
+                                </#if>
+                            </#items>
+                        </#list>
+                        <li class="mt5"></li>
+                    </ul>
+                </div>
+                </#if>
           </div>
        </div>
       <div class="social-auth-links text-center">
@@ -234,7 +238,7 @@
         <#items as d>
             <#if d.status =='0' >
                 <span class="footer-item">
-                    <a href="${ctxStatic}/login?view=${d.dictValue}">${d.dictLabel}</a>
+                    <a href="${ctxStatic + login}?view=${d.dictValue}">${d.dictLabel}</a>
                 </span>
             </#if>
         </#items>

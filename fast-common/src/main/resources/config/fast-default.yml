@@ -48,7 +48,6 @@ spring:
   freemarker:
     suffix: .html
     request-context-attribute: request
-    debug: true
     #cache: true
 
   #redis数据库服务器
@@ -119,6 +118,16 @@ aj:
 
 # Shiro 相关配置
 shiro:
+  ## V2.6.1 以上版本 ---------
+  #登录地址
+  loginUrl: /login
+  #登录成功地址
+  successUrl: /index
+  #是否隐藏登录页面-后台登录页面不容易发现
+  isHideLoginUrl: false
+  #是否允许刷新主框架页，如果设置为 true，刷新主页将导致重新登录。如安全性比较高的，如银行个人首页不允许刷新。
+  isAllowRefreshIndex: false
+  ## ------------------
   cookie:
     # 设置Cookie的域名 默认空，即当前访问的域名
     domain: ~
@@ -267,13 +276,13 @@ fast:
     #多租户需要略拼接多租户ID的表 多个表之间, 分割 注意大小写. 例如: 'sys_user,sys_comp'
     ignoreTable: ~
   messages:
+    #是否开启前端切换
+    enabled: false
     # 国际化资源文件路径
     basename: i18n/
     #默认语言（2.0.3+）
     defaultLocale: zh_CN
-  #前后端分离模式
-  distributed:
-     enabled: false
+
 #web页面相关
 web:
    view:
