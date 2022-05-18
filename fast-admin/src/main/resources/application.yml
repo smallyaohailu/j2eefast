@@ -5,14 +5,13 @@ productName: J2eeFAST 开源版本
 version: 2.6.0
 
 # 设置项目访问路径
-server:
-    servlet:
-        context-path: /
-    #tomcat:
-    #如果使用Nginx反向代理, 获取真实IP 需要开启
-    #use-forward-headers: true
-    # 当 Nginx 为 https，程序 为 http 时，设置该选项为 true
-    #schemeHttps: true
+#server:
+#    servlet:
+#        context-path: /
+#    #如果使用Nginx反向代理, 获取真实IP 需要开启
+#    #use-forward-headers: true
+#    #当 Nginx 为 https，程序 为 http 时，设置该选项为 true
+#    #schemeHttps: true
 
 spring:
     # 启动环境 Dev|Test|Prod
@@ -22,43 +21,100 @@ spring:
         #模板引擎缓存
         cache: true
 
-#登录安全验证基本配置
+#登录图形认证安全验证
 aj:
-   captcha:
-      #redis 缓存 本地缓存 local
-      cache-type: redis
+    captcha:
+       #redis 缓存 本地缓存 local
+       cache-type: redis
 
-# Shiro 配置
+#Shiro 配置
 shiro:
-#    cookie:
-#        # 设置Cookie的域名 默认空，即当前访问的域名
-#        domain:
-#        # 设置HttpOnly属性
-#        httpOnly: true
-#        # 设置Cookie的过期时间，天为单位
-#        maxAge: 30
-#    session:
-#        # Session超时时间，-1代表永不过期（默认30分钟）
-#        expireTime: 30
-#        #设置session失效的扫描时间, 清理用户直接关闭浏览器造成的孤立会话 (默认设置5分钟)
-#        validationTime: 5
+    ## V2.6.1 以上版本
+    #登录地址 默认 login, 如果有特殊符号请记得URL转码访问
+    #loginUrl: /_6OLU0AarrZ5A==__
+    #是否隐藏登录页面、如果开启则不过不是配置的登录地址则直接404 默认false、自动跳转登录页面
+    #isHideLoginUrl: true
+    #是否允许刷新主框架页，如果设置为 true，刷新主页将导致重新登录。如安全性比较高的，如银行个人首页不允许刷新。
+    #isAllowRefreshIndex: false
+    #是否指定只能内部IP访问多个IP逗号隔开
+    #innerFilterIps: 192.168.20.1
+    #记住我
     rememberMe:
          # 是否开启记住我
          enabled: true
          # 若开启记住我请设置记住我密钥 可以在 com.j2eefast.test.EncondeTest 测试类 执行getShiroDeskey单元测试方法 获取项目唯一密钥
          # 若不设置，则每次启动系统后自动随机生成一个新秘钥，这样会导致每次重启后，客户端记录的用户信息将失效。
          cipherKey: 6OLU0Aarr/mQ4tkxEzMZ5A==
+    # 系统登录密钥对 可以在 com.j2eefast.test.EncondeTest 测试类 执行getLoginKey单元测试方法 获取密钥对
+    #  若不设置 系统每次启动自动生成一对一个新的密钥对, 如果不考虑 均衡负载 无需设置、让系统自动生成安全可靠
+    sysKey:
+         pubKey: +DXuD9dEHyraZQvN9fX/0TabHPC9hjNguZ8x7DGhsNthzi2FKe6z863w9/rrlgpSpwgpHHRgMJYTZg7Ne/3jQw==
+         priKey: M/TiLr4eQy8SBIehEI148nO2hNCKCiaZZ9V3EVNCUQs=
     #custome url filter Map(系统权限拦截配置)   
     filterMap: "{
-           '/login': 'anon',
            '/auth/**': 'anon',
-           '/404.html': 'anon',
            '/upbw/**': 'anon'
            }"
+    #如果需要对外提供接口需要开启
+    #cors:
+         #是否开启跨域访问
+         #enabled: false
+         #设置允许跨域的路径
+         #urlPatterns: /*
+         #设置允许跨域请求的域名 * 所有域名都可以访问
+         #allowedOrigins: "*"
+         #设置允许的方法
+         #allowedMethods: 'GET,POST,DELETE,PUT'
+         #设置允许的header属性
+         #allowedHeaders: 'content-type,x-requested-with,ajax,token,Authorization,authorization'
+         #跨域允许时间
+         #maxAge: 3600
+         #允许携带信息头
+         #credentials: true
+   #是否允许嵌入到外部网站iframe中 (true 允许, 默认false 不允许)
+   #selfIframe:
+         #enabled: false
+
+#系统相关
+#fast:
+    #是否开启ureport2报表功能
+    #ureport:
+    #    enabled: false
+    #过滤开关
+    #xss:
+    #     enabled: true
+    #是否开启csrf 防护,此开启针对需要系统授权所有的POST请求
+    #csrf:
+    #     enabled: true
+            #排除链接（多个用逗号分隔）
+    #     excludes: /ureport/*
+          #防盗链允许的网站来源地址配置多个URL , 分割
+    #     urlReferer: 'http:127.0.0.1, http:loclhost'
+    #messages:
+    #      #是否开启前端切换
+    #      enabled: false
+    #      #默认语言（2.0.3+）
+    #      defaultLocale: zh_CN
+    #是否开启多租户模式（SAAS模式）
+    #tenantModel:
+    #       enabled: false
+    #       #多租户需要略拼接多租户ID的表 多个表之间, 分割 注意大小写. 例如: 'sys_user,sys_comp'
+    #       ignoreTable: ~
+
+#web页面相关
+web:
+   #JS CSS 缓存时间(天)
+   cacheTime: 25
 
 #mybatis 配置
 mybatis-plus:
-    mapper-locations: classpath*:mapper/**/*.xml
+    #实体扫描，多个package用逗号或者分号分隔
+    type-aliases-package: com.j2eefast.*.*.entity
+    #扫描mapper 相当于 @MapperScan 注解,多个逗号分割
+    mapper-package: com.j2eefast.*.*.mapper
+    #打印sql语句,调试用
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #日志路径配置
 #logging:
