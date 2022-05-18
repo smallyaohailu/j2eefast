@@ -338,11 +338,16 @@
         $('#layui-layer-shade'+ that.index).css({
             'background-color': config.shade[1] || 'rgba(0,0,0,.5)'
             ,'opacity': config.shade[0]||config.shade
-            ,'-webkit-backdrop-filter': 'blur(10px)'
-            ,'backdrop-filter': 'blur(10px)'
         });
 
-
+        //添加毛玻璃效果,可能会出现闪屏、抖动情况
+        // window.setTimeout(function () {
+        //     $('#layui-layer-shade'+ that.index).css({
+        //         '-webkit-backdrop-filter': 'blur(3px)'
+        //         ,'backdrop-filter': 'blur(3px)'
+        //         ,'transform': 'translateZ(0)'
+        //     });
+        // },100);
 
         if (config.type == 2) {
             if(config.fromData != null && config.fromData != undefined && Object.keys(config.fromData).length > 0){
@@ -376,9 +381,11 @@
             });
         }
 
+        //自动关闭
         config.time <= 0 || setTimeout(function(){
             layer.close(that.index)
         }, config.time);
+
         that.move().callback();
 
         //为兼容jQuery3.0的css动画影响元素尺寸计算

@@ -9,6 +9,8 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.NumberChineseFormatter;
 import org.springframework.stereotype.Component;
 
+import com.j2eefast.common.core.io.PropertiesUtils;
+
 /**
  * 前端工具类
  * @author huanzhou
@@ -26,6 +28,18 @@ public class Tools {
      */
     public String numToChinese(String amount, boolean isUseTraditional, boolean isMoneyMode){
         return NumberChineseFormatter.format(Convert.toDouble(amount),isUseTraditional,isMoneyMode);
+    }
+    
+    /**
+     * 获取系统配置文件参数 相当于后端 PropertiesUtils.getInstance().getProperty(key)</br>
+     * 例如 Tools.getConfig("productName") = J2eeFAST 开源版本
+     * @author ZhouZhou
+     * @date 2022-05-17 18:36
+     * @param key 
+     * @return
+     */
+    public String getConfig(String key) {
+    	return PropertiesUtils.getInstance().getProperty(key);
     }
 
 }

@@ -1,7 +1,18 @@
+# 产品或项目名称
+productName: J2eeFAST 开源版本
+
+# 系统版本
+version: 2.6.0
+
 # 设置项目访问路径
-#server:
-#    servlet:
-#        context-path: /
+server:
+    servlet:
+        context-path: /
+    #tomcat:
+    #如果使用Nginx反向代理, 获取真实IP 需要开启
+    #use-forward-headers: true
+    # 当 Nginx 为 https，程序 为 http 时，设置该选项为 true
+    #schemeHttps: true
 
 spring:
     # 启动环境 Dev|Test|Prod

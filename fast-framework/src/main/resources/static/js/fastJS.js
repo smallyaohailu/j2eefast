@@ -1,10 +1,9 @@
 /*!
  * Copyright (c) 2020-Now http://www.j2eefast.com All rights reserved.
  * No deletion without permission
- * @author ZhouHuan 二次封装 新增若干方法优化部分BUG
+ * @author ZhouHuan
  * @date 2020-12-21
- * @version v1.1.0
- * 、、、、、注意此为源文件、测试环境中使用、若部署生产请 压缩去掉注释
+ * @version 2.6.0
  */
 if (typeof jQuery === "undefined") {
     throw new Error("fastJS JavaScript requires jQuery")
@@ -22,7 +21,7 @@ if (typeof jQuery === "undefined") {
             debug:true,
             mode: 'storage',
             // 默认加载提示名人名言 如果不用 false
-            loadTip:true,
+            loadTip: true,
             // 是否开启水印
             isWatermark: true,
             // 表格类型
@@ -206,8 +205,7 @@ if (typeof jQuery === "undefined") {
                     }
                 }
             }
-            opt.modal.enable(); //显示提交按钮
-            hideTime = hideTime || 8000;
+            opt.modal.enable(); //显示提交按钮=
             if(opt.toast){
                 var position = {
                     right: 7,
@@ -944,7 +942,7 @@ if (typeof jQuery === "undefined") {
                                 }
                             }
                             //请求后台
-                            opt.common.sendAjax(conifg);
+                            $.ajax(conifg);
                         }
                         else{
                             var d = JSON.parse(data);
@@ -1625,25 +1623,27 @@ if (typeof jQuery === "undefined") {
              * 发送AJax数据 Jq Ajax 原生方法添加防CSRF攻击
              * @param request
              */
+            //@Deprecated
             sendAjax :function(config){
-                //防CSRF攻击
-                if(opt.common.equalsIgnoreCase(config.type,'POST') && opt.common.isNotEmpty($('meta[name="csrf-token"]').attr("content"))){
-                    config = opt.common.extend(config,{headers: {
-                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
-                        }});
-                }
-                if(opt.common.isEmpty(config.error) || typeof config.error != "function"){
-                    config = opt.common.extend(config,{error:
-                            function(xhr, textStatus) {
-                                try{
-                                    opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
-                                }catch (e) {
-                                    console.error(xhr.responseText);
-                                }
-                                opt.modal.closeLoading();
-                                return;
-                            }
-                    });
+            	 console.warn('opt.common.sendAjax 方法即将弃用,请直接使用$.ajax(). 系统已经重载自动判断添加X-CSRF-Token');
+                 //防CSRF攻击
+                 if(opt.common.equalsIgnoreCase(config.type,'POST') && opt.common.isNotEmpty($('meta[name="csrf-token"]').attr("content"))){
+                     config = opt.common.extend(config,{headers: {
+                             "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
+                         }});
+                 }
+                 if(opt.common.isEmpty(config.error) || typeof config.error != "function"){
+                     config = opt.common.extend(config,{error:
+                             function(xhr, textStatus) {
+                                 try{
+                                     opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
+                                 }catch (e) {
+                                     console.error(xhr.responseText);
+                                 }
+                                 opt.modal.closeLoading();
+                                 return;
+                             }
+                     });
                 }
                 $.ajax(config);
             },
@@ -2159,27 +2159,32 @@ if (typeof jQuery === "undefined") {
                     height = 'auto';
                     full = true;
                 }
-                if (opt.common.isEmpty(title)) {
-                    title = false;
-                }
-                if (opt.common.isEmpty(url)) {
-                    url = "/404.html";
-                }
-                if (opt.common.isEmpty(width)) {
-                    width = 800;
-                }
+                // if (opt.common.isEmpty(title)) {
+                //     title = false;
+                // }
+                title = title || false;
+                // if (opt.common.isEmpty(url)) {
+                //     url = "/404.html";
+                // }
+                url = url || "/404.html";
+                // if (opt.common.isEmpty(width)) {
+                //     width = 800;
+                // }
+                width = width || 800;
                 if (opt.common.isEmpty(height)) {
                     height = ($(window).height() - 50);
                 }
-                if (opt.common.isEmpty(type)) {
-                    type = 2;
-                }
+                // if (opt.common.isEmpty(type)) {
+                //     type = 2;
+                // }
+                type = type || 2;
                 //自动适配窗口大小 如果传的大小比所在窗口大 则最大化
                 if(width !== 'auto' || height !== 'auto'){
                     if(width > $(window).width() || height > $(window).height() ){
                         full = true;
                     }
                 }
+
                 var submit;
 
                 // 查看是否传回调函数
@@ -2729,7 +2734,7 @@ if (typeof jQuery === "undefined") {
                         opt.operate.ajaxSuccess(result);
                     }
                 };
-                opt.common.sendAjax(config);
+                $.ajax(config);
             },
             //删除单独调用post删除
             delPost:function(url, data, callback) {
@@ -3084,7 +3089,7 @@ if (typeof jQuery === "undefined") {
                         }
                     }
                 };
-                opt.common.sendAjax(config);
+                $.ajax(config);
             },
             // 保存信息 弹出提示框
             saveModal: function(url, data, callback) {
@@ -3111,7 +3116,7 @@ if (typeof jQuery === "undefined") {
                         }
                     }
                 };
-                opt.common.sendAjax(config);
+                $.ajax(config);
             },
             // 保存选项卡信息
             saveTab: function(url, data, callback) {
@@ -3135,7 +3140,7 @@ if (typeof jQuery === "undefined") {
                         }
                     }
                 };
-                opt.common.sendAjax(config);
+                $.ajax(config);
             },
             // 保存结果弹出msg刷新table表格
             ajaxSuccess: function (result) {
@@ -3818,13 +3823,13 @@ if (typeof jQuery === "undefined") {
 //设置主页皮肤
 +function () {
 
-    var _lang = opt.getCookie("_lang");
+    //var _lang = opt.getCookie("_lang");
 
     //初始化i18n插件
     $.i18n.properties({
         path: baseURL + 'i18n/',//这里表示访问路径
         name: 'i18n',//文件名开头
-        language: _lang,//文件名语言 例如en_US
+        language: __LANG__,//文件名语言 例如en_US
         tag: __I18NTAG__,
         cache: true,
         mode: 'map'//默认值
@@ -4225,7 +4230,8 @@ $(function () {
         var _ajax = $.ajax;
 
         //重写jquery的ajax方法
-        $.ajax = function (opt) {
+        $.ajax = function ($opt) {
+        	
             //备份opt中error和success方法
             var fn = {
                 beforeSend: function (XHR) { },
@@ -4234,21 +4240,44 @@ $(function () {
                 complete: function (XHR, TS) { }
             }
 
-            if (opt.beforeSend) {
-                fn.beforeSend = opt.beforeSend;
+            if ($opt.beforeSend) {
+                fn.beforeSend = $opt.beforeSend;
             }
-            if (opt.error) {
-                fn.error = opt.error;
+            
+            if ($opt.error) {
+                fn.error = $opt.error;
+            }else{
+            	fn.error = function(xhr){
+            		try{
+                        opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
+                    }catch (e) {
+                        console.error(xhr.responseText);
+                    }
+                    opt.modal.closeLoading();
+                    return;
+            	}
             }
-            if (opt.success) {
-                fn.success = opt.success;
+            
+            if ($opt.success) {
+                fn.success = $opt.success;
             }
-            if (opt.complete) {
-                fn.complete = opt.complete;
+            if ($opt.complete) {
+                fn.complete = $opt.complete;
+            }
+            
+            //防CSRF攻击
+            if(__ISCSRF__ && 
+            		opt.common.equalsIgnoreCase($opt.type,'POST')){
+            	
+            	if(!($opt.headers && $opt.headers["X-CSRF-Token"])){
+            		$opt = opt.common.extend($opt,{headers: {
+                	  "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
+              	   }});
+            	}
             }
 
             //扩展增强处理
-            var _opt = $.extend(opt, {
+            var _opt = $.extend($opt, {
                 //全局允许跨域
                 xhrFields: {
                     withCredentials: true
@@ -4270,8 +4299,9 @@ $(function () {
                     fn.complete(XHR, TS);
                 }
             });
-            if (opt.xhrFields) {
-                _opt.xhrFields = opt.xhrFields;
+            
+            if ($opt.xhrFields) {
+                _opt.xhrFields = $opt.xhrFields;
             }
 
             //调用native ajax 方法

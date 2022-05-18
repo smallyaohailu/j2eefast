@@ -161,7 +161,7 @@
                         }
                     }
                 };
-                opt.common.sendAjax(config);
+                $.ajax(config);
             },
             expandAll: function(){
                 $._tree.expandAll(true);

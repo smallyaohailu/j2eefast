@@ -65,7 +65,7 @@
 		var img = cropper.getBlob();
 		var formdata = new FormData();
 		formdata.append("avatarfile", img);
-		opt.common.sendAjax({
+		$.ajax({
 			url: baseURL + "sys/user/profile/updateAvatar",
 			data: formdata,
 			type: "POST",
