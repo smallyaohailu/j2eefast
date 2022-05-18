@@ -401,7 +401,7 @@ if ( typeof Object.create !== 'function' ) {
         hideAfter: 3000, //是否自动隐藏
         loader: true, // 是否显示加载条
         loaderBg: '#000000',//加载条的背景颜色。
-        stack: 5, //消息栈。同时允许的提示框数量
+        stack: 8, //消息栈。同时允许的提示框数量
         position: 'bottom-left',//消息提示框的位置：bottom-left, bottom-right,bottom-center,top-left,top-right,top-center,mid-center。
         bgColor: false,//背景颜色。
         textColor: false,//文字颜色。

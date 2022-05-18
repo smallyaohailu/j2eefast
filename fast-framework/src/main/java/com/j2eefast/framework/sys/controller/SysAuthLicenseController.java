@@ -114,7 +114,7 @@ public class SysAuthLicenseController extends BaseController {
             throw new RxcException(ToolUtil.message("sys.login.failure"),"50001");
         }
         try{
-            if (!file.isEmpty() && file.getOriginalFilename().equals("license.lic")){
+            if (!file.isEmpty() && "license.lic".equals(file.getOriginalFilename())){
                 String pathName = FileUploadUtil.uploadFile(Global.getTempPath(), file);
                 //先拷贝之前的备份防止出故障 重命名
                 FileUtil.rename(FileUtil.file(licensePath),"licenseReName",true,true);

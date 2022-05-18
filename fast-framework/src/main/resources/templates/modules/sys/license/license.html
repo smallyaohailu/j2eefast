@@ -56,7 +56,7 @@
                     var formdata = new FormData();
                     var file = layero.find('#f')[0].files[0];
                     formdata.append("licfile", file);
-                    opt.common.sendAjax({
+                    $.ajax({
                         url: prefix + "/uploadLic",
                         data: formdata,
                         type: "POST",
@@ -134,7 +134,7 @@
                         focusCleanup: true
                     });
                     if(layero.find('#form-downlod').validate().form()){
-                        opt.common.sendAjax({
+                        $.ajax({
                             url: prefix + "/creatLicense",
                             data: layero.find('#form-downlod').serialize(),
                             type: "POST",

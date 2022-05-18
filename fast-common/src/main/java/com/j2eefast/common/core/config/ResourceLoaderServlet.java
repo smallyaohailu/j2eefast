@@ -218,7 +218,8 @@ public class ResourceLoaderServlet extends HttpServlet {
 		sb.append(StrUtil.format("__LOCKSCREEN__='{}',", Global.getDbKey("SYS_LOCK_SCEREEN")));
 		sb.append(StrUtil.format("__I18NTAG__='{}',", ConfigConstant.I18N_ATG));
 		sb.append(StrUtil.format("__DICTTAG__='{}',", ConfigConstant.DICT_TAG));
-		sb.append(StrUtil.format("__VERSION__='{}'", ConfigConstant.F_VSRION));
+		sb.append(StrUtil.format("__VERSION__='{}',", ConfigConstant.F_VSRION));
+		sb.append(StrUtil.format("__ISCSRF__={}", PropertiesUtils.getInstance().get("fast.csrf.enabled")));
 		return sb;
 	}
 	

@@ -127,6 +127,8 @@ shiro:
   isHideLoginUrl: false
   #是否允许刷新主框架页，如果设置为 true，刷新主页将导致重新登录。如安全性比较高的，如银行个人首页不允许刷新。
   isAllowRefreshIndex: false
+  #是否指定内部IP访问多个IP逗号隔开
+  #innerFilterIps: 192.168.20.1
   ## ------------------
   cookie:
     # 设置Cookie的域名 默认空，即当前访问的域名
@@ -259,7 +261,7 @@ fast:
     urlPatterns: /sys/*
   #是否开启csrf 防护,此开启针对需要系统授权所有的POST请求
   csrf:
-    enabled: true
+    enabled: false
     #防盗链允许的网站来源地址配置多个URL , 分割
     #urlReferer: 'http:127.0.0.1, http:loclhost'
     # 排除链接（多个用逗号分隔）

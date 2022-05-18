@@ -778,7 +778,7 @@
                             opt.modal.closeLoading();
                         }
                     }
-                    opt.common.sendAjax(config);
+                    $.ajax(config);
                 });
             },
             // 下载模板
@@ -844,7 +844,7 @@
                                 return;
                             }
                         };
-                        opt.common.sendAjax(config);
+                        $.ajax(config);
                     }
                 });
             },

@@ -7,8 +7,12 @@ package com.j2eefast.framework.sys.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.controller.BaseController;
+import com.j2eefast.common.core.io.PropertiesUtils;
+import com.j2eefast.common.core.utils.CookieUtil;
 import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.SysMenuEntity;
@@ -49,14 +53,39 @@ public class SystemController extends BaseController {
 	@Value("#{${web.view.roleMain} ?: null}")
 	private LinkedHashMap<String, String> roleMainMap ;
 
+	@Value("#{ @environment['fast.messages.enabled'] ?: false }")
+	private boolean msgEnabled;
+	
+	@Value("#{ @environment['shiro.isAllowRefreshIndex'] ?: false }")
+	private boolean isAllowRefreshIndex;
+
 	/**
 	 * 主页
 	 * @param mmap
 	 * @return
 	 */
-	@GetMapping(value = { "/", "/index","/index.html" })
+//	@GetMapping(value = { "/", "/index","/index.html" })
+	@GetMapping(value = { "${shiro.successUrl}","/"})
 	public String index(ModelMap mmap) {
+
 		LoginUserEntity user = UserUtils.getUserInfo();
+
+		//刷新主页是否退出
+		if(isAllowRefreshIndex &&
+				UserUtils.isLogin()){
+			String logined = super.getCookie("__LOGINED__");
+			if (ToolUtil.isEmpty(logined) || "false".equals(logined)){
+				CookieUtil.setCookie(getHttpServletResponse(), "__LOGINED__", "true");
+			}else if (StrUtil.equals(logined, "true")){
+				UserUtils.getSubject().logout();
+				deleteCookieByName("__LOGINED__");
+				UserUtils.logout();
+				ServletUtil.redirectUrl(super.getHttpServletRequest(),
+						super.getHttpServletResponse(), PropertiesUtils.getInstance().getProperty("shiro.loginUrl"));
+				return null;
+			}
+		}
+
 		List<Map<String, Object>> modules = ConstantFactory.me().getModules(user.getId());
 		Map<String, List<SysMenuEntity>> menuList = new HashMap<>();
 		for(Map<String, Object> s: modules){
@@ -64,9 +93,12 @@ public class SystemController extends BaseController {
 					(String) s.get("moduleCode"),user);
 			menuList.put((String) s.get("moduleCode"),menu);
 		}
+		
 		mmap.put("modules",modules);
 		mmap.put("menuList",menuList);
 		mmap.put("user",user);
+		mmap.put("msgEnabled",msgEnabled);
+		mmap.put("successUrl",this.successUrl);
 		//是否为管理员租户
 		mmap.put("superTenant",user.getSuperTenant());
 		return "index";
@@ -142,11 +174,6 @@ public class SystemController extends BaseController {
 		mmap.put("compName",ConstantFactory.me().getCompName(UserUtils.getUserId()));
 
 		return url;
-	}
-
-	@RequestMapping("404.html")
-	public String notFound() {
-		return "404";
 	}
 
 	@RequestMapping(value = "/sys/loginOut", method = RequestMethod.GET)

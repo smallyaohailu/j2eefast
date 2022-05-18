@@ -29,9 +29,18 @@ public class SecurityKeyInterceptorAdapter implements HandlerInterceptor{
 	@Value("#{ @environment['shiro.selfIframe.enabled'] ?: false }")
 	private boolean enabled;
 
+	/**
+	 * XSS 过滤
+	 */
+	@Value("#{ @environment['fast.xss.enabled'] ?: true }")
+	private boolean xssEnabled;
+	
 
 	public static final String X_FRAME_OPTIONS = "X-Frame-Options";
-	
+	public static final String X_XSS_PROTECTION = "X-XSS-Protection";
+	//如果检测到攻击，浏览器直接阻止整个页面的加载
+	public static final String X_XSS_HEADERVALUE = "1 ; mode=block";
+
 	public enum Mode {
 		/**
 		 * A browser receiving content with this header field MUST NOT display
@@ -85,6 +94,10 @@ public class SecurityKeyInterceptorAdapter implements HandlerInterceptor{
 		
 		if(!enabled) {
 			response.addHeader(X_FRAME_OPTIONS, Mode.SAMEORIGIN.name());
+		}
+		
+		if(xssEnabled) {
+			response.addHeader(X_XSS_PROTECTION, X_XSS_HEADERVALUE);
 		}
 		
         return true;

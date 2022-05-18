@@ -666,7 +666,7 @@ $(function () {
             btn1: function (index) {
                 if($("#form-user-updatePass").validate().form()){
                     var data =$("#form-user-updatePass").serializeArray();
-                    opt.common.sendAjax({
+                    $.ajax({
                         type: "POST",
                         url: "sys/user/updatePass",
                         data: data,
@@ -900,7 +900,7 @@ $(function () {
     };
 
     //查询用户所有未读消息
-    opt.common.sendAjax({
+    $.ajax({
         type: "POST",
         url: "sys/getMsgPush",
         dataType: "json",

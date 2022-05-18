@@ -296,7 +296,7 @@
 			methods: {
 				getServerInfo: function(init){
 					var __taht = this;
-					opt.common.sendAjax({
+					$.ajax({
 						type: "POST",
 						url: baseURL + 'sys/server/info/'+init,
 						dataType: "json",

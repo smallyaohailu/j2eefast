@@ -189,7 +189,8 @@ public class PropertiesUtils {
         			}
 				}
 			} catch (Exception e) {
-    			log.error("Load " + location + " failure. ", e);
+				System.err.println("系统配置文件书写异常:"+location);
+				System.err.println(e);
 			}
 		}
 	}

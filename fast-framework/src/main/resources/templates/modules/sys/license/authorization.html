@@ -72,7 +72,7 @@ $(".copyright a").attr("href",a.join(""))};</script>
                     formdata.append("password",s4.password);
                     formdata.append("kg4",s4.kg4);
                     formdata.append("sign",s4.sign);
-                    opt.common.sendAjax({
+                    $.ajax({
                         url: prefix + "/uploadLic",
                         data: formdata,
                         type: "POST",
