@@ -902,7 +902,7 @@ $(function () {
     //查询用户所有未读消息
     $.ajax({
         type: "POST",
-        url: "sys/getMsgPush",
+        url:  baseURL +"sys/getMsgPush",
         dataType: "json",
         success: function (result) {
             if (result.code == opt.variable.web_status.SUCCESS && result.data && result.data.length > 0) {

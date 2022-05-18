@@ -4224,91 +4224,88 @@ if (typeof jQuery === "undefined") {
 
 
 /*重写Jquery中的ajax 封装壳*/
-$(function () {
-    (function ($) {
-        //首先备份下jquery的ajax方法
-        var _ajax = $.ajax;
+(function (window,$) {
+    //首先备份下jquery的ajax方法
+    var _ajax = $.ajax;
+    //重写jquery的ajax方法
+    $.ajax = function ($opt) {
 
-        //重写jquery的ajax方法
-        $.ajax = function ($opt) {
-        	
-            //备份opt中error和success方法
-            var fn = {
-                beforeSend: function (XHR) { },
-                error: function (XMLHttpRequest, textStatus, errorThrown) { },
-                success: function (data, textStatus) { },
-                complete: function (XHR, TS) { }
-            }
+        //备份opt中error和success方法
+        var fn = {
+            beforeSend: function (XHR) { },
+            error: function (XMLHttpRequest, textStatus, errorThrown) { },
+            success: function (data, textStatus) { },
+            complete: function (XHR, TS) { }
+        }
 
-            if ($opt.beforeSend) {
-                fn.beforeSend = $opt.beforeSend;
-            }
-            
-            if ($opt.error) {
-                fn.error = $opt.error;
-            }else{
-            	fn.error = function(xhr){
-            		try{
-                        opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
-                    }catch (e) {
-                        console.error(xhr.responseText);
-                    }
-                    opt.modal.closeLoading();
-                    return;
-            	}
-            }
-            
-            if ($opt.success) {
-                fn.success = $opt.success;
-            }
-            if ($opt.complete) {
-                fn.complete = $opt.complete;
-            }
-            
-            //防CSRF攻击
-            if(__ISCSRF__ && 
-            		opt.common.equalsIgnoreCase($opt.type,'POST')){
-            	
-            	if(!($opt.headers && $opt.headers["X-CSRF-Token"])){
-            		$opt = opt.common.extend($opt,{headers: {
-                	  "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
-              	   }});
-            	}
-            }
+        if ($opt.beforeSend) {
+            fn.beforeSend = $opt.beforeSend;
+        }
 
-            //扩展增强处理
-            var _opt = $.extend($opt, {
-                //全局允许跨域
-                xhrFields: {
-                    withCredentials: true
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    //错误方法增强处理
-                    fn.error(XMLHttpRequest, textStatus, errorThrown);
-                },
-                success: function (data, textStatus) {
-                    //成功回调方法增强处理
-                    fn.success(data, textStatus);
-                },
-                beforeSend: function (XHR) {
-                    //提交前回调方法
-                    fn.beforeSend(XHR);
-                },
-                complete: function (XHR, TS) {
-                    //请求完成后回调函数 (请求成功或失败之后均调用)。
-                    fn.complete(XHR, TS);
+        if ($opt.error) {
+            fn.error = $opt.error;
+        }else{
+            fn.error = function(xhr){
+                try{
+                    opt.error(JSON.parse(xhr.responseText).msg || xhr.responseText );
+                }catch (e) {
+                    console.error(xhr.responseText);
                 }
-            });
-            
-            if ($opt.xhrFields) {
-                _opt.xhrFields = $opt.xhrFields;
+                opt.modal.closeLoading();
+                return;
             }
+        }
 
-            //调用native ajax 方法
-            return _ajax(_opt);
-        };
-    })(jQuery);
-});
+        if ($opt.success) {
+            fn.success = $opt.success;
+        }
+        if ($opt.complete) {
+            fn.complete = $opt.complete;
+        }
+
+        //防CSRF攻击
+        if(__ISCSRF__ &&
+                opt.common.equalsIgnoreCase($opt.type,'POST')){
+
+            if(!($opt.headers && $opt.headers["X-CSRF-Token"])){
+                $opt = opt.common.extend($opt,{headers: {
+                  "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content")
+               }});
+            }
+        }
+
+        //扩展增强处理
+        var _opt = $.extend($opt, {
+            //全局允许跨域
+            xhrFields: {
+                withCredentials: true
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //错误方法增强处理
+                fn.error(XMLHttpRequest, textStatus, errorThrown);
+            },
+            success: function (data, textStatus) {
+                //成功回调方法增强处理
+                fn.success(data, textStatus);
+            },
+            beforeSend: function (XHR) {
+                //提交前回调方法
+                fn.beforeSend(XHR);
+            },
+            complete: function (XHR, TS) {
+                //请求完成后回调函数 (请求成功或失败之后均调用)。
+                fn.complete(XHR, TS);
+            }
+        });
+
+        if ($opt.xhrFields) {
+            _opt.xhrFields = $opt.xhrFields;
+        }
+
+        //调用native ajax 方法
+        return _ajax(_opt);
+    };
+})(window,jQuery);
 /**
  * 日期范围工具类
  */
