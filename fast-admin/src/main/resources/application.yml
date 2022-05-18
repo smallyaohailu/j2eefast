@@ -117,13 +117,7 @@ mybatis-plus:
         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #日志路径配置
-#logging:
-#    file:
-#        name: fast
-#        path: logs/
-
 logging:
-  pattern:
-    console: "%date{HH:mm:ss.SSS} %-5level %-30.30logger{29} : %msg%n"
-  level:
-    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    file:
+        name: fast
+        path: logs/
