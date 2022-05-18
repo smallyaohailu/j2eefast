@@ -10,10 +10,9 @@ import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
-
+import cn.hutool.http.HtmlUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.mybatis.spring.MyBatisSystemException;
@@ -28,13 +27,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.ModelAndView;
-
 import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.j2eefast.common.core.exception.RxcException;
 import freemarker.core.InvalidReferenceException;
 import org.springframework.web.util.UrlPathHelper;
-
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -87,7 +83,9 @@ public class RxcExceptionHandler {
 			return ResponseData.error("50001","没有权限，请联系管理员授权");
 		}else {
 			Map<String, Object> model = new ModelMap();
-			model.put(ConfigConstant.ERR_PAGE, UrlPathHelper.defaultInstance.getOriginatingRequestUri(request));
+			//去除XSS
+			model.put(ConfigConstant.ERR_PAGE, HtmlUtil.escape(HtmlUtil.filter(UrlPathHelper
+					.defaultInstance.getOriginatingRequestUri(request))));
 			return new ModelAndView("error/401",model);
 		}
 	}

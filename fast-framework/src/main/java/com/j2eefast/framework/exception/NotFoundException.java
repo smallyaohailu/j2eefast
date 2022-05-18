@@ -5,6 +5,7 @@
  */
 package com.j2eefast.framework.exception;
 
+import cn.hutool.http.HtmlUtil;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.utils.ResponseData;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -31,7 +32,7 @@ import java.util.Map;
 public class NotFoundException extends BasicErrorController {
 
     private static final String HTTP_NOT_FOUND = "error/404";
-
+    
     public NotFoundException(ServerProperties serverProperties) {
         super(new DefaultErrorAttributes(), serverProperties.getError());
     }
@@ -42,7 +43,8 @@ public class NotFoundException extends BasicErrorController {
     @Override
     public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> model = new ModelMap();
-        model.put(ConfigConstant.ERR_PAGE,UrlPathHelper.defaultInstance.getOriginatingRequestUri(request));
+        //去除XSS
+        model.put(ConfigConstant.ERR_PAGE, HtmlUtil.escape(HtmlUtil.filter(UrlPathHelper.defaultInstance.getOriginatingRequestUri(request))));
         return  new ModelAndView(HTTP_NOT_FOUND, model);
     }
 
