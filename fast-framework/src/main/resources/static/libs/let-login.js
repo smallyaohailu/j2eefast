@@ -156,7 +156,7 @@ var vm = new Vue({
 		                if(result.code == 0){
 		                    setTimeout(
 		                        function () {
-		                            location.href = result.index;
+		                            location.href = ctx + result.index;
 		                        }
 		                        , 100);
 		                }
@@ -246,7 +246,7 @@ var vm = new Vue({
                         };
                         setTimeout(
                             function () {
-                            	location.href = result.index;
+                            	location.href = ctx + result.index;
                             }
                             , 100);
                     }else if(result.code == '50004' || result.code == '50006'){
