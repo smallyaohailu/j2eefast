@@ -294,7 +294,7 @@
             success: function(result) {
                 $(window).unblock();
                 if(result.code === "00000"){
-                    location.href = result.index;
+                    location.href = ctx+result.index;
                     return;
                 }if(result.code === "50004"){
                     $("input[name='password']").val("");
