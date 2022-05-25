@@ -307,11 +307,10 @@ public class SysLoginController extends BaseController {
 			}
 		}
 
+		//如果已经登录、跳转首页
 		if(UserUtils.isLogin()){
-			//UserUtils.logout();
-			ServletUtil.redirectUrl(super.getHttpServletRequest(),
-					super.getHttpServletResponse(), super.successUrl);
-			return null;
+//			//UserUtils.logout();
+			return REDIRECT + super.successUrl;
 		}
 		
 		String view = super.getPara("view");
