@@ -33,7 +33,7 @@
         <mybatisplus.spring.boot.version>3.4.3.4</mybatisplus.spring.boot.version>
         <commons.fileupload.version>1.4</commons.fileupload.version>
         <commons.io.version>2.11.0</commons.io.version>
-        <fastjson.version>1.2.80</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <oshi.version>6.1.6</oshi.version>
         <swagger.version>3.0.0</swagger.version>
         <qiniu.version>[7.2.0, 7.2.99]</qiniu.version>
