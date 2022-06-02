@@ -1,17 +1,19 @@
+/*
+ * All content copyright http://www.j2eefast.com, unless
+ * otherwise indicated. All rights reserved.
+ * No deletion without permission
+ */
 package com.j2eefast.common.core.xss;
 
-
+import com.google.common.collect.Lists;
 import com.j2eefast.common.core.utils.ToolUtil;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * XSS过滤
@@ -19,9 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 public class XssFilter implements Filter {
 
 	/**
-	 * 排除链接
+	 * 排除链接 系统必须排除否则会有数据异常
 	 */
-	public List<String> excludes = new ArrayList<>();
+	public List<String> excludes = Lists.newArrayList("/sys/config/*",
+			"/sys/dict/*","/tool/gen/column/list",
+			"/tool/gen/column/list","/tool/gen/*",
+			"/sys/database/add","/sys/msg/*","/sys/area/load");
 
 	/**
 	 * xss过滤开关
@@ -35,7 +40,9 @@ public class XssFilter implements Filter {
 		if (ToolUtil.isNotEmpty(tempExcludes)) {
 			String[] url = tempExcludes.split(",");
 			for (int i = 0; url != null && i < url.length; i++) {
-				excludes.add(url[i]);
+				if(excludes.indexOf(url[i]) == -1){
+					excludes.add(url[i]);
+				}
 			}
 		}
 		if (ToolUtil.isNotEmpty(tempEnabled)) {
@@ -63,11 +70,15 @@ public class XssFilter implements Filter {
 		if (excludes == null || excludes.isEmpty()) {
 			return false;
 		}
+		String method = request.getMethod();
+		// GET DELETE 不过滤
+		if (method == null || method.matches("GET") || method.matches("DELETE")){
+			return true;
+		}
 		String url = request.getServletPath();
 		for (String pattern : excludes) {
-			Pattern p = Pattern.compile("^" + pattern);
-			Matcher m = p.matcher(url);
-			if (m.find()){
+			AntPathMatcher matcher = new AntPathMatcher();
+			if (matcher.match(pattern, url)){
 				return true;
 			}
 		}

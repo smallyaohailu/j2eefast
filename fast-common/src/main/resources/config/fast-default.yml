@@ -256,7 +256,7 @@ fast:
     # 过滤开关
     enabled: true
     # 排除链接（多个用逗号分隔）
-    excludes: /sys/notice/*,/sys/database/add,/sys/msg/*,/sys/area/load,/tool/gen/*,/tool/gen/column/list
+    excludes: /sys/notice/*
     # 匹配链接
     urlPatterns: /sys/*
   #是否开启csrf 防护,此开启针对需要系统授权所有的POST请求
