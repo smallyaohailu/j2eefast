@@ -15,16 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.definition.dataset;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import com.bstek.ureport.utils.ToolUtils;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.build.Dataset;
@@ -34,6 +24,16 @@ import com.bstek.ureport.expression.model.Expression;
 import com.bstek.ureport.expression.model.data.ExpressionData;
 import com.bstek.ureport.expression.model.data.ObjectExpressionData;
 import com.bstek.ureport.utils.ProcedureUtils;
+import com.bstek.ureport.utils.ToolUtils;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -115,6 +115,7 @@ public class SqlDatasetDefinition implements DatasetDefinition {
 			}
 			SingleConnectionDataSource datasource=new SingleConnectionDataSource(conn,false);
 			NamedParameterJdbcTemplate jdbcTemplate=new NamedParameterJdbcTemplate(datasource);
+			Utils.logToConsole("FAST SQL:"+sqlForUse);
 			List<Map<String,Object>> list= jdbcTemplate.queryForList(sqlForUse, pmap);
 			return new Dataset(name,list);
 		}

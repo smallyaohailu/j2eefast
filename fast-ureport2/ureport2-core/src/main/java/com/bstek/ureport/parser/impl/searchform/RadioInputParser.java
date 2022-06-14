@@ -15,14 +15,20 @@
  ******************************************************************************/
 package com.bstek.ureport.parser.impl.searchform;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dom4j.Element;
-
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.bstek.ureport.definition.searchform.LabelPosition;
 import com.bstek.ureport.definition.searchform.Option;
 import com.bstek.ureport.definition.searchform.RadioInputComponent;
+import com.bstek.ureport.provider.report.ReportProvider;
+import com.bstek.ureport.utils.ToolUtils;
+import org.apache.commons.lang.StringUtils;
+import org.dom4j.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -36,7 +42,34 @@ public class RadioInputParser implements FormParser<RadioInputComponent> {
 		radio.setOptionsInline(Boolean.valueOf(element.attributeValue("options-inline")));
 		radio.setLabel(element.attributeValue("label"));
 		radio.setType(element.attributeValue("type"));
+		radio.setTitleValue(StrUtil.nullToDefault(element.attributeValue("title-value"),StrUtil.EMPTY));
+		radio.setLabelClass(StrUtil.nullToDefault(element.attributeValue("label-class"),StrUtil.EMPTY));
+		radio.setInputClass(StrUtil.nullToDefault(element.attributeValue("input-class"),StrUtil.EMPTY));
+
 		radio.setLabelPosition(LabelPosition.valueOf(element.attributeValue("label-position")));
+
+		String useDict = element.attributeValue("use-dict");
+
+		if(StringUtils.isNotBlank(useDict)){
+			radio.setUseDict(Boolean.valueOf(useDict));
+			radio.setDictType(element.attributeValue("dict-type"));
+			//获取系统字典
+			Map<String,String> dict = null;
+			Collection<ReportProvider> providers= SpringUtil.getBeansOfType(ReportProvider.class).values();
+			for(ReportProvider provider:providers){
+				if(provider.disabled() || provider.getName()==null){
+					continue;
+				}
+				dict = provider.getTypeDict(radio.getDictType());
+				if(ToolUtils.isNotEmpty(dict)){
+					break;
+				}
+			}
+			radio.setDicts(dict);
+		}else{
+			radio.setDictType(StrUtil.EMPTY);
+		}
+
 		List<Option> options=new ArrayList<Option>();
 		for(Object obj:element.elements()){
 			if(obj==null || !(obj instanceof Element)){
@@ -52,6 +85,19 @@ public class RadioInputParser implements FormParser<RadioInputComponent> {
 			option.setValue(ele.attributeValue("value"));
 		}
 		radio.setOptions(options);
+
+		for(Object obj:element.elements()){
+			if(obj==null || !(obj instanceof Element)){
+				continue;
+			}
+			Element ele=(Element)obj;
+			if(!ele.getName().equals("js-data")){
+				continue;
+			}
+			String jsFun =  ele.getText().trim();
+			radio.setJsFun(jsFun);
+		}
+
 		return radio;
 	}
 	@Override

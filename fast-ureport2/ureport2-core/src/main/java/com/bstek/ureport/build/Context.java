@@ -15,14 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.build;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.chart.ChartData;
 import com.bstek.ureport.definition.mapping.MappingType;
@@ -36,6 +28,10 @@ import com.bstek.ureport.model.Column;
 import com.bstek.ureport.model.Report;
 import com.bstek.ureport.model.Row;
 import com.bstek.ureport.utils.ElCompute;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
+
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -55,10 +51,13 @@ public class Context {
 	private Map<String,Object> parameters;
 	private HideRowColumnBuilder hideRowColumnBuilder;
 	private List<Cell> existPageFunctionCells=new ArrayList<Cell>();
+	//所有单元格名称-单元格
 	private Map<String,List<Cell>> unprocessedCellsMap = new HashMap<String,List<Cell>>();
 	private Map<Row,Map<Column,Cell>> blankCellsMap=new HashMap<Row,Map<Column,Cell>>();
 	private Map<Row,Integer> fillBlankRowsMap=new HashMap<Row,Integer>();
 	private Map<String,ChartData> chartDataMap=new HashMap<String,ChartData>();
+	private Map<String,ChartData> echartDataMap=new HashMap<String,ChartData>();
+
 	public Context(ReportBuilder reportBuilder,Report report,Map<String,Dataset> datasetMap,ApplicationContext applicationContext,Map<String,Object> parameters,HideRowColumnBuilder hideRowColumnBuilder) {
 		this.reportBuilder=reportBuilder;
 		this.report = report;
@@ -67,7 +66,10 @@ public class Context {
 		this.applicationContext=applicationContext;
 		this.parameters=parameters;
 		this.hideRowColumnBuilder=hideRowColumnBuilder;
+
+		//所有单元格
 		Map<String,List<Cell>> cellsMap=report.getCellsMap();
+
 		for(String key:cellsMap.keySet()){
 			if(key.equals(report.getRootCell().getName())){
 				continue;
@@ -76,6 +78,7 @@ public class Context {
 			list.addAll(cellsMap.get(key));
 			unprocessedCellsMap.put(key, list);
 		}
+
 		this.rootCell=new Cell();
 		this.rootCell.setName("ROOT");
 	}
@@ -207,10 +210,19 @@ public class Context {
 	public void addChartData(ChartData data){
 		chartDataMap.put(data.getId(), data);
 	}
+
 	public Map<String, ChartData> getChartDataMap() {
 		return chartDataMap;
 	}
-	
+
+	public void addEchartData(ChartData data){
+		echartDataMap.put(data.getId(), data);
+	}
+
+	public Map<String, ChartData> getEchartDataMap() {
+		return echartDataMap;
+	}
+
 	public Row getRow(int rowNumber){
 		return report.getRow(rowNumber);
 	}
@@ -326,4 +338,6 @@ public class Context {
 	public Object getVariable(String key){
 		return variableMap.get(key);
 	}
+
+
 }

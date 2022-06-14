@@ -15,21 +15,14 @@
  ******************************************************************************/
 package com.bstek.ureport.build;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.bstek.ureport.build.compute.ChartValueCompute;
-import com.bstek.ureport.build.compute.DatasetValueCompute;
-import com.bstek.ureport.build.compute.ExpressionValueCompute;
-import com.bstek.ureport.build.compute.ImageValueCompute;
-import com.bstek.ureport.build.compute.SimpleValueCompute;
-import com.bstek.ureport.build.compute.SlashValueCompute;
-import com.bstek.ureport.build.compute.ValueCompute;
-import com.bstek.ureport.build.compute.ZxingValueCompute;
+import com.bstek.ureport.build.compute.*;
 import com.bstek.ureport.definition.value.Value;
 import com.bstek.ureport.exception.ReportException;
 import com.bstek.ureport.model.Cell;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -53,7 +46,8 @@ public class DataCompute {
 		valueComputesMap.put(zxingValueCompute.type().name(), zxingValueCompute);
 		ChartValueCompute chartValueCompute=new ChartValueCompute();
 		valueComputesMap.put(chartValueCompute.type().name(), chartValueCompute);
-		
+		EChartValueCompute eChartValueCompute = new EChartValueCompute();
+		valueComputesMap.put(eChartValueCompute.type().name(), eChartValueCompute);
 	}
 
 	public static List<BindData> buildCellData(Cell cell,Context context) {

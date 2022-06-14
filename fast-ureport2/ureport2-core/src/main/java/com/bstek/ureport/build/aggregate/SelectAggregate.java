@@ -15,11 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.build.aggregate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.build.BindData;
 import com.bstek.ureport.build.Context;
@@ -27,6 +22,11 @@ import com.bstek.ureport.definition.Order;
 import com.bstek.ureport.expression.model.expr.dataset.DatasetExpression;
 import com.bstek.ureport.model.Cell;
 import com.bstek.ureport.utils.DataUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -63,6 +63,7 @@ public class SelectAggregate extends Aggregate {
 			rowList.add(new HashMap<String,Object>());
 			list.add(new BindData("",rowList));
 		}
+		//数据内存排序
 		if(list.size()>1){
 			Order order=expr.getOrder();
 			orderBindDataList(list, order);			

@@ -15,6 +15,18 @@
  ******************************************************************************/
 package com.bstek.ureport.console.importexcel;
 
+import com.bstek.ureport.console.RenderPageServletAction;
+import com.bstek.ureport.console.cache.TempObjectCache;
+import com.bstek.ureport.definition.ReportDefinition;
+import com.bstek.ureport.parser.ReportParser;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,31 +35,66 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
-import com.bstek.ureport.console.RenderPageServletAction;
-import com.bstek.ureport.console.cache.TempObjectCache;
-import com.bstek.ureport.definition.ReportDefinition;
-
 /**
  * @author Jacky.gao
  * @since 2017年5月25日
  */
 public class ImportExcelServletAction extends RenderPageServletAction {
 	private List<ExcelParser> excelParsers=new ArrayList<ExcelParser>();
+	private ReportParser reportParser;
 	public ImportExcelServletAction(){
 		excelParsers.add(new HSSFExcelParser());
 		excelParsers.add(new XSSFExcelParser());
 	}
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		String method=retriveMethod(req);
+		if(method!=null){
+			invokeMethod(method, req, resp);
+		}else{
+			importExcel(req, resp);
+		}
+
+	}
+
+	public void importXml(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String tempDir=System.getProperty("java.io.tmpdir");
+		FileItemFactory factory=new DiskFileItemFactory(1000240,new File(tempDir));
+		ServletFileUpload upload=new ServletFileUpload(factory);
+		String errorInfo=null;
+		ReportDefinition report=null;
+		try {
+			List<FileItem> items=upload.parseRequest(req);
+			for(FileItem item:items){
+				String fieldName=item.getFieldName();
+				String name=item.getName().toLowerCase();
+				if(fieldName.equals("_xml_file") && (name.endsWith(".xml"))){
+					InputStream inputStream = item.getInputStream();
+					report = reportParser.parse(inputStream,"classpath:template/template.ureport.xml");
+					inputStream.close();
+					break;
+				}
+			}
+			errorInfo="请选择一个合法的XML导入";
+		} catch (Exception e) {
+			e.printStackTrace();
+			errorInfo=e.getMessage();
+		}
+		Map<String,Object> result=new HashMap<String,Object>();
+		if(report!=null){
+			result.put("result", true);
+			TempObjectCache.putObject("classpath:template/template.ureport.xml", report);
+		}else{
+			result.put("result", false);
+			if(errorInfo!=null){
+				result.put("errorInfo", errorInfo);
+			}
+		}
+		writeObjectToJson(resp, result);
+	}
+
+	private void importExcel(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String tempDir=System.getProperty("java.io.tmpdir");
 		FileItemFactory factory=new DiskFileItemFactory(1000240,new File(tempDir));
 		ServletFileUpload upload=new ServletFileUpload(factory);
@@ -87,7 +134,11 @@ public class ImportExcelServletAction extends RenderPageServletAction {
 		}
 		writeObjectToJson(resp, result);
 	}
-	
+
+	public void setReportParser(ReportParser reportParser) {
+		this.reportParser = reportParser;
+	}
+
 	@Override
 	public String url() {
 		return "/import";

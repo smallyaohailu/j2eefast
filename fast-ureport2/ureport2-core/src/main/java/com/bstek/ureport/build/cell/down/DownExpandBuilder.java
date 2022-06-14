@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.build.cell.down;
 
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.Range;
 import com.bstek.ureport.build.BindData;
 import com.bstek.ureport.build.Context;
@@ -28,6 +25,9 @@ import com.bstek.ureport.definition.ConditionPropertyItem;
 import com.bstek.ureport.model.Cell;
 import com.bstek.ureport.model.Row;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Jacky.gao
  * @since 2016年11月1日
@@ -35,8 +35,11 @@ import com.bstek.ureport.model.Row;
 public class DownExpandBuilder extends ExpandBuilder {
 	@Override
 	public Cell buildCell(List<BindData> dataList, Cell cell, Context context) {
-		Range duplicateRange=cell.getDuplicateRange();
-		int mainCellRowNumber=cell.getRow().getRowNumber();
+
+		Range duplicateRange = cell.getDuplicateRange();
+		//行号
+		int mainCellRowNumber= cell.getRow().getRowNumber();
+
 		Range rowRange = buildRowRange(mainCellRowNumber,duplicateRange);
 		
 		DownDuplocatorWrapper downDuplocatorWrapper=buildCellDownDuplicator(cell,context,rowRange);

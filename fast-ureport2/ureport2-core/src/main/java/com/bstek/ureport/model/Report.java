@@ -15,18 +15,15 @@
  ******************************************************************************/
 package com.bstek.ureport.model;
 
+import com.bstek.ureport.build.Context;
+import com.bstek.ureport.build.paging.Page;
+import com.bstek.ureport.build.paging.PagingBuilder;
+import com.bstek.ureport.definition.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.bstek.ureport.build.Context;
-import com.bstek.ureport.build.paging.Page;
-import com.bstek.ureport.build.paging.PagingBuilder;
-import com.bstek.ureport.definition.Band;
-import com.bstek.ureport.definition.ConditionPropertyItem;
-import com.bstek.ureport.definition.HeaderFooterDefinition;
-import com.bstek.ureport.definition.Paper;
 
 /**
  * @author Jacky.gao
@@ -34,21 +31,28 @@ import com.bstek.ureport.definition.Paper;
  */
 public class Report {
 	private Paper paper;
+	private Config config;
 	private HeaderFooterDefinition header;
 	private HeaderFooterDefinition footer;
 	private Cell rootCell;
 	private Context context;
+	//行信息
 	private List<Row> rows;
 	private List<Row> headerRepeatRows=new ArrayList<Row>();
 	private List<Row> footerRepeatRows=new ArrayList<Row>();
 	private List<Row> titleRows=new ArrayList<Row>();
 	private List<Row> summaryRows=new ArrayList<Row>();
 	private int repeatHeaderRowHeight=0,repeatFooterRowHeight=0,titleRowsHeight=0,summaryRowsHeight=0;
+	//列信息
 	private List<Column> columns;
 	private List<Page> pages;
 	private String reportFullName;
+	//存放有条件属性的单元格
 	private List<Cell> lazyComputeCells=new ArrayList<Cell>();
+
+	//存放所有行Key value 列-单元格  -- 单元格存放在哪行、那列
 	private Map<Row,Map<Column,Cell>> rowColCellMap=new HashMap<Row,Map<Column,Cell>>();
+	//存放所有单元格- key 单元格名称  value 单元格
 	private Map<String,List<Cell>> cellsMap=new HashMap<String,List<Cell>>();
 	public void insertRow(Row row,int rowNumber){
 		int pos=rowNumber-1;
@@ -111,7 +115,9 @@ public class Report {
 			colMap=new HashMap<Column,Cell>();
 			rowColCellMap.put(row, colMap);
 		}
+		//列 - 单元格
 		colMap.put(col, cell);
+
 		return addLazyCell(cell);
 	}
 	
@@ -238,5 +244,13 @@ public class Report {
 	}
 	public void setFooter(HeaderFooterDefinition footer) {
 		this.footer = footer;
+	}
+
+	public Config getConfig() {
+		return config;
+	}
+
+	public void setConfig(Config config) {
+		this.config = config;
 	}
 }

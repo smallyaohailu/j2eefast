@@ -18,6 +18,7 @@ package com.bstek.ureport.definition;
 import java.io.Serializable;
 
 /**
+ * 扩展方向
  * @author Jacky.gao
  * @since 2016年11月1日
  */

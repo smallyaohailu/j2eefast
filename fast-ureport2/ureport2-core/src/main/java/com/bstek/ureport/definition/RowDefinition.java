@@ -15,12 +15,13 @@
  ******************************************************************************/
 package com.bstek.ureport.definition;
 
+import com.bstek.ureport.model.Row;
+
 import java.io.Serializable;
 import java.util.List;
 
-import com.bstek.ureport.model.Row;
-
 /**
+ * 行样本信息
  * @author Jacky.gao
  * @since 2016年11月1日
  */

@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.bstek.ureport.chart.dataset.impl.category;
 
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.model.Cell;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -36,6 +36,11 @@ public class PolarDataset extends CategoryDataset {
 		sb.append("\"datasets\":["+datasetJson+"]");
 		sb.append("}");
 		return sb.toString();
+	}
+
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
 	}
 
 	@Override

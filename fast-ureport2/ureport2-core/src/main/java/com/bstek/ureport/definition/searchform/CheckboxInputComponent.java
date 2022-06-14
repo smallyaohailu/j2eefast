@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.bstek.ureport.definition.searchform;
 
+import cn.hutool.core.util.StrUtil;
+import com.bstek.ureport.utils.ToolUtils;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,9 +40,10 @@ public class CheckboxInputComponent extends InputComponent {
 			String label=option.getLabel();
 			String checked=list.contains(value) ? "checked" : "";
 			if(this.optionsInline){
-				sb.append("<span class='checkbox-inline' style='padding-top:0px'><input value='"+value+"' type='checkbox' "+checked+" name='"+name+"'>"+label+"</span>");
+//				sb.append("<span class='checkbox-inline' style='padding-top:0px'><input value='"+value+"' type='checkbox' "+checked+" name='"+name+"'>"+label+"</span>");
+				sb.append("<label class='check-box'><input value='"+value+"' type='checkbox' "+checked+" name='"+name+"'/>"+label+"</label>");
 			}else{
-				sb.append("<span class='checkbox'><input type='checkbox' value='"+value+"' name='"+name+"' "+checked+" style='margin-left: auto'><span style=\"margin-left:15px\">"+label+"</span></span>");
+				sb.append("<span class='checkbox'><label class='check-box'><input type='checkbox' value='"+value+"' name='"+name+"' "+checked+" style='margin-left: auto'><span style=\"margin-left:5px\"/>"+label+"</span></label></span>");
 			}				
 		}
 		return sb.toString();
@@ -48,6 +52,11 @@ public class CheckboxInputComponent extends InputComponent {
 	public String initJs(RenderContext context) {
 		String name=getBindParameter();
 		StringBuilder sb=new StringBuilder();
+		if(ToolUtils.isEmpty(this.getJsFun())){
+			sb.append("function "+(context.buildComponentId(this)+"_val_")+"(vl){return vl};");
+		}else{
+			sb.append(ToolUtils.cleanCommons(StrUtil.replace(this.getJsFun(),"validate",context.buildComponentId(this)+"_val_"))).append(";");
+		}
 		sb.append("formElements.push(");
 		sb.append("function(){");
 		sb.append("if(''==='"+name+"'){");
@@ -58,8 +67,9 @@ public class CheckboxInputComponent extends InputComponent {
 		sb.append("$(\"input[name='"+getBindParameter()+"']:checked\").each(function(index,item){");
 		sb.append("if(names===''){names+=$(item).val();}else{names+=','+$(item).val();}");
 		sb.append("});");
+		sb.append("vl = "+context.buildComponentId(this)+"_val_(names);");
 		sb.append("return {");
-		sb.append("\""+name+"\":names");
+		sb.append("\""+name+"\":vl");
 		sb.append("}");
 		sb.append("}");
 		sb.append(");");

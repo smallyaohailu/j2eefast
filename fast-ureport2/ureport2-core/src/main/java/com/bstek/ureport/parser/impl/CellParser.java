@@ -15,32 +15,21 @@
  ******************************************************************************/
 package com.bstek.ureport.parser.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Element;
-
-import com.bstek.ureport.definition.CellDefinition;
-import com.bstek.ureport.definition.CellStyle;
-import com.bstek.ureport.definition.ConditionPropertyItem;
-import com.bstek.ureport.definition.Expand;
-import com.bstek.ureport.definition.LinkParameter;
+import com.bstek.ureport.definition.*;
 import com.bstek.ureport.definition.value.Value;
 import com.bstek.ureport.exception.ReportException;
 import com.bstek.ureport.exception.ReportParseException;
 import com.bstek.ureport.expression.ExpressionUtils;
 import com.bstek.ureport.expression.model.Expression;
 import com.bstek.ureport.parser.Parser;
-import com.bstek.ureport.parser.impl.value.ChartValueParser;
-import com.bstek.ureport.parser.impl.value.DatasetValueParser;
-import com.bstek.ureport.parser.impl.value.ExpressionValueParser;
-import com.bstek.ureport.parser.impl.value.ImageValueParser;
-import com.bstek.ureport.parser.impl.value.SimpleValueParser;
-import com.bstek.ureport.parser.impl.value.SlashValueParser;
-import com.bstek.ureport.parser.impl.value.ZxingValueParser;
+import com.bstek.ureport.parser.impl.value.*;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Element;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -56,6 +45,7 @@ public class CellParser implements Parser<CellDefinition>{
 		parsers.put("slash-value",new SlashValueParser());
 		parsers.put("zxing-value",new ZxingValueParser());
 		parsers.put("chart-value",new ChartValueParser());
+		parsers.put("echart-value",new EChartValueParser());
 		parsers.put("cell-style",new CellStyleParser());
 		parsers.put("link-parameter",new LinkParameterParser());
 		parsers.put("condition-property-item",new ConditionParameterItemParser());
@@ -68,10 +58,12 @@ public class CellParser implements Parser<CellDefinition>{
 		cell.setRowNumber(Integer.valueOf(element.attributeValue("row")));
 		cell.setLeftParentCellName(element.attributeValue("left-cell"));
 		cell.setTopParentCellName(element.attributeValue("top-cell"));
+		//合并行
 		String rowSpan=element.attributeValue("row-span");
 		if(StringUtils.isNotBlank(rowSpan)){
 			cell.setRowSpan(Integer.valueOf(rowSpan));
 		}
+		//合并列
 		String colSpan=element.attributeValue("col-span");
 		if(StringUtils.isNotBlank(colSpan)){
 			cell.setColSpan(Integer.valueOf(colSpan));
@@ -130,6 +122,16 @@ public class CellParser implements Parser<CellDefinition>{
 		cell.setConditionPropertyItems(conditionPropertyItems);
 		if(cell.getValue()==null){
 			throw new ReportException("Cell ["+cell.getName()+"] value not define.");
+//			cell.setValue(new Value() {
+//				@Override
+//				public String getValue() {
+//					return "";
+//				}
+//				@Override
+//				public ValueType getType() {
+//					return ValueType.simple;
+//				}
+//			});
 		}
 		return cell;
 	}

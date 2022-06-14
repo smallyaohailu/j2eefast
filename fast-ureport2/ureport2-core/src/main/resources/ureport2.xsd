@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/ureport2" xmlns:tns="http://www.example.org/ureport2" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.j2eefast.com/JUUreport" xmlns:tns="http://www.j2eefast.com/JUUreport" elementFormDefault="qualified">
 	<element name="ureport">
 		<complexType>
 			<sequence>
+				<element name="config" type="tns:config" minOccurs="1" maxOccurs="1"></element>
 				<element name="cell" type="tns:cell" minOccurs="1" maxOccurs="unbounded"></element>
 				<element name="row" type="tns:row" minOccurs="1" maxOccurs="unbounded"></element>
 				<element name="column" type="tns:column" minOccurs="1" maxOccurs="unbounded"></element>
@@ -235,6 +236,25 @@
 		<attribute name="width" type="int" use="required"></attribute>
 		<attribute name="hide" type="boolean"></attribute>
 	</complexType>
+
+	<complexType name="config">
+		<sequence>
+			<element name="name" type="tns:name-value" minOccurs="0" maxOccurs="1"></element>
+			<element name="downName" type="tns:downName-value" minOccurs="0" maxOccurs="1"></element>
+			<element name="func" type="tns:func-value" minOccurs="0" maxOccurs="1"></element>
+			<element name="roleKeys" type="tns:roleKeys-value" minOccurs="0" maxOccurs="1"></element>
+			<element name="tableAlias" type="tns:tableAlias-value" minOccurs="0" maxOccurs="1"></element>
+			<element name="remark" type="tns:remark-value" minOccurs="0" maxOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="name-value" mixed="true"></complexType>
+	<complexType name="downName-value" mixed="true"></complexType>
+	<complexType name="func-value" mixed="true"></complexType>
+	<complexType name="roleKeys-value" mixed="true"></complexType>
+	<complexType name="tableAlias-value" mixed="true"></complexType>
+	<complexType name="remark-value" mixed="true"></complexType>
+
 	<complexType name="cell">
 		<sequence>
 			<element name="simple-value" type="tns:simple-value" minOccurs="0" maxOccurs="1"></element>

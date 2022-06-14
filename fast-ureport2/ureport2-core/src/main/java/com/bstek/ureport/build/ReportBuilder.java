@@ -15,14 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.build;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
-
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.build.cell.CellBuilder;
 import com.bstek.ureport.build.cell.NoneExpandBuilder;
@@ -31,24 +23,21 @@ import com.bstek.ureport.build.cell.right.RightExpandBuilder;
 import com.bstek.ureport.build.paging.BasePagination;
 import com.bstek.ureport.build.paging.Page;
 import com.bstek.ureport.build.paging.PagingBuilder;
-import com.bstek.ureport.definition.Band;
-import com.bstek.ureport.definition.Expand;
-import com.bstek.ureport.definition.Orientation;
-import com.bstek.ureport.definition.PagingMode;
-import com.bstek.ureport.definition.Paper;
-import com.bstek.ureport.definition.ReportDefinition;
-import com.bstek.ureport.definition.datasource.BuildinDatasource;
-import com.bstek.ureport.definition.datasource.BuildinDatasourceDefinition;
-import com.bstek.ureport.definition.datasource.DatasourceDefinition;
-import com.bstek.ureport.definition.datasource.DatasourceProvider;
-import com.bstek.ureport.definition.datasource.JdbcDatasourceDefinition;
-import com.bstek.ureport.definition.datasource.SpringBeanDatasourceDefinition;
+import com.bstek.ureport.definition.*;
+import com.bstek.ureport.definition.datasource.*;
 import com.bstek.ureport.exception.ReportComputeException;
 import com.bstek.ureport.exception.ReportException;
 import com.bstek.ureport.model.Cell;
 import com.bstek.ureport.model.Column;
 import com.bstek.ureport.model.Report;
 import com.bstek.ureport.model.Row;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -67,16 +56,24 @@ public class ReportBuilder extends BasePagination implements ApplicationContextA
 		cellBuildersMap.put(Expand.None,noneExpandBuilder);
 	}
 	public Report buildReport(ReportDefinition reportDefinition,Map<String,Object> parameters) {
+		// 配置文件信息
 		Report report = reportDefinition.newReport();
-		Map<String,Dataset> datasetMap=buildDatasets(reportDefinition, parameters, applicationContext);
+
+		// 获取数据源信息
+		Map<String,Dataset> datasetMap = buildDatasets(reportDefinition, parameters, applicationContext);
+
 		Context context = new Context(this,report,datasetMap,applicationContext,parameters,hideRowColumnBuilder);
+
 		long start=System.currentTimeMillis();
 		List<Cell> cells=new ArrayList<Cell>();
 		cells.add(report.getRootCell());
-		do {			
+		//单元格赋值
+		do {
 			buildCell(context,cells);
 			cells = context.nextUnprocessedCells();
 		} while (cells != null);
+
+		//填充空白
 		doFillBlankRows(report,context);
 		recomputeCells(report,context);
 		long end=System.currentTimeMillis();
@@ -84,7 +81,8 @@ public class ReportBuilder extends BasePagination implements ApplicationContextA
 		Utils.logToConsole(msg);
 		return report;
 	}
-	
+
+	//转换生成信息
 	public void buildCell(Context context,List<Cell> cells){
 		if(cells==null){
 			cells=context.nextUnprocessedCells();			
@@ -93,13 +91,21 @@ public class ReportBuilder extends BasePagination implements ApplicationContextA
 			return;
 		}
 		for(Cell cell:cells){
+			if(cells.size() == 10 || cell.getName().equals("A3")){
+				System.out.println(cell.getName() + " : "+ cell.getRow().getTempRowNumber());
+			}
+			//获取单元格绑定数据
 			List<BindData> dataList=context.buildCellData(cell);
 			cell.setProcessed(true);
 			int size=dataList.size();
 			Cell lastCell=cell;
+			//System.out.println(JSONUtil.parse(cell).toString());
 			if(size==1){
 				lastCell=noneExpandBuilder.buildCell(dataList, cell, context);
-			}else if(size>1){
+			}
+			//数据集 单元格 多个数据
+			else if(size>1){
+				//获取数据展示反向
 				CellBuilder cellBuilder=cellBuildersMap.get(cell.getExpand());
 				lastCell=cellBuilder.buildCell(dataList,cell, context);				
 			}
@@ -321,7 +327,10 @@ public class ReportBuilder extends BasePagination implements ApplicationContextA
 		List<Row> pageRepeatFooters=new ArrayList<Row>();
 		pageRepeatHeaders.addAll(headerRows);
 		pageRepeatFooters.addAll(footerRows);
+
+		//自动分页
 		if(pagingMode.equals(PagingMode.fitpage)){
+			//计算可视高度
 			int height=paper.getHeight()-paper.getBottomMargin()-paper.getTopMargin()-5;
 			if(paper.getOrientation().equals(Orientation.landscape)){
 				height=paper.getWidth()-paper.getBottomMargin()-paper.getTopMargin()-5;

@@ -15,14 +15,14 @@
  ******************************************************************************/
 package com.bstek.ureport.parser.impl.searchform;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dom4j.Element;
-
+import cn.hutool.core.util.StrUtil;
 import com.bstek.ureport.definition.searchform.CheckboxInputComponent;
 import com.bstek.ureport.definition.searchform.LabelPosition;
 import com.bstek.ureport.definition.searchform.Option;
+import org.dom4j.Element;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -36,6 +36,9 @@ public class CheckboxParser implements FormParser<CheckboxInputComponent> {
 		checkbox.setOptionsInline(Boolean.valueOf(element.attributeValue("options-inline")));
 		checkbox.setLabel(element.attributeValue("label"));
 		checkbox.setType(element.attributeValue("type"));
+		checkbox.setTitleValue(StrUtil.nullToDefault(element.attributeValue("title-value"),StrUtil.EMPTY));
+		checkbox.setLabelClass(StrUtil.nullToDefault(element.attributeValue("label-class"),StrUtil.EMPTY));
+		checkbox.setInputClass(StrUtil.nullToDefault(element.attributeValue("input-class"),StrUtil.EMPTY));
 		checkbox.setLabelPosition(LabelPosition.valueOf(element.attributeValue("label-position")));
 		List<Option> options=new ArrayList<Option>();
 		for(Object obj:element.elements()){
@@ -52,6 +55,19 @@ public class CheckboxParser implements FormParser<CheckboxInputComponent> {
 			option.setValue(ele.attributeValue("value"));
 		}
 		checkbox.setOptions(options);
+
+		for(Object obj:element.elements()){
+			if(obj==null || !(obj instanceof Element)){
+				continue;
+			}
+			Element ele=(Element)obj;
+			if(!ele.getName().equals("js-data")){
+				continue;
+			}
+			String jsFun =  ele.getText().trim();
+			checkbox.setJsFun(jsFun);
+		}
+
 		return checkbox;
 	}
 	@Override

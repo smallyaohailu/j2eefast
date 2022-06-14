@@ -27,6 +27,9 @@ import com.bstek.ureport.model.Cell;
 public class ChartData {
 	private String id;
 	private String json;
+	//类型
+	@JsonIgnore
+	private String type;
 	@JsonIgnore
 	private String base64Data;
 	@JsonIgnore
@@ -36,6 +39,12 @@ public class ChartData {
 	public ChartData(String json,Cell cell) {
 		this.json=json;
 		this.id=cell.getName();
+		this.type = "chart";
+	}
+	public ChartData(String json,Cell cell,String type) {
+		this.json=json;
+		this.id=cell.getName();
+		this.type = type;
 	}
 	public String getJson() {
 		return json;
@@ -68,5 +77,16 @@ public class ChartData {
 	}
 	public String getId() {
 		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

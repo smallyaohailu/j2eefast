@@ -15,14 +15,14 @@
  ******************************************************************************/
 package com.bstek.ureport.export.builder.down;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.Range;
 import com.bstek.ureport.definition.BlankCellInfo;
 import com.bstek.ureport.definition.CellDefinition;
 import com.bstek.ureport.parser.BuildUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -31,12 +31,20 @@ import com.bstek.ureport.parser.BuildUtils;
 public class LeftParentCellCreator {
 	public List<Range> buildParentCells(CellDefinition cell){
 		List<Range> rangeList=new ArrayList<Range>();
-		Range childRange=buildChildrenCellRange(cell);
-		List<CellDefinition> parentCells=new ArrayList<CellDefinition>();
-		collectParentCells(cell,parentCells);
+		//单元格 右边行范围
+		Range childRange = buildChildrenCellRange(cell);
+		//单元格左侧单元格集合
+		List<CellDefinition> parentCells= cell.getLeftParentCells();
+//		collectParentCells(cell,parentCells);
 		buildParents(cell, parentCells, childRange, rangeList);
 		return rangeList;
 	}
+
+	/**
+	 * 获取单元格所有左侧单元格集合
+	 * @param cell
+	 * @param parentCells
+	 */
 	private void collectParentCells(CellDefinition cell,List<CellDefinition> parentCells){
 		CellDefinition leftParentCell=cell.getLeftParentCell();
 		if(leftParentCell==null){
@@ -47,17 +55,25 @@ public class LeftParentCellCreator {
 	}
 	
 	private void buildParents(CellDefinition mainCell,List<CellDefinition> parentCells,Range childRange,List<Range> rangeList){
+		//当前行
 		int rowNumberStart=mainCell.getRowNumber();
+		// 如果是合并行 终止行
 		int rowNumberEnd=BuildUtils.buildRowNumberEnd(mainCell, rowNumberStart);
+		// 当前行范围
 		rangeList.add(new Range(rowNumberStart,rowNumberEnd));
-		
+
+		//右侧行范围
 		int start=childRange.getStart(),end=childRange.getEnd();
-		Map<String,BlankCellInfo> newBlankCellsMap=mainCell.getNewBlankCellsMap();
+
+		Map<String,BlankCellInfo> newBlankCellsMap = mainCell.getNewBlankCellsMap();
+
 		boolean increase=true;
+
 		for(CellDefinition parentCell:parentCells){
 			String parentCellName=parentCell.getName();
 			int parentRowNumberStart=parentCell.getRowNumber();
 			int parentRowNumberEnd=BuildUtils.buildRowNumberEnd(parentCell,parentRowNumberStart);
+			//偏移行
 			int offset=parentRowNumberStart-rowNumberStart;
 			int parentRowSpan=parentCell.getRowSpan();
 			boolean isOut=assertOut(parentCell, mainCell, childRange);
@@ -100,7 +116,14 @@ public class LeftParentCellCreator {
 		}
 		return assertDoBlank(nextParentCell.getLeftParentCell(), parentCell, mainCell, childRange);
 	}
-	
+
+	/**
+	 *
+	 * @param parentCell 左边
+	 * @param mainCell 主单元格
+	 * @param childRange 右边行范围
+	 * @return
+	 */
 	private boolean assertOut(CellDefinition parentCell,CellDefinition mainCell,Range childRange){
 		int start=parentCell.getRowNumber(),end=BuildUtils.buildRowNumberEnd(parentCell, start);
 		int rangeStart=childRange.getStart(),rangeEnd=childRange.getEnd();
@@ -118,6 +141,7 @@ public class LeftParentCellCreator {
 	
 	private Range buildChildrenCellRange(CellDefinition mainCell){
 		Range range=new Range();
+		//右侧单元格集合
 		List<CellDefinition> childrenCells=mainCell.getRowChildrenCells();
 		for(CellDefinition childCell:childrenCells){
 			int childRowNumberStart=childCell.getRowNumber();

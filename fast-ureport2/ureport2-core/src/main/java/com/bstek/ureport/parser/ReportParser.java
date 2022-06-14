@@ -15,35 +15,22 @@
  ******************************************************************************/
 package com.bstek.ureport.parser;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import cn.hutool.core.util.IdUtil;
+import com.bstek.ureport.definition.*;
+import com.bstek.ureport.definition.datasource.DatasourceDefinition;
+import com.bstek.ureport.definition.searchform.SearchForm;
+import com.bstek.ureport.exception.ReportException;
+import com.bstek.ureport.exception.ReportParseException;
+import com.bstek.ureport.parser.impl.*;
+import com.bstek.ureport.parser.impl.searchform.SearchFormParser;
+import com.bstek.ureport.utils.ToolUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.bstek.ureport.definition.CellDefinition;
-import com.bstek.ureport.definition.ColumnDefinition;
-import com.bstek.ureport.definition.HeaderFooterDefinition;
-import com.bstek.ureport.definition.Paper;
-import com.bstek.ureport.definition.ReportDefinition;
-import com.bstek.ureport.definition.RowDefinition;
-import com.bstek.ureport.definition.datasource.DatasourceDefinition;
-import com.bstek.ureport.definition.searchform.SearchForm;
-import com.bstek.ureport.exception.ReportException;
-import com.bstek.ureport.exception.ReportParseException;
-import com.bstek.ureport.parser.impl.CellParser;
-import com.bstek.ureport.parser.impl.ColumnParser;
-import com.bstek.ureport.parser.impl.DatasourceParser;
-import com.bstek.ureport.parser.impl.HeaderFooterParser;
-import com.bstek.ureport.parser.impl.PaperParser;
-import com.bstek.ureport.parser.impl.RowParser;
-import com.bstek.ureport.parser.impl.searchform.SearchFormParser;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author Jacky.gao
@@ -53,6 +40,7 @@ public class ReportParser {
 	private Map<String,Parser<?>> parsers=new HashMap<String,Parser<?>>();
 	public ReportParser() {
 		parsers.put("row",new RowParser());
+		parsers.put("config",new ConfigParser());
 		parsers.put("column",new ColumnParser());
 		parsers.put("cell",new CellParser());
 		parsers.put("datasource",new DatasourceParser());
@@ -75,8 +63,11 @@ public class ReportParser {
 			List<ColumnDefinition> columns=new ArrayList<ColumnDefinition>();
 			List<CellDefinition> cells=new ArrayList<CellDefinition>();
 			List<DatasourceDefinition> datasources=new ArrayList<DatasourceDefinition>();
+			//行信息
 			report.setRows(rows);
+			//列信息
 			report.setColumns(columns);
+			//单元格信息
 			report.setCells(cells);
 			report.setDatasources(datasources); 
 			for(Object obj:element.elements()){
@@ -98,7 +89,19 @@ public class ReportParser {
 					}else if(target instanceof Paper){
 						Paper paper=(Paper)target;
 						report.setPaper(paper);
-					}else if(target instanceof HeaderFooterDefinition){
+					}else if(target instanceof Config){
+						Config config = (Config) target;
+						if("classpath:template/template.ureport.xml".equals(report.getReportFullName())){
+							if((ToolUtils.isNotEmpty(config.getName())
+									&& "template.ureport.xml".equals(config.getName())) ||
+									ToolUtils.isEmpty(config.getName())){
+								//初始文件赋值名称
+								config.setName(IdUtil.nanoId());
+							}
+						}
+						report.setConfig(config);
+					}
+					else if(target instanceof HeaderFooterDefinition){
 						HeaderFooterDefinition hf=(HeaderFooterDefinition)target;
 						if(ele.getName().equals("header")){
 							report.setHeader(hf);
@@ -122,6 +125,8 @@ public class ReportParser {
 		rebuild(report);
 		return report;
 	}
+
+	//转换赋值 单元格 相邻左侧 上面 单元格
 	private void rebuild(ReportDefinition report) {
 		List<CellDefinition> cells=report.getCells();
 		Map<String,CellDefinition> cellsMap=new HashMap<String,CellDefinition>();
@@ -130,12 +135,14 @@ public class ReportParser {
 			cellsMap.put(cell.getName(), cell);
 			int rowNum=cell.getRowNumber(),colNum=cell.getColumnNumber(),rowSpan=cell.getRowSpan(),colSpan=cell.getColSpan();
 			rowSpan = rowSpan>0 ? rowSpan-- : 1;
-			colSpan = colSpan>0 ? colSpan-- : 1;
+			colSpan = colSpan>0 ? colSpan-- : 1; // 1 - 2
 			int rowStart=rowNum,rowEnd=rowNum+rowSpan,colStart=colNum,colEnd=colNum+colSpan;
 			for(int i=rowStart;i<rowEnd;i++){
-				cellsRowColMap.put(i+","+colNum, cell);				
+				//1,2 2,2
+				cellsRowColMap.put(i+","+colNum, cell);
 			}
 			for(int i=colStart;i<colEnd;i++){
+				//1,2 1,3
 				cellsRowColMap.put(rowNum+","+i, cell);								
 			}
 		}
@@ -152,11 +159,16 @@ public class ReportParser {
 					cell.setLeftParentCell(targetCell);					
 				}
 			}else{
+				//列大于一 就一定会有左边列
 				if(colNumber>1){
-					CellDefinition targetCell=cellsRowColMap.get(rowNumber+","+(colNumber-1));
-					cell.setLeftParentCell(targetCell);
+					CellDefinition targetCell = cellsRowColMap.get(rowNumber+","+(colNumber-1));
+					if(targetCell != null){
+						//cell.setLeftParentCellName(targetCell.getName());
+						cell.setLeftParentCell(targetCell);
+					}
 				}
 			}
+
 			String topParentCellName=cell.getTopParentCellName();
 			if(StringUtils.isNotBlank(topParentCellName)){
 				if(!topParentCellName.equals("root")){
@@ -169,7 +181,50 @@ public class ReportParser {
 			}else{
 				if(rowNumber>1){
 					CellDefinition targetCell=cellsRowColMap.get((rowNumber-1)+","+colNumber);
-					cell.setTopParentCell(targetCell);
+					if(targetCell != null){
+						//cell.setTopParentCellName(targetCell.getName());
+						cell.setTopParentCell(targetCell);
+					}
+				}
+			}
+
+			//设置下方
+			String downParentCellName = cell.getDownParentCellName();
+			if(StringUtils.isNotBlank(downParentCellName)){
+				if(!topParentCellName.equals("root")){
+					CellDefinition targetCell=cellsMap.get(topParentCellName);
+					if(targetCell==null){
+						throw new ReportException("Cell ["+cell.getName()+"] 's down parent cell ["+topParentCellName+"] not exist.");
+					}
+					cell.setDownParentCell(targetCell);
+				}
+			}else{
+				int rowN = rowNumber + (cell.getRowSpan() > 0?(cell.getRowSpan() -1):0);
+				//当前行小于总行数才有 相邻下单元格
+				if(rowN < report.getRows().size()){
+					CellDefinition targetCell=cellsRowColMap.get((rowN+1)+","+colNumber);
+					cell.setDownParentCellName(targetCell.getName());
+					cell.setDownParentCell(targetCell);
+				}
+			}
+
+			//设置右侧相邻单元格
+			String rightParentCellName = cell.getRightParentCellName();
+			if(StringUtils.isNotBlank(rightParentCellName)){
+				if(!topParentCellName.equals("root")){
+					CellDefinition targetCell=cellsMap.get(rightParentCellName);
+					if(targetCell==null){
+						throw new ReportException("Cell ["+cell.getName()+"] 's down parent cell ["+topParentCellName+"] not exist.");
+					}
+					cell.setRightParentCell(targetCell);
+				}
+			}else{
+				//当前所在列小于总列 才有相邻右单元格
+				int colN  = colNumber + (cell.getColSpan() > 0?(cell.getColSpan() -1):0);
+				if( colN < report.getColumns().size()){
+					CellDefinition targetCell=cellsRowColMap.get(rowNumber+","+(colN+1));
+					cell.setRightParentCellName(targetCell.getName());
+					cell.setRightParentCell(targetCell);
 				}
 			}
 		}

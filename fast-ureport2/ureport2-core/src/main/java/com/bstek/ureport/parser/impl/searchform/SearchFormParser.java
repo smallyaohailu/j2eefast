@@ -15,14 +15,13 @@
  ******************************************************************************/
 package com.bstek.ureport.parser.impl.searchform;
 
-import java.util.List;
-
-import org.dom4j.Element;
-
 import com.bstek.ureport.definition.searchform.Component;
 import com.bstek.ureport.definition.searchform.FormPosition;
 import com.bstek.ureport.definition.searchform.SearchForm;
 import com.bstek.ureport.parser.Parser;
+import org.dom4j.Element;
+
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -33,6 +32,23 @@ public class SearchFormParser implements Parser<SearchForm> {
 	public SearchForm parse(Element element) {
 		SearchForm form=new SearchForm();
 		form.setFormPosition(FormPosition.valueOf(element.attributeValue("form-position")));
+
+		//解析加载 表单增强JS/CSS
+		for(Object obj:element.elements()){
+			if(obj==null || !(obj instanceof Element)){
+				continue;
+			}
+			Element ele=(Element)obj;
+			if(ele.getName().equals("js-data")){
+				String loadJs =  ele.getText().trim();
+				form.setLoadJs(loadJs);
+			}
+			if(ele.getName().equals("css-data")){
+				String loadCss =  ele.getText().trim();
+				form.setLoadCss(loadCss);
+			}
+		}
+
 		List<Component> components=FormParserUtils.parse(element);
 		form.setComponents(components);
 		return form;

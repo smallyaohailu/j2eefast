@@ -15,9 +15,9 @@
  ******************************************************************************/
 package com.bstek.ureport.export.html;
 
-import java.util.Collection;
-
 import com.bstek.ureport.chart.ChartData;
+
+import java.util.Collection;
 
 /**
  * @author Jacky.gao
@@ -34,7 +34,9 @@ public class HtmlReport {
 	private String file;
 	private String reportAlign;
 	private Collection<ChartData> chartDatas;
+	private Collection<ChartData> echartDatas;
 	private int htmlIntervalRefreshValue;
+	//表单
 	private SearchFormData searchFormData;
 	private boolean page;
 	public String getContent() {
@@ -99,6 +101,15 @@ public class HtmlReport {
 	public void setChartDatas(Collection<ChartData> chartDatas) {
 		this.chartDatas = chartDatas;
 	}
+
+	public Collection<ChartData> getEchartDatas() {
+		return echartDatas;
+	}
+
+	public void setEchartDatas(Collection<ChartData> echartDatas) {
+		this.echartDatas = echartDatas;
+	}
+
 	public int getHtmlIntervalRefreshValue() {
 		return htmlIntervalRefreshValue;
 	}

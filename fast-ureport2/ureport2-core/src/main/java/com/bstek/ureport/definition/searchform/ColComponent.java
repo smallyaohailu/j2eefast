@@ -16,7 +16,7 @@
 package com.bstek.ureport.definition.searchform;
 
 /**
- * @author Jacky.gao
+ * @author Jacky.gao J2eeFAST
  * @since 2017年10月23日
  */
 public class ColComponent extends ContainerComponent{
@@ -24,7 +24,7 @@ public class ColComponent extends ContainerComponent{
 	@Override
 	public String toHtml(RenderContext context) {
 		StringBuffer sb=new StringBuffer();
-		sb.append("<div class='col-md-"+size+"' style='padding-left:2px;padding-right:2px'");
+		sb.append("<div class='col-md-"+size+"'");// style='padding-left:2px;padding-right:2px'
 		Object gridComponent=context.getMetadata(GridComponent.KEY);
 		if(gridComponent!=null){
 			GridComponent gc=(GridComponent)gridComponent;

@@ -43,7 +43,9 @@
 	</bean>
 	
 	<bean id="ureport.imageServletAction" class="com.bstek.ureport.console.image.ImageServletAction"></bean>
-	<bean id="ureport.importExcelServletAction" class="com.bstek.ureport.console.importexcel.ImportExcelServletAction"></bean>
+	<bean id="ureport.importExcelServletAction" class="com.bstek.ureport.console.importexcel.ImportExcelServletAction">
+		<property name="reportParser" ref="ureport.reportParser"></property>
+	</bean>
 	
 	<bean id="ureport.chartServletAction" class="com.bstek.ureport.console.chart.ChartServletAction"></bean>
 	

@@ -15,18 +15,20 @@
  ******************************************************************************/
 package com.bstek.ureport.export;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bstek.ureport.build.paging.Page;
 import com.bstek.ureport.definition.Paper;
 import com.bstek.ureport.model.Report;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jacky.gao
  * @since 2017年3月23日
  */
 public class PageBuilder {
+
+	//拆分数据 分页
 	public static FullPageData buildFullPageData(Report report){
 		List<Page> pages=report.getPages();
 		int pageSize=pages.size();

@@ -15,16 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.export;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
 import com.bstek.ureport.build.ReportBuilder;
 import com.bstek.ureport.cache.CacheUtils;
 import com.bstek.ureport.definition.CellDefinition;
@@ -37,6 +27,16 @@ import com.bstek.ureport.export.builder.right.RightCellbuilder;
 import com.bstek.ureport.model.Report;
 import com.bstek.ureport.parser.ReportParser;
 import com.bstek.ureport.provider.report.ReportProvider;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -48,6 +48,7 @@ public class ReportRender implements ApplicationContextAware{
 	private Collection<ReportProvider> reportProviders;
 	private DownCellbuilder downCellParentbuilder=new DownCellbuilder();
 	private RightCellbuilder rightCellParentbuilder=new RightCellbuilder();
+
 	public Report render(String file,Map<String,Object> parameters){
 		ReportDefinition reportDefinition=getReportDefinition(file);
 		return reportBuilder.buildReport(reportDefinition,parameters);
@@ -70,8 +71,8 @@ public class ReportRender implements ApplicationContextAware{
 	public void rebuildReportDefinition(ReportDefinition reportDefinition){
 		List<CellDefinition> cells=reportDefinition.getCells();
 		for(CellDefinition cell:cells){
-			addRowChildCell(cell,cell);
-			addColumnChildCell(cell,cell);
+			addRowChildCell(cell,cells);
+			addColumnChildCell(cell,cells);
 		}
 		for(CellDefinition cell:cells){
 			Expand expand=cell.getExpand();
@@ -82,7 +83,7 @@ public class ReportRender implements ApplicationContextAware{
 			}
 		}
 	}
-	
+
 	public ReportDefinition parseReport(String file){
 		InputStream inputStream=null;
 		try {
@@ -112,25 +113,77 @@ public class ReportRender implements ApplicationContextAware{
 		}
 		return inputStream;
 	}
-	
-	private void addRowChildCell(CellDefinition cell,CellDefinition childCell){
-		CellDefinition leftCell=cell.getLeftParentCell();
-		if(leftCell==null){
-			return;
+
+	/**
+	 * 获取同行右侧单元格
+	 * @param cell
+	 * @param cells
+	 */
+	private void addRowChildCell(CellDefinition cell,List<CellDefinition> cells){
+
+		List<CellDefinition> rowCells = new ArrayList<>();
+		int row = cell.getRowNumber();
+		for(CellDefinition c:cells){
+			if(c.getRowNumber() == row){
+				rowCells.add(c);
+			}
 		}
-		List<CellDefinition> childrenCells=leftCell.getRowChildrenCells();
-		childrenCells.add(childCell);
-		addRowChildCell(leftCell,childCell);
-	}
-	private void addColumnChildCell(CellDefinition cell,CellDefinition childCell){
-		CellDefinition topCell=cell.getTopParentCell();
-		if(topCell==null){
-			return;
+
+		for(CellDefinition c: rowCells){
+			if(c.getColumnNumber() > cell.getColumnNumber()){
+				cell.getRowChildrenCells().add(c);
+			}
 		}
-		List<CellDefinition> childrenCells=topCell.getColumnChildrenCells();
-		childrenCells.add(childCell);
-		addColumnChildCell(topCell,childCell);
+
+		for(CellDefinition c: rowCells){
+			if(c.getColumnNumber() < cell.getColumnNumber()){
+				cell.getLeftParentCells().add(c);
+			}
+		}
 	}
+
+	private void addColumnChildCell(CellDefinition cell,List<CellDefinition> cells){
+//		CellDefinition topCell=cell.getTopParentCell();
+//		if(topCell==null){
+//			return;
+//		}
+//		List<CellDefinition> childrenCells=topCell.getColumnChildrenCells();
+//		childrenCells.add(childCell);
+//		addColumnChildCell(topCell,childCell);
+		List<CellDefinition> columnCells = new ArrayList<>();
+		int col = cell.getColumnNumber(); //所属列
+		for(CellDefinition c:cells){
+			if(c.getColumnNumber() == col){
+				columnCells.add(c);
+			}
+		}
+		for(CellDefinition c: columnCells){
+			if(c.getRowNumber() > cell.getRowNumber()){
+				cell.getColumnChildrenCells().add(c);
+			}
+		}
+	}
+//	private void addRowChildCell(CellDefinition cell,CellDefinition childCell){
+//
+//		//		//解决横向合并问题
+////		if((cell.getRowNumber() + (cell.getRowSpan() > 0? (cell.getRowSpan() - 1): 0)) >= childCell.getRowNumber()){
+////
+////			CellDefinition leftCell = cell.getLeftParentCell();
+////			CellDefinition rightCell = cell.getRightParentCell();
+////			if(leftCell==null || rightCell == null){
+////				return;
+////			}
+////			List<CellDefinition> childrenCells=leftCell.getRowChildrenCells();
+////			childrenCells.add(childCell);
+////			addRowChildCell(leftCell,childCell);
+////
+////		}
+////		//解决横向合并问题
+////		if(!((cell.getRowNumber() + cell.getRowSpan()) >= childCell.getRowNumber())){
+////			return;
+////		}
+//	}
+
 	public void setReportParser(ReportParser reportParser) {
 		this.reportParser = reportParser;
 	}

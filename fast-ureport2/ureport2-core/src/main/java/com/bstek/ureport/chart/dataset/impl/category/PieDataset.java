@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.bstek.ureport.chart.dataset.impl.category;
 
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.model.Cell;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -37,6 +37,12 @@ public class PieDataset extends CategoryDataset {
 		sb.append("}");
 		return sb.toString();
 	}
+
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
+	}
+
 	@Override
 	protected String buildDatasets(Map<Object,Map<Object,List<Object>>> map,String props){
 		StringBuilder sb=new StringBuilder();
@@ -77,4 +83,5 @@ public class PieDataset extends CategoryDataset {
 	public String getType() {
 		return "pie";
 	}
+
 }

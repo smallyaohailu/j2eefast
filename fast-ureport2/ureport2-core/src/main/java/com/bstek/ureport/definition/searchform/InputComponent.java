@@ -16,6 +16,9 @@
 package com.bstek.ureport.definition.searchform;
 
 
+import cn.hutool.core.util.StrUtil;
+import com.bstek.ureport.utils.ToolUtils;
+
 /**
  * @author Jacky.gao
  * @since 2016年1月11日
@@ -24,31 +27,90 @@ public abstract class InputComponent implements Component{
 	private String label;
 	private String bindParameter;
 	private String type;
+	/**
+	 * 标题样式
+	 */
+	private String labelClass;
+
+	private String titleValue;
+
+	/**
+	 * 元素父样式
+	 */
+	private String inputClass;
+
+	/**
+	 * 增强JS
+	 */
+	private String jsFun;
+
 	protected LabelPosition labelPosition=LabelPosition.top;
 	
 	abstract String inputHtml(RenderContext context);
 	@Override
 	public String toHtml(RenderContext context) {
 		StringBuffer sb=new StringBuffer();
-		if(this.labelPosition.equals(LabelPosition.top)){
-			sb.append("<div>");			
-		}else{
-			sb.append("<div class='form-horizontal'>");			
+//		if(this.labelPosition.equals(LabelPosition.top)){
+//			sb.append("<div>");
+//		}else{
+//			sb.append("<div class='form-horizontal'>");
+//		}
+//		sb.append("<div class='form-group' style='margin:0px 0px 10px 0px'>");
+		if(ToolUtils.isEmpty(labelClass)){
+			labelClass = "";
 		}
-		sb.append("<div class='form-group' style='margin:0px 0px 10px 0px'>");
-		if(this.labelPosition.equals(LabelPosition.top)){		
-			sb.append("<span style='font-size:13px'>"+this.label+"</span>");			
+		if(ToolUtils.isEmpty(inputClass)){
+			inputClass = "";
+		}
+		sb.append("<div class='form-group'>");
+		String titleTip = StrUtil.EMPTY;
+		String icon = StrUtil.EMPTY;
+		if(ToolUtils.isNotEmpty(titleValue)){
+			titleTip = " title='"+titleValue+"'";
+			icon = " <i class=\"fa fa-question-circle-o\" style=\"color: orange\"></i>";
+		}
+		if(this.labelPosition.equals(LabelPosition.top)){
+			sb.append("<span class='"+labelClass+"'"+titleTip+">"+this.label+icon+"</span>");
+//			sb.append("<span style='font-size:13px'>"+this.label+"</span>");
 			sb.append(inputHtml(context));
 		}else{					
-			sb.append("<span class='col-md-3' style='text-align:right;padding-right:1px;font-size:13px'>"+this.label+"</span>");			
-			sb.append("<div class='col-md-9' style='padding-left:1px;'>");
+//			sb.append("<span class='col-md-3' style='text-align:right;padding-right:1px;font-size:13px'>"+this.label+"</span>");
+//			sb.append("<div class='col-md-9' style='padding-left:1px;'>");
+
+			sb.append("<span class='control-label col-md-4 "+labelClass+"'"+titleTip+">"+this.label+icon+"</span>");
+			sb.append("<div class='col-md-8 '"+inputClass+">");
 			sb.append(inputHtml(context));
 			sb.append("</div>");
 		}
-		sb.append("</div>");
+//		sb.append("</div>");
 		sb.append("</div>");
 		return sb.toString();
 	}
+
+	public String getTitleValue() {
+		return titleValue;
+	}
+
+	public void setTitleValue(String titleValue) {
+		this.titleValue = titleValue;
+	}
+
+	public String getLabelClass() {
+		return labelClass;
+	}
+
+	public void setLabelClass(String labelClass) {
+		this.labelClass = labelClass;
+	}
+
+	public String getInputClass() {
+		return inputClass;
+	}
+
+	public void setInputClass(String inputClass) {
+		this.inputClass = inputClass;
+	}
+
 	public void setLabel(String label) {
 		this.label = label;
 	}
@@ -73,5 +135,13 @@ public abstract class InputComponent implements Component{
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getJsFun() {
+		return jsFun;
+	}
+
+	public void setJsFun(String jsFun) {
+		this.jsFun = jsFun;
 	}
 }

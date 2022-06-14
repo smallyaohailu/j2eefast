@@ -15,38 +15,11 @@
  ******************************************************************************/
 package com.bstek.ureport.model;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JLabel;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.bstek.ureport.Range;
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.build.BindData;
 import com.bstek.ureport.build.Context;
-import com.bstek.ureport.definition.Alignment;
-import com.bstek.ureport.definition.BlankCellInfo;
-import com.bstek.ureport.definition.Border;
-import com.bstek.ureport.definition.CellStyle;
-import com.bstek.ureport.definition.ConditionCellStyle;
-import com.bstek.ureport.definition.ConditionPaging;
-import com.bstek.ureport.definition.ConditionPropertyItem;
-import com.bstek.ureport.definition.Expand;
-import com.bstek.ureport.definition.LinkParameter;
-import com.bstek.ureport.definition.PagingPosition;
-import com.bstek.ureport.definition.Scope;
+import com.bstek.ureport.definition.*;
 import com.bstek.ureport.definition.value.SimpleValue;
 import com.bstek.ureport.definition.value.Value;
 import com.bstek.ureport.exception.ReportComputeException;
@@ -56,9 +29,22 @@ import com.bstek.ureport.expression.model.data.BindDataListExpressionData;
 import com.bstek.ureport.expression.model.data.ExpressionData;
 import com.bstek.ureport.expression.model.data.ObjectExpressionData;
 import com.bstek.ureport.expression.model.data.ObjectListExpressionData;
+import com.bstek.ureport.utils.ToolUtils;
 import com.bstek.ureport.utils.UnitUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
 
 /**
+ * 单元格
  * @author Jacky.gao
  * @since 2016年11月1日
  */
@@ -66,7 +52,13 @@ public class Cell implements ReportCell {
 	private String name;
 	private int rowSpan;
 	private int colSpan;
-	
+
+	//行
+	private int rowNumber;
+
+	//列
+	private int columnNumber;
+
 	/**
 	 * 下面属性用于存放分页后的rowspan信息
 	 * */
@@ -87,7 +79,10 @@ public class Cell implements ReportCell {
 	private CellStyle cellStyle;
 	private CellStyle customCellStyle;
 	private Value value;
+	//单元格所在的行信息
 	private Row row;
+
+	//单元格所在的列信息
 	private Column column;
 	private Expand expand;
 	private boolean processed;
@@ -117,19 +112,45 @@ public class Cell implements ReportCell {
 	 */
 	private Cell leftParentCell;
 	/**
+	 * 左侧单元格名称
+	 */
+	private String leftParentCellName;
+
+	/**
+	 * 上单元格名称
+	 */
+	private String topParentCellName;
+
+	/**
+	 * 当前单元格相邻右边
+	 */
+	private Cell rightParentCell;
+	/**
+	 * 当前单元格相邻下边
+	 */
+	private Cell downParentCell;
+
+	private String downParentCellName;
+
+	private String rightParentCellName;
+
+
+	/**
 	 * 当前单元格上父格
 	 */
 	private Cell topParentCell;
 	
 	/**
-	 * 当前单元格所在行所有子格
+	 * 当前单元格所在行所有子格 右
 	 */
 	private Map<String,List<Cell>> rowChildrenCellsMap=new HashMap<String,List<Cell>>();
 	/**
-	 * 当前单元格所在列所有子格
+	 * 当前单元格所在列所有子格 下
 	 */
 	private Map<String,List<Cell>> columnChildrenCellsMap=new HashMap<String,List<Cell>>();
-	
+
+	private Map<String,List<Cell>> leftParentCellsMap=new HashMap<String,List<Cell>>();
+
 	
 	private List<String> increaseSpanCellNames;
 	private Map<String,BlankCellInfo> newBlankCellsMap;
@@ -155,8 +176,16 @@ public class Cell implements ReportCell {
 		}
 		return blankCell;
 	}
-	
-	public Cell newColumnBlankCell(Context context,BlankCellInfo blankCellInfo,ReportCell mainCell){
+
+	public Map<String, List<Cell>> getLeftParentCellsMap() {
+		return leftParentCellsMap;
+	}
+
+	public void setLeftParentCellsMap(Map<String, List<Cell>> leftParentCellsMap) {
+		this.leftParentCellsMap = leftParentCellsMap;
+	}
+
+	public Cell newColumnBlankCell(Context context, BlankCellInfo blankCellInfo, ReportCell mainCell){
 		Cell blankCell=newCell();
 		blankCell.setBlankCell(true);
 		blankCell.setValue(new SimpleValue(""));
@@ -181,11 +210,23 @@ public class Cell implements ReportCell {
 		cell.setColumn(column);
 		cell.setRow(row);
 		cell.setLeftParentCell(leftParentCell);
+		cell.setLeftParentCellName(leftParentCellName);
+
+		cell.setTopParentCellName(topParentCellName);
 		cell.setTopParentCell(topParentCell);
+
+		cell.setRightParentCellName(rightParentCellName);
+		cell.setRightParentCell(rightParentCell);
+
+		cell.setDownParentCellName(downParentCellName);
+		cell.setDownParentCell(downParentCell);
+
 		cell.setValue(value);
 		cell.setRowSpan(rowSpan);
 		cell.setColSpan(colSpan);
 		cell.setExpand(expand);
+		cell.setRowNumber(rowNumber);
+		cell.setColumnNumber(columnNumber);
 		cell.setName(name);
 		cell.setCellStyle(cellStyle);
 		cell.setNewBlankCellsMap(newBlankCellsMap);
@@ -202,17 +243,87 @@ public class Cell implements ReportCell {
 		cell.setLinkUrlExpression(linkUrlExpression);
 		return cell;
 	}
-	
+
+	public int getRowNumber() {
+		return rowNumber;
+	}
+
+	public void setRowNumber(int rowNumber) {
+		this.rowNumber = rowNumber;
+	}
+
+	public int getColumnNumber() {
+		return columnNumber;
+	}
+
+	public void setColumnNumber(int columnNumber) {
+		this.columnNumber = columnNumber;
+	}
+
+
+	public String getLeftParentCellName() {
+		return leftParentCellName;
+	}
+
+	public void setLeftParentCellName(String leftParentCellName) {
+		this.leftParentCellName = leftParentCellName;
+	}
+
+	public String getTopParentCellName() {
+		return topParentCellName;
+	}
+
+	public void setTopParentCellName(String topParentCellName) {
+		this.topParentCellName = topParentCellName;
+	}
+
+	public Cell getRightParentCell() {
+		return rightParentCell;
+	}
+
+	public void setRightParentCell(Cell rightParentCell) {
+		this.rightParentCell = rightParentCell;
+	}
+
+	public Cell getDownParentCell() {
+		return downParentCell;
+	}
+
+	public void setDownParentCell(Cell downParentCell) {
+		this.downParentCell = downParentCell;
+	}
+
+	public String getDownParentCellName() {
+		return downParentCellName;
+	}
+
+	public void setDownParentCellName(String downParentCellName) {
+		this.downParentCellName = downParentCellName;
+	}
+
+	public String getRightParentCellName() {
+		return rightParentCellName;
+	}
+
+	public void setRightParentCellName(String rightParentCellName) {
+		this.rightParentCellName = rightParentCellName;
+	}
+
 	public void addRowChild(Cell child){
-		String name=child.getName();
-		List<Cell> cells=rowChildrenCellsMap.get(name);
+
+		String name = child.getName();
+
+		List<Cell> cells= rowChildrenCellsMap.get(name);
+
 		if(cells==null){
 			cells=new ArrayList<Cell>();
 			rowChildrenCellsMap.put(name, cells);
 		}
+
 		if(!cells.contains(child)){
-			cells.add(child);			
+			cells.add(child);
 		}
+
 		if(leftParentCell!=null){
 			leftParentCell.addRowChild(child);
 		}
@@ -220,7 +331,9 @@ public class Cell implements ReportCell {
 	
 	
 	public void addColumnChild(Cell child){
+
 		String name=child.getName();
+
 		List<Cell> cells=columnChildrenCellsMap.get(name);
 		if(cells==null){
 			cells=new ArrayList<Cell>();
@@ -233,6 +346,22 @@ public class Cell implements ReportCell {
 			topParentCell.addColumnChild(child);
 		}
 	}
+
+	public void addLeftColumnChild(Cell child){
+
+		String name=child.getName();
+
+		List<Cell> cells= leftParentCellsMap.get(name);
+		if(cells==null){
+			cells=new ArrayList<Cell>();
+			leftParentCellsMap.put(name, cells);
+		}
+		if(!cells.contains(child)){
+			cells.add(child);
+		}
+	}
+
+
 	
 	@Override
 	public Object getData() {
@@ -929,6 +1058,46 @@ public class Cell implements ReportCell {
 	
 	public boolean isFillBlankRows() {
 		return fillBlankRows;
+	}
+
+	public int getCurrentRowInt(int rowRpan){
+		if(ToolUtils.isEmpty(this.leftParentCell)){
+			Map<String, List<Cell>> map = this.getRowChildrenCellsMap();
+			for(String key : map.keySet()){
+				if(map.get(key).size() > 1){
+					rowRpan = rowRpan +  map.get(key).size() - 1;
+					break;
+				}
+			}
+			return rowRpan;
+		}else {
+			//获取所有左边列表
+			List<Cell> cells = new ArrayList<>();
+			findleftParentCell(this, cells);
+			boolean flag = false;
+			for (int i = 0; (i < cells.size() && !flag); i++) {
+				Cell c = cells.get(i);
+				int row = c.rowNumber + c.rowSpan;
+				if (row < (this.rowNumber + rowRpan)) {
+					Map<String, List<Cell>> listMap = c.getColumnChildrenCellsMap();
+					for (String key : listMap.keySet()) {
+						if (listMap.get(key).size() > 1) {
+							rowRpan = rowRpan + listMap.get(key).size() - 1;
+							flag = true;
+							break;
+						}
+					}
+				}
+			}
+			return rowRpan;
+		}
+	}
+
+	private void findleftParentCell(Cell cell,List<Cell> cells){
+		if(ToolUtils.isNotEmpty(cell.getLeftParentCell())){
+			cells.add(cell.getLeftParentCell());
+			findleftParentCell(cell.getLeftParentCell(),cells);
+		}
 	}
 
 	public void setFillBlankRows(boolean fillBlankRows) {

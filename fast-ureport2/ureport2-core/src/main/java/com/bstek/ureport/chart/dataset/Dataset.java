@@ -23,6 +23,18 @@ import com.bstek.ureport.model.Cell;
  * @since 2017年6月8日
  */
 public interface Dataset {
+
+	//JSON数据
 	String buildDataJson(Context context,Cell cell);
+
+//	String buildDataJson(Context context, Cell cell, List<Option> options,List<Plugin> plugins);
+
+	String buildLabelsJson(Context context,Cell cell);
+
+//	String buildLabelsJson(Context context,Cell cell, List<Option> options,List<Plugin> plugins);
+
 	String getType();
+
+	//获取数据源类型
+//	String getDateType();
 }
