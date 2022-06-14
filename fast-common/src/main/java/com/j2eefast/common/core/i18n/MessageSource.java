@@ -8,6 +8,7 @@ package com.j2eefast.common.core.i18n;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -132,7 +133,7 @@ public class MessageSource extends AbstractMessageSource implements ResourceLoad
                             if(fileName.equals(I18N)){
                                 continue;
                             }
-                            URL f = MessageSource.class.getResource(File.separator+ I18N + File.separator  + nameSuffix);
+                            URL f =  ResourceUtil.getResource(FileUtil.normalize(File.separator+ I18N + File.separator  + nameSuffix),MessageSource.class);
                             loadPropsFile(fileName,new Props(f,UTF8),_LOCAL_CACHE);
                         }
                     }
