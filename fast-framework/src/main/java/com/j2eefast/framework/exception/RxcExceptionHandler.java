@@ -5,14 +5,16 @@
  */
 package com.j2eefast.framework.exception;
 
+import cn.hutool.http.HtmlUtil;
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
-import cn.hutool.http.HtmlUtil;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import freemarker.core.InvalidReferenceException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.mybatis.spring.MyBatisSystemException;
@@ -27,10 +29,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.ModelAndView;
-import com.alibaba.excel.exception.ExcelAnalysisException;
-import com.j2eefast.common.core.exception.RxcException;
-import freemarker.core.InvalidReferenceException;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -84,8 +86,8 @@ public class RxcExceptionHandler {
 		}else {
 			Map<String, Object> model = new ModelMap();
 			//去除XSS
-			model.put(ConfigConstant.ERR_PAGE, HtmlUtil.escape(HtmlUtil.filter(UrlPathHelper
-					.defaultInstance.getOriginatingRequestUri(request))));
+			model.put(ConfigConstant.ERR_PAGE, StringUtils.substring(HtmlUtil.escape(HtmlUtil.filter(UrlPathHelper
+					.defaultInstance.getOriginatingRequestUri(request))),0,100));
 			return new ModelAndView("error/401",model);
 		}
 	}
