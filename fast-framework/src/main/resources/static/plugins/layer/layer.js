@@ -341,13 +341,13 @@
         });
 
         //添加毛玻璃效果,可能会出现闪屏、抖动情况
-        // window.setTimeout(function () {
-        //     $('#layui-layer-shade'+ that.index).css({
-        //         '-webkit-backdrop-filter': 'blur(3px)'
-        //         ,'backdrop-filter': 'blur(3px)'
-        //         ,'transform': 'translateZ(0)'
-        //     });
-        // },100);
+         window.setTimeout(function () {
+             $('#layui-layer-shade'+ that.index).css({
+                 '-webkit-backdrop-filter': 'blur(3px)'
+                 ,'backdrop-filter': 'blur(3px)'
+                 ,'transform': 'translateZ(0)'
+             });
+         }, 50);
 
         if (config.type == 2) {
             if(config.fromData != null && config.fromData != undefined && Object.keys(config.fromData).length > 0){

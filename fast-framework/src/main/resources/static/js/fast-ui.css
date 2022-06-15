@@ -3797,12 +3797,14 @@ button,input{
 }
 /**------------------------------*/
 @media (min-width: 768px){
-	.col-sm-9-1 {
-		width: 11.11%;
-	}
-	.col-sm-9-8 {
-		width: 88.88%;
-	}
+	.col-sm-9-1{width:11.11%}
+	.col-sm-9-2{width:22.22%}
+	.col-sm-9-3{width:33.33%}
+	.col-sm-9-4{width:44.44%}
+	.col-sm-9-5{width:55.55%}
+	.col-sm-9-6{width:66.66%}
+	.col-sm-9-7{width:77.77%}
+	.col-sm-9-8{width:88.88%}
 }
 
 /**BOX 样式 参考系统监控***/

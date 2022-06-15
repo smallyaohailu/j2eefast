@@ -16,9 +16,11 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,7 @@ import java.util.regex.Pattern;
  * @author zhouzhou
  * @date 2020-12-09 14:53
  */
-@Order(4)
+@Order(Ordered.HIGHEST_PRECEDENCE + 4000)
 @Aspect
 @Component
 public class RequiresPermissionsAspect {
