@@ -7,16 +7,15 @@ package com.j2eefast.framework.shiro;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
-
 import org.apache.http.HttpStatus;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
@@ -109,7 +108,7 @@ public class UserFilter extends org.apache.shiro.web.filter.authc.UserFilter {
             httpResponse.setContentType("application/json;charset=utf-8");
             httpResponse.setStatus(HttpStatus.SC_UNAUTHORIZED);
             httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
-            response.getWriter().print(JSONUtil.parse(ResponseData.error("A0001","未登录或者登录超时,请重新认证登录.")).toString());
+            response.getWriter().print(JSONUtil.parse(ResponseData.error(RxcException.LOGIN_EXPIRED,"未登录或者登录超时,请重新认证登录.")).toString());
             return;
         }
     }
