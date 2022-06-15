@@ -1,0 +1,8 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="XML预览"  libs=["code"]/>
+<div class="wrapper">
+<@f.inputCode name="xml" height="auto" codeType="xml" readonly=true value="${xml?html}"/>
+</div>
+<@footer/>
+</@pageTheme>

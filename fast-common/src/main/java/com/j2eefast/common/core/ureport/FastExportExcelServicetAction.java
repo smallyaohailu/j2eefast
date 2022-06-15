@@ -83,6 +83,9 @@ public class FastExportExcelServicetAction extends BaseServletAction {
         if(StringUtils.isBlank(file)){
             throw new ReportComputeException("Report file can not be null.");
         }
+        if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+            file = "fast-" + file + ".xml";
+        }
         String fileName=req.getParameter("_n");
         //J2eeFAST 修改如果前端不传 下载之后的文件名 则使用 系统数据库保存的默认名称
         if(ToolUtil.isEmpty(fileName)){

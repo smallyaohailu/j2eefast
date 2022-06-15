@@ -85,11 +85,13 @@
             editUrl: prefix + "/edit/{id}",
             modalName: '<@ctx.i18n text="配置存储"/>',
             uniqueId:  'id',/* 唯一ID */
-            escape: true,/* 分页设置 */
+            sortName: "createTime",
+            //escape: true,/* 分页设置 */
             /* clickToSelect: false, */
-            showPageGo: true,/* 分页设置 */
-            pageSize: 10,/* 分页设置 */
-            pageList: [10, 30, 50],/* 分页设置 */
+            //showPageGo: true,/* 分页设置 */
+            //pageSize: 15,/* 分页设置 */
+            //pageList: [15, 30, 50],/* 分页设置 */
+            height: function(){ return $(window).height() - 114},
             columns:[
                 {title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
                     return $.table.serialNumber(index);
@@ -100,13 +102,19 @@
                 ,{field : 'fileName',title : '${i18n("下载文件名称")}'}
                 ,{field : 'createTime',title : '${i18n("创建时间")}'}
                 ,{field : 'updateTime',title : '${i18n("更新时间")}'}
-                ,{title:"${i18n("操作")}",align: 'center',visible:visible,formatter: function(value, row, index) {
+                ,{title:"${i18n("操作")}",align: 'center',class:'action',visible:visible,formatter: function(value, row, index) {
                     var actions = [];
-                    actions.push('<a class="btn btn-default btn-xs preview " href="javascript:void(0)" onclick="opt.modal.windowOpen(\''+baseURL+'ureport/preview?_u=fast-' + row.name + '\',\''+row.name+'\')"><i class="fa fa-eye"></i> ${i18n("预览")}</a> ');
-                    actions.push('<a class="btn btn-default btn-xs preview " href="javascript:void(0)" onclick="createShare(\''+row.id+'\',\''+row.share+'\',\''+row.pass+'\',\''+row.code+'\',\''+row.time+'\')"><i class="fa fa-share-alt"></i> ${i18n("分享")}</a> ');
-                    actions.push('<a class="btn btn-primary btn-xs " href="javascript:void(0)" onclick="opt.modal.openTab(\''+row.name+'\',\''+baseURL+'ureport/designer?_u=fast-' + row.name + '\')" title="${i18n("报表设计")}"><i class="fa fa-pencil-square-o"></i> ${i18n("报表设计")}</a> ');
-                    actions.push('<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="editOpen(\''+ row.id + '\')" title="${i18n("权限设置")}"><i class="fa fa-pencil-square-o"></i> ${i18n("权限相关")}</a> ');
-                    actions.push('<a class="btn btn-danger btn-xs ' + delFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i> ${i18n("删除")}</a>');
+                    actions.push('<a class="" title="${i18n("预览")}" href="javascript:void(0)" onclick="opt.modal.windowOpen(\''+baseURL+'ureport/preview?_u=fast-' + row.name + '\',\''+row.name+'\')"><i class="fa fa-eye"></i>预览</a> ');
+                    actions.push('<a class="" title="${i18n("分享")}" href="javascript:void(0)" onclick="createShare(\''+row.id+'\',\''+row.share+'\',\''+row.pass+'\',\''+row.code+'\',\''+row.time+'\')"><i class="fa fa-share-alt"></i> 分享</a> ');
+                    actions.push('<a class="" href="javascript:void(0)" onclick="opt.modal.openTab(\''+row.name+'\',\''+baseURL+'ureport/designer?_u=fast-' + row.name + '\')" title="${i18n("报表设计")}"><i class="fa fa-pencil-square-o"></i> 设计</a> ');
+                    //actions.push('<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="editOpen(\''+ row.id + '\')" title="${i18n("权限设置")}"><i class="fa fa-pencil-square-o"></i> ${i18n("权限相关")}</a> ');
+                    //actions.push('<a class="btn btn-danger btn-xs ' + delFlag + '" href="javascript:void(0)" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-remove"></i> ${i18n("删除")}</a>');
+                    var info = "<a  class='btn btn-default btn-xs' onclick=javascript:opt.operate.del(\'" + row.id + "\');><i class='fa fa-remove'></i> ${i18n("删除")}</a>&nbsp;";
+                    info += "<a  class='btn btn-default btn-xs' onclick=javascript:editOpen(\'" + row.id +"\');><i class='fa fa-pencil-square-o'></i> ${i18n("权限设置")}</a>&nbsp;";
+                    info += "<a  class='btn btn-default btn-xs' onclick=javascript:preview(\'" + row.id +"\',\'"+row.name+"\');><i class='fa fa-eye'></i> ${i18n("XML预览")}</a>";
+                    actions.push('<a tabindex="0" class="" role="button" data-container="body" ' +
+                        'data-placement="left" data-toggle="popover" data-html="true" data-trigger="hover" ' +
+                        'data-content="'+info+'"><i class="fa fa-chevron-circle-right" title="${i18n("更多操作")}"></i>更多</a>');
                     return actions.join('');
                 }}
             ]
@@ -116,6 +124,10 @@
 
     function editOpen(id) {
         opt.modal.open("${i18n("报表权限设置")}",opt.operate.editUrl(id),'900', '605');
+    }
+
+    function preview(id,name){
+        opt.modal.windowOpen(prefix + "/previewXml/"+id,name);
     }
 
     function createShare(id,share,pass,code,time){

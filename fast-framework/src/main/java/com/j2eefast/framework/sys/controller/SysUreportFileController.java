@@ -7,30 +7,27 @@ package com.j2eefast.framework.sys.controller;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.XmlUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.bstek.ureport.console.cache.TempObjectCache;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
-import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
+import com.j2eefast.framework.sys.entity.SysUreportFileEntity;
 import com.j2eefast.framework.sys.service.SysRoleService;
+import com.j2eefast.framework.sys.service.SysUreportFileService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.*;
-
-import com.j2eefast.framework.sys.entity.SysNoticeEntity;
-import com.j2eefast.framework.sys.entity.SysUreportFileEntity;
-import com.j2eefast.framework.sys.service.SysUreportFileService;
-
-import cn.hutool.core.io.FileUtil;
 
 /**
  * ureport2报配置存储页面控制器
@@ -58,6 +55,16 @@ public class SysUreportFileController extends BaseController{
     @GetMapping()
     public String ureport(){
         return prefix + "/ureport";
+    }
+
+
+    @RequiresPermissions("sys:ureport:view")
+    @GetMapping("/previewXml/{id}")
+    public String previewXml(@PathVariable("id") Long id, ModelMap mmap){
+        SysUreportFileEntity sysFile = sysUreportFileService.getById(id);
+        String xml = XmlUtil.format(new String(sysFile.getContent()));
+        mmap.put("xml",xml);
+        return prefix + "/previewXml";
     }
     
     /**
@@ -178,6 +185,9 @@ public class SysUreportFileController extends BaseController{
                   sysUreportFileService.getById(id);
           redisUtil.del(redisPrefix + "func:"+sysUreportFileEntity.getName());
           redisUtil.del(redisPrefix + "role:"+sysUreportFileEntity.getName());
+
+          //删除缓存
+          TempObjectCache.removeObject(sysUreportFileEntity.getName());
       }
       return sysUreportFileService.deleteBatchByIds(ids)? success(): error("删除失败!");
     }

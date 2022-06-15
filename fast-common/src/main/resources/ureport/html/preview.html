@@ -1,29 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <link href="${contextPath}/ureport/res/ureport-asserts/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-    <meta http-equiv="Cache-Control" content="no-siteapp" />
-    <meta name ="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
-    <title>J2eeFAST平台-Ureport2表报</title>
-    <style type="text/css" id="_ureport_table_style">
-        ${style}
-    </style>
-    <script src="${contextPath}/static/libs/jquery.min.js"></script>
-    <script src="${contextPath}/static/libs/jquery-migrate.min.js"></script>
-    <script type="text/javascript"  src="${contextPath}/static/config.js"></script>
-    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap.min.js"></script>
-    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/Chart.bundle.min.js"></script>
-    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/chartjs-plugin-datalabels.min.js"></script>
-    <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap-datetimepicker.js"></script>
-    <script type="text/javascript" src="${contextPath}/ureport/res/ureport/js/preview.bundle.js"></script>
+<meta charset="UTF-8">
+<link href="${contextPath}/ureport/res/ureport-asserts/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+#if($FAST_LOGIN_CSRF_TOKEN.length()>0)
+<meta content="${FAST_LOGIN_CSRF_TOKEN}" name="csrf-token" />
+#end
+<meta name ="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+<title>J2eeFAST平台-Ureport2表报</title>
+<script src="${contextPath}/static/libs/jquery.min.js"></script>
+<script src="${contextPath}/static/libs/jquery-migrate.min.js"></script>
+<script type="text/javascript"  src="${contextPath}/static/config.js"></script>
+<script src="${contextPath}/static/plugins/blockUI/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap.min.js"></script>
+<script src="${contextPath}/static/plugins/echarts/echarts.min.js"></script>
+#if($upSearchFormHtml.length()>0 || $downSearchFormHtml.length() > 0)
+<link rel="stylesheet" href="${contextPath}/static/plugins/select2/select2.min.css"/>
+<link rel="stylesheet" href="${contextPath}/static/plugins/select2/select2-bootstrap.css"/>
+<link rel="stylesheet" href="${contextPath}/static/css/iCheck/all.css" />
+<link rel="stylesheet" href="${contextPath}/static/css/font-awesome.min.css"/>
+<script src="${contextPath}/static/plugins/select2/select2.min.js"></script>
+<script src="${contextPath}/static/plugins/iCheck/icheck.min.js"></script>
+<script src="${contextPath}/static/plugins/blockUI/jquery.blockUI.js"></script>
+<script src="${contextPath}/static/plugins/laydate/laydate.js"></script>
+<script type="text/javascript" src="${contextPath}/ureport/res/ureport/js/preview.js"></script>
+#end
+<script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/chartjs-plugin-datalabels.min.js"></script>
+<!-- <script type="text/javascript" src="${contextPath}/ureport/res/ureport-asserts/venderjs/bootstrap-datetimepicker.js"></script>-->
+<script type="text/javascript" src="${contextPath}/ureport/res/ureport/js/preview.bundle.js"></script>
+<link rel="stylesheet" href="${contextPath}/ureport/res/ureport/css/preview.css"/>
+#if($style.length()>0)
+<style type="text/css" id="_ureport_table_style">
+${style}
+</style>
+#end
 </head>
 <body style="margin:5px">
 ${upSearchFormHtml}
 #if($tools.show)
-<div style="border:solid 1px #ddd;border-radius:5px;height:35px;width:100%;margin-bottom:5px;background:#f8f8f8">
+<div #if($upSearchFormHtml.length()>0 || $downSearchFormHtml.length() > 0) id="_from_print"#end style="border:solid 1px #ddd;border-radius:5px;height:35px;margin-bottom:5px;background:#f8f8f8">
     <div style="text-align:${reportAlign}">
         #if($tools.print)
         <button type="button" class="btn btn-default ureport-print" style="display:inline-block;padding:0;background:#f8f8f8;border:none;margin:3px" title="打印当前">
@@ -139,11 +158,28 @@ ${downSearchFormHtml}
             _buildChartDatas(${chartDatas});
         #end
 
+        #if( $echartDatas)
+            _buildEchartDatas(${echartDatas});
+        #end
+
 
         ${searchFormJs}
+
         #if( $file)
         function doSearch(){
             submitSearchForm("${file}","${customParameters}");
+        }
+        function __resetBut(){
+            var inpt = $(".form-horizontal").find('input, select');
+            $.each(inpt, function() {
+                if(this.tagName == "SELECT"){
+                    $(this).val(null).trigger("change");
+                }
+                else if(this.tagName == "INPUT"){
+                    this.value = "";
+                }
+            });
+            doSearch();
         }
         #end
 

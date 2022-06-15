@@ -295,26 +295,50 @@ public class MySQLProvider implements ReportProvider {
         String _downFileName = ServletUtil.getParameter("_downFileName");
         String _roleKeys = ServletUtil.getParameter("_roleKeys");
         String func = ServletUtil.getParameter("_func");
+        String tableAlias = ServletUtil.getParameter("tableAlias");
+        String remark = ServletUtil.getParameter("remark");
         file = getCorrectName(file);
         SysUreportFileEntity ureportFileEntity = sysUreportFileService
                 .getUreportFileByFileName(file);
-        if(ureportFileEntity == null && status.equals("save")){
+        //保存/另存为
+        if(ureportFileEntity == null &&
+                (status.equals("save") || status.equals("saveAS"))){
             ureportFileEntity = new SysUreportFileEntity();
             ureportFileEntity.setName(file);
             ureportFileEntity.setCode(RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 22));
             ureportFileEntity.setFileName(_downFileName);
             ureportFileEntity.setRoleKeys(_roleKeys);
             ureportFileEntity.setFunc(func);
+            ureportFileEntity.setTableAlias(tableAlias);
             ureportFileEntity.setContent(content.getBytes());
             ureportFileEntity.setUpdateTime(new Date());
+            ureportFileEntity.setRemark(remark);
             redisUtil.set(redisPrefix + "func:"+file,func);
             redisUtil.set(redisPrefix + "role:"+file,_roleKeys);
-        }else if(ToolUtil.isNotEmpty(ureportFileEntity) && status.equals("update")){
+        }
+        //快速保存 只修改XML
+        else if(ToolUtil.isNotEmpty(ureportFileEntity) &&
+                status.equals("quickUpdate")){
             if(ToolUtil.isEmpty(ureportFileEntity.getCode())){
                 ureportFileEntity.setCode(RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 22));
             }
             ureportFileEntity.setContent(content.getBytes());
-        }else{
+        }
+        //更新
+        else if(ToolUtil.isNotEmpty(ureportFileEntity) && status.equals("update")){
+            if(ToolUtil.isEmpty(ureportFileEntity.getCode())){
+                ureportFileEntity.setCode(RandomUtil.randomString(RandomUtil.BASE_NUMBER + RandomUtil.BASE_CHAR +RandomUtil.BASE_CHAR.toUpperCase(), 22));
+            }
+            ureportFileEntity.setContent(content.getBytes());
+            ureportFileEntity.setFileName(_downFileName);
+            ureportFileEntity.setRoleKeys(_roleKeys);
+            ureportFileEntity.setFunc(func);
+            ureportFileEntity.setRemark(remark);
+            ureportFileEntity.setTableAlias(tableAlias);
+            redisUtil.set(redisPrefix + "func:"+file,func);
+            redisUtil.set(redisPrefix + "role:"+file,_roleKeys);
+        }
+        else{
             throw new RxcException("报表名称已经存在请确保唯一性!","A00002");
         }
         sysUreportFileService.saveOrUpdate(ureportFileEntity);

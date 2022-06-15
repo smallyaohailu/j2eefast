@@ -29,11 +29,8 @@ import com.bstek.ureport.expression.model.data.ExpressionData;
 import com.bstek.ureport.expression.model.data.ObjectExpressionData;
 import com.bstek.ureport.utils.ProcedureUtils;
 import com.j2eefast.common.core.utils.SpringUtil;
-
-import cn.hutool.db.meta.MetaUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParseException;
@@ -47,6 +44,7 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.support.JdbcUtils;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,8 +53,8 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -295,6 +293,53 @@ public class FastDatasourceServletAction extends RenderPageServletAction {
             writeObjectToJson(resp, result);
         }catch(Exception ex){
             throw new ServletException(ex);
+        }finally{
+            if(conn!=null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 校验SQL
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void validationData(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String sql=req.getParameter("sql");
+        //查询参数
+        String parameters=req.getParameter("parameters");
+        Map<String, Object> map = buildParameters(parameters);
+        sql=parseSql(sql, map);
+        log.info("UP-SQL:{}",sql);
+        Connection conn=null;
+        Map<String,String> ref = new HashMap<>();
+        try{
+            conn=buildConnection(req);
+            List<Map<String,Object>> list=null;
+            //判断是否为存储过程
+            if(ProcedureUtils.isProcedure(sql)){
+                ProcedureUtils.procedureQuery(sql, map, conn);
+            }else{
+                // 只取前50条数据,防止数据过大导致过慢问题  PaginationInnerInterceptor 后期优化支持多数据库分页语句 目前只支持mysql
+                StringBuilder limitSql = new StringBuilder(sql).append(" LIMIT ").append("50");
+                DataSource dataSource=new SingleConnectionDataSource(conn,false);
+                NamedParameterJdbcTemplate jdbc=new NamedParameterJdbcTemplate(dataSource);
+                jdbc.queryForList(limitSql.toString(), map);
+            }
+            ref.put("code","00000");
+            ref.put("msg","正常");
+            writeObjectToJson(resp, ref);
+        }catch(Exception ex){
+            ref.put("code","00001");
+            ref.put("msg",ex.getMessage());
+            writeObjectToJson(resp, ref);
         }finally{
             if(conn!=null){
                 try {

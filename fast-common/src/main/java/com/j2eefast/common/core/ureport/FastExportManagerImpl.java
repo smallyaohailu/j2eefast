@@ -87,6 +87,7 @@ public class FastExportManagerImpl implements ExportManager {
         htmlReport.setSearchFormData(reportDefinition.buildSearchFormData(report.getContext().getDatasetMap(),parameters));
         htmlReport.setReportAlign(report.getPaper().getHtmlReportAlign().name());
         htmlReport.setChartDatas(report.getContext().getChartDataMap().values());
+        htmlReport.setEchartDatas(report.getContext().getEchartDataMap().values());
         htmlReport.setHtmlIntervalRefreshValue(report.getPaper().getHtmlIntervalRefreshValue());
         return htmlReport;
     }
@@ -144,6 +145,7 @@ public class FastExportManagerImpl implements ExportManager {
         htmlReport.setTotalPage(totalPages);
         htmlReport.setReportAlign(report.getPaper().getHtmlReportAlign().name());
         htmlReport.setChartDatas(report.getContext().getChartDataMap().values());
+        htmlReport.setEchartDatas(report.getContext().getEchartDataMap().values());
         htmlReport.setHtmlIntervalRefreshValue(report.getPaper().getHtmlIntervalRefreshValue());
         return htmlReport;
     }
