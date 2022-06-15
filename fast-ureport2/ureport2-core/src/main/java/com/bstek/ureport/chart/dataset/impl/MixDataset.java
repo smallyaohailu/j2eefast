@@ -15,15 +15,15 @@
  ******************************************************************************/
 package com.bstek.ureport.chart.dataset.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.chart.dataset.Dataset;
 import com.bstek.ureport.chart.dataset.impl.category.BarDataset;
 import com.bstek.ureport.chart.dataset.impl.category.LineDataset;
 import com.bstek.ureport.exception.ReportComputeException;
 import com.bstek.ureport.model.Cell;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -65,7 +65,12 @@ public class MixDataset implements Dataset {
 		return sb.toString();
 	}
 
-	
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
+	}
+
+
 	@Override
 	public String getType() {
 		return "bar";

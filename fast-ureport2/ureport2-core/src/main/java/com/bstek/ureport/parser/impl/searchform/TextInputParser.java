@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.bstek.ureport.parser.impl.searchform;
 
+import cn.hutool.core.util.StrUtil;
 import org.dom4j.Element;
 
 import com.bstek.ureport.definition.searchform.LabelPosition;
@@ -30,8 +31,24 @@ public class TextInputParser implements FormParser<TextInputComponent> {
 		TextInputComponent component=new TextInputComponent();
 		component.setBindParameter(element.attributeValue("bind-parameter"));
 		component.setLabel(element.attributeValue("label"));
+		component.setTitleValue(StrUtil.nullToDefault(element.attributeValue("title-value"),StrUtil.EMPTY));
+		component.setLabelClass(StrUtil.nullToDefault(element.attributeValue("label-class"),StrUtil.EMPTY));
+		component.setInputClass(StrUtil.nullToDefault(element.attributeValue("input-class"),StrUtil.EMPTY));
 		component.setType(element.attributeValue("type"));
 		component.setLabelPosition(LabelPosition.valueOf(element.attributeValue("label-position")));
+
+		for(Object obj:element.elements()){
+			if(obj==null || !(obj instanceof Element)){
+				continue;
+			}
+			Element ele=(Element)obj;
+			if(!ele.getName().equals("js-data")){
+				continue;
+			}
+			String jsFun =  ele.getText().trim();
+			component.setJsFun(jsFun);
+		}
+
 		return component;
 	}
 	@Override

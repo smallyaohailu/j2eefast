@@ -5,12 +5,11 @@
  */
 package com.j2eefast.framework.config;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import com.j2eefast.common.core.page.JFreeMarkerViewResolver;
-import com.j2eefast.framework.utils.*;
+import com.j2eefast.framework.utils.DictConfig;
+import com.j2eefast.framework.utils.PermissionConfig;
+import com.j2eefast.framework.utils.SysConfig;
+import com.j2eefast.framework.utils.Tools;
 import com.jagregory.shiro.freemarker.ShiroTags;
 import freemarker.template.TemplateException;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -23,7 +22,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactory;
-import org.springframework.web.servlet.view.freemarker.*;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Freemarker 模板引擎配置
@@ -72,7 +75,7 @@ public class FreemarkerConfig {
 													 PermissionConfig permission)
 			 										 throws IOException, TemplateException {
 		FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-		configurer.setTemplateLoaderPath("classpath:/templates");
+		configurer.setTemplateLoaderPaths("classpath:/templates");
 		Map<String, Object> variables = new HashMap<>(3);
 		variables.put("config", sysconfig);
 		variables.put("dict",dict);

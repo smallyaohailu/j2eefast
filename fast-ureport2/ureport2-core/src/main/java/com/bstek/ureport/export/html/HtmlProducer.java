@@ -15,10 +15,8 @@
  ******************************************************************************/
 package com.bstek.ureport.export.html;
 
-import java.util.List;
-import java.util.Map;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
-import org.apache.commons.lang3.StringUtils;
 import com.bstek.ureport.build.BindData;
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.build.paging.Page;
@@ -31,11 +29,13 @@ import com.bstek.ureport.expression.model.data.BindDataListExpressionData;
 import com.bstek.ureport.expression.model.data.ExpressionData;
 import com.bstek.ureport.expression.model.data.ObjectExpressionData;
 import com.bstek.ureport.expression.model.data.ObjectListExpressionData;
-import com.bstek.ureport.model.Cell;
-import com.bstek.ureport.model.Column;
-import com.bstek.ureport.model.Image;
-import com.bstek.ureport.model.Report;
-import com.bstek.ureport.model.Row;
+import com.bstek.ureport.model.*;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 修复套打背景图问题  修复打印重复表头第一页表头下有空格问题
@@ -90,7 +90,8 @@ public class HtmlProducer{
 		StringBuilder sb = buildTable(context,rows, columns, cellMap,breakPage,true);
 		return sb.toString();
 	}
-	
+
+
 	private StringBuilder buildTable(Context context,List<Row> rows, List<Column> columns,Map<Row, Map<Column, Cell>> cellMap,boolean breakPage,boolean forPage) {
 		StringBuilder sb=new StringBuilder();
 		int tableWidth=buildTableWidth(columns);
@@ -100,9 +101,9 @@ public class HtmlProducer{
 			bgStyle=";background:url("+bgImage+");background-size:100% 100%;background-repeat: no-repeat;";
 		}
 		if(breakPage){
-			sb.append("<table class='page-break' border='0' style='margin:auto;border-collapse:collapse;width:"+tableWidth+"pt"+bgStyle+"'>");						
+			sb.append("<table class='page-break' border='0' style='margin:auto;border-collapse:collapse;width:"+tableWidth+"pt"+bgStyle+"'>");
 		}else{
-			sb.append("<table border='0' style='margin:auto;border-collapse:collapse;width:"+tableWidth+"pt"+bgStyle+"'>");						
+			sb.append("<table border='0' style='margin:auto;border-collapse:collapse;width:"+tableWidth+"pt"+bgStyle+"'>");
 		}
 		int colSize=columns.size();
 		int rowSize=rows.size();
@@ -112,7 +113,7 @@ public class HtmlProducer{
 				continue;
 			}
 			int height=row.getRealHeight();
-			if(height<=1){
+			if(height<1){
 				continue;
 			}
 			sb.append("<tr style=\"height:"+height+"pt\">");
@@ -135,9 +136,291 @@ public class HtmlProducer{
 				}
 				if(rowSpan>0){
 					if(colSpan>0){
+						sb.append("<td rowspan=\""+rowSpan+"\" colspan=\""+colSpan+"\"");
+					}else{
+						sb.append("<td rowspan=\""+rowSpan+"\"");
+//						sb.append("<td rowspan=\""+cell.getCurrentRowInt(rowSpan)+"\"");
+					}
+				}else{
+					if(colSpan>0){
+						sb.append("<td colspan=\""+colSpan+"\"");
+					}else{
+						sb.append("<td");
+					}
+				}
+				sb.append(" class='_"+cell.getName()+"' ");
+				String style=buildCustomStyle(cell);
+				sb.append(" "+style+"");
+				sb.append(">");
+				boolean hasLink=false;
+				String linkURL=cell.getLinkUrl();
+				if(StringUtils.isNotBlank(linkURL)){
+					Expression urlExpression=cell.getLinkUrlExpression();
+					if(urlExpression!=null){
+						ExpressionData<?> exprData=urlExpression.execute(cell, cell, context);
+						if(exprData instanceof BindDataListExpressionData){
+							BindDataListExpressionData listExprData=(BindDataListExpressionData)exprData;
+							List<BindData> bindDataList=listExprData.getData();
+							if(bindDataList!=null && bindDataList.size()>0){
+								Object data=bindDataList.get(0).getValue();
+								if(data!=null){
+									linkURL=data.toString();
+								}
+							}
+						}else if(exprData instanceof ObjectExpressionData){
+							ObjectExpressionData objExprData=(ObjectExpressionData)exprData;
+							Object data=objExprData.getData();
+							if(data!=null){
+								linkURL=data.toString();
+							}
+						}else if(exprData instanceof ObjectListExpressionData){
+							ObjectListExpressionData objListExprData=(ObjectListExpressionData)exprData;
+							List<?> list=objListExprData.getData();
+							if(list!=null && list.size()>0){
+								Object data=list.get(0);
+								if(data!=null){
+									linkURL=data.toString();
+								}
+							}
+						}
+					}
+					hasLink=true;
+					String urlParameter=cell.buildLinkParameters(context);
+					if(StringUtils.isNotBlank(urlParameter)) {
+						if(linkURL.indexOf("?")==-1){
+							linkURL+="?"+urlParameter;
+						}else{
+							linkURL+="&"+urlParameter;
+						}
+					}
+					String target=cell.getLinkTargetWindow();
+					if(StringUtils.isBlank(target))target="_self";
+					sb.append("<a href=\""+linkURL+"\" target=\""+target+"\">");
+				}
+				Object obj=(cell.getFormatData()== null) ? "" : cell.getFormatData();
+				if(obj instanceof Image){
+					Image img=(Image)obj;
+					String path=img.getPath();
+					String imageType="image/png";
+					if(StringUtils.isNotBlank(path)){
+						path=path.toLowerCase();
+						if(path.endsWith(".jpg") || path.endsWith(".jpeg")){
+							imageType="image/jpeg";
+						}else if(path.endsWith(".gif")){
+							imageType="image/gif";
+						}
+					}
+					sb.append("<img src=\"data:"+imageType+";base64,"+img.getBase64Data()+"\"");
+					sb.append(">");
+				}else if(obj instanceof ChartData){
+					ChartData chartData=(ChartData)obj;
+					String canvasId=chartData.getId();
+					int width=col.getWidth()-2;
+					if(colSpan>0){
+						width=buildWidth(columns,j,colSpan)-2;
+					}
+					if(rowSpan>0){
+						height=buildHeight(rows,i,rowSpan)-2;
+					}else{
+						height-=2;
+					}
+					sb.append("<div style=\"position: relative;width:"+width+"pt;height:"+height+"pt\">");
+					if("echart".equals(chartData.getType())){
+						sb.append("<div id=\""+canvasId+"\" style=\"width:"+width+"pt !important;height:"+height+"pt !important\"></div>");
+					}else{
+						sb.append("<canvas id=\""+canvasId+"\" style=\"width:"+width+"px !important;height:"+height+"px !important\"></canvas>");
+					}
+					sb.append("</div>");
+				}else{
+					String text=obj.toString();
+					if(cell.getCellStyle().getHtmlEscape() == null
+							|| cell.getCellStyle().getHtmlEscape()){
+						//转义
+						text= HtmlUtil.escape(text);
+						text=text.replaceAll("\r\n", "<br>");
+						text=text.replaceAll("\n", "<br>");
+						text=text.replaceAll(" ", "&nbsp;");
+					}else{
+//						text.replaceAll("\\\"","\"");
+						text = StrUtil.replace(text,"\\\"","\"");
+						//text= HtmlUtil.escape(text);
+					}
+					if(text.equals("")){
+						text="";
+					}
+					sb.append(text);
+				}
+				if(hasLink){
+					sb.append("</a>");
+				}
+				sb.append("</td>");
+			}
+			sb.append("</tr>");
+		}
+		sb.append("</table>");
+		return sb;
+	}
+
+	private StringBuilder buildTable0(Context context,List<Row> rows, List<Column> columns,Map<Row, Map<Column, Cell>> cellMap,boolean breakPage,boolean forPage) {
+		StringBuilder sb=new StringBuilder();
+		int tableWidth=buildTableWidth(columns);
+		String bgStyle="";
+		String bgImage=context.getReport().getPaper().getBgImage();
+		if(StringUtils.isNotBlank(bgImage)){
+			bgStyle=";background:url("+bgImage+");background-size:100% 100%;background-repeat: no-repeat;";
+		}
+		if(breakPage){
+			sb.append("<table class='page-break' border='0' style='margin:auto;border-collapse:collapse;width:"+tableWidth+"pt"+bgStyle+"'>");						
+		}else{
+			sb.append("<table border='0' style='margin:auto;border-collapse:collapse;width:"+tableWidth+"pt"+bgStyle+"'>");						
+		}
+		int colSize=columns.size();
+		int rowSize=rows.size();
+		List<Cell> tcCell = new ArrayList<>();
+		Map<Cell,Integer> ttCell = new HashMap<>();
+
+		for(int i=0;i<rowSize;i++){
+			Row row=rows.get(i);
+			if(row.getRowKey().equals("r4")){
+				System.out.println(row.getRowKey());
+			}
+			if(!forPage && row.isForPaging()){
+				continue;
+			}
+			int height=row.getRealHeight();
+			if(height<=1){
+				continue;
+			}
+
+			if( row.getTempRowNumber() !=0 ){
+				//
+				int a = row.getCells().size();
+				int rh = row.getRowNumber();
+				int b = 0;
+				for(Row row0:rows){
+					if(row0.getRowKey().equals("r"+rh)){
+						b = row0.getCells().size();
+						if(a < b){
+							Map<Column,Cell> colMap=cellMap.get(row);
+							row0.getCells().forEach(e->{
+								if(e.getRowSpan() != 0){
+									ttCell.put(e,1);
+									colMap.put(e.getColumn(),e);
+								}
+							});
+						}
+						break;
+					}
+				}
+			}else{
+				int t = 0;
+				for(int cc = 0; cc< row.getCells().size(); cc++){
+					if(tcCell.indexOf(row.getCells().get(cc)) > -1){
+						t++;
+					}
+					if(ttCell.get(row.getCells().get(cc)) != null
+							&& ttCell.get(row.getCells().get(cc)) == 2){
+						t++;
+					}
+				}
+				if(t > 0){
+					continue;
+				}
+			}
+
+			sb.append("<tr style=\"height:"+height+"pt\">");
+
+			for(int j=0;j<colSize;j++){
+
+				Column col=columns.get(j);
+
+				Cell cell=null;
+
+				if(cellMap.containsKey(row)){
+					Map<Column,Cell> colMap=cellMap.get(row);
+					if(colMap.containsKey(col)){
+						cell=colMap.get(col);
+					}
+				}
+
+				if(cell==null || (!forPage && cell.isForPaging())){
+					continue;
+				}
+
+
+				boolean flag = false;
+
+				if(tcCell.indexOf(cell) > -1){
+					continue;
+				}
+
+				if(ttCell.get(cell) != null && ttCell.get(cell) == 2){
+					continue;
+				}
+
+				if(ttCell.get(cell) != null &&  ttCell.get(cell) == 1){
+					ttCell.put(cell,2);
+				}
+
+
+
+				if(!cell.isProcessed()){
+
+					List<Row> rs = context.getReport().getHeaderRepeatRows();
+					for( Row r :rs){
+						if(r.getRowKey().equals(row.getRowKey())){
+							flag = true;
+							break;
+						}
+					}
+
+					rs = context.getReport().getFooterRepeatRows();
+					for( Row r :rs){
+						if(r.getRowKey().equals(row.getRowKey())){
+							flag = true;
+							break;
+						}
+					}
+
+					if(!flag) {
+						if (cell.getRowNumber() != row.getRowNumber()) {
+							Map<String, List<Cell>> map = context.getReport().getCellsMap().get(cell.getName()).get(0).getColumnChildrenCellsMap();
+							for (String k : map.keySet()) {
+								if (map.get(k).get(0).getRowNumber() == row.getRowNumber()) {
+									cell = map.get(k).get(0);
+									flag = true;
+									tcCell.add(cell);
+									break;
+								}
+							}
+						}
+					}
+
+					if(!flag){
+						continue;
+					}
+
+				}
+
+				// 合并列
+				int colSpan=cell.getColSpan();
+				// 合并行
+				int rowSpan=cell.getRowSpan();
+				if(forPage){
+					rowSpan=cell.getPageRowSpan();
+				}
+				if(rowSpan>0){
+					if(colSpan>0){
 						sb.append("<td rowspan=\""+rowSpan+"\" colspan=\""+colSpan+"\"");						
 					}else{
-						sb.append("<td rowspan=\""+rowSpan+"\"");						
+//						Map<String, List<Cell>> c = cell.getRowChildrenCellsMap(); // 行
+//						Map<String, List<Cell>> b = cell.getColumnChildrenCellsMap(); //列
+//						//合并行中行 是否有数据集数据
+//						Cell dd = cell.getLeftParentCell();
+//						System.out.println(cell.getRow().getTempRowNumber());
+//						System.out.println(cell.getLeftParentCell());
+//						sb.append("<td rowspan=\""+rowSpan+"\"");
+						sb.append("<td rowspan=\""+cell.getCurrentRowInt(rowSpan)+"\"");
 					}
 				}else{
 					if(colSpan>0){
@@ -223,7 +506,11 @@ public class HtmlProducer{
 						height-=2;
 					}
 					sb.append("<div style=\"position: relative;width:"+width+"pt;height:"+height+"pt\">");
-					sb.append("<canvas id=\""+canvasId+"\" style=\"width:"+width+"px !important;height:"+height+"px !important\"></canvas>");
+					if("echart".equals(chartData.getType())){
+						sb.append("<div id=\""+canvasId+"\" style=\"width:"+width+"pt !important;height:"+height+"pt !important\"></div>");
+					}else{
+						sb.append("<canvas id=\""+canvasId+"\" style=\"width:"+width+"px !important;height:"+height+"px !important\"></canvas>");
+					}
 					sb.append("</div>");
 				}else{
 					String text=obj.toString();
@@ -451,4 +738,14 @@ public class HtmlProducer{
 		}
 		return width;
 	}
+
+	public static void main(String[] args) {
+		String text = "completed\\\"";
+		//String b = "completed\\\"";
+		System.out.println("completed\\\"");
+		String a  = StrUtil.replace(text,"\\\"","\"");
+		//a = text.replaceAll("\\\"","\\");
+		System.out.println(a);
+	}
+
 }

@@ -5,7 +5,7 @@ spring:
         master:
             #mysql 数据库配置
             driverClassName: com.mysql.cj.jdbc.Driver
-            url: jdbc:mysql://127.0.0.1:3306/fastdb?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=CTT
+            url: jdbc:mysql://127.0.0.1:3306/fastdb?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
             username: 
             password: 
             filters: mergeStat

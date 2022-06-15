@@ -15,17 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.console.pdf;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.bstek.ureport.build.ReportBuilder;
 import com.bstek.ureport.console.BaseServletAction;
 import com.bstek.ureport.console.cache.TempObjectCache;
@@ -40,6 +29,15 @@ import com.bstek.ureport.export.ExportManager;
 import com.bstek.ureport.export.ReportRender;
 import com.bstek.ureport.export.pdf.PdfProducer;
 import com.bstek.ureport.model.Report;
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -68,6 +66,9 @@ public class ExportPdfServletAction extends BaseServletAction{
 		file=decode(file);
 		if(StringUtils.isBlank(file)){
 			throw new ReportComputeException("Report file can not be null.");
+		}
+		if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+			file = "fast-" + file + ".xml";
 		}
 		OutputStream outputStream=null;
 		try {
@@ -106,6 +107,9 @@ public class ExportPdfServletAction extends BaseServletAction{
 		String file=req.getParameter("_u");
 		if(StringUtils.isBlank(file)){
 			throw new ReportComputeException("Report file can not be null.");
+		}
+		if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+			file = "fast-" + file + ".xml";
 		}
 		Report report=null;
 		Map<String, Object> parameters = buildParameters(req);

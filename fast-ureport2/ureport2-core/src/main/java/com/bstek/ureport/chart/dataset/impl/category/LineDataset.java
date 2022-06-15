@@ -36,7 +36,12 @@ public class LineDataset extends CategoryDataset{
 		sb.append("}");
 		return sb.toString();
 	}
-	
+
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
+	}
+
 	public String toMixJson(Context context,Cell cell,int index){
 		String props="\"type\":\"line\",\"lineTension\":"+lineTension+",\"fill\":false";
 		String datasetJson=buildDatasetJson(context, cell,props);

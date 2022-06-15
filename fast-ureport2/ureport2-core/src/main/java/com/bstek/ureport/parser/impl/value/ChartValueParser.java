@@ -205,6 +205,7 @@ public class ChartValueParser extends ValueParser {
 			ds.setyProperty(element.attributeValue("y-property"));
 			dataset=ds;
 		}
+
 		if(dataset!=null && dataset instanceof CategoryDataset){
 			CategoryDataset ds=(CategoryDataset)dataset;
 			String datasetName=element.attributeValue("dataset-name");

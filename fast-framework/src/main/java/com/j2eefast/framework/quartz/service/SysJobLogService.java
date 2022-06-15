@@ -5,10 +5,6 @@
  */
 package com.j2eefast.framework.quartz.service;
 
-import java.util.Arrays;
-import java.util.Map;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,6 +13,11 @@ import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.quartz.entity.SysJobLogEntity;
 import com.j2eefast.framework.quartz.mapper.SysJobLogMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Map;
 
 
 
@@ -62,7 +63,6 @@ public class SysJobLogService extends ServiceImpl<SysJobLogMapper,SysJobLogEntit
 	 * @author zhouzhou
 	 * @date 2020-03-08 20:37
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean cleanJobLog() {
 		 this.baseMapper.cleanJobLog();
 		 return true;
@@ -73,7 +73,6 @@ public class SysJobLogService extends ServiceImpl<SysJobLogMapper,SysJobLogEntit
 	 * @author zhouzhou
 	 * @date 2020-03-08 20:45
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] logIds) {
 		return this.removeByIds(Arrays.asList(logIds));
 	}

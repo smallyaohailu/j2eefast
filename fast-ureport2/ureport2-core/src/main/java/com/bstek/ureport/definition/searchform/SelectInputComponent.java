@@ -15,20 +15,29 @@
  ******************************************************************************/
 package com.bstek.ureport.definition.searchform;
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.build.Dataset;
 import com.bstek.ureport.exception.DatasetUndefinitionException;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Jacky.gao
+ * @author Jacky.gao J2eeFAST
  * @since 2017年10月23日
  */
 public class SelectInputComponent extends InputComponent {
+	//数据库
 	private boolean useDataset;
+	// 是否为系统字典
+	private boolean useDict;
+	//是否为多选
+	private boolean multiple;
+	private Map<String,String> dicts = new HashMap<>();
+	// 字典值
+	private String dictType;
 	private String dataset;
 	private String labelField;
 	private String valueField;
@@ -38,7 +47,8 @@ public class SelectInputComponent extends InputComponent {
 		String name=getBindParameter();
 		Object pvalue=context.getParameter(name)==null ? "" : context.getParameter(name);
 		StringBuilder sb=new StringBuilder();
-		sb.append("<select style=\"padding:3px;height:28px\" id='"+context.buildComponentId(this)+"' name='"+name+"' class='form-control'>");
+//		sb.append("<select style=\"padding:3px;height:28px\" id='"+context.buildComponentId(this)+"' name='"+name+"' class='form-control'>");
+		sb.append("<select id='"+context.buildComponentId(this)+"' name='"+name+"' class='form-control'"+(multiple?" multiple='true'":"")+">");
 		if(useDataset && StringUtils.isNotBlank(dataset)){
 			Dataset ds=context.getDataset(dataset);
 			if(ds==null){
@@ -53,14 +63,26 @@ public class SelectInputComponent extends InputComponent {
 			if(pvalue.equals("")){
 				sb.append("<option value='' selected></option>");
 			}
-		}else{
+		}
+		else if(useDict && dicts.size() != 0){
+			if(pvalue.equals("")){
+				sb.append("<option value=''>所有</option>");
+			}
+			for (Map.Entry<String, String> entry : dicts.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				String selected=key.equals(pvalue) ? "selected" : "";
+				sb.append("<option value='"+key+"' "+selected+">"+value+"</option>");
+			}
+		}
+		else{
 			for(Option option:options){
 				String value=option.getValue();
 				String selected=value.equals(pvalue) ? "selected" : "";
-				sb.append("<option value='"+value+"' "+selected+">"+option.getLabel()+"</option>");
+				sb.append("<option value='"+value+"' "+selected+">"+(option.getLabel().trim().equals("")?"&nbsp;":option.getLabel())+"</option>");
 			}
-			if(pvalue.equals("")){
-				sb.append("<option value='' selected></option>");
+			if(!pvalue.equals("")){
+				sb.append("<option value='' selected>&nbsp;</option>");
 			}
 		}
 		sb.append("</select>");
@@ -83,6 +105,34 @@ public class SelectInputComponent extends InputComponent {
 		sb.append("}");
 		sb.append(");");
 		return sb.toString();
+	}
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
+	}
+
+	public Map<String, String> getDicts() {
+		return dicts;
+	}
+
+	public void setDicts(Map<String, String> dicts) {
+		this.dicts = dicts;
+	}
+
+	public boolean isUseDict() {
+		return useDict;
+	}
+	public void setUseDict(boolean useDict) {
+		this.useDict = useDict;
+	}
+	public String getDictType() {
+		return dictType;
+	}
+	public void setDictType(String dictType) {
+		this.dictType = dictType;
 	}
 	public boolean isUseDataset() {
 		return useDataset;

@@ -23,6 +23,7 @@ import com.bstek.ureport.chart.Chart;
  */
 public class ChartValue implements Value {
 	private Chart chart;
+
 	@Override
 	public String getValue() {
 		return null;

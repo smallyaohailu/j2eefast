@@ -5,23 +5,22 @@
  */
 package com.j2eefast.common.core.utils;
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Web客户端工具
@@ -64,9 +63,9 @@ public class ServletUtil {
                 ip = request.getHeader("X-Real-IP");
             }
             if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getRemoteHost();
+                ip = request.getRemoteAddr();
             }
-            if(ToolUtil.isNotEmpty(ip)){
+            if(ToolUtil.isNotEmpty(ip) && !ip.equals("127.0.0.1")){
                 return ip;
             }
         	return NetUtil.getMultistageReverseProxyIp(request.getRemoteAddr());

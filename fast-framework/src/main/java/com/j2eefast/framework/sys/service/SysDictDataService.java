@@ -5,11 +5,6 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
@@ -29,6 +24,11 @@ import com.j2eefast.framework.sys.mapper.SysDictDataMapper;
 import com.j2eefast.framework.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据字典
@@ -194,7 +194,6 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 
 	public boolean deleteBatchByIds(Long[] ids) {
 		SysDictDataEntity dict = this.getById(ids[0]);
-		boolean r = this.baseMapper.deleteDictDataByIds(ids) > 0;
 		List<SysDictDataEntity>  list = this.list(new QueryWrapper<SysDictDataEntity>().eq("dict_type",dict.getDictType()).
 				eq("status","0").orderBy(true, true, "dict_sort"));
 		if(ToolUtil.isEmpty(list)){
@@ -202,7 +201,7 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 		}else{
 			sysConfigRedis.saveOrUpdateDict(dict.getDictType(),list);
 		}
-		return r;
+		return this.baseMapper.deleteDictDataByIds(ids) > 0;
 	}
 
 	public String getDictDefaultLabelValue(String dictType) {

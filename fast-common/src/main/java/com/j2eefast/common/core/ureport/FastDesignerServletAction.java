@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.j2eefast.common.core.ureport;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.XmlUtil;
 import com.bstek.ureport.cache.CacheUtils;
 import com.bstek.ureport.console.RenderPageServletAction;
 import com.bstek.ureport.console.cache.TempObjectCache;
@@ -33,7 +36,6 @@ import com.bstek.ureport.provider.report.ReportProvider;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.utils.SpringUtil;
-import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -46,12 +48,11 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.NullLogChute;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -159,6 +160,12 @@ public class FastDesignerServletAction extends RenderPageServletAction {
         writeObjectToJson(resp, result);
     }
 
+    public void getFileName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Map<String,String> result=new HashMap<String,String>();
+        result.put("fileName", IdUtil.nanoId());
+        writeObjectToJson(resp, result);
+    }
+
     public void savePreviewData(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String content=req.getParameter("content");
         content=decodeContent(content);
@@ -236,6 +243,42 @@ public class FastDesignerServletAction extends RenderPageServletAction {
         reportRender.rebuildReportDefinition(reportDef);
         CacheUtils.cacheReportDefinition(file, reportDef);
         IOUtils.closeQuietly(inputStream);
+    }
+
+
+    /**
+     * 导出XML
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void exportXML(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String file=req.getParameter("file");
+        file=ReportUtils.decodeFileName(file);
+        String content=req.getParameter("content");
+        content=decodeContent(content);
+        ReportProvider targetReportProvider=null;
+        for(ReportProvider provider:reportProviders){
+            if(file.startsWith(provider.getPrefix())){
+                targetReportProvider=provider;
+                break;
+            }
+        }
+        InputStream input = targetReportProvider.loadReport(file);
+        resp.setContentType("application/octet-stream;charset=ISO8859-1");
+        resp.setHeader("Content-Disposition","attachment;filename=\"" + file + "\"");
+        OutputStream output=resp.getOutputStream();
+        String xml = XmlUtil.format(XmlUtil.readXML(input));
+        InputStream outInput= new ByteArrayInputStream(xml.getBytes());
+        try{
+            IoUtil.copy(outInput,output);
+            output.flush();
+        }finally{
+            IoUtil.close(input);
+            IoUtil.close(outInput);
+            IoUtil.close(output);
+        }
     }
 
     public void loadReportProviders(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

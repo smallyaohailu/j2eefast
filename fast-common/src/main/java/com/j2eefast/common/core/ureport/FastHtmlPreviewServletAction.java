@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.j2eefast.common.core.ureport;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.util.StrUtil;
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.build.ReportBuilder;
@@ -38,6 +39,7 @@ import com.bstek.ureport.model.Report;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -50,6 +52,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.NullLogChute;
 import org.codehaus.jackson.map.ObjectMapper;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,9 +90,6 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                 errorMsg = "错误代码:"+e.getCode() +" 错误信息:" + e.getMsg();
             }catch(Exception ex){
                 log.error("报表计算出错，错误信息如下：",ex);
-//                if(!(ex instanceof ReportDesignException)){
-//                    ex.printStackTrace();
-//                }
                 errorMsg ="报表内部异常,请查看后台日志.";
             }
             String title = "异常请求";
@@ -99,13 +99,16 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             }
             context.put("title", title);
             if(htmlReport==null){
-//                context.put("content", "<div style='color:red'><strong>报表计算出错，错误信息如下：</strong><br><div style=\"margin:10px\">"+errorMsg+"</div></div>");
                 context.put("content", "<div style='width: 550px;margin: 7% auto;margin-top: 0;padding-top: 20%;'><div style='color:red;font-size:25px;text-align: center;'><strong>"+errorMsg+"</strong></div></div>");
                 context.put("error", true);
                 context.put("searchFormJs", "");
                 context.put("downSearchFormHtml", "");
                 context.put("upSearchFormHtml", "");
             }else{
+                String file=req.getParameter("_u");
+                if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+                    file = "fast-" + file + ".xml";
+                }
                 SearchFormData formData=htmlReport.getSearchFormData();
                 if(formData!=null){
                     context.put("searchFormJs", formData.getJs());
@@ -123,14 +126,21 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                 }
                 context.put("content", htmlReport.getContent());
                 context.put("style", htmlReport.getStyle());
+                if((Boolean) PropertiesUtils.getInstance().get("fast.csrf.enabled")){
+                    context.put(ConfigConstant.FAST_LOGIN_CSRF_TOKEN, Base64Encoder.encode(((LoginUserEntity) SecurityUtils.getSubject()
+                            .getPrincipal()).getCsrfToken()));
+                }else {
+                    context.put(ConfigConstant.FAST_LOGIN_CSRF_TOKEN, "");
+                }
                 context.put("reportAlign", htmlReport.getReportAlign());
                 context.put("totalPage", htmlReport.getTotalPage());
                 context.put("totalPageWithCol", htmlReport.getTotalPageWithCol());
                 context.put("pageIndex", htmlReport.getPageIndex());
                 context.put("chartDatas", convertJson(htmlReport.getChartDatas()));
+                context.put("echartDatas", convertJson(htmlReport.getEchartDatas()));
                 context.put("error", false);
                 context.put("pageAll", htmlReport.isPage());
-                context.put("file", req.getParameter("_u"));
+                context.put("file", file);
                 context.put("__f", StrUtil.nullToDefault(req.getParameter("__f"),""));
                 context.put("intervalRefreshValue",htmlReport.getHtmlIntervalRefreshValue());
                 String customParameters=buildCustomParameters(req);
@@ -142,8 +152,6 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                     tools=new Tools(false);
                     tools.setShow(false);
                 }else{
-
-                    String file=req.getParameter("_u");
                     file=decode(file);
                     if(file.equals(PREVIEW_KEY)){
                         tools=new Tools(true);
@@ -242,6 +250,8 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             throw new ReportComputeException("Report file can not be null.");
         }
 
+
+
         Map<String, Object> parameters = buildParameters(req);
         // J2eeFAST 整合系统 支持多租户模式
         parameters.put("tenantId",((LoginUserEntity) SecurityUtils.getSubject()
@@ -253,11 +263,25 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
         ReportDefinition reportDefinition=null;
 
 
+
         String _file= file;
         if(file.equals(PREVIEW_KEY)){
             _file=req.getParameter("__f");
             _file=decode(_file);
         }
+
+        if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+            file = "fast-" + file + ".xml";
+            _file = "fast-" + _file + ".xml";
+        }
+
+        //已经设计完成
+        if(!UreportUtils.isPermissions(_file)){
+            throw new RxcException("无权限访问!","A00001");
+        }
+
+        //数据权限
+        parameters.put(ConfigConstant.SQLFILTER,UreportUtils.getSQLFilter(_file));
 
         //分页 当前页
         if(ToolUtil.isNotEmpty(fpage) &&
@@ -321,6 +345,7 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             }
             Map<String,String> map=new HashMap<String,String>();
             map.put("html", sb.toString());
+            map.put("echarts",convertJson(report.getContext().getEchartDataMap().values()));
             map.put("watermark", reportDefinition.getPaper().getWatermark());
             writeObjectToJson(resp, map);
         }else{
@@ -429,6 +454,7 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
 
                 Map<String,String> map=new HashMap<String,String>();
                 map.put("html", sb.toString());
+                map.put("echarts",convertJson(report.getContext().getEchartDataMap().values()));
                 map.put("watermark", reportDefinition.getPaper().getWatermark());
                 writeObjectToJson(resp, map);
             }else{
@@ -476,6 +502,8 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
                 }
                 Map<String,String> map=new HashMap<String,String>();
                 map.put("html", sb.toString());
+                System.out.println(sb.toString());
+                map.put("echarts",convertJson(report.getContext().getEchartDataMap().values()));
                 map.put("watermark", reportDefinition.getPaper().getWatermark());
                 writeObjectToJson(resp, map);
             }
@@ -487,6 +515,9 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
 
     public void loadPagePaper(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String file=req.getParameter("_u");
+        if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+            file = "fast-" + file + ".xml";
+        }
         file=decode(file);
         if(StringUtils.isBlank(file)){
             throw new ReportComputeException("Report file can not be null.");
@@ -524,22 +555,19 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             throw new RxcException("链接有误,请确认访问链接!","A00003");
         }
         String _file= file;
+
         if(file.equals(PREVIEW_KEY)){
-             _file=req.getParameter("__f");
+            _file=req.getParameter("__f");
             _file=decode(_file);
         }
+
+        if(file.indexOf("fast-") == -1 && !file.equals(PREVIEW_KEY)){
+            file = "fast-" + file + ".xml";
+            _file = "fast-" + _file + ".xml";
+        }
+
         //分页 当前页
         if(ToolUtil.isNotEmpty(pageIndex)){
-//            Map<String, Object> map = UreportUtils.isLimit(_file);
-//            if((Boolean) map.get("isLimit")){
-//                //当前页
-//                parameters.put("__page", Integer.parseInt(pageIndex));
-//                parameters.put("__paging", true);
-//                // 分页大小
-//                parameters.put("__pageSize", map.get("pageSize"));
-//                // 需要分页的对象
-//                parameters.put("__objList", map.get("ObjList"));
-//            }
             //当前页
             parameters.put("__page", Integer.parseInt(pageIndex));
         }
@@ -592,6 +620,7 @@ public class FastHtmlPreviewServletAction extends RenderPageServletAction {
             }
             htmlReport.setWatermark(reportDefinition.getPaper().getWatermark());
             htmlReport.setChartDatas(report.getContext().getChartDataMap().values());
+            htmlReport.setEchartDatas(report.getContext().getEchartDataMap().values());
             htmlReport.setContent(html);
             htmlReport.setTotalPage(report.getPages().size());
             htmlReport.setStyle(reportDefinition.getStyle());

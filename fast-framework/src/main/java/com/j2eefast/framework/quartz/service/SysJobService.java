@@ -6,15 +6,6 @@
 package com.j2eefast.framework.quartz.service;
 
 
-import java.util.Map;
-import com.j2eefast.framework.quartz.utils.JobInvokeUtil;
-import org.quartz.JobDataMap;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,9 +14,19 @@ import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.quartz.entity.SysJobEntity;
 import com.j2eefast.framework.quartz.mapper.SysJobMapper;
+import com.j2eefast.framework.quartz.utils.JobInvokeUtil;
 import com.j2eefast.framework.quartz.utils.ScheduleUtils;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.CronUtils;
+import org.quartz.JobDataMap;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 
 /**
@@ -150,7 +151,6 @@ public class SysJobService extends ServiceImpl<SysJobMapper,SysJobEntity>{
 	 * @author zhouzhou
 	 * @date 2020-03-08 16:58
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public int updateBatchStatus(Long[] jobIds, String status) {
 		
 		return this.baseMapper.updateBatchStatus(status,jobIds);
@@ -164,7 +164,6 @@ public class SysJobService extends ServiceImpl<SysJobMapper,SysJobEntity>{
 	 * @return
 	 * @throws SchedulerException
 	 */
-	@Transactional
 	public boolean changeStatus(SysJobEntity job) throws SchedulerException{
 		String status = job.getStatus();
 		if (Constant.ScheduleStatus.NORMAL.getValue().equals(status)) {

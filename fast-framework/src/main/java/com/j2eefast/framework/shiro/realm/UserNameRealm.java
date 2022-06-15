@@ -6,8 +6,6 @@
 package com.j2eefast.framework.shiro.realm;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
-
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.enums.LogType;
 import com.j2eefast.common.core.utils.RedisUtil;
@@ -33,15 +31,12 @@ import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.manager.AsyncManager;
 import com.j2eefast.common.core.shiro.RedisCacheManager;
-import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
 import com.j2eefast.framework.shiro.service.SysLoginService;
 import com.j2eefast.framework.utils.Constant;

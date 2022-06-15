@@ -38,7 +38,12 @@ public class RadarDataset extends CategoryDataset {
 		sb.append("}");
 		return sb.toString();
 	}
-	
+
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
+	}
+
 	@Override
 	public String getType() {
 		return "radar";

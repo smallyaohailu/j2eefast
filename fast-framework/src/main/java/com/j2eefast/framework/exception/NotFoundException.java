@@ -8,6 +8,7 @@ package com.j2eefast.framework.exception;
 import cn.hutool.http.HtmlUtil;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.utils.ResponseData;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
@@ -19,6 +20,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UrlPathHelper;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -44,7 +46,8 @@ public class NotFoundException extends BasicErrorController {
     public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> model = new ModelMap();
         //去除XSS
-        model.put(ConfigConstant.ERR_PAGE, HtmlUtil.escape(HtmlUtil.filter(UrlPathHelper.defaultInstance.getOriginatingRequestUri(request))));
+        model.put(ConfigConstant.ERR_PAGE, StringUtils.substring(
+                HtmlUtil.escape(HtmlUtil.filter(UrlPathHelper.defaultInstance.getOriginatingRequestUri(request))),0,100));
         return  new ModelAndView(HTTP_NOT_FOUND, model);
     }
 

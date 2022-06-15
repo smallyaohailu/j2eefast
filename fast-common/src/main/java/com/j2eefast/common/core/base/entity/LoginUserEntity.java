@@ -8,11 +8,10 @@ package com.j2eefast.common.core.base.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.j2eefast.common.core.enums.LoginType;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>用于专门存放登陆用户信息</p>

@@ -34,12 +34,19 @@ public class BarDataset extends CategoryDataset{
 		sb.append("}");
 		return sb.toString();
 	}
-	
+
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
+	}
+
+
 	public String toMixJson(Context context,Cell cell,int index){
 		String props="\"type\":\"bar\"";
 		String datasetJson=buildDatasetJson(context, cell,props);
 		return datasetJson;
 	}
+
 	@Override
 	public String getType() {
 		return "bar";

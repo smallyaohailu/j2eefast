@@ -5,25 +5,24 @@
  */
 package com.j2eefast.framework.sys.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.base.entity.LoginTenantEntity;
 import com.j2eefast.common.core.base.entity.Ztree;
-import com.j2eefast.framework.sys.entity.SysTenantEntity;
-import com.j2eefast.framework.sys.mapper.SysTenantMapper;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysTenantEntity;
+import com.j2eefast.framework.sys.mapper.SysTenantMapper;
 import com.j2eefast.framework.utils.Constant;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import javax.annotation.Resource;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 租户Service接口
@@ -75,7 +74,6 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper,SysTenantEntit
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}
@@ -83,7 +81,6 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper,SysTenantEntit
 	/**
      * 单个删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysTenantById(Long id) {
 		return this.removeById(id);
 	}
@@ -91,7 +88,6 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper,SysTenantEntit
 	/**
      * 保存
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean addSysTenant(SysTenantEntity sysTenant){
 		if(this.save(sysTenant)){
 			return true;
@@ -102,7 +98,6 @@ public class SysTenantService extends ServiceImpl<SysTenantMapper,SysTenantEntit
 	/**
      * 修改根居ID
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean updateSysTenantById(SysTenantEntity sysTenant) {
 		if(this.updateById(sysTenant)){
 			return true;

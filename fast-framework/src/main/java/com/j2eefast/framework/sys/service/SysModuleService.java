@@ -8,16 +8,16 @@ package com.j2eefast.framework.sys.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.mapper.SysModuleMapper;
+import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 模块服务实现类
@@ -45,7 +45,6 @@ public class SysModuleService  extends ServiceImpl<SysModuleMapper,SysModuleEnti
 	 * @author zhouzhou
 	 * @date 2020-03-08 21:30
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}

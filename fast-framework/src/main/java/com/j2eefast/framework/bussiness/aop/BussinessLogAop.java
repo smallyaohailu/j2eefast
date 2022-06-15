@@ -5,17 +5,16 @@
  */
 package com.j2eefast.framework.bussiness.aop;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.http.HtmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.PropertyPreFilters;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.enums.BusinessStatus;
+import com.j2eefast.common.core.manager.AsyncManager;
 import com.j2eefast.common.core.utils.JSON;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
@@ -23,27 +22,27 @@ import com.j2eefast.framework.log.entity.SysOperLogEntity;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.utils.UserUtils;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.http.HtmlUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NamedThreadLocal;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
-import com.j2eefast.common.core.business.annotaion.BussinessLog;
-import com.j2eefast.common.core.enums.BusinessStatus;
-import com.j2eefast.common.core.manager.AsyncManager;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 系统日志，切面处理类AOP实现日志统一处理
@@ -52,6 +51,7 @@ import com.j2eefast.common.core.manager.AsyncManager;
  */
 @Aspect
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 300)
 public class BussinessLogAop {
 
 	private static final Logger					LOG 					= LoggerFactory.getLogger(BussinessLogAop.class);

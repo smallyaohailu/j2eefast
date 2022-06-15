@@ -15,17 +15,17 @@
  ******************************************************************************/
 package com.bstek.ureport.chart.dataset.impl;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.Utils;
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.chart.dataset.BaseDataset;
 import com.bstek.ureport.chart.dataset.ScatterData;
 import com.bstek.ureport.model.Cell;
 import com.bstek.ureport.utils.DataUtils;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -100,11 +100,17 @@ public class ScatterDataset extends BaseDataset {
 		sb.append("}");
 		return sb.toString();
 	}
+
+	@Override
+	public String buildLabelsJson(Context context, Cell cell) {
+		return null;
+	}
+
 	@Override
 	public String getType() {
 		return "scatter";
 	}
-	
+
 	public String getDatasetName() {
 		return datasetName;
 	}

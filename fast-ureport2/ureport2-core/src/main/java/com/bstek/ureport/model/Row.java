@@ -15,9 +15,9 @@
  ******************************************************************************/
 package com.bstek.ureport.model;
 
-import java.util.List;
-
 import com.bstek.ureport.definition.Band;
+
+import java.util.List;
 
 
 /**
@@ -31,7 +31,7 @@ public class Row extends Line{
 	/**
 	 * 一个用来临时存放当前行号的属性，只在构建报表时创建新行时使用
 	 */
-	private int tempRowNumber;
+	private int tempRowNumber = 0;
 	private Band band;
 	private int pageIndex;
 	private boolean forPaging;

@@ -15,11 +15,12 @@
  ******************************************************************************/
 package com.bstek.ureport.definition;
 
-import java.util.List;
-
 import com.bstek.ureport.model.Column;
 
+import java.util.List;
+
 /**
+ * 列样本
  * @author Jacky.gao
  * @since 2016年11月1日
  */

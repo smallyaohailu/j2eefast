@@ -5,13 +5,13 @@
  */
 package com.j2eefast.framework.config;
 
-import java.util.Properties;
-import javax.sql.DataSource;
 import com.j2eefast.common.db.utils.DbUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * 定时任务配置
@@ -36,7 +36,7 @@ public class ScheduleConfig {
 		prop.put("org.quartz.threadPool.threadCount", "20");
 		prop.put("org.quartz.threadPool.threadPriority", "5");
 		// JobStore配置 springboot 升级导致启动org.quartz.SchedulerConfigException: DataSource name not set.异常
-		// prop.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
+		//prop.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
 		prop.put("org.quartz.jobStore.class", "org.springframework.scheduling.quartz.LocalDataSourceJobStore");
 		
 		// 集群配置

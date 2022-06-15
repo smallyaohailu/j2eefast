@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.chart;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bstek.ureport.build.Context;
 import com.bstek.ureport.chart.axes.impl.XAxes;
 import com.bstek.ureport.chart.axes.impl.YAxes;
@@ -29,6 +26,9 @@ import com.bstek.ureport.chart.dataset.impl.category.LineDataset;
 import com.bstek.ureport.chart.option.Option;
 import com.bstek.ureport.chart.plugins.Plugin;
 import com.bstek.ureport.model.Cell;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jacky.gao
@@ -71,6 +71,9 @@ public class Chart {
 			}
 			sb.append("}");
 		}else {
+			if(withoption){
+				sb.append(",");
+			}
 			withoption=true;
 			sb.append("\"plugins\": {");
 			sb.append("\"datalabels\":{\"display\":false}");

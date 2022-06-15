@@ -58,6 +58,8 @@
     var resetPwdFlag = "${permission.hasPermi('sys:user:resetPwd')}";
     var visible = ${permission.isPermitteds("sys:user:edit,sys:user:del,sys:user:resetPwd")?string('true', 'false')};
     var prefix = baseURL + 'sys/user';
+    // 自定义表格视图切换记住我,使用当前页面URLBase64作为KEY
+    var urlBase64 = btoa(opt.common.encodeUrl(window.location.href.substr(basePath.length)));
 
     $(function() {
         initTable();
@@ -65,6 +67,11 @@
 
     /****自定义表格案例 与 行明细案例**/
     function initTable() {
+    
+    	var showCustomTalbe = opt.storage.get(urlBase64) || true;
+        showCustomTalbe = (typeof showCustomTalbe === 'boolean') ?
+            showCustomTalbe: (showCustomTalbe === 'true');
+            
         /* 初始表格对象 */
         var options = {
             url: prefix + "/list",
@@ -73,7 +80,8 @@
             delUrl: prefix + "/del",
             viewUrl: prefix + "/view/{id}",
             exportUrl:  prefix + "/export",
-            showSearch: true,
+            //showSearch: true,
+            showColumns: false,
             pageSize: 12,
             pageList: [12, 24, 36],
             sortName: "createTime",
@@ -91,8 +99,16 @@
             showCustomView: true, /* 自定义表格*/
             // 不填默认切换图标
             //customVIcon: 'fa fa-bar-chart-o',
+            // 显示图标文字 不填默认无文字
+            customTxt: ' ${i18n("视图切换")}',
             // 初始化显示表格 默认false 显示自定义
-            //showCustomTalbe: true,
+            showCustomTalbe: showCustomTalbe,
+            // 点击右上角视图切换按钮回调事件 -- 配合 showCustomTalbe 属性可以实现 点击切换视图记住我功能.下次再打开本页面会显示上次视图。
+            // 返回 showCustomTalbe 值
+            onCustom: function(args){
+            	//保存状态
+                opt.storage.set(urlBase64,!args);
+            },
             customViewFormatter: customViewFormatter,/* 自定义表格视图函数*/
             // -----
 

@@ -15,18 +15,13 @@
  ******************************************************************************/
 package com.bstek.ureport.console.designer;
 
+import com.bstek.ureport.definition.*;
+import com.bstek.ureport.definition.datasource.DatasourceDefinition;
+import com.bstek.ureport.definition.searchform.SearchForm;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.bstek.ureport.definition.CellDefinition;
-import com.bstek.ureport.definition.ColumnDefinition;
-import com.bstek.ureport.definition.HeaderFooterDefinition;
-import com.bstek.ureport.definition.Paper;
-import com.bstek.ureport.definition.ReportDefinition;
-import com.bstek.ureport.definition.RowDefinition;
-import com.bstek.ureport.definition.datasource.DatasourceDefinition;
-import com.bstek.ureport.definition.searchform.SearchForm;
 
 /**
  * @author Jacky.gao
@@ -34,6 +29,7 @@ import com.bstek.ureport.definition.searchform.SearchForm;
  */
 public class ReportDefinitionWrapper {
 	private Paper paper;
+	private Config config;
 	private HeaderFooterDefinition header;
 	private HeaderFooterDefinition footer;
 	private SearchForm searchForm;
@@ -45,6 +41,7 @@ public class ReportDefinitionWrapper {
 	public ReportDefinitionWrapper(ReportDefinition report) {
 		this.paper=report.getPaper();
 		this.header=report.getHeader();
+		this.config = report.getConfig();
 		this.footer=report.getFooter();
 		this.searchForm=report.getSearchForm();
 		this.searchFormXml=report.getSearchFormXml();
@@ -54,6 +51,10 @@ public class ReportDefinitionWrapper {
 		for(CellDefinition cell:report.getCells()){
 			cellsMap.put(cell.getRowNumber()+","+cell.getColumnNumber(), cell);
 		}
+	}
+
+	public Config getConfig() {
+		return config;
 	}
 	public List<ColumnDefinition> getColumns() {
 		return columns;

@@ -1,8 +1,5 @@
 package com.bstek.ureport.utils;
 
-import java.security.MessageDigest;
-import java.util.*;
-
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
@@ -13,6 +10,10 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author huanzhou
@@ -28,6 +29,13 @@ public class ToolUtils {
 
     protected static final List<SelectItem> COUNT_SELECT_ITEM = Collections.singletonList(defaultCountSelectItem());
 
+    private static Pattern pattern = Pattern.compile("/\\*.+?\\*/", Pattern.DOTALL);
+
+    public static String cleanCommons(String content) {
+        content.replaceAll("//.+\\r\\n", "");
+        String pattern0 ="[^:]//.*|/\\*(\\s|.)*?\\*\\/";
+        return pattern.matcher(content).replaceAll("").replaceAll(pattern0,"");
+    }
     /**
      * 获取jsqlparser中count的SelectItem
      */

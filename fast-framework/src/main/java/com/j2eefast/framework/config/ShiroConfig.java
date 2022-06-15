@@ -5,8 +5,6 @@
  */
 package com.j2eefast.framework.config;
 
-import java.io.Serializable;
-import java.util.*;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.IdUtil;
 import com.j2eefast.common.core.shiro.RedisCacheManager;
@@ -16,10 +14,13 @@ import com.j2eefast.common.core.shiro.ShiroSessionManager;
 import com.j2eefast.common.core.shiro.filter.InnerSessionFilter;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.shiro.RestLogoutFilter;
+import com.j2eefast.framework.shiro.ShiroSessionListener;
 import com.j2eefast.framework.shiro.UserFilter;
+import com.j2eefast.framework.shiro.auth.UserModularRealmAuthenticator;
 import com.j2eefast.framework.shiro.auth.UserModularRealmAuthorizer;
 import com.j2eefast.framework.shiro.realm.OtherRealm;
 import com.j2eefast.framework.shiro.realm.UserNameRealm;
+import com.j2eefast.framework.shiro.realm.ValideCodeRealm;
 import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
@@ -40,10 +41,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.j2eefast.framework.shiro.ShiroSessionListener;
-import com.j2eefast.framework.shiro.auth.UserModularRealmAuthenticator;
-import com.j2eefast.framework.shiro.realm.ValideCodeRealm;
+
 import javax.servlet.Filter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Shiro的配置文件
@@ -97,8 +101,6 @@ public class ShiroConfig {
 	@Value("#{ @environment['shiro.session.kickoutAfter'] ?: false }")
 	private boolean kickoutAfter;
 
-//	@Value("#{ @environment['shiro.isHideLoginUrl'] ?: false }")
-//	private boolean isHideLoginUrl;
 	/**
 	 * 是否开启记住我功能
 	 */
@@ -129,6 +131,12 @@ public class ShiroConfig {
 	@Value("#{ @environment['fast.tenantModel.enabled'] ?: false }")
 	private boolean enabled;
 
+	/**
+	 * 是否开启报表
+	 */
+	@Value("#{ @environment['fast.ureport.enabled'] ?: false }")
+	private boolean ufenabled;
+	
 	/**
 	 * Shiro授权认证配置 系统YML文件配置信息
 	 */
@@ -382,8 +390,11 @@ public class ShiroConfig {
 		filterMap.put("/sys/comm/download/**", "anon");
 		filterMap.put("/authInsu", "anon");
 		filterMap.put("/authInsu/uploadLic", "anon");
-		filterMap.put("/ureport/res/**", "anon");
-		filterMap.put("/ureport/shareview/**", "anon");
+		//报表分享
+		if(ufenabled) {
+			filterMap.put("/ureport/res/**", "anon");
+			filterMap.put("/ureport/shareview/**", "anon");
+		}
 		filterMap.put("/v3/api-docs", "anon");
         filterMap.put("/favicon.ico", "anon");
 		filterMap.put("/captcha.gif", "anon");
@@ -404,6 +415,7 @@ public class ShiroConfig {
 		if (null !=filterMap && filterMap.size() != 0) {			
 			  shiroFilter.setFilterChainDefinitionMap(filterMap);
 		}
+		
 		return shiroFilter;
 	}
 
@@ -444,6 +456,11 @@ public class ShiroConfig {
 		return advisor;
 	}
 
+	/**
+	 * 自定义SessionId
+	 * @author huanzhou
+	 * @date 2022-05-19 20:04
+	 */
 	class CustomSessionIdGenerator implements SessionIdGenerator{
 		@Override
 		public Serializable generateId(Session session) {

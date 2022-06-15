@@ -15,29 +15,33 @@
  ******************************************************************************/
 package com.bstek.ureport.definition;
 
+import com.bstek.ureport.Range;
+import com.bstek.ureport.definition.value.Value;
+import com.bstek.ureport.expression.model.Expression;
+import com.bstek.ureport.model.Cell;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-import com.bstek.ureport.Range;
-import com.bstek.ureport.definition.value.Value;
-import com.bstek.ureport.expression.model.Expression;
-import com.bstek.ureport.model.Cell;
-
 
 /**
+ * 单元格样本
  * @author Jacky.gao
  * @since 2016年11月1日
  */
 public class CellDefinition implements Serializable{
 	private static final long serialVersionUID = -2667510071560936139L;
+	//行
 	private int rowNumber;
+	//列
 	private int columnNumber;
+	//行合并
 	private int rowSpan;
+	//列合并
 	private int colSpan;
 	private String name;
 	private Value value;
@@ -71,10 +75,13 @@ public class CellDefinition implements Serializable{
 	 * 当前单元格左父格名
 	 */
 	private String leftParentCellName;
+
 	/**
 	 * 当前单元格上父格名
 	 */
 	private String topParentCellName;
+
+
 	/**
 	 * 当前单元格左父格
 	 */
@@ -85,22 +92,50 @@ public class CellDefinition implements Serializable{
 	 */
 	@JsonIgnore
 	private CellDefinition topParentCell;
+
 	/**
-	 * 当前单无格所在行的所有子格
+	 * 当前单元格相邻右边
+	 */
+	@JsonIgnore
+	private CellDefinition rightParentCell;
+
+	/**
+	 * 当前单元格相邻下边
+	 */
+	@JsonIgnore
+	private CellDefinition downParentCell;
+
+	@JsonIgnore
+	private String downParentCellName;
+
+	@JsonIgnore
+	private String rightParentCellName;
+	/**
+	 * 当前单无格所在行的所有子格 -- 所有单元格右侧单元格机构
 	 */
 	@JsonIgnore
 	private List<CellDefinition> rowChildrenCells=new ArrayList<CellDefinition>();
+
 	/**
-	 * 当前单无格所在列的所有子格
+	 * 当前左侧集合
+	 */
+	@JsonIgnore
+	private List<CellDefinition> leftParentCells=new ArrayList<CellDefinition>();
+
+	/**
+	 * 当前单无格所在列的所有子格-- 所有当前单元格下方单元格集合
 	 */
 	@JsonIgnore
 	private List<CellDefinition> columnChildrenCells=new ArrayList<CellDefinition>();
 	
 	private List<ConditionPropertyItem> conditionPropertyItems;
-	
+
+	//构建预览页面单元格信息
 	protected Cell newCell(){
 		Cell cell=new Cell();
 		cell.setValue(value);
+		cell.setColumnNumber(columnNumber);
+		cell.setRowNumber(rowNumber);
 		cell.setName(name);
 		cell.setRowSpan(rowSpan);
 		cell.setColSpan(colSpan);
@@ -120,6 +155,15 @@ public class CellDefinition implements Serializable{
 		return cell;
 	}
 
+
+	public List<CellDefinition> getLeftParentCells() {
+		return leftParentCells;
+	}
+
+	public void setLeftParentCells(List<CellDefinition> leftParentCells) {
+		this.leftParentCells = leftParentCells;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -130,6 +174,22 @@ public class CellDefinition implements Serializable{
 
 	public int getRowNumber() {
 		return rowNumber;
+	}
+
+	public String getDownParentCellName() {
+		return downParentCellName;
+	}
+
+	public void setDownParentCellName(String downParentCellName) {
+		this.downParentCellName = downParentCellName;
+	}
+
+	public String getRightParentCellName() {
+		return rightParentCellName;
+	}
+
+	public void setRightParentCellName(String rightParentCellName) {
+		this.rightParentCellName = rightParentCellName;
 	}
 
 	public void setRowNumber(int rowNumber) {
@@ -194,6 +254,22 @@ public class CellDefinition implements Serializable{
 
 	public CellDefinition getLeftParentCell() {
 		return leftParentCell;
+	}
+
+	public CellDefinition getRightParentCell() {
+		return rightParentCell;
+	}
+
+	public void setRightParentCell(CellDefinition rightParentCell) {
+		this.rightParentCell = rightParentCell;
+	}
+
+	public CellDefinition getDownParentCell() {
+		return downParentCell;
+	}
+
+	public void setDownParentCell(CellDefinition downParentCell) {
+		this.downParentCell = downParentCell;
 	}
 
 	public void setLeftParentCell(CellDefinition leftParentCell) {

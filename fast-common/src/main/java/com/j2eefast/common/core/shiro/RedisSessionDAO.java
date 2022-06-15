@@ -1,18 +1,18 @@
+/**
+ * All content copyright http://www.j2eefast.com, unless
+ * otherwise indicated. All rights reserved.
+ * No deletion without permission
+ */
 package com.j2eefast.common.core.shiro;
 
-import cn.hutool.core.codec.Base64Encoder;
-import cn.hutool.crypto.digest.MD5;
-import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.ValidatingSession;
 import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.serializer.SerializationException;
 import java.io.Serializable;
@@ -102,7 +102,9 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      * @throws UnknownSessionException
      */
     private void saveSession(Session session) throws UnknownSessionException {
-        log.debug("更新保存saveSession:{}",session.getId());
+        if(log.isDebugEnabled()) {
+            log.debug("更新保存saveSession:{}",session.getId());
+        }
         if (session == null || session.getId() == null) {
             log.error("session or session id is null");
             throw new UnknownSessionException("session or session id is null");
@@ -169,7 +171,9 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      */
     @Override
     protected Serializable doCreate(Session session) {
-        log.debug("创建会话:" + session);
+        if(log.isDebugEnabled()) {
+            log.debug("创建会话:" + session);
+        }
         if (session == null) {
             log.error("session is null");
             throw new UnknownSessionException("session is null");
@@ -187,7 +191,9 @@ public class RedisSessionDAO extends AbstractSessionDAO {
      */
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        log.debug("doReadSession-sessionId:{}",sessionId);
+        if(log.isDebugEnabled()) {
+            log.debug("doReadSession-sessionId:{}", sessionId);
+        }
         if (sessionId == null) {
             log.info("session id is null");
             return null;
@@ -199,7 +205,9 @@ public class RedisSessionDAO extends AbstractSessionDAO {
             }
         }
         Session session = null;
-        log.debug("read session from redis");
+        if(log.isDebugEnabled()) {
+            log.debug("read session from redis");
+        }
         try {
             session = (Session) redisUtil.getSession(getRedisSessionKey(sessionId));
             if (this.sessionInMemoryEnabled) {

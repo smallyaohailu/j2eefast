@@ -55,8 +55,9 @@ public class RedisCache<K, V> implements Cache<K, V> {
      */
     @Override
     public V get(K key) throws CacheException {
-        log.debug("get key [" + key + "]");
-
+        if(log.isDebugEnabled()) {
+            log.debug("get key [" + key + "]");
+        }
         if (key == null) {
             return null;
         }
@@ -83,7 +84,9 @@ public class RedisCache<K, V> implements Cache<K, V> {
         }
         try {
             String redisCacheKey = getRedisCacheKey(key);
-            log.debug("put key [" + redisCacheKey + "]");
+            if(log.isDebugEnabled()) {
+                log.debug("put key [" + redisCacheKey + "]");
+            }
             redisUtil.setSession(redisCacheKey, value != null ? value : null, expire);
             return value;
         } catch (SerializationException e) {
@@ -93,7 +96,9 @@ public class RedisCache<K, V> implements Cache<K, V> {
 
     @Override
     public V remove(K key) throws CacheException {
-        log.debug("remove key [{}]",key);
+        if(log.isDebugEnabled()) {
+            log.debug("remove key [{}]", key);
+        }
         if (key == null) {
             return null;
         }
@@ -172,7 +177,9 @@ public class RedisCache<K, V> implements Cache<K, V> {
 
     @Override
     public void clear() throws CacheException {
-        log.debug("clear cache");
+        if(log.isDebugEnabled()) {
+            log.debug("clear cache");
+        }
         Set<String> keys = null;
         try {
             keys = redisUtil.scan(this.keyPrefix + "*");

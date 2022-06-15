@@ -15,15 +15,6 @@
  ******************************************************************************/
 package com.bstek.ureport.definition;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.bstek.ureport.build.Dataset;
 import com.bstek.ureport.definition.datasource.DatasourceDefinition;
 import com.bstek.ureport.definition.searchform.RenderContext;
@@ -33,6 +24,14 @@ import com.bstek.ureport.model.Cell;
 import com.bstek.ureport.model.Column;
 import com.bstek.ureport.model.Report;
 import com.bstek.ureport.model.Row;
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao
@@ -42,13 +41,14 @@ public class ReportDefinition implements Serializable{
 	private static final long serialVersionUID = 5934291400824773809L;
 	private String reportFullName;
 	private Paper paper;
+	private Config config;
 	private CellDefinition rootCell;
 	private HeaderFooterDefinition header;
 	private HeaderFooterDefinition footer;
 	private SearchForm searchForm;
 	private List<CellDefinition> cells;
 	private List<RowDefinition> rows;
-	private List<ColumnDefinition> columns;
+	private List<ColumnDefinition>columns ;
 	private List<DatasourceDefinition> datasources;
 	private String searchFormXml;
 	@JsonIgnore
@@ -58,18 +58,26 @@ public class ReportDefinition implements Serializable{
 		Report report = new Report();
 		report.setReportFullName(reportFullName);
 		report.setPaper(paper);
+		report.setConfig(config);
 		report.setHeader(header);
 		report.setFooter(footer);
 		List<Row> reportRows = new ArrayList<Row>();
 		List<Column> reportColumns = new ArrayList<Column>();
 		report.setRows(reportRows);
 		report.setColumns(reportColumns);
+		//行号对应行信息
 		Map<Integer,Row> rowMap=new HashMap<Integer,Row>();
+
 		int headerRowsHeight=0,footerRowsHeight=0,titleRowsHeight=0,summaryRowsHeight=0;
+		//转换行信息
 		for (RowDefinition rowDef : rows) {
+
 			Row newRow=rowDef.newRow(reportRows);
+			//插入行信息
 			report.insertRow(newRow, rowDef.getRowNumber());
+
 			rowMap.put(rowDef.getRowNumber(), newRow);
+
 			Band band=rowDef.getBand();
 			if(band!=null){
 				if(band.equals(Band.headerrepeat)){
@@ -87,61 +95,112 @@ public class ReportDefinition implements Serializable{
 				}
 			}
 		}
+
 		report.setRepeatHeaderRowHeight(headerRowsHeight);
 		report.setRepeatFooterRowHeight(footerRowsHeight);
 		report.setTitleRowsHeight(titleRowsHeight);
 		report.setSummaryRowsHeight(summaryRowsHeight);
+
+		//列号对应列信息
 		Map<Integer,Column> columnMap=new HashMap<Integer,Column>();
+
 		for (ColumnDefinition columnDef : columns) {
 			Column newColumn=columnDef.newColumn(reportColumns);
 			report.insertColumn(newColumn, columnDef.getColumnNumber());
 			columnMap.put(columnDef.getColumnNumber(), newColumn);
 		}
+
+		//xml单元格对应页面单元格
 		Map<CellDefinition,Cell> cellMap=new HashMap<CellDefinition,Cell>();
+
 		for (CellDefinition cellDef : cells) {
+
 			Cell cell = cellDef.newCell();
+
 			cellMap.put(cellDef, cell);
+			//设置单元格所在行信息
 			Row targetRow=rowMap.get(cellDef.getRowNumber());
 			cell.setRow(targetRow);
+			//反搞过来将行对象中添加单元格信息
 			targetRow.getCells().add(cell);
+
+			//设置单元格列信息
 			Column targetColumn=columnMap.get(cellDef.getColumnNumber());
 			cell.setColumn(targetColumn);
+			//反搞过来将列对象中添加单元格信息
 			targetColumn.getCells().add(cell);
-			
+
+			//左上角第一个单元格
 			if(cellDef.getLeftParentCell()==null && cellDef.getTopParentCell()==null){
 				report.setRootCell(cell);
 			}
+
+			//添加信息单元格信息
 			report.addCell(cell);
 		}
+
+		//设置单元格左 上 单元格
 		for (CellDefinition cellDef : cells) {
+
 			Cell targetCell=cellMap.get(cellDef);
 			CellDefinition leftParentCellDef=cellDef.getLeftParentCell();
+
 			if(leftParentCellDef!=null){
 				targetCell.setLeftParentCell(cellMap.get(leftParentCellDef));
+				targetCell.setLeftParentCellName(targetCell.getLeftParentCell().getName());
 			}else{
 				targetCell.setLeftParentCell(null);
 			}
 			CellDefinition topParentCellDef=cellDef.getTopParentCell();
 			if(topParentCellDef!=null){
 				targetCell.setTopParentCell(cellMap.get(topParentCellDef));
+				targetCell.setTopParentCellName(targetCell.getTopParentCell().getName());
 			}else{
 				targetCell.setTopParentCell(null);
 			}
+
+			CellDefinition downParentCell=cellDef.getDownParentCell();
+			if(downParentCell!=null){
+				targetCell.setDownParentCell(cellMap.get(downParentCell));
+				targetCell.setDownParentCellName(targetCell.getDownParentCell().getName());
+			}else{
+				targetCell.setDownParentCell(null);
+			}
+
+			CellDefinition rightParentCell= cellDef.getRightParentCell();
+			if(rightParentCell!=null){
+				targetCell.setRightParentCell(cellMap.get(rightParentCell));
+				targetCell.setRightParentCellName(targetCell.getRightParentCell().getName());
+			}else{
+				targetCell.setRightParentCell(null);
+			}
 		}
+
+		//设置单元格 行子 、 列子 单元格
 		for (CellDefinition cellDef : cells) {
-			Cell targetCell=cellMap.get(cellDef);
-			
+
+			Cell targetCell = cellMap.get(cellDef);
+
 			List<CellDefinition> rowChildrenCellDefinitions=cellDef.getRowChildrenCells();
 			for(CellDefinition childCellDef:rowChildrenCellDefinitions){
 				Cell childCell=cellMap.get(childCellDef);
 				targetCell.addRowChild(childCell);
 			}
+
 			List<CellDefinition> columnChildrenCellDefinitions=cellDef.getColumnChildrenCells();
 			for(CellDefinition childCellDef:columnChildrenCellDefinitions){
 				Cell childCell=cellMap.get(childCellDef);
 				targetCell.addColumnChild(childCell);
 			}
+
+			List<CellDefinition> leftChildrenCellDefinitions=cellDef.getLeftParentCells();
+			for(CellDefinition childCellDef:leftChildrenCellDefinitions){
+				Cell childCell=cellMap.get(childCellDef);
+				targetCell.addLeftColumnChild(childCell);
+			}
+
 		}
+
 		return report;
 	}
 	
@@ -323,6 +382,14 @@ public class ReportDefinition implements Serializable{
 
 	public List<CellDefinition> getCells() {
 		return cells;
+	}
+
+	public Config getConfig() {
+		return config;
+	}
+
+	public void setConfig(Config config) {
+		this.config = config;
 	}
 
 	public void setCells(List<CellDefinition> cells) {

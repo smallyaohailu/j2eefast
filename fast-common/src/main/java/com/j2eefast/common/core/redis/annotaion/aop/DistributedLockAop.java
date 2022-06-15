@@ -1,7 +1,9 @@
 package com.j2eefast.common.core.redis.annotaion.aop;
 
-import java.lang.reflect.Method;
-
+import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.utils.ReflectUtils;
+import com.j2eefast.common.core.utils.ToolUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,15 +13,15 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.utils.ReflectUtils;
-import com.j2eefast.common.core.utils.ToolUtil;
 
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Method;
 
 /**
  * 分布式锁
+ * 添加执行顺利避免与事务同时使用,出现先开事务情况
  * @ClassName DistributedLockAop
  * @Description
  * @author mfksn001@163.com
@@ -28,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 @Component
 @Slf4j
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DistributedLockAop {
 
 	@Autowired

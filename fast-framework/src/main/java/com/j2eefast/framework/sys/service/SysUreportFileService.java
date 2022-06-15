@@ -5,21 +5,21 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import com.j2eefast.framework.sys.entity.SysUreportFileEntity;
-import com.j2eefast.framework.sys.mapper.SysUreportFileMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysUreportFileEntity;
+import com.j2eefast.framework.sys.mapper.SysUreportFileMapper;
 import com.j2eefast.framework.utils.Constant;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
 import javax.annotation.Resource;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ureport2报配置存储Service接口
@@ -63,7 +63,6 @@ public class SysUreportFileService extends ServiceImpl<SysUreportFileMapper,SysU
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}
@@ -71,7 +70,6 @@ public class SysUreportFileService extends ServiceImpl<SysUreportFileMapper,SysU
 	/**
      * 单个删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysUreportFileById(Long id) {
 		return this.removeById(id);
 	}
@@ -79,7 +77,6 @@ public class SysUreportFileService extends ServiceImpl<SysUreportFileMapper,SysU
 	/**
      * 保存
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean addSysUreportFile(SysUreportFileEntity sysUreportFile){
 		if(this.save(sysUreportFile)){
 			return true;
@@ -90,7 +87,6 @@ public class SysUreportFileService extends ServiceImpl<SysUreportFileMapper,SysU
 	/**
      * 修改根居ID
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean updateSysUreportFileById(SysUreportFileEntity sysUreportFile) {
 		if(this.updateById(sysUreportFile)){
 			return true;

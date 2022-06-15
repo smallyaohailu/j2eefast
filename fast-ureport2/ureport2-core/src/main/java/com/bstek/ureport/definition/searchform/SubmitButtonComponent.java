@@ -20,6 +20,12 @@ package com.bstek.ureport.definition.searchform;
  * @since 2017年10月24日
  */
 public class SubmitButtonComponent extends ButtonComponent{
+
+	@Override
+	public String toHtml(RenderContext context) {
+		return "<button type=\"button\" id=\""+context.buildComponentId(this)+"\" class=\"btn "+getStyle()+" btn-sm submit\"><i class=\"fa fa-search\"></i>&nbsp;"+getLabel()+"</button>";
+	}
+
 	@Override
 	public String initJs(RenderContext context) {
 		StringBuilder sb=new StringBuilder();

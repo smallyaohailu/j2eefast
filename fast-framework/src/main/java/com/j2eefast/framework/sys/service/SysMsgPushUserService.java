@@ -5,21 +5,22 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import com.j2eefast.framework.sys.entity.SysMsgPushUserEntity;
-import com.j2eefast.framework.sys.mapper.SysMsgPushUserMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysMsgPushUserEntity;
+import com.j2eefast.framework.sys.mapper.SysMsgPushUserMapper;
 import com.j2eefast.framework.utils.Constant;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Map;
-import java.util.List;
+
+import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 推送用户Service接口
@@ -83,13 +84,11 @@ public class SysMsgPushUserService extends ServiceImpl<SysMsgPushUserMapper,SysM
 	/**
      * 单个删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysMsgPushUserById(Long id) {
 		return this.removeById(id);
 	}
 
 
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysMsgPushUserByMsgId(Long msgId){
 		return this.remove(new QueryWrapper<SysMsgPushUserEntity>().eq("msg_id",msgId));
 	}
@@ -97,7 +96,6 @@ public class SysMsgPushUserService extends ServiceImpl<SysMsgPushUserMapper,SysM
 	/**
      * 保存
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean addSysMsgPushUser(SysMsgPushUserEntity sysMsgPushUser){
 		if(this.save(sysMsgPushUser)){
 			return true;
@@ -108,7 +106,6 @@ public class SysMsgPushUserService extends ServiceImpl<SysMsgPushUserMapper,SysM
 	/**
      * 修改根居ID
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean updateSysMsgPushUserById(SysMsgPushUserEntity sysMsgPushUser) {
 		if(this.updateById(sysMsgPushUser)){
 			return true;

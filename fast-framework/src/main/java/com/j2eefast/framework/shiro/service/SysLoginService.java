@@ -6,42 +6,47 @@ package com.j2eefast.framework.shiro.service;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
-
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.j2eefast.common.core.enums.LogType;
-import com.j2eefast.common.core.enums.LoginType;
 import com.j2eefast.common.core.auth.AuthService;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.crypto.SoftEncryption;
-import com.j2eefast.common.core.utils.*;
-import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
-import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
-import com.j2eefast.framework.sys.entity.*;
-import com.j2eefast.framework.sys.factory.UserFactory;
-import com.j2eefast.framework.sys.mapper.*;
-import com.j2eefast.framework.utils.UserUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-import cn.hutool.core.util.HexUtil;
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
+import com.j2eefast.common.core.enums.LogType;
+import com.j2eefast.common.core.enums.LoginType;
 import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.exception.ServiceException;
 import com.j2eefast.common.core.manager.AsyncManager;
 import com.j2eefast.common.core.shiro.RedisSessionDAO;
+import com.j2eefast.common.core.utils.Global;
+import com.j2eefast.common.core.utils.RedisUtil;
+import com.j2eefast.common.core.utils.ServletUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
+import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
+import com.j2eefast.framework.sys.entity.SysRoleEntity;
+import com.j2eefast.framework.sys.entity.SysTenantEntity;
+import com.j2eefast.framework.sys.entity.SysUserEntity;
+import com.j2eefast.framework.sys.factory.UserFactory;
+import com.j2eefast.framework.sys.mapper.SysMenuMapper;
+import com.j2eefast.framework.sys.mapper.SysRoleMapper;
+import com.j2eefast.framework.sys.mapper.SysTenantMapper;
+import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.RedisKeys;
+import com.j2eefast.framework.utils.UserUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.*;
@@ -169,9 +174,13 @@ public class SysLoginService implements AuthService {
 
 		//解密数据
 		String kg4 = ServletUtil.getRequest().getParameter("kg4");
-		log.debug("kg4:{}",kg4);
+		if(log.isDebugEnabled()) {
+			log.debug("kg4:{}", kg4);
+		}
 		String sign =ServletUtil.getRequest().getParameter("sign");
-		log.debug("sign:{}",sign);
+		if(log.isDebugEnabled()) {
+			log.debug("sign:{}", sign);
+		}
 
 		if(ToolUtil.isEmpty(kg4) || ToolUtil.isEmpty(sign)){
 			throw new RxcException("登录确实必要参数kg4/sing","50002");

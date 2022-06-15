@@ -19,6 +19,7 @@ import java.util.List;
 
 
 /**
+ * 列信息
  * @author Jacky.gao
  * @since 2016年11月1日
  */
@@ -29,6 +30,7 @@ public class Column extends Line{
 	 * 一个用来临时存放当前列号的属性，只在构建报表时创建新列时使用
 	 */
 	private int tempColumnNumber;
+
 	private List<Column> columns;
 	
 	public Column(List<Column> columns) {

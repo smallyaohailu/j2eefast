@@ -3575,7 +3575,8 @@ if (typeof jQuery === "undefined") {
                 //     $(this).valid();
                 // })
                 if(typeof($(this).attr("multiple"))=="undefined"){
-                    $(this).select2({allowClear: false, placeholder: $.i18n.text("请点击选择")});
+                    //$(this).select2({allowClear: false, placeholder: $.i18n.text("请点击选择")});
+                    $(this).select2();
                 }else{
                     $(this).select2({allowClear: true, placeholder: ""});
                 }
@@ -3826,7 +3827,8 @@ if (typeof jQuery === "undefined") {
     //var _lang = opt.getCookie("_lang");
 
     //初始化i18n插件
-    $.i18n.properties({
+
+    $.i18n && $.i18n.properties({
         path: baseURL + 'i18n/',//这里表示访问路径
         name: 'i18n',//文件名开头
         language: __LANG__,//文件名语言 例如en_US

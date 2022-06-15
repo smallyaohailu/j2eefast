@@ -15,13 +15,13 @@
  ******************************************************************************/
 package com.bstek.ureport.export.builder.down;
 
-import java.util.List;
-import java.util.Map;
-
 import com.bstek.ureport.Range;
 import com.bstek.ureport.definition.BlankCellInfo;
 import com.bstek.ureport.definition.CellDefinition;
 import com.bstek.ureport.parser.BuildUtils;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jacky.gao

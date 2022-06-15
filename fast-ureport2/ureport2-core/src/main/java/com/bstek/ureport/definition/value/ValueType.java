@@ -20,5 +20,5 @@ package com.bstek.ureport.definition.value;
  * @since 2017年2月7日
  */
 public enum ValueType {
-	simple,expression,dataset,image,chart,slash,zxing;
+	simple,expression,dataset,image,chart,slash,zxing,echart;
 }

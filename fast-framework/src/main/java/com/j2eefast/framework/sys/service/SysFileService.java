@@ -56,7 +56,6 @@ public class SysFileService extends ServiceImpl<SysFileMapper, SysFilesEntity> {
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysFilesByIds(Long[] ids) {
 		
 		return this.removeByIds(Arrays.asList(ids));

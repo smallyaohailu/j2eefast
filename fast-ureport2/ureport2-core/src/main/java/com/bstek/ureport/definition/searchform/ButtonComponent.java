@@ -26,7 +26,8 @@ public abstract class ButtonComponent implements Component{
 	private String type;
 	@Override
 	public String toHtml(RenderContext context) {
-		return "<div style='text-align:"+this.align+"'><button type=\"button\" id=\""+context.buildComponentId(this)+"\" class=\"btn "+style+" btn-sm\">"+label+"</button></div>";
+//		return "<div style='text-align:"+this.align+"'><button type=\"button\" id=\""+context.buildComponentId(this)+"\" class=\"btn "+style+" btn-sm\">"+label+"</button></div>";
+		return "<button type=\"button\" id=\""+context.buildComponentId(this)+"\" class=\"btn "+style+" btn-sm\">"+label+"</button>";
 	}
 	public String getLabel() {
 		return label;

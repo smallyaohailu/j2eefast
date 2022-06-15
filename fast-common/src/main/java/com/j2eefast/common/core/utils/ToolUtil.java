@@ -1,5 +1,43 @@
 package com.j2eefast.common.core.utils;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.mail.MailUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.system.SystemUtil;
+import cn.hutool.system.oshi.OshiUtil;
+import com.bstek.ureport.export.ExportManager;
+import com.bstek.ureport.export.html.HtmlReport;
+import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.crypto.EnctryptTools;
+import com.j2eefast.common.core.exception.RxcException;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.cache.AuthStateCache;
+import me.zhyd.oauth.config.AuthConfig;
+import me.zhyd.oauth.exception.AuthException;
+import me.zhyd.oauth.request.*;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import oshi.hardware.NetworkIF;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -8,38 +46,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.system.SystemUtil;
-import cn.hutool.system.oshi.OshiUtil;
-import com.j2eefast.common.core.constants.ConfigConstant;
-import com.j2eefast.common.core.crypto.EnctryptTools;
-import com.j2eefast.common.core.exception.RxcException;
-import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.cache.AuthStateCache;
-import me.zhyd.oauth.config.AuthConfig;
-import me.zhyd.oauth.exception.AuthException;
-import me.zhyd.oauth.request.*;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Map;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import oshi.hardware.NetworkIF;
 
 /**
  * 高频使用工具类
@@ -358,6 +364,52 @@ public class ToolUtil{
 		filename = UUID.randomUUID().toString() + "_" + filename + ".xlsx";
 		return filename;
 	}
+
+    /**
+     * 配合JU在线报表模板、发送邮件
+     * @param tos 收件人列表
+     * @param ccs 抄送人列表，可以为null或空
+     * @param bccs 密送人列表，可以为null或空
+     * @param subject 标题
+     * @param fileNo 报表名 (注意不含前缀fast- 、 不含后缀.xml)
+     * @param parameters 报表接收参数
+     * @param files 附件列表 可以为 null
+     */
+	public static void sendMailJu(Collection<String> tos,
+                                  Collection<String> ccs,
+                                  Collection<String> bccs,
+                                  String subject,
+                                  String fileNo,
+                                  Map<String,Object> parameters,
+                                  File... files){
+	    try{
+	        log.info("开始发送准备>>>>>>>>>");
+            parameters.put(ConfigConstant.SQLFILTER, "");
+            HtmlReport htmlReport = ((ExportManager)SpringUtil.getBean("fastExportManager")).exportHtml("fast-"+fileNo+".xml","",parameters);
+            log.info("成功获取报表转换>>>>>>>>>");
+            FreeMarkerConfigurer freeMarkerConfigurer = SpringUtil.getBean(FreeMarkerConfigurer.class);
+            //生成静态文件
+            Configuration configuration = freeMarkerConfigurer.getConfiguration();
+            // 加载模板对象
+            Template template = configuration.getTemplate("common/template/mail.html");
+            // 创建一个数据集
+            Map<String, Object>  data = new HashMap<>();
+            data.put("style",htmlReport.getStyle());
+            data.put("table",htmlReport.getContent());
+            File file = FileUtil.touch(Global.getRootPath() + "mail" + File.separator +
+                    DatePattern.PURE_DATE_FORMAT.format(new Date())+"_"+fileNo + ".html" );
+            // 指定文件输出路径以及文件名
+            Writer out = new FileWriter(file);
+            // 输出文件
+            template.process(data, out);
+            // 关闭流
+            out.close();
+            MailUtil.send(tos,ccs,bccs,  subject,FileUtil.readUtf8String(file),true,files);
+            log.info("开始发送成功>>>>>>>>>");
+        }catch (Exception e){
+	        log.error("发送异常:",e);
+        }
+    }
 
 	/**
 	 * 通过Hutool工具类获取系统硬件信息

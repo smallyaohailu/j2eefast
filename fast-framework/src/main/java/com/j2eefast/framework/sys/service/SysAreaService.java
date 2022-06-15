@@ -103,7 +103,6 @@ public class SysAreaService extends ServiceImpl<SysAreaMapper,SysAreaEntity> {
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteSysAreaByIds(Long[] ids) {
 		return removeByIds(Arrays.asList(ids));
 	}
