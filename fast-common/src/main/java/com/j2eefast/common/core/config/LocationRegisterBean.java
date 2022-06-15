@@ -5,7 +5,7 @@
  */
 package com.j2eefast.common.core.config;
 
-import com.bstek.ureport.build.HideRowColumnBuilder;
+import cn.hutool.core.util.StrUtil;
 import com.bstek.ureport.build.ReportBuilder;
 import com.bstek.ureport.definition.datasource.BuildinDatasource;
 import com.bstek.ureport.export.ExportManager;
@@ -15,15 +15,14 @@ import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.ureport.*;
 import com.j2eefast.common.core.utils.RedisUtil;
-import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
-import cn.hutool.core.util.StrUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.stereotype.Component;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Map;
@@ -100,6 +99,7 @@ public class LocationRegisterBean implements BeanFactoryAware {
             fastHtmlPreviewServletAction.setReportBuilder(beanFactory.getBean(ReportBuilder.class));
 //            fastHtmlPreviewServletAction.setReportBuilder(fastReportBuilder);
             fastHtmlPreviewServletAction.setReportRender(beanFactory.getBean(ReportRender.class));
+//            fastHtmlPreviewServletAction.setApplicationContext();
 //            fastHtmlPreviewServletAction.setReportRender(fastReportRender);
             listableBeanFactory.registerSingleton("fastHtmlPreviewServletAction",fastHtmlPreviewServletAction);
 

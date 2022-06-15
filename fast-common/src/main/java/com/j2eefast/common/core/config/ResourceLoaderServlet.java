@@ -20,13 +20,10 @@ import com.j2eefast.common.core.utils.CookieUtil;
 import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpHeaders;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +76,9 @@ public class ResourceLoaderServlet extends HttpServlet {
 				// 转unicode输出
 				//outBytes = UnicodeUtil.toUnicode(sb.toString()).getBytes();
 				outBytes = sb.toString().getBytes();
-				log.debug("压缩前:{}" ,outBytes.length);
+				if(log.isDebugEnabled()) {
+					log.debug("压缩前:{}" ,outBytes.length);
+				}
 				//用GZIPOutputStream压缩
 				ByteArrayOutputStream bout=new ByteArrayOutputStream();
 				GZIPOutputStream gzip=new GZIPOutputStream(bout);
@@ -88,7 +87,9 @@ public class ResourceLoaderServlet extends HttpServlet {
 				gzip.flush();
 				gzip.close();
 				outBytes = bout.toByteArray();
-				log.debug("压缩之后:{}" ,outBytes.length);
+				if(log.isDebugEnabled()) {
+					log.debug("压缩之后:{}", outBytes.length);
+				}
 				//注明压缩类型
 				resp.setHeader("content-encoding", "gzip");
 				resp.setHeader("content-length",outBytes.length+"");
@@ -172,7 +173,9 @@ public class ResourceLoaderServlet extends HttpServlet {
 				}
 				//outBytes = UnicodeUtil.toUnicode(_default.toString()).getBytes();
 				outBytes = _default.toString().getBytes();
-				log.debug("压缩前:{}", outBytes.length);
+				if(log.isDebugEnabled()) {
+					log.debug("压缩前:{}", outBytes.length);
+				}
 				// 用GZIPOutputStream压缩
 				ByteArrayOutputStream bout=new ByteArrayOutputStream();
 				GZIPOutputStream gzip=new GZIPOutputStream(bout);
@@ -181,7 +184,9 @@ public class ResourceLoaderServlet extends HttpServlet {
 				gzip.flush();
 				gzip.close();
 				outBytes = bout.toByteArray();
-				log.debug("压缩之后:{}" + outBytes.length);
+				if(log.isDebugEnabled()) {
+					log.debug("压缩之后:{}" + outBytes.length);
+				}
 				resp.setContentType("text/javascript");
 				// 注明压缩类型
 				resp.setHeader("content-encoding", "gzip");

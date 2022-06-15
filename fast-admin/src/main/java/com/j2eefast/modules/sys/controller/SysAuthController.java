@@ -10,8 +10,6 @@ import cn.hutool.json.JSONUtil;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.utils.AuthStateRedisCache;
 import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.framework.shiro.LoginType;
-import com.j2eefast.framework.shiro.UserToken;
 import com.j2eefast.framework.shiro.token.OtherToken;
 import com.j2eefast.framework.sys.entity.SysAuthUserEntity;
 import com.j2eefast.framework.sys.entity.SysUserEntity;
@@ -33,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
@@ -163,7 +162,7 @@ public class SysAuthController extends BaseController {
             	OtherToken otherToken = new OtherToken("gitee1816537","000000",rememberMe);
                 Subject subject = null;
             	subject = UserUtils.getSubject();
-                subject.login(otherToken); 
+                subject.login(otherToken);
                 return new ModelAndView(REDIRECT+"/index");
             }
         }

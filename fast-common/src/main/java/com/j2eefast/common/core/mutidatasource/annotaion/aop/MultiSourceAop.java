@@ -5,7 +5,9 @@
  */
 package com.j2eefast.common.core.mutidatasource.annotaion.aop;
 
-import java.lang.reflect.Method;
+import com.j2eefast.common.core.mutidatasource.DataSourceContextHolder;
+import com.j2eefast.common.core.mutidatasource.annotaion.DataSource;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -14,9 +16,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.Ordered;
-import com.j2eefast.common.core.mutidatasource.DataSourceContextHolder;
-import com.j2eefast.common.core.mutidatasource.annotaion.DataSource;
-import com.j2eefast.common.core.utils.ToolUtil;
+
+import java.lang.reflect.Method;
 
 /**
  * 多数据源切换AOP
@@ -36,7 +37,7 @@ public class MultiSourceAop implements Ordered {
 	 */
 	@Override
 	public int getOrder() {
-		return 1;
+		return Ordered.HIGHEST_PRECEDENCE + 100;
 	}
 	
 	/**
@@ -62,15 +63,21 @@ public class MultiSourceAop implements Ordered {
 		//如果有DataSource注解，则设置DataSourceContextHolder为注解上的名称
         if (ToolUtil.isNotEmpty(datasource)) {
             DataSourceContextHolder.setDataSourceType(datasource.name());
-            log.debug("设置数据源为：" + datasource.name());
+			if(log.isDebugEnabled()) {
+				log.debug("设置数据源为：" + datasource.name());
+			}
         } else {
             DataSourceContextHolder.setDataSourceType(DataSourceContext.MASTER_DATASOURCE_NAME);
-			log.debug("设置数据源为：dataSourceCurrent");
+			if(log.isDebugEnabled()) {
+				log.debug("设置数据源为：dataSourceCurrent");
+			}
         }
         try {
             return point.proceed();
         } finally {
-			log.debug("清空数据源信息！");
+			if(log.isDebugEnabled()) {
+				log.debug("清空数据源信息！");
+			}
             DataSourceContextHolder.clearDataSourceType();
         }
     }
