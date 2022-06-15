@@ -5,7 +5,7 @@ spring:
         master:
             #mysql 数据库配置
             driverClassName: com.mysql.cj.jdbc.Driver
-            url: jdbc:mysql://192.168.20.110:3306/fastdb?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=CTT
+            url: jdbc:mysql://192.168.20.110:3306/fastdb?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
             #url: ENC{6mrUX1SZ/wgmN11iXmMyqplOpIbLBTlo3wh3K7T9qieephrFWPxUeOeswsLG+HKDvzd1wbo0DONij81tZUjIIEX/2gADAjSoJewZaxIeuVD1foEoEjzB/US3uf3gJYkee3IJPFEhABPSefwJGthT4xceWx27axifRKC6SfDzl5A=}
             username: fast
             password: fast@123$
@@ -35,7 +35,7 @@ spring:
     #redis数据库服务器
     redis:
         database: 10
-        host: 192.168.20.110
+        host: 
         port: 6379
         #redis密码 请为你的redis 设置连接密码、 如果无密码、请注释 #password,否则会报连接异常
         password: 123456
@@ -49,8 +49,8 @@ mybatis-plus:
     configuration:
         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 http:
-  #port: 8200 #web端口
-  #port: 80 #web端口
+#port: 8200 #web端口
+#port: 80 #web端口
 server:
     name: '##################J2eeFAST[开发环境]##############'
     projectName: 'J2eeFAST[开发环境]'
