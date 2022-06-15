@@ -5,32 +5,36 @@
  */
 package com.j2eefast.framework.bussiness.aop;
 
-import java.util.*;
 import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.annotation.AuthData;
+import com.j2eefast.framework.annotation.DataFilter;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
+import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.framework.annotation.DataFilter;
-import com.j2eefast.framework.utils.Constant;
+
+import java.util.Map;
 
 /**
  * @Description:数据过滤，切面处理类
  * @author zhouzhou loveingowp@163.com
  * @time 2018-12-03 17:25
  */
-@Order(5)
+@Order(Ordered.HIGHEST_PRECEDENCE + 4001)
 @Aspect
 @Component
+@Slf4j
 public class DataFilterAspect {
 
 	@Pointcut("@annotation(com.j2eefast.framework.annotation.DataFilter)")
@@ -49,7 +53,14 @@ public class DataFilterAspect {
 			map.put(Constant.SQL_FILTER,StrUtil.EMPTY);
 
 			// 特除业务 不需要数据过滤
-			boolean _isADMIN =  ToolUtil.isEmpty(map.get("__ISADMIN"))?false: (boolean) map.get("__ISADMIN");
+			// __ISADMIN 只能是程序内部传入布尔型、 防止外部注入越界访问
+			boolean _isADMIN = false;
+			try{
+				_isADMIN =  ToolUtil.isEmpty(map.get("__ISADMIN")) ? false: (boolean) map.get("__ISADMIN");
+			}catch (Exception e){
+				log.error("数据过滤,[__ISADMIN] 参数必须内部传入,禁止外部注入.外部传入{}",map.get("__ISADMIN"));
+				throw new RxcException("用户请求参数错误",RxcException.PARAMETER_ERROR);
+			}
 
 			LoginUserEntity user = UserUtils.getUserInfo();
 			// 如果不是超级管理员，则进行数据过滤
