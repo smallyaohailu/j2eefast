@@ -5,22 +5,18 @@
  */
 package com.j2eefast.common.core.utils;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.*;
-import org.springframework.stereotype.Component;
+import com.alibaba.fastjson.JSON;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.util.CollectionUtils;
-import com.alibaba.fastjson.JSON;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis工具类
@@ -31,23 +27,21 @@ import com.alibaba.fastjson.JSON;
 public class RedisUtil {
 
 	@SuppressWarnings("unused")
-	@Autowired
-	@Lazy
-	private StringRedisTemplate 					stringRedisTemplate;
-	@SuppressWarnings("rawtypes")
-	@Autowired
-	@Lazy
+//	@Autowired
+//	@Lazy
+//	private StringRedisTemplate 					stringRedisTemplate;
+	@Resource(name = "redisTemplate")
 	private RedisTemplate<String, Object> 			redisTemplate;
-	@Resource(name = "redisTemplate")
-	private ValueOperations<String, String> 		valueOperations;
-	@Resource(name = "redisTemplate")
-	private HashOperations<String, String, Object> 	hashOperations;
-	@Resource(name = "redisTemplate")
-	private ListOperations<String, Object> 			listOperations;
-	@Resource(name = "redisTemplate")
-	private SetOperations<String, Object> 			setOperations;
-	@Resource(name = "redisTemplate")
-	private ZSetOperations<String, Object> 			zSetOperations;
+//	@Resource(name = "redisTemplate")
+//	private ValueOperations<String, String> 		valueOperations;
+//	@Resource(name = "redisTemplate")
+//	private HashOperations<String, String, Object> 	hashOperations;
+//	@Resource(name = "redisTemplate")
+//	private ListOperations<String, Object> 			listOperations;
+//	@Resource(name = "redisTemplate")
+//	private SetOperations<String, Object> 			setOperations;
+//	@Resource(name = "redisTemplate")
+//	private ZSetOperations<String, Object> 			zSetOperations;
 	/** 
 	 * 默认过期时长，单位：秒
 	 */
@@ -72,36 +66,61 @@ public class RedisUtil {
 	}
 
 	/**
+	 * 设置KEY VALUE 相当于SETNX指令 不存在key 设置、存在不设置
+	 * @param Key
+	 * @param Value
+	 * @param time
+	 * @return true 设置成功 false 已经存在
+	 */
+	public Boolean setIfAbsent(String Key, Object Value,long time){
+		return redisTemplate.opsForValue().setIfAbsent(Key,Value,time,TimeUnit.SECONDS);
+	}
+
+	/**
 	 * 数据存放Set集合
 	 */
 	public void add(String key,long expire,String... values) {
-		setOperations.add(key, values);
+		redisTemplate.opsForSet().add(key, values);
 		if(expire != NOT_EXPIRE) {
 			redisTemplate.expire(key,expire,TimeUnit.SECONDS);
 		}
 	}
 	
 	public void delSet(String key,String... values) {
-		setOperations.remove(key,values);
+		redisTemplate.opsForSet().remove(key,values);
 	}
 	
 	/**
 	 * 通过Key获取之前存放的Set集合
 	 */
 	public Set<Object> getSets(String key){
-		return setOperations.members(key);
+		return redisTemplate.opsForSet().members(key);
+	}
+
+
+	/**
+	 * LPUSH
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public Long leftPush(String key, Object ...value){
+		return redisTemplate.opsForList().leftPush(key,value);
+	}
+
+	public Object  leftPop(String key){
+		return redisTemplate.opsForList().leftPop(key);
 	}
 	
-	
 	public void set(String key, Object value, long expire) {
-		valueOperations.set(key, toJson(value));
+		redisTemplate.opsForValue().set(key, toJson(value));
 		if (expire != NOT_EXPIRE) {
 			redisTemplate.expire(key, expire, TimeUnit.SECONDS);
 		}
 	}
 	
 	public void setMillse(String key, Object value, long expire) {
-		valueOperations.set(key, toJson(value));
+		redisTemplate.opsForValue().set(key, toJson(value));
 		if (expire != NOT_EXPIRE) {
 			redisTemplate.expire(key, expire, TimeUnit.MILLISECONDS);
 		}
@@ -121,7 +140,7 @@ public class RedisUtil {
 	}
 	
 	public void setSeConds(String key, Object value, long expire) {
-		valueOperations.set(key, toJson(value));
+		redisTemplate.opsForValue().set(key, toJson(value));
 		if (expire != NOT_EXPIRE) {
 			redisTemplate.expire(key, expire, TimeUnit.SECONDS);
 		}
@@ -166,7 +185,7 @@ public class RedisUtil {
 	}
 
 	public <T> T get(String key, Class<T> clazz, long expire) {
-		String value = valueOperations.get(key);
+		String value = (String) redisTemplate.opsForValue().get(key);
 		if (expire != NOT_EXPIRE) {
 			redisTemplate.expire(key, expire, TimeUnit.SECONDS);
 		}
@@ -179,7 +198,7 @@ public class RedisUtil {
 
 	@SuppressWarnings("unchecked")
 	public String get(String key, long expire) {
-		String value = valueOperations.get(key);
+		String value = (String) redisTemplate.opsForValue().get(key);
 		if (expire != NOT_EXPIRE) {
 			redisTemplate.expire(key, expire, TimeUnit.SECONDS);
 		}
