@@ -76,7 +76,6 @@ public class SysFileUploadService extends ServiceImpl<SysFileUploadMapper,SysFil
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteSysFileUploadByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}

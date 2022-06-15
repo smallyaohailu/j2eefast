@@ -5,22 +5,21 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import com.j2eefast.framework.sys.entity.SysMsgCcUserEntity;
-import com.j2eefast.framework.sys.entity.SysMsgPushUserEntity;
-import com.j2eefast.framework.sys.mapper.SysMsgCcUserMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysMsgCcUserEntity;
+import com.j2eefast.framework.sys.mapper.SysMsgCcUserMapper;
 import com.j2eefast.framework.utils.Constant;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
 import javax.annotation.Resource;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 抄送用户Service接口
@@ -76,7 +75,6 @@ public class SysMsgCcUserService extends ServiceImpl<SysMsgCcUserMapper,SysMsgCc
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}
@@ -84,12 +82,10 @@ public class SysMsgCcUserService extends ServiceImpl<SysMsgCcUserMapper,SysMsgCc
 	/**
      * 单个删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysMsgCcUserById(Long id) {
 		return this.removeById(id);
 	}
 
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysMsgCcUserByMsgId(Long msgId) {
 		return this.remove(new QueryWrapper<SysMsgCcUserEntity>().eq("msg_id",msgId));
 	}
@@ -97,7 +93,6 @@ public class SysMsgCcUserService extends ServiceImpl<SysMsgCcUserMapper,SysMsgCc
 	/**
      * 保存
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean addSysMsgCcUser(SysMsgCcUserEntity sysMsgCcUser){
 		if(this.save(sysMsgCcUser)){
 			return true;
@@ -108,7 +103,6 @@ public class SysMsgCcUserService extends ServiceImpl<SysMsgCcUserMapper,SysMsgCc
 	/**
      * 修改根居ID
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean updateSysMsgCcUserById(SysMsgCcUserEntity sysMsgCcUser) {
 		if(this.updateById(sysMsgCcUser)){
 			return true;

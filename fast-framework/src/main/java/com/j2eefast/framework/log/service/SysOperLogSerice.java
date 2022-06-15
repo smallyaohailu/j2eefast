@@ -58,7 +58,6 @@ public class SysOperLogSerice extends ServiceImpl<SysOperLogMapper, SysOperLogEn
 	 * @author zhouzhou
 	 * @date 2020-03-08 20:37
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean cleanLog() {
 		this.baseMapper.cleanLog();
 		return true;

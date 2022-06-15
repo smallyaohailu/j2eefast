@@ -5,19 +5,19 @@
  */
 package com.j2eefast.framework.log.service;
 
-import java.util.Arrays;
-import java.util.Map;
-import com.j2eefast.framework.annotation.DataFilter;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.framework.annotation.DataFilter;
 import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.log.mapper.SysLoginInfoMapper;
 import com.j2eefast.framework.utils.Constant;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * 日志查询
@@ -58,7 +58,6 @@ public class SysLoginInfoSerice extends ServiceImpl<SysLoginInfoMapper, SysLogin
 	 * @date 2020-03-08 20:45
 	 * @return
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] logIds) {
 		return this.removeByIds(Arrays.asList(logIds));
 	}
@@ -81,7 +80,6 @@ public class SysLoginInfoSerice extends ServiceImpl<SysLoginInfoMapper, SysLogin
 	 * @date 2020-03-08 20:37
 	 * @return
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean cleanLog() {
 		 this.baseMapper.cleanLog();
 		 return true;

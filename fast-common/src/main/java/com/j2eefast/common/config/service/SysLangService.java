@@ -15,7 +15,7 @@ import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +65,6 @@ public class SysLangService extends ServiceImpl<SysLangMapper, SysLangEntity> {
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}
@@ -73,7 +72,6 @@ public class SysLangService extends ServiceImpl<SysLangMapper, SysLangEntity> {
 	/**
      * 单个删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysLangById(Long id) {
 		return this.removeById(id);
 	}
@@ -81,7 +79,6 @@ public class SysLangService extends ServiceImpl<SysLangMapper, SysLangEntity> {
 	/**
      * 保存
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean addSysLang(SysLangEntity sysLang){
 		if(this.save(sysLang)){
 			return true;
@@ -92,7 +89,6 @@ public class SysLangService extends ServiceImpl<SysLangMapper, SysLangEntity> {
 	/**
      * 修改根居ID
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean updateSysLangById(SysLangEntity sysLang) {
 		if(this.updateById(sysLang)){
 			return true;

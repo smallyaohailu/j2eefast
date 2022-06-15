@@ -6,25 +6,27 @@
 package com.j2eefast.flowable.bpm.service;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.j2eefast.common.core.page.Query;
+import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.flowable.bpm.entity.BpmOaFormEntity;
 import com.j2eefast.flowable.bpm.entity.StartProcessInstanceEntity;
 import com.j2eefast.flowable.bpm.mapper.BpmOaFormMapper;
-import com.j2eefast.common.core.page.Query;
-import com.j2eefast.common.core.utils.PageUtil;
-import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.utils.UserUtils;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -69,7 +71,6 @@ public class BpmOaFormService extends ServiceImpl<BpmOaFormMapper,BpmOaFormEntit
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBpmOaFormByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}

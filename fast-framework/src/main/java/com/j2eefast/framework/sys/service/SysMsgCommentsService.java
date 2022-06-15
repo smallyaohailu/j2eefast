@@ -5,21 +5,20 @@
  */
 package com.j2eefast.framework.sys.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.base.entity.CommentTree;
-import com.j2eefast.framework.sys.entity.SysMsgCommentsEntity;
-import com.j2eefast.framework.sys.mapper.SysMsgCommentsMapper;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysMsgCommentsEntity;
+import com.j2eefast.framework.sys.mapper.SysMsgCommentsMapper;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import javax.annotation.Resource;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -120,7 +119,6 @@ public class SysMsgCommentsService extends ServiceImpl<SysMsgCommentsMapper,SysM
 	/**
      * 批量删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean deleteBatchByIds(Long[] ids) {
 		return this.removeByIds(Arrays.asList(ids));
 	}
@@ -128,7 +126,6 @@ public class SysMsgCommentsService extends ServiceImpl<SysMsgCommentsMapper,SysM
 	/**
      * 删除
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean delSysMsgCommentsById(Long id) {
 		SysMsgCommentsEntity commentsEntity = this.getById(id);
 		if(!commentsEntity.getUserId().equals(UserUtils.getUserId())){
@@ -161,7 +158,6 @@ public class SysMsgCommentsService extends ServiceImpl<SysMsgCommentsMapper,SysM
 	/**
      * 保存
      */
-	@Transactional(rollbackFor = Exception.class)
 	public boolean addSysMsgComments(SysMsgCommentsEntity sysMsgComments){
 		sysMsgComments.setUserId(UserUtils.getUserId());
 		sysMsgComments.setUserName(UserUtils.getName());

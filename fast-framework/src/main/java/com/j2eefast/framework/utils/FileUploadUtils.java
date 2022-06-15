@@ -149,7 +149,6 @@ public class FileUploadUtils {
 	* @author mfksn001@163.com
 	* @Date: 2020年8月14日
 	 */
-	@Transactional(rollbackFor = Exception.class)
 	public void deleteFileRelation(Long[] fileIds) {
 		if (null != fileIds && fileIds.length > 0) {
 			for (Long fileId : fileIds) {
