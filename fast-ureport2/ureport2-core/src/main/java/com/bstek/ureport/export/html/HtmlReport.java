@@ -86,6 +86,12 @@ public class HtmlReport {
 			if(m>0){
 				totalPageWithCol++;
 			}			
+		}else{
+			if(totalPage == 0){
+				totalPageWithCol = 1;
+			}else{
+				totalPageWithCol = totalPage;
+			}
 		}
 		return totalPageWithCol;
 	}

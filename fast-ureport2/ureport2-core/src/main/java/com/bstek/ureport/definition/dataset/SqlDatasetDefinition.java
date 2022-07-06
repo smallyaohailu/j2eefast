@@ -52,6 +52,21 @@ public class SqlDatasetDefinition implements DatasetDefinition {
 	private List<Parameter> parameters;
 	private List<Field> fields;
 	private Expression sqlExpression;
+
+	/**
+	 * 当前分页总页数
+	 */
+	public long getPages(int count) {
+		if (pageSize == 0) {
+			return 0L;
+		}
+		long pages = count / pageSize;
+		if (count % pageSize != 0) {
+			pages++;
+		}
+		return pages;
+	}
+
 	public Dataset buildDataset(Map<String,Object> parameterMap,Connection conn){
 		String sqlForUse=sql;
 		Context context=new Context(null,parameterMap);
@@ -85,8 +100,11 @@ public class SqlDatasetDefinition implements DatasetDefinition {
 			// 2.计算分页查询
 			// 当前页
 			int page = (int) parameterMap.get("__page");
+
+
 			//一共多少页
-			long totalPage = (long) Math.ceil((double) count / pageSize);
+			long totalPage = getPages(count);
+
 			int start = 0;
 			int end = pageSize;
 			String LIMT = " LIMIT";

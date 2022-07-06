@@ -41,6 +41,10 @@ public class Dataset {
 		this.data = data;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public Dataset(String name, List<?> data, int count) {
 		this.name = name;
 		this.data = data;
@@ -54,8 +58,21 @@ public class Dataset {
 		this.totalPage = totalPage;
 	}
 
+	public Dataset(List<?> data, int count, long totalPage) {
+		this.data = data;
+		this.count = count;
+		this.totalPage = totalPage;
+	}
+
 	public Dataset(String name, List<?> data, int count, long totalPage, int pageSize) {
 		this.name = name;
+		this.data = data;
+		this.count = count;
+		this.totalPage = totalPage;
+		this.pageSize = pageSize;
+	}
+
+	public Dataset(List<?> data, int count, long totalPage, int pageSize) {
 		this.data = data;
 		this.count = count;
 		this.totalPage = totalPage;
