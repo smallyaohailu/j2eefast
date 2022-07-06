@@ -15,12 +15,13 @@
  ******************************************************************************/
 package com.bstek.ureport.definition.dataset;
 
+import com.bstek.ureport.build.Dataset;
+import com.bstek.ureport.exception.ReportComputeException;
+import com.bstek.ureport.utils.ToolUtils;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-
-import com.bstek.ureport.build.Dataset;
-import com.bstek.ureport.exception.ReportComputeException;
 
 /**
  * @author Jacky.gao
@@ -38,8 +39,15 @@ public class BeanDatasetDefinition implements DatasetDefinition {
 		try {
 			Method m=obj.getClass().getMethod(method, new Class[]{String.class,String.class,Map.class});
 			Object result=m.invoke(obj, new Object[]{datasourceName,name,parameters});
-			List<Object> list=(List<Object>)result;
-			return new Dataset(name,list);
+
+			Dataset dataset = (Dataset) result;
+			dataset.setName(name);
+//			List<Object> list=(List<Object>)result;
+			if(ToolUtils.isNotEmpty(parameters.get("__page"))){
+				parameters.put("__totalPage",dataset.getTotalPage());
+				parameters.put("__paging",true);
+			}
+			return dataset;
 		} catch (Exception e) {
 			throw new ReportComputeException(e);
 		}

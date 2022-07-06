@@ -25,6 +25,7 @@ import com.bstek.ureport.build.paging.Page;
 import com.bstek.ureport.build.paging.PagingBuilder;
 import com.bstek.ureport.definition.*;
 import com.bstek.ureport.definition.datasource.*;
+import com.bstek.ureport.definition.value.ValueType;
 import com.bstek.ureport.exception.ReportComputeException;
 import com.bstek.ureport.exception.ReportException;
 import com.bstek.ureport.model.Cell;
@@ -90,12 +91,19 @@ public class ReportBuilder extends BasePagination implements ApplicationContextA
 		if(cells==null){
 			return;
 		}
-		for(Cell cell:cells){
-			if(cells.size() == 10 || cell.getName().equals("A3")){
-				System.out.println(cell.getName() + " : "+ cell.getRow().getTempRowNumber());
-			}
+		for(int i=0; i<cells.size(); i++){
+			Cell cell = cells.get(i);
 			//获取单元格绑定数据
 			List<BindData> dataList=context.buildCellData(cell);
+			if(cell.getValue().getType().equals(ValueType.zxing) && cells.size() > 1){
+				if(dataList.size() > i){
+					BindData bindData = dataList.get(i);
+					dataList.clear();
+					dataList.add(bindData);
+				}else{
+					dataList.clear();
+				}
+			}
 			cell.setProcessed(true);
 			int size=dataList.size();
 			Cell lastCell=cell;
@@ -107,7 +115,7 @@ public class ReportBuilder extends BasePagination implements ApplicationContextA
 			else if(size>1){
 				//获取数据展示反向
 				CellBuilder cellBuilder=cellBuildersMap.get(cell.getExpand());
-				lastCell=cellBuilder.buildCell(dataList,cell, context);				
+				lastCell=cellBuilder.buildCell(dataList,cell, context);
 			}
 			if(lastCell.isFillBlankRows() && lastCell.getMultiple()>0){
 				int result=size % lastCell.getMultiple();

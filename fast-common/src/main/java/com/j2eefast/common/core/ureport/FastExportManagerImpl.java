@@ -264,63 +264,66 @@ public class FastExportManagerImpl implements ExportManager {
         List<DatasetDefinition> definitions = reportDefinition.getDatasources().get(0).getDatasets();
 
         for(DatasetDefinition dsDef : definitions){
-            //获取设置的SQL
-            SqlDatasetDefinition sqlDataset=(SqlDatasetDefinition)dsDef;
-            String sql = sqlDataset.getSql();
 
-            //先查看内存是否有保存_SQLFILTER_
-            //前端是否添加数据过滤条件
-            boolean _sqlfilter = false;
-            for(Parameter p: sqlDataset.getParameters()){
-                if(p.getName().equals(_SQLFILTER_)){
-                    _sqlfilter = true;
-                    break;
-                }
-            }
+            if(dsDef instanceof  SqlDatasetDefinition){
+                //获取设置的SQL
+                SqlDatasetDefinition sqlDataset=(SqlDatasetDefinition)dsDef;
+                String sql = sqlDataset.getSql();
 
-            //保存原始SQL
-            if(StrUtil.contains(sql,StrUtil.C_COLON+ConfigConstant.SQLFILTER)){
-                Parameter parameter = new Parameter();
-                parameter.setName("_SQLFILTER_");
-                parameter.setType(DataType.String);
-                parameter.setDefaultValue(sql);
-                sqlDataset.getParameters().add(parameter);
-            }else if(!_sqlfilter){
-                return;
-            }
-
-            //sqlDataset.setSql(sql);
-            if(sql.startsWith(ExpressionUtils.EXPR_PREFIX) && sql.endsWith(ExpressionUtils.EXPR_SUFFIX)){
-                //表达式SQL 注入数据过滤SQL
-                sql = "";
+                //先查看内存是否有保存_SQLFILTER_
+                //前端是否添加数据过滤条件
+                boolean _sqlfilter = false;
                 for(Parameter p: sqlDataset.getParameters()){
                     if(p.getName().equals(_SQLFILTER_)){
-                        sql = p.getDefaultValue();
+                        _sqlfilter = true;
                         break;
                     }
                 }
-                sql = sql.substring(2,sql.length()-1);
-                sql = StrUtil.replaceIgnoreCase(sql,StrUtil.COLON+ ConfigConstant.SQLFILTER,
-                        (String)parameters.get(ConfigConstant.SQLFILTER));
-                Expression expr=ExpressionUtils.parseExpression(sql);
-                sqlDataset.setSqlExpression(expr);
-            }else{
-                //前端没有表达式 - 剔除and 注入数据过滤SQL
-                sql = "";
-                for(Parameter p: sqlDataset.getParameters()){
-                    if(p.getName().equals(_SQLFILTER_)){
-                        sql = p.getDefaultValue();
-                        break;
-                    }
+
+                //保存原始SQL
+                if(StrUtil.contains(sql,StrUtil.C_COLON+ConfigConstant.SQLFILTER)){
+                    Parameter parameter = new Parameter();
+                    parameter.setName("_SQLFILTER_");
+                    parameter.setType(DataType.String);
+                    parameter.setDefaultValue(sql);
+                    sqlDataset.getParameters().add(parameter);
+                }else if(!_sqlfilter){
+                    return;
                 }
-                if(ToolUtil.isEmpty((String)parameters.get(ConfigConstant.SQLFILTER))){
-                    sql = StrUtil.replaceIgnoreCase(sql,"and "+StrUtil.COLON+ ConfigConstant.SQLFILTER,
-                            (String)parameters.get(ConfigConstant.SQLFILTER));
-                }else{
+
+                //sqlDataset.setSql(sql);
+                if(sql.startsWith(ExpressionUtils.EXPR_PREFIX) && sql.endsWith(ExpressionUtils.EXPR_SUFFIX)){
+                    //表达式SQL 注入数据过滤SQL
+                    sql = "";
+                    for(Parameter p: sqlDataset.getParameters()){
+                        if(p.getName().equals(_SQLFILTER_)){
+                            sql = p.getDefaultValue();
+                            break;
+                        }
+                    }
+                    sql = sql.substring(2,sql.length()-1);
                     sql = StrUtil.replaceIgnoreCase(sql,StrUtil.COLON+ ConfigConstant.SQLFILTER,
                             (String)parameters.get(ConfigConstant.SQLFILTER));
+                    Expression expr=ExpressionUtils.parseExpression(sql);
+                    sqlDataset.setSqlExpression(expr);
+                }else{
+                    //前端没有表达式 - 剔除and 注入数据过滤SQL
+                    sql = "";
+                    for(Parameter p: sqlDataset.getParameters()){
+                        if(p.getName().equals(_SQLFILTER_)){
+                            sql = p.getDefaultValue();
+                            break;
+                        }
+                    }
+                    if(ToolUtil.isEmpty((String)parameters.get(ConfigConstant.SQLFILTER))){
+                        sql = StrUtil.replaceIgnoreCase(sql,"and "+StrUtil.COLON+ ConfigConstant.SQLFILTER,
+                                (String)parameters.get(ConfigConstant.SQLFILTER));
+                    }else{
+                        sql = StrUtil.replaceIgnoreCase(sql,StrUtil.COLON+ ConfigConstant.SQLFILTER,
+                                (String)parameters.get(ConfigConstant.SQLFILTER));
+                    }
+                    sqlDataset.setSql(sql);
                 }
-                sqlDataset.setSql(sql);
             }
         }
 
