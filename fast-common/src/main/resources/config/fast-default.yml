@@ -170,7 +170,7 @@ shiro:
     allowedHeaders: 'content-type,x-requested-with,ajax,token,Authorization,authorization'
     #跨域允许时间
     maxAge: 3600
-    #允许携带信息头
+    #允许携带信息头、cookie信息
     credentials: true
   #是否允许嵌入到外部网站iframe中 (true 允许, false 不允许)
   selfIframe:
@@ -256,7 +256,7 @@ fast:
     # 过滤开关
     enabled: true
     # 排除链接（多个用逗号分隔）
-    excludes: /sys/notice/*
+    excludes: /sys/notice/*,/tool/gen/db/list
     # 匹配链接
     urlPatterns: /sys/*
   #是否开启csrf 防护,此开启针对需要系统授权所有的POST请求
