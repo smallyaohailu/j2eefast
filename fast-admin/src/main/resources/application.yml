@@ -89,7 +89,7 @@ shiro:
             #排除链接（多个用逗号分隔）
     #     excludes: /ureport/*
           #防盗链允许的网站来源地址配置多个URL , 分割
-    #     urlReferer: 'http:127.0.0.1, http:loclhost'
+    #     urlReferer: 'http://127.0.0.1, http://localhost'
     #messages:
     #      #是否开启前端切换
     #      enabled: false
