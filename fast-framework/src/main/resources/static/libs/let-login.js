@@ -372,8 +372,9 @@ var vm = new Vue({
         var href= location.href;
         if(href.indexOf("kickout=2")>0){
             that.errrInfo("您被提下线,请重新登陆!");
-        };
-        if(href.indexOf("kickout=1")>0){
+        }else if(href.indexOf("kickout=3")>0){
+            that.errrInfo("您的信息被修改,请重新登录!");
+        }else if(href.indexOf("kickout=1")>0){
             that.errrInfo("您的账号在另一台设备上登录,如非本人操作，请立即修改密码！");
         };
     }

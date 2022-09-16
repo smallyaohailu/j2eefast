@@ -2136,6 +2136,12 @@ if (typeof jQuery === "undefined") {
                                 $(layero).find('.layui-layer-title').attr("style","font-size:13px;").before(update);
                             }
                         }
+
+                        // 页面回调
+                        var iframeWin = layero.find('iframe')[0];
+                        if(!opt.common.isEmpty(iframeWin.contentWindow.onLoadSuccess)){
+                            iframeWin.contentWindow.onLoadSuccess(index,layero,opt.selfLayer);
+                        }
                     },
                     content: url
                 });
