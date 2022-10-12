@@ -15,7 +15,7 @@
                             </a>
                             <#if menuList?? && (menuList?size > 0) >
                                 <#list menuList?keys as key>
-                                        <#if c['moduleCode'] == key>
+                                        <#if c['moduleCode'] == key && menuList[key]??>
                                             <ul class="treeview-menu" style="display: none">
                                                 <@showMenu menuList[key], key ,true/>
                                             </ul>
