@@ -6,6 +6,10 @@
 package com.j2eefast.framework.utils;
 
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
+import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.shiro.RedisSessionDAO;
+import com.j2eefast.common.core.utils.SpringUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.shiro.realm.OtherRealm;
 import com.j2eefast.framework.shiro.realm.UserNameRealm;
 import com.j2eefast.framework.shiro.realm.ValideCodeRealm;
@@ -19,12 +23,14 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.ValidatingSession;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.utils.ToolUtil;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -179,6 +185,33 @@ public class UserUtils {
 	 */
 	public static String getDeptName() {
 		return  ConstantFactory.me().getDeptName(getUserId());
+	}
+
+
+	/**
+	 * 更新在线用户状态
+	 * @param id
+	 */
+	public static void updateUserSessionStatus(Long id,int status){
+		RedisSessionDAO redisSessionDAO = SpringUtil.getBean(RedisSessionDAO.class);
+		Collection<Session> activeList = redisSessionDAO.getActiveSessions();
+		for(Session session: activeList){
+			if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
+				continue;
+			}
+			if (session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY) == null) {
+				continue;
+			}
+			Subject subject = new Subject.Builder().session(session).buildSubject();
+			LoginUserEntity loginUserEntity =  (LoginUserEntity) subject.getPrincipal();
+			if(id.equals(loginUserEntity.getId()) &&
+					ToolUtil.isNotEmpty(loginUserEntity.getLoginStatus()) &&
+					loginUserEntity.getLoginStatus() != -9){
+				((LoginUserEntity) subject.getPrincipal()).setLoginStatus(status);
+				redisSessionDAO.update(session);
+				break;
+			}
+		}
 	}
 
 	/**
