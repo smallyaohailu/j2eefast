@@ -146,16 +146,22 @@ public class InnerSessionFilter extends AccessControlFilter {
         Session session = subject.getSession();
         LoginUserEntity loginUserEntity = ((LoginUserEntity) subject.getPrincipal());
 
+        //被主动踢出
         if(ToolUtil.isNotEmpty(loginUserEntity.getLoginStatus())
-                && loginUserEntity.getLoginStatus() == -9){
+                && (loginUserEntity.getLoginStatus() == -9 ||
+                loginUserEntity.getLoginStatus() == -7)){
             //会话被踢出了
             try {
                 subject.logout();
             } catch (Exception e) {
             }
-
-            //页面跳转
-            WebUtils.issueRedirect(request, response, kickoutUrl + "2&uuid="+ IdUtil.fastSimpleUUID());
+            if(loginUserEntity.getLoginStatus() == -9){
+                //页面跳转
+                WebUtils.issueRedirect(request, response, kickoutUrl + "2&uuid="+ IdUtil.fastSimpleUUID());
+            }else if(loginUserEntity.getLoginStatus() == -7){
+                //页面跳转
+                WebUtils.issueRedirect(request, response, kickoutUrl + "3&uuid="+ IdUtil.fastSimpleUUID());
+            }
             return false;
         }
 
@@ -163,6 +169,8 @@ public class InnerSessionFilter extends AccessControlFilter {
             request.setAttribute(ConfigConstant.FAST_LOGIN_CSRF_TOKEN, Base64Encoder.encode(loginUserEntity.getCsrfToken()));
         }
 
+
+        //被动登录排挤
         int maxSession = -1;
         //获取系统配置参数
         try{
