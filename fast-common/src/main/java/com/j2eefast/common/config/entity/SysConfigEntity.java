@@ -4,17 +4,12 @@
  */
 package com.j2eefast.common.config.entity;
 
-import javax.validation.constraints.NotBlank;
-
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.j2eefast.common.core.base.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * <p>系统配置参数</p>

@@ -104,6 +104,7 @@ public class AntiFakeCsrfFilter {
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
             }
+            
             if("POST".equals(request.getMethod()) && csrfEnabled) {
 
                 //排除特例

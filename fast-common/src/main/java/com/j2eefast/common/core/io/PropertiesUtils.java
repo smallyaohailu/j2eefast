@@ -3,14 +3,6 @@
  */
 package com.j2eefast.common.core.io;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -19,12 +11,21 @@ import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.crypto.SM4;
 import com.j2eefast.common.core.crypto.SoftEncryption;
 import com.j2eefast.common.core.utils.HexUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.core.utils.YamlParsing;
 import lombok.extern.slf4j.Slf4j;
-import com.j2eefast.common.core.utils.ToolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Properties工具类， 可载入多个properties、yml文件，
@@ -46,7 +47,7 @@ public class PropertiesUtils {
 	private final Set<String>					configSet 					=  new LinkedHashSet<>();
 	private final Properties 					properties 					= new Properties();
 	private static Environment 					environment;
-	
+
 	/**
 	 * 当前类的实例持有者（静态内部类，延迟加载，懒汉式，线程安全的单例模式）
 	 */
@@ -100,9 +101,9 @@ public class PropertiesUtils {
 					}
 				}
 			}
-			
+
 			configFiles = configSet.toArray(new String[configSet.size()]);
-			
+
 			INSTANCE = new PropertiesUtils(configFiles);
 
 			// J2eeFAST 赋值系统加密数据
@@ -219,14 +220,14 @@ public class PropertiesUtils {
 	public static PropertiesUtils getInstance(){
 		return PropertiesLoaderHolder.INSTANCE;
 	}
-	
+
 	/**
 	 * 重新加载实例（重新实例化，以重新加载属性文件数据）
 	 */
 	public static void releadInstance(){
 		PropertiesLoaderHolder.releadInstance();
 	}
-	
+
 	// 正则表达式预编译
 	private static Pattern p1 = Pattern.compile("\\$\\{.*?\\}");
 

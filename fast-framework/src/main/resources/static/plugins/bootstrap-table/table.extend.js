@@ -477,7 +477,7 @@
                 }
 
                 // 浮动提示框特效
-                $(".table [data-toggle='tooltip']").tooltip();
+                $(".bootstrap-table [data-toggle='tooltip']").tooltip();
 
                 //加载合计统计
                 if(opt.common.isNotEmpty(opt.table.options._total) && opt.table.options._total){
@@ -491,7 +491,7 @@
                     $("#_pageTotal").html(_p);
                 }
 
-                $('.table [data-toggle="popover"]').popover();
+                $('.bootstrap-table [data-toggle="popover"]').popover();
 
                 if ($.fn.iCheck !== undefined) {
                     $(".check-box:not(.noicheck),.radio-box:not(.noicheck)").each(function() {

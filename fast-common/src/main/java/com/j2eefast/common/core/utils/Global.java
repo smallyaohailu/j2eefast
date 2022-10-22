@@ -5,17 +5,18 @@
  */
 package com.j2eefast.common.core.utils;
 
-import java.io.File;
-import com.j2eefast.common.config.service.SysConfigService;
-import com.j2eefast.common.core.io.PropertiesUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.j2eefast.common.core.constants.ConfigConstant;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.Setting;
+import com.j2eefast.common.config.service.SysConfigService;
+import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.io.PropertiesUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * 获取系统配置参数
@@ -86,7 +87,6 @@ public class Global {
     * @Date: 2020年8月13日
      */
     public static String getRootPath() {
-    	
     	return StrUtil.blankToDefault(getConfig(ConfigConstant.SYS_CONFIG_ROOT_PATH),"D:/fast/");
     }
 

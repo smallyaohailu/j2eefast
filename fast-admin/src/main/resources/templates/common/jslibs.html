@@ -129,11 +129,15 @@
             <#if x == "intro">
                 <script src="${ctxStatic}/static/plugins/intro/intro.js"></script>
             </#if>
+            <#-- jquery-validate 表单验证插件 -->
+            <#if x == "validate">
+				<script src="${ctxStatic}/static/plugins/validate/jquery.validate.min.js?V=${config.getDvVersion()}"></script>
+				<script src="${ctxStatic}/static/plugins/validate/jquery.validate.extend.js?V=${config.getDvVersion()}"></script>
+            </#if>
             <#-- 可自行扩展, 如果插件有CSS样式请在 cssLibs 相应添加-->
         </#list>
 </#if>
 <script src="${ctxStatic}/static/js/fastJS.js?V=${config.getDvVersion()}"></script>
-<#-- jquery-validate 表单验证插件 -->
 <script src="${ctxStatic}/static/plugins/validate/jquery.validate.min.js?V=${config.getDvVersion()}"></script>
 <script src="${ctxStatic}/static/plugins/validate/jquery.validate.extend.js?V=${config.getDvVersion()}"></script>
 <#--VUE-->
