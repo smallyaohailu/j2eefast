@@ -58,6 +58,10 @@ public class RxcException extends RuntimeException {
 	public static final String  PARAMETER_ERROR = "A0400";
 	//用户登录已过期
 	public static final String  LOGIN_EXPIRED = "A0230";
+	//请求并发数超出限制
+	public static final String  CONCURRENT_LIMIT = "A0502";
+
+
 //  系统异常码
 //	A0001 用户端错误 一级宏观错误码
 //	A0100 用户注册错误 二级宏观错误码
