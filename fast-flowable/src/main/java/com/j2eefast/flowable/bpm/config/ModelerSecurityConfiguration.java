@@ -30,7 +30,7 @@ public class ModelerSecurityConfiguration {
             SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
             successHandler.setTargetUrlParameter("redirectTo");
             http.headers().frameOptions().disable();
-            http.csrf().disable().authorizeRequests().antMatchers("/**/**").permitAll().anyRequest().authenticated().and().httpBasic();
+            http.logout().disable().csrf().disable().authorizeRequests().antMatchers("/**/**").permitAll().anyRequest().authenticated().and().httpBasic();
         }
 
     }
