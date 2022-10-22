@@ -61,6 +61,10 @@ public class MessageSource extends AbstractMessageSource implements ResourceLoad
 
     @Value("#{ @environment['fast.messages.basename'] ?: 'i18n/' }")
     private String basename;
+    @Value("#{ @environment['fast.messages.defaultLocale'] ?: 'zh_CN' }")
+    private String defaultLocale;
+    @Value("#{ @environment['fast.messages.enabled'] ?: false }")
+    private boolean msgEnabled;
 
     @Autowired
     private SysLangService sysLangService;
@@ -206,16 +210,16 @@ public class MessageSource extends AbstractMessageSource implements ResourceLoad
      * @return
      */
     public String getSourceFromCache(String code, Locale locale) {
-
-        String language = CookieUtil.getCookie(ServletUtil.getRequest(),"_lang");
-
-        if(ToolUtil.isEmpty(language)){
-            // 获取系统设置的语言编码
-            language = locale == null ? RequestContextUtils.getLocale(ServletUtil.getRequest()).getLanguage() + "_"
-                    + RequestContextUtils.getLocale(ServletUtil.getRequest()).getCountry()
-                    : locale.getLanguage() + "_" + locale.getCountry();
+        String language = defaultLocale;
+        if(msgEnabled){
+            language = CookieUtil.getCookie(ServletUtil.getRequest(),"_lang");
+            if(ToolUtil.isEmpty(language)){
+                // 获取系统设置的语言编码
+                language = locale == null ? RequestContextUtils.getLocale(ServletUtil.getRequest()).getLanguage() + "_"
+                        + RequestContextUtils.getLocale(ServletUtil.getRequest()).getCountry()
+                        : locale.getLanguage() + "_" + locale.getCountry();
+            }
         }
-
         // 获取缓存中对应语言的所有数据项
         Map<String, String> props = LOCAL_CACHE.get(language);
         if (null != props && props.containsKey(code)) {
