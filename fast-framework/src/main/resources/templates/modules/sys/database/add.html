@@ -74,6 +74,15 @@
                 <@f.textarea name="remark"/>
             </div>
         </div>
+         <div class="form-group">
+             <div class="col-sm-offset-2 col-sm-9">
+                 <div class="alert alert-warning">
+                     <p style="font-weight: bold">特别注意:</p>
+                     &nbsp;&nbsp;&nbsp;&nbsp; 新加的数据源请将本数据源Mybatis中的XML文件映射器,单独创建文件夹 <span style="font-weight: bold">("/resources/mapper_数据库名称/**/.xml")</span> 例如: 新添加的数据源名称db2 则新建mapper_db2文件夹.
+                     <p style="font-weight: bold;color: red">&nbsp;&nbsp;&nbsp;&nbsp;请不要放到系统mapper文件夹下;否则会引发语句执行异常.</p>
+                 </div>
+             </div>
+        </div>
 </@f.form>
 <@footer>
 <script type="text/javascript">
