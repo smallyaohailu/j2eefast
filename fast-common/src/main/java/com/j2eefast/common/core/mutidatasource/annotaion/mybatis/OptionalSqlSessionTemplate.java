@@ -8,7 +8,6 @@ package com.j2eefast.common.core.mutidatasource.annotaion.mybatis;
 import cn.hutool.core.lang.Assert;
 import com.j2eefast.common.core.mutidatasource.DataSourceContextHolder;
 import com.j2eefast.common.core.utils.ToolUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchResult;
@@ -16,11 +15,13 @@ import org.apache.ibatis.session.*;
 import org.mybatis.spring.MyBatisExceptionTranslator;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
+
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.apache.ibatis.reflection.ExceptionUtil.unwrapThrowable;
 import static org.mybatis.spring.SqlSessionUtils.*;

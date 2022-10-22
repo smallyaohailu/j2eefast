@@ -15,6 +15,7 @@ import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.ureport.*;
 import com.j2eefast.common.core.utils.RedisUtil;
+import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
@@ -82,7 +83,7 @@ public class LocationRegisterBean implements BeanFactoryAware {
             // 修改支持多源数据库热拔插
             FastDatasourceServletAction fastDatasourceServletAction = new FastDatasourceServletAction();
             listableBeanFactory.registerSingleton("fastDatasourceServletAction",fastDatasourceServletAction);
-
+            fastDatasourceServletAction.setApplicationContext(SpringUtil.getApplicationContext());
 
 
 

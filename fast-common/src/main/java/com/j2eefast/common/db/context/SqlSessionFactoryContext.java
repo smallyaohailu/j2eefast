@@ -87,7 +87,7 @@ public class SqlSessionFactoryContext {
 			DataSource dataSource = entry.getValue();
 
 			//如果是主数据源，跳过
-			if (DataSourceContext.MASTER_DATASOURCE_NAME.equals(dbName) || DataSourceContext.FLOWABLE_DATASOURCE_NAME.equals(dbName)) {
+			if (DataSourceContext.MASTER_DATASOURCE_NAME.equals(dbName)) {
 				continue;
 			} else {
 				SqlSessionFactory sqlSessionFactory = sqlSessionFactoryCreator.createSqlSessionFactory(dataSource,dbName);

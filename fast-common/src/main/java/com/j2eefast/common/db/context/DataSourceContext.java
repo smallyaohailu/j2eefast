@@ -5,15 +5,16 @@
  */
 package com.j2eefast.common.db.context;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
 import com.j2eefast.common.core.config.properties.DruidProperties;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
-import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.dao.SysDataBaseDao;
 import com.j2eefast.common.db.factory.AtomikosFactory;
 import org.springframework.core.io.Resource;
+
 import javax.sql.DataSource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +33,7 @@ public class DataSourceContext {
 	 */
 	public static final String MASTER_DATASOURCE_NAME = "MASTER";//master
 
-	public static final String FLOWABLE_DATASOURCE_NAME = "FLOWABLE";
+//	public static final String FLOWABLE_DATASOURCE_NAME = "FLOWABLE";
 
 	/**
 	 * 数据源容器
@@ -55,19 +56,19 @@ public class DataSourceContext {
 	 *
 	 * @Date 2019-06-12 13:48
 	 */
-	public static void initDataSource(DruidProperties masterDataSourceProperties, DataSource dataSourcePrimary,
-									  DruidProperties flowableProperties, DataSource flowableSourcePrimary) {
+	public static void initDataSource(DruidProperties masterDataSourceProperties, DataSource dataSourcePrimary) {
+//									, DruidProperties flowableProperties, DataSource flowableSourcePrimary) {
 
 		//清空数据库中的主数据源信息
 		new SysDataBaseDao(masterDataSourceProperties).deleteDatabaseInfo(MASTER_DATASOURCE_NAME);
-		new SysDataBaseDao(masterDataSourceProperties).deleteDatabaseInfo(FLOWABLE_DATASOURCE_NAME);
+//		new SysDataBaseDao(masterDataSourceProperties).deleteDatabaseInfo(FLOWABLE_DATASOURCE_NAME);
 
 		//初始化主数据源信息
 		new SysDataBaseDao(masterDataSourceProperties).createMasterDatabaseInfo(masterDataSourceProperties,MASTER_DATASOURCE_NAME);
 
-		if(ToolUtil.isNotEmpty(flowableProperties) && ToolUtil.isNotEmpty(flowableSourcePrimary)){
-			new SysDataBaseDao(masterDataSourceProperties).createMasterDatabaseInfo(flowableProperties,FLOWABLE_DATASOURCE_NAME);
-		}
+//		if(ToolUtil.isNotEmpty(flowableProperties) && ToolUtil.isNotEmpty(flowableSourcePrimary)){
+//			new SysDataBaseDao(masterDataSourceProperties).createMasterDatabaseInfo(flowableProperties,FLOWABLE_DATASOURCE_NAME);
+//		}
 
 		//从数据库中获取所有的数据源信息
 		SysDataBaseDao dataBaseInfoDao = new SysDataBaseDao(masterDataSourceProperties);
@@ -86,10 +87,11 @@ public class DataSourceContext {
 			if (dbName.equalsIgnoreCase(MASTER_DATASOURCE_NAME)) {
 				DATA_SOURCES_CONF.put(dbName, masterDataSourceProperties);
 				DATA_SOURCES.put(dbName, dataSourcePrimary);
-			}else if(dbName.equalsIgnoreCase(FLOWABLE_DATASOURCE_NAME) ){
-				DATA_SOURCES_CONF.put(dbName, flowableProperties);
-				DATA_SOURCES.put(dbName, flowableSourcePrimary);
 			}
+//			else if(dbName.equalsIgnoreCase(FLOWABLE_DATASOURCE_NAME) ){
+//				DATA_SOURCES_CONF.put(dbName, flowableProperties);
+//				DATA_SOURCES.put(dbName, flowableSourcePrimary);
+//			}
 			else {
 				DataSource dataSource = createDataSource(dbName, druidProperties);
 				DATA_SOURCES.put(dbName, dataSource);
@@ -124,7 +126,7 @@ public class DataSourceContext {
 	}
 
 	public static void removeByName(String dbName){
-		if(!dbName.equalsIgnoreCase(MASTER_DATASOURCE_NAME)|| !dbName.equalsIgnoreCase(FLOWABLE_DATASOURCE_NAME) ) {
+		if(!dbName.equalsIgnoreCase(MASTER_DATASOURCE_NAME)) {
 			DATA_SOURCES_CONF.remove(dbName);
 			DATA_SOURCES.remove(dbName);
 			SqlSessionFactoryContext.getSqlSessionFactorys().remove(dbName);
@@ -201,6 +203,9 @@ public class DataSourceContext {
 	 * @return
 	 */
 	public static String getDbType(String dbName) {
-		return JdbcUtils.getDbType(DATA_SOURCES_CONF.get(dbName).getUrl()).getDb();
+		if(DATA_SOURCES_CONF.containsKey(dbName)){
+			return JdbcUtils.getDbType(DATA_SOURCES_CONF.get(dbName).getUrl()).getDb();
+		}
+		return StrUtil.EMPTY;
 	}
 }

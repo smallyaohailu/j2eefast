@@ -2,7 +2,10 @@ package com.j2eefast.common.db.collector;
 
 import cn.hutool.core.date.SystemClock;
 //import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
+import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.io.PropertiesUtils;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -146,19 +149,20 @@ public class SqlSessionFactoryCreator {
 		//初始化本MybatisSqlSessionFactoryBean需要的配置，如果不初始化，则所有MybatisSqlSessionFactoryBean都用一套配置，会出现mapper语句差不不进去（因为mp的缓存）
 		MybatisConfiguration originConfiguration =  properties.getConfiguration();
 		GlobalConfig originGlobalConfig = properties.getGlobalConfig();
-
 		//清空mapper的缓存
 		originGlobalConfig.setMapperRegistryCache(new ConcurrentSkipListSet<>());
-
 		//创建新的配置
 		MybatisConfiguration mybatisConfiguration = new MybatisConfiguration();
 		GlobalConfig globalConfig = GlobalConfigUtils.defaults();
 
+		String slaveDbs = PropertiesUtils.getInstance().getProperty("fast.datasource.slaveDb.names");
+		List<String>  salveList = null;
+		if(ToolUtil.isNotEmpty(slaveDbs)){
+			salveList = StrUtil.splitTrim(slaveDbs,StrUtil.C_COMMA);
+		}
 		//执行拷贝操作
 		BeanUtil.copyProperties(originConfiguration, mybatisConfiguration, CopyOptions.create().ignoreError());
 		BeanUtil.copyProperties(originGlobalConfig, globalConfig, CopyOptions.create().ignoreError());
-
-
 
 		GlobalConfigUtils.setGlobalConfig(mybatisConfiguration, globalConfig);
 
@@ -176,7 +180,11 @@ public class SqlSessionFactoryCreator {
 		}else{
 			properties = new Properties();
 		}
-		if(dbName.equals(DataSourceContext.FLOWABLE_DATASOURCE_NAME)){
+
+
+		if((Boolean)PropertiesUtils.getInstance().get("fast.flowable.enabled")
+				&& ( dbName.equals(DataSourceContext.MASTER_DATASOURCE_NAME) ||
+				(salveList != null && salveList.contains(dbName)))){
 			String databaseType = initDatabaseType(dataSource);
 			properties.put("prefix", "");
 			properties.put("blobType", "BLOB");
@@ -197,13 +205,7 @@ public class SqlSessionFactoryCreator {
 			factory.setDatabaseIdProvider(this.databaseIdProvider);
 		}else {
 			DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
-			Properties p = new Properties();
-			p.setProperty("Oracle", "oracle");
-			p.setProperty("MySQL", "mysql");
-			p.setProperty("PostgreSQL", "postgresql");
-			p.setProperty("DB2", "db2");
-			p.setProperty("SQL Server", "sqlserver");
-			databaseIdProvider.setProperties(p);
+			databaseIdProvider.setProperties(databaseTypeMappings);
 			factory.setDatabaseIdProvider(databaseIdProvider);
 		}
 		if (StringUtils.hasLength(this.properties.getTypeAliasesPackage())) {
@@ -222,25 +224,31 @@ public class SqlSessionFactoryCreator {
 		if (!ObjectUtils.isEmpty(this.properties.resolveMapperLocations())) {
 			Resource[] resource = this.properties.resolveMapperLocations();
 			Resource[] resource1 = new Resource[0];
-			Resource[] resource2 = new Resource[0];
-			if(dbName.equals(DataSourceContext.FLOWABLE_DATASOURCE_NAME)){
-				Resource[] resource3 = new Resource[0];
+			if((Boolean)PropertiesUtils.getInstance().get("fast.flowable.enabled")
+					&& ( dbName.equals(DataSourceContext.MASTER_DATASOURCE_NAME) ||
+					(salveList != null && salveList.contains(dbName)))){
 				try {
 					resource1 = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).
 							getResources("classpath*:/META-INF/modeler-mybatis-mappings/*.xml");
-//					resource2  = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).
-//							getResources("classpath*:mapper/bpm/*.xml");
-//					resource3  = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).
-//							getResources("classpath*:mapper/generator/*.xml");
-//					Resource[] mapper = ArrayUtils.addAll(resource1, resource2);
-//					Resource[] mapperLocations = ArrayUtils.addAll(mapper,resource3);
 					Resource[] mapperLocations = ArrayUtils.addAll(resource1, resource);
 					factory.setMapperLocations(mapperLocations);
 				} catch (IOException e) {
 					log.error("异常");
 				}
-			}else{
+			} else if(dbName.equals(DataSourceContext.MASTER_DATASOURCE_NAME) ||
+					(salveList != null && salveList.contains(dbName))) {
 				factory.setMapperLocations(resource);
+			}else{
+				try{
+					resource1 = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).
+							getResources("classpath*:/mapper/generator/*.xml");
+					Resource[] resource0 = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).
+							getResources("classpath*:/mapper_"+dbName+"/**/*.xml");
+					Resource[] mapperLocations = ArrayUtils.addAll(resource1, resource0);
+					factory.setMapperLocations(mapperLocations);
+				}catch (Exception e){
+					log.error("加载外挂数据源资源异常:{}","classpath*:/"+dbName+"_mapper/**/*.xml");
+				}
 			}
 			DataSourceContext.addMapperLocations(dbName,resource);
 			DataSourceContext.addBeforeTime(dbName, SystemClock.now());
@@ -255,9 +263,9 @@ public class SqlSessionFactoryCreator {
 		Optional.ofNullable(defaultLanguageDriver).ifPresent(factory::setDefaultScriptingLanguageDriver);
 
 		// TODO 自定义枚举包
-		if (StringUtils.hasLength(this.properties.getTypeEnumsPackage())) {
-			factory.setTypeEnumsPackage(this.properties.getTypeEnumsPackage());
-		}
+//		if (StringUtils.hasLength(this.properties.getTypeEnumsPackage())) {
+//			factory.setTypeEnumsPackage(this.properties.getTypeEnumsPackage());
+//		}
 		// TODO 注入填充器
 		this.getBeanThen(MetaObjectHandler.class, globalConfig::setMetaObjectHandler);
 

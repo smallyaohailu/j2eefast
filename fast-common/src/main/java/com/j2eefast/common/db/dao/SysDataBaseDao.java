@@ -121,7 +121,6 @@ public class SysDataBaseDao {
 			Class.forName(druidProperties.getDriverClassName());
 		    conn = DriverManager.getConnection(
 					druidProperties.getUrl(), druidProperties.getUsername(), druidProperties.getPassword());
-
 			PreparedStatement preparedStatement = conn.prepareStatement(new DelSysDatabaseSql().getSql(druidProperties.getUrl()));
 			preparedStatement.setString(1, name);
 			int i = preparedStatement.executeUpdate();
