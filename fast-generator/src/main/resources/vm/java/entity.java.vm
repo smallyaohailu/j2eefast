@@ -62,23 +62,12 @@ import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.sys.entity.SysDeptEntity;
 #end
 #end
-#if($table.crud)
+#if($entitys)
 #set($Entity="extends BaseEntity")
 import com.j2eefast.common.core.base.entity.BaseEntity;
 #else
-#set($EntityFlag="0")
-#foreach ($column in $columns)
-#if($table.isSuperColumn($column.javaField))
-#set($EntityFlag="1")#break
-#end
-#end
-#if($EntityFlag == "0")
-#set($Entity="implements Serializable")
 import java.io.Serializable;
-#else
-#set($Entity="extends BaseEntity")
-import com.j2eefast.common.core.base.entity.BaseEntity;
-#end
+#set($Entity="implements Serializable")
 #end
 import lombok.Getter;
 import lombok.Setter;

@@ -5,10 +5,10 @@
  */
 package com.j2eefast.generator.gen.util;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.db.context.DataSourceContext;
@@ -17,15 +17,16 @@ import com.j2eefast.framework.utils.UserUtils;
 import com.j2eefast.generator.gen.config.GenConfig;
 import com.j2eefast.generator.gen.entity.GenTableColumnEntity;
 import com.j2eefast.generator.gen.entity.GenTableEntity;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.j2eefast.generator.gen.service.GenTableColumnService;
 import com.j2eefast.generator.gen.service.GenTableService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
-import com.alibaba.fastjson.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author zhouzhou
@@ -37,7 +38,7 @@ public class VelocityUtils{
     private static final String PROJECT_PATH = "main/java";
 
     /** mybatis空间路径 */
-    private static final String MYBATIS_PATH = "main/resources/mapper";
+    private static final String MYBATIS_PATH = "main/resources/";
 
     /** html空间路径 */
     private static final String TEMPLATES_PATH = "main/resources/templates/modules";
@@ -99,6 +100,7 @@ public class VelocityUtils{
         }
         velocityContext.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
         velocityContext.put("columns", genTable.getColumns());
+        velocityContext.put("entitys", isBaseEntity(genTable));
         // 表 需要查询字段有几个
         velocityContext.put("columnsIsQueryNum", genTable.isQueryNum());
         velocityContext.put("table", genTable);
@@ -241,10 +243,14 @@ public class VelocityUtils{
         // 业务名称
         String businessName = genTable.getBusinessName();//log
 
+        String dbName = genTable.getDbName();
+        String mapper = "mapper";
+        if(!DataSourceContext.MASTER_DATASOURCE_NAME.equals(dbName)){
+            mapper = dbName + "_mapper";
+        }
         String javaPath = PROJECT_PATH + "/" + StringUtils.replace(packageName, ".", "/");
-        String mybatisPath = MYBATIS_PATH + "/" + moduleName;
+        String mybatisPath = MYBATIS_PATH + mapper + "/" + moduleName;
         String htmlPath = TEMPLATES_PATH + "/" + moduleName + "/" + businessName;
-
         if (template.contains("entity.java.vm"))
         {
             fileName = StrUtil.format("{}/entity/{}Entity.java", javaPath, className);
@@ -399,13 +405,25 @@ public class VelocityUtils{
      * @param paramsObj 生成其他选项
      * @return 树名称
      */
-    public static String getTreeName(JSONObject paramsObj)
-    {
+    public static String getTreeName(JSONObject paramsObj){
         if (paramsObj.containsKey(GenConstants.TREE_NAME))
         {
             return StrUtil.toCamelCase(paramsObj.getString(GenConstants.TREE_NAME));
         }
         return "";
+    }
+
+    public static Boolean isBaseEntity(GenTableEntity genTable){
+        int num = GenConstants.BASE_ENTITY_DB.length;
+        for(String f: GenConstants.BASE_ENTITY_DB){
+            List<GenTableColumnEntity> list = genTable.getColumns();
+            for(GenTableColumnEntity tableColumnEntity : list){
+                if(f.equals(tableColumnEntity.getColumnName())){
+                    num--;
+                }
+            }
+        }
+        return num == 0;
     }
 
     /**

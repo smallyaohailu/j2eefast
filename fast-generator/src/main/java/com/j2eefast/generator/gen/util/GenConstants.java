@@ -65,6 +65,7 @@ public class GenConstants{
 
     /** Entity基类字段 */
     public static final String[] BASE_ENTITY = { "createBy", "createTime", "updateBy", "updateTime", "remark" };
+    public static final String[] BASE_ENTITY_DB = { "create_by", "create_time", "update_by", "update_time", "remark" };
 
     /** Tree基类字段 */
     public static final String[] TREE_ENTITY = { "parentName", "parentId", "orderNum", "ancestors" };
