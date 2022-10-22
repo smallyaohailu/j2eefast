@@ -74,19 +74,48 @@ public class TaskController extends BaseController {
 		return success(page);
 	}
 
-	/**
-	 * 退回
-	 * @param processInstanceId
-	 * @param taskId
-	 * @return
-	 */
-	@GetMapping("/getBackNodesByProcessInstanceId/{processInstanceId}/{taskId}")
-	public String getBackNodesByProcessInstanceId(@PathVariable String processInstanceId,
-												  @PathVariable String taskId, ModelMap mmp) {
-		List<FlowNodeEntity> list = flowableTaskService.getBackNodesByProcessInstanceId(processInstanceId,taskId);
-		mmp.put("flowBodes",list);
-		return prefix + "/basckNodes";
 
+	@RequestMapping("/getNodes/{processInstanceId}/{taskId}")
+	@RequiresPermissions("bpm:task:list")
+	@ResponseBody
+	public ResponseData getNodes(@PathVariable String processInstanceId,
+								 @PathVariable String taskId,
+								 @RequestParam Map<String, Object> params) {
+		//当前页
+		int currPage = Integer.parseInt((String) params.get("__page"));
+		//每页条数
+		int limit = Integer.parseInt((String) params.get("__limit"));
+		List<FlowNodeEntity> list = flowableTaskService.getBackNodesByProcessInstanceId(processInstanceId,taskId);
+		return success(new PageUtil(list,list.size(),limit,currPage));
+	}
+
+//	/**
+//	 * 退回
+//	 * @param processInstanceId
+//	 * @param taskId
+//	 * @return
+//	 */
+//	@GetMapping("/getBackNodesByProcessInstanceId/{processInstanceId}/{taskId}")
+//	public String getBackNodesByProcessInstanceId(@PathVariable String processInstanceId,
+//												  @PathVariable String taskId, ModelMap mmp) {
+////		List<FlowNodeEntity> list = flowableTaskService.getBackNodesByProcessInstanceId(processInstanceId,taskId);
+//		mmp.put("flowBode",flowableTaskService.getActiveActivityIds(taskId));
+////		mmp.put("flowBodes",list);
+//		return prefix + "/basckNodes";
+//	}
+
+	@GetMapping("/getBasckNodes/{taskId}")
+	public String getBack(@PathVariable String taskId, ModelMap mmp){
+		mmp.put("flowBode",flowableTaskService.getActiveActivityIds(taskId));
+		return prefix + "/basckNodes";
+	}
+
+	@GetMapping("/rollback/{processInstanceId}/{targetKey}")
+	@ResponseBody
+	public ResponseData rollback(@PathVariable String processInstanceId,
+								 @PathVariable String targetKey){
+		flowableTaskService.rollback(processInstanceId,targetKey);
+		return success();
 	}
 
 	/**

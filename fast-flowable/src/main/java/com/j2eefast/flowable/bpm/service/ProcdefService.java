@@ -17,7 +17,6 @@ import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.flowable.bpm.entity.BpmProcessDefinitionEntity;
 import com.j2eefast.flowable.bpm.mapper.ProcessDefinitionMapper;
 import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.UserUtils;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -31,6 +30,7 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -119,6 +119,7 @@ public class ProcdefService  extends ServiceImpl<ProcessDefinitionMapper, BpmPro
 	 * @param deploymentId
 	 * @return
 	 */
+	@Transactional(readOnly = false)
 	public boolean deleteDeployment(String deploymentId) {
 		repositoryService.deleteDeployment(deploymentId, true);
 		return true;
@@ -211,12 +212,11 @@ public class ProcdefService  extends ServiceImpl<ProcessDefinitionMapper, BpmPro
 			processName += ".bpmn20.xml";
 		}
 		//TODO 添加隔离信息 先定死测试
-		String tenantId = UserUtils.getTenantId();
 		Deployment deployment = repositoryService.createDeployment()
 				.addBytes(processName, bpmnBytes)
 				.name(model.getName())
 				.key(model.getKey())
-				.tenantId(tenantId)
+				.tenantId(tenantProvider.getTenantId())
 				.deploy();
 
 		List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery()

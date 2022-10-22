@@ -22,6 +22,7 @@ public enum  CommentTypeEnum {
     QJQ("前加签"),
     HJQ("后加签"),
     XTZX("系统执行"),
+
     TJ("提交"),
     CXTJ("重新提交"),
     SPJS("审批结束"),

@@ -11,7 +11,7 @@
             t2.BUSINESS_KEY_ AS businessKey,
             t2.PROC_INST_ID_ AS processInstanceId,
             t1.CREATE_TIME_ AS startTime,
-            u.`FIRST_` AS username,
+            u.`name` AS username,
             t1.`SUSPENSION_STATE_` AS status,
             t1.PRIORITY_ as priority
         FROM
@@ -23,13 +23,13 @@
                 INNER JOIN act_ru_execution t2 ON (t1.PROC_INST_ID_ = t2.PROC_INST_ID_ AND t2.TENANT_ID_ =  #{tenantId, jdbcType=VARCHAR})
                 LEFT JOIN act_ru_identitylink t3 ON t3.TASK_ID_ = t1.ID_
                 LEFT JOIN `act_hi_procinst` t4 ON (t1.`PROC_INST_ID_` = t4.`PROC_INST_ID_` AND t4.TENANT_ID_ =  #{tenantId, jdbcType=VARCHAR})
-                LEFT JOIN `act_id_user` u ON (u.`ID_` = t4.`START_USER_ID_`  AND u.TENANT_ID_ =  #{tenantId, jdbcType=VARCHAR})
+                LEFT JOIN `sys_user` u ON (u.`id` = t4.`START_USER_ID_`  AND u.tenant_id =  #{tenantId, jdbcType=VARCHAR})
             </when>
             <otherwise>
                 INNER JOIN act_ru_execution t2 ON t1.PROC_INST_ID_ = t2.PROC_INST_ID_
                 LEFT JOIN act_ru_identitylink t3 ON t3.TASK_ID_ = t1.ID_
                 LEFT JOIN `act_hi_procinst` t4 ON t1.`PROC_INST_ID_` = t4.`PROC_INST_ID_`
-                LEFT JOIN `act_id_user` u ON u.`ID_` = t4.`START_USER_ID_`
+                LEFT JOIN `sys_user` u ON u.`id` = t4.`START_USER_ID_`
             </otherwise>
         </choose>
         WHERE
@@ -39,11 +39,11 @@
             OR (
                 t1.ASSIGNEE_ IN (
                     SELECT
-                        G.group_id_
+                        G.role_id
                     FROM
-                        act_id_membership G
+                        sys_user_role G
                     WHERE
-                        G.user_id_ = #{userId}
+                        G.user_id = #{userId}
                 )
             )
             OR (
@@ -55,11 +55,11 @@
                     t3.USER_ID_ = #{userId}
                     OR t3.GROUP_ID_ IN (
                         SELECT
-                            g.group_id_
+                            g.role_id
                         FROM
-                            act_id_membership g
+                            sys_user_role g
                         WHERE
-                            g.user_id_ = #{userId}
+                            g.user_id = #{userId}
                     )
                 )
             )
@@ -77,9 +77,9 @@
         SELECT DISTINCT
             t1.ID_ AS taskId,
             t1.NAME_ AS taskName,
-            t2.FIRST_ AS username,
+            t2.name AS username,
             t1.PRIORITY_ as priority,
-            t2.ID_ AS approverId,
+            t2.id AS approverId,
             t3.NAME_ AS formName,
             t3.BUSINESS_KEY_ AS businessKey,
             t3.PROC_INST_ID_ AS processInstanceId,
@@ -97,7 +97,7 @@
                 LEFT JOIN act_hi_procinst t3 ON (t1.PROC_INST_ID_ = t3.PROC_INST_ID_ AND t3.TENANT_ID_ =  #{tenantId, jdbcType=VARCHAR})
                 LEFT JOIN `act_hi_actinst` t4 ON (t1.PROC_INST_ID_ = t4.PROC_INST_ID_ AND t4.`TASK_ID_` = t1.`ID_` AND t4.TENANT_ID_ =  #{tenantId, jdbcType=VARCHAR})
                 LEFT JOIN `act_hi_comment` t5 ON (t5.`TASK_ID_` = t1.`ID_` AND t5.`USER_ID_` IS NOT NULL)
-                LEFT JOIN act_id_user t2 ON (t5.`USER_ID_` = t2.ID_ AND t2.TENANT_ID_ =  #{tenantId, jdbcType=VARCHAR})
+                LEFT JOIN sys_user t2 ON (t5.`USER_ID_` = t2.id )
                 LEFT JOIN `bpm_task_from` t6 ON (t6.`process_definition_key` = t1.`PROC_DEF_ID_` AND t6.tenant_id =  #{tenantId, jdbcType=VARCHAR})
                 WHERE
                 t1.END_TIME_ IS NOT NULL
@@ -107,7 +107,7 @@
                 LEFT JOIN act_hi_procinst t3 ON t1.PROC_INST_ID_ = t3.PROC_INST_ID_
                 LEFT JOIN `act_hi_actinst` t4 ON (t1.PROC_INST_ID_ = t4.PROC_INST_ID_ AND t4.`TASK_ID_` = t1.`ID_`)
                 LEFT JOIN `act_hi_comment` t5 ON (t5.`TASK_ID_` = t1.`ID_` AND t5.`USER_ID_` IS NOT NULL)
-                LEFT JOIN act_id_user t2 ON t5.`USER_ID_` = t2.ID_
+                LEFT JOIN sys_user t2 ON t5.`USER_ID_` = t2.id
                 LEFT JOIN `bpm_task_from` t6 ON t6.`process_definition_key` = t1.`PROC_DEF_ID_`
                 WHERE
                 t1.END_TIME_ IS NOT NULL

@@ -1,0 +1,70 @@
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+    <@header title="退回" bodyClass="white-bg" libs=["table"]/>
+    <div class="box-body" style="padding:10px 20px 0 20px;">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">当前环节：</label>
+                    <div class="col-xs-9">
+                        <label class="control-label">${flowBode.name}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="control-label col-xs-3">退回到哪：</label>
+                    <div class="col-xs-9">
+                        <input type="hidden" name="!action" value=""/>
+                        <span id="action" class="icheck">
+<label><input type="radio" id="action1" name="action"
+              value="1" class="form-control required" checked> 退回到发起人</label><label><input type="radio" id="action2" name="action"
+                                                                                           value="2" class="form-control required"> 退回到上一步</label><label><input type="radio" id="action3" name="action"
+                                                                                                                                                                value="3" class="form-control required"> 退回任意环节</label></span>
+                        <@table id="bootstrap-table"/>
+                        <input type="hidden" id="activityId" name="activityId" value=""/>
+                        <input type="hidden" id="nextUserCodes" name="nextUserCodes" value=""/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <@footer>
+        <script type="text/javascript">
+            var prefix = baseURL + "bpm/task";
+            $(function() {
+                var options = {
+                    url: prefix + "/getNodes/${flowBode.processInstanceId}/${flowBode.id}",
+                    uniqueId: "id",
+                    showSearch: false,
+                    showBorder: true, // 是否显示表格边框
+                    showToggle: false,
+                    showToolbar: false,
+                    showColumns: false,
+                    outcheckbox: false,
+                    showRefresh: false,
+                    rememberSelected: false,
+                    height: 280, //设置固定高度                            , /* 唯一ID */
+                    columns: [
+                        {
+                            field : 'nodeName'
+                            ,title : '${i18n("环节名称")}'
+                        }
+                        ,{
+                            field : 'userName'
+                            ,title : '${i18n("处理人姓名")}'
+                        }
+                        ,{
+                            field : 'endTime'
+                            ,title : '${i18n("处理时间")}'
+                            ,width: 170
+                        }
+                    ]
+                };
+                $.table.init(options);
+            });
+        </script>
+    </@footer>
+</@pageTheme>

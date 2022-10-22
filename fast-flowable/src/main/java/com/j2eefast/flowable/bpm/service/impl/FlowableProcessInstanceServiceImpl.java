@@ -17,15 +17,16 @@ import com.j2eefast.flowable.bpm.entity.RevokeProcessEntity;
 import com.j2eefast.flowable.bpm.entity.StartProcessInstanceEntity;
 import com.j2eefast.flowable.bpm.enums.CommentTypeEnum;
 import com.j2eefast.flowable.bpm.service.FlowableProcessInstanceService;
-import com.j2eefast.flowable.bpm.service.IFlowableBpmnModelService;
 import com.j2eefast.framework.utils.Constant;
+import com.j2eefast.framework.utils.UserUtils;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.ui.common.tenant.TenantProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.flowable.engine.runtime.Execution;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,7 @@ public class FlowableProcessInstanceServiceImpl extends  BaseProcessService impl
 			 */
 			//1.1、设置提交人字段为空字符串让其自动跳过
 			params.getVariables().put("initiator", "");
+			params.getVariables().put("role", UserUtils.hasAnyRoleKeys("DEPT"));
 			//1.2、设置可以自动跳过
 			params.getVariables().put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
 			// TODO 1.3、汇报线的参数设置
@@ -83,12 +85,19 @@ public class FlowableProcessInstanceServiceImpl extends  BaseProcessService impl
 					.tenantId(tenantProvider.getTenantId())
 					.start();
 			//4.添加审批记录
+			List<String> taskIds = flowableCommentService.findTaskInstId(processInstance.getProcessInstanceId());
+
+			for(int i =0; i< taskIds.size(); i++){
+				if(i == 0){
+					this.addComment(taskIds.get(i),params.getCurrentUserCode(), processInstance.getProcessInstanceId(),
+							CommentTypeEnum.TJ.toString(), params.getFormName() + "提交");
+				}else{
+					this.addComment(taskIds.get(i),params.getCurrentUserCode(), processInstance.getProcessInstanceId(),
+							CommentTypeEnum.XTZX.toString(), params.getFormName() + " 直接跳过");
+				}
+			}
 
 
-			String taskId = flowableCommentService.findTaskInstId(processInstance.getProcessInstanceId());
-
-			this.addComment(taskId,params.getCurrentUserCode(), processInstance.getProcessInstanceId(),
-					CommentTypeEnum.TJ.toString(), params.getFormName() + "提交");
 			//5.TODO 推送消息数据
 			return ResponseData.success(processInstance);
 		} else {

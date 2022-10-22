@@ -130,8 +130,15 @@
 
     /*回退*/
     function back(){
-        opt.warning("正在开发中....");
-        return;
+        // opt.warning("正在开发中....");
+        var options = {
+            url: baseURL + "bpm/task/getBasckNodes/${taskId}",
+            title: '${i18n("流程回退")}',
+            btn:['<i class="fa fa-close"></i> '+$.i18n.prop("取消")],
+            // width: 400,
+            // height: 200
+        };
+        opt.modal.openMainWin(options);
     }
 
     /*转办*/

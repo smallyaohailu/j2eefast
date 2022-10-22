@@ -24,5 +24,5 @@ public interface IFlowableCommentMapper {
 	List<CommentEntity> getFlowCommentVosByProcessInstanceId(String processInstanceId);
 
 
-	String findTaskInstId(String processInstanceId);
+	List<String> findTaskInstId(String processInstanceId);
 }

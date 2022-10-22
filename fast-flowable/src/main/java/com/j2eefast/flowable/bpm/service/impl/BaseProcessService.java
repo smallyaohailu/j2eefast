@@ -10,6 +10,7 @@ import com.j2eefast.flowable.bpm.entity.CommentEntity;
 import com.j2eefast.flowable.bpm.mapper.ProcessInstanceMapper;
 import com.j2eefast.flowable.bpm.service.FlowableActinstService;
 import com.j2eefast.flowable.bpm.service.FlowableCommentService;
+import com.j2eefast.framework.sys.service.SysUserService;
 import org.flowable.engine.*;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -33,6 +34,8 @@ public abstract class BaseProcessService {
 	@Autowired
 	@Lazy(value = true)
 	protected IdentityService identityService;
+	@Autowired
+	protected SysUserService sysUserService;
 	@Autowired
 	@Lazy(value = true)
 	protected RuntimeService runtimeService;

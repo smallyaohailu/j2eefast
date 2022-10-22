@@ -5,8 +5,10 @@
  */
 package com.j2eefast.flowable.bpm.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ResponseData;
@@ -19,6 +21,8 @@ import com.j2eefast.flowable.bpm.enums.CommentTypeEnum;
 import com.j2eefast.flowable.bpm.mapper.BpmTaskMapper;
 import com.j2eefast.flowable.bpm.service.IFlowableTaskService;
 import com.j2eefast.flowable.bpm.utils.BpmConstant;
+import com.j2eefast.framework.sys.entity.SysUserEntity;
+import com.j2eefast.framework.utils.UserUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
@@ -203,7 +207,7 @@ public class FlowableTaskServiceImpl extends BaseProcessService implements IFlow
 		hisComment.forEach(e->{
 			userCodes.add(e.getUserId());
 		});
-		List<String> userIds = userCodes.stream().distinct().collect(Collectors.toList());
+		List<String> userIds = userCodes.stream().filter(x -> x!=null).distinct().collect(Collectors.toList());
 
 		//组装人员名称 ACT_HI_TASKINST 历史任务
 		List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
@@ -224,8 +228,13 @@ public class FlowableTaskServiceImpl extends BaseProcessService implements IFlow
 		});
 
 		//组装usertask的数据
-		List<User> userList = identityService.createUserQuery().userIds(userIds).list();
+//		List<User> userList = identityService.createUserQuery().userIds(userIds).list();
+		List<SysUserEntity> userList = new ArrayList<>();
+		if(ToolUtil.isNotEmpty(userIds)){
+			userList = sysUserService.list(new QueryWrapper<SysUserEntity>().in("id",userIds));
+		}
 		if (CollectionUtils.isNotEmpty(userTasks)) {
+			List<SysUserEntity> finalUserList = userList;
 			userTasks.forEach(activityInstance -> {
 				FlowNodeEntity node = new FlowNodeEntity();
 				node.setNodeId(activityInstance.getActivityId());
@@ -233,14 +242,14 @@ public class FlowableTaskServiceImpl extends BaseProcessService implements IFlow
 				node.setEndTime(activityInstance.getEndTime());
 				for(int i=0; i< hisComment.size(); i++){
 					if(hisComment.get(i).getTaskId().equals(activityInstance.getTaskId())){
-						for(int k=0; k< userList.size(); k++){
-							if(userList.get(k).getId().equals(hisComment.get(i).getUserId())){
-								node.setUserId(userList.get(k).getId());
-								node.setUserName(userList.get(k).getDisplayName());
+						for(int k = 0; k< finalUserList.size(); k++){
+							if(String.valueOf(finalUserList.get(k).getId()).equals(hisComment.get(i).getUserId())){
+								node.setUserId(String.valueOf(finalUserList.get(k).getId()));
+								node.setUserName(finalUserList.get(k).getName());
 								break;
 							}
 						}
-						break;
+//						break;
 					}
 				}
 				backNods.add(node);
@@ -278,8 +287,15 @@ public class FlowableTaskServiceImpl extends BaseProcessService implements IFlow
 		return datas;
 	}
 
-	private Map<String, String> getApplyers(String processInstanceId, List<User> userList, Map<String, List<HistoricTaskInstance>> taskInstanceMap) {
-		Map<String, User> userMap = userList.stream().collect(Collectors.toMap(User::getId, user -> user));
+	@Override
+	public TaskEntity getActiveActivityIds(String taskId) {
+		//查询当前运行时任务数据 ACT_RU_TASK
+		TaskEntity taskEntity = (TaskEntity) taskService.createTaskQuery().taskId(taskId).singleResult();
+		return taskEntity;
+	}
+
+	private Map<String, String> getApplyers(String processInstanceId, List<SysUserEntity> userList, Map<String, List<HistoricTaskInstance>> taskInstanceMap) {
+		Map<Long, SysUserEntity> userMap = userList.stream().collect(Collectors.toMap(SysUserEntity::getId, user -> user));
 		Map<String, String> applyMap = new HashMap<>();
 		//ACT_RU_EXECUTION
 		ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
@@ -288,10 +304,10 @@ public class FlowableTaskServiceImpl extends BaseProcessService implements IFlow
 			StringBuffer finalApplyers = applyers;
 			taskInstances.forEach(taskInstance -> {
 				if (!taskInstance.getName().equals(BpmConstant.FLOW_SUBMITTER)) {
-					User user = userMap.get(taskInstance.getAssignee());
+					SysUserEntity user = userMap.get(Convert.toLong(taskInstance.getAssignee()));
 					if (user != null) {
-						if (StringUtils.indexOf(finalApplyers.toString(), user.getDisplayName()) == -1) {
-							finalApplyers.append(user.getDisplayName()).append(",");
+						if (StringUtils.indexOf(finalApplyers.toString(), user.getName()) == -1) {
+							finalApplyers.append(user.getName()).append(",");
 						}
 					}
 				} else {
@@ -318,6 +334,30 @@ public class FlowableTaskServiceImpl extends BaseProcessService implements IFlow
 			flag = !processInstance.isSuspended();
 		}
 		return flag;
+	}
+
+	/**
+	 *@Description  驳回
+	 * proInstanceId  需要驳回的流程实例id(当前发起节点的流程实例id)
+	 * currTaskKeys   驳回发起的当前节点key 为  act_ru_task 中TASK_DEF_KEY_ 字段的值
+	 * targetKey  目标节点的key  为act_hi_taskinst 中 TASK_DEF_KEY_
+	 **/
+	@Override
+	public void rollback(String proInstanceId, String targetKey) {
+		//查询当前运行时任务数据 ACT_RU_TASK
+		TaskEntity taskEntity = (TaskEntity) taskService.createTaskQuery()
+				.processInstanceId(proInstanceId).singleResult();
+		//跳转到需要回退的节点
+		List<String> currTaskKeys = new ArrayList<>();
+		currTaskKeys.add(taskEntity.getTaskDefinitionKey());
+		runtimeService.createChangeActivityStateBuilder()
+				.processInstanceId(proInstanceId)
+				.moveActivityIdsToSingleActivityId(currTaskKeys, targetKey)
+				.changeState();
+
+		//添加备注
+		addComment(taskEntity.getId(), UserUtils.getUserIdToStr(),
+				proInstanceId,CommentTypeEnum.BH.toString(),"不同意");
 	}
 
 }

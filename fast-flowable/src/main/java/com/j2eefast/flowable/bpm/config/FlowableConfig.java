@@ -39,7 +39,7 @@ public class FlowableConfig{
 
 
 	@Bean(name = "processEngineConfiguration")
-	public SpringProcessEngineConfiguration getSpringProcessEngineConfiguration(@Qualifier("flowableSourcePrimary") DataSource dataSource
+	public SpringProcessEngineConfiguration getSpringProcessEngineConfiguration(@Qualifier("dataSourcePrimary") DataSource dataSource
 			,@Qualifier("transactionManager") PlatformTransactionManager transactionManager
 	) {
 		SpringProcessEngineConfiguration configuration = new SpringProcessEngineConfiguration();

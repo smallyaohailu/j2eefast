@@ -27,5 +27,5 @@ public interface FlowableCommentService {
 	 */
 	List<CommentEntity> getFlowCommentVosByProcessInstanceId(String processInstanceId) ;
 
-	String findTaskInstId(String ProcessInstanceId);
+	List<String> findTaskInstId(String ProcessInstanceId);
 }

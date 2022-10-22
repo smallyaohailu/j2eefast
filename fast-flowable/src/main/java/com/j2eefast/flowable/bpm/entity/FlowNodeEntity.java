@@ -1,5 +1,6 @@
 package com.j2eefast.flowable.bpm.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,5 +35,6 @@ public class FlowNodeEntity implements Serializable {
     /**
      * 任务节点结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
     private Date endTime;
 }

@@ -48,7 +48,7 @@ public class FlowableCommentServiceImpl extends BaseProcessService implements Fl
 	}
 
 	@Override
-	public String findTaskInstId(String ProcessInstanceId) {
+	public List<String> findTaskInstId(String ProcessInstanceId) {
 		return this.flowableCommentMapper.findTaskInstId(ProcessInstanceId);
 	}
 }
