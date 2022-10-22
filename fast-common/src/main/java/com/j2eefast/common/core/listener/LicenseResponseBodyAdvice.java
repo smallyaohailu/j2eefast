@@ -6,14 +6,17 @@
 package com.j2eefast.common.core.listener;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSONObject;
+import com.j2eefast.common.core.utils.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.j2eefast.common.core.base.entity.BaseEntity;
 import com.j2eefast.common.core.base.entity.annotaion.JsonListBaselgonre;
 import com.j2eefast.common.core.base.entity.annotaion.JsonListFiledIgnore;
 import com.j2eefast.common.core.enums.ConvertType;
-import com.j2eefast.common.core.utils.*;
+import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ServletUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
@@ -68,7 +71,7 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
         if(ToolUtil.isNotEmpty(permissions)){
             ServletUtil.getRequest().removeAttribute(PERMISSIONS);
         }
-        if(body instanceof ResponseData ){
+        if(body instanceof ResponseData){
             ResponseData rd = (ResponseData) body;
             try{
                 if( rd.get("data") instanceof PageUtil){
@@ -76,7 +79,7 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                     //需要删除输出的字段
                     List<String> rmfields = new ArrayList<>();
                     //需要转换的字段
-                    List<Map<String,ConvertType>> conver = new ArrayList<>();
+                    List<Map<String, ConvertType>> conver = new ArrayList<>();
                     List<Map<String,String[]>> objList = new ArrayList<>();
                     if(page.getList().size() > 0){
                         //获取List 对象 遍历 是否有禁止输出或者转换的字段
@@ -164,16 +167,14 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                         }
                     }
                     if(ToolUtil.isNotEmpty(rmfields) || ToolUtil.isNotEmpty(conver) || ToolUtil.isNotEmpty(objList)){
-                        String q = JSON.marshal(rd);
-                        cn.hutool.json.JSONObject c = JSONUtil.parseObj(q);
+                        JSONObject c = JSON.parseObject(JSON.marshal(rd));
                         JSONArray a =  c.getJSONObject("data").getJSONArray("list");
-                        cn.hutool.json.JSONObject __JSON__ = c.getJSONObject("data").getJSONObject("__JSON__");
+                        JSONObject __JSON__ = c.getJSONObject("data").getJSONObject("__JSON__");
                         if(ToolUtil.isEmpty(__JSON__)){
                             c.getJSONObject("data").remove("__JSON__");
                         }
                         for (Iterator iter = a.iterator(); iter.hasNext();) {
-                            cn.hutool.json.JSONObject str = (cn.hutool.json.JSONObject)iter.next();
-
+                            JSONObject str = (JSONObject) iter.next();
                             //剔除不输出前端数据
                             if(ToolUtil.isNotEmpty(rmfields)){
                                 rmfields.forEach(x->{
@@ -188,19 +189,19 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                                         ConvertType value = x.get(key);
                                         // 手机号码隐藏转换
                                         if(value.equals(ConvertType.PHONE)){
-                                            if(!ToolUtil.isEmpty(str.getStr(key))){
-                                                str.set(key,str.getStr(key).replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+                                            if(!ToolUtil.isEmpty(str.getString(key))){
+                                                str.put(key,str.getString(key).replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
                                             }else {
-                                                str.set(key, StrUtil.EMPTY);
+                                                str.put(key, StrUtil.EMPTY);
                                             }
 
                                         }
                                         // 邮箱隐藏转换
                                         if(value.equals(ConvertType.EMAIL)){
-                                            if(!ToolUtil.isEmpty(str.getStr(key))){
-                                                str.set(key,str.getStr(key).replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4"));
+                                            if(!ToolUtil.isEmpty(str.getString(key))){
+                                                str.put(key,str.getString(key).replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4"));
                                             }else {
-                                                str.set(key, StrUtil.EMPTY);
+                                                str.put(key, StrUtil.EMPTY);
                                             }
                                         }
                                     }
@@ -212,7 +213,7 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                                 objList.forEach(x->{
                                     for(String key : x.keySet()){
                                         String[]  value = x.get(key);
-                                        cn.hutool.json.JSONObject ob =  str.getJSONObject(key);
+                                        JSONObject ob =  str.getJSONObject(key);
                                         List<String> show = new ArrayList<>();
                                         for(Map.Entry<String, Object> entry :ob.entrySet()){
                                             boolean mark = true;
@@ -235,15 +236,14 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                                 });
                             }
                         }
-                        body = JSONObject.parseObject(c.toString());
+                        body =  JSONObject.parseObject(c.toString());
                     }else{
-                        String q = JSON.marshal(rd);
-                        cn.hutool.json.JSONObject c = JSONUtil.parseObj(q);
-                        cn.hutool.json.JSONObject __JSON__ = c.getJSONObject("data").getJSONObject("__JSON__");
+                        JSONObject c = JSON.parseObject(JSON.marshal(rd));
+                        JSONObject __JSON__ = c.getJSONObject("data").getJSONObject("__JSON__");
                         if(ToolUtil.isEmpty(__JSON__)){
                             c.getJSONObject("data").remove("__JSON__");
                         }
-                        body = JSONObject.parseObject(c.toString());
+                        body =  JSONObject.parseObject(c.toString());
                     }
                 }
             }catch (Exception e){
@@ -258,7 +258,7 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                     AntPathMatcher matcher = new AntPathMatcher();
                     if(matcher.match(url[i],path) ||
                             matcher.matchStart(url[i],path)){
-                        log.info("响应信息-->>>:"+JSONUtil.parse(body).toString());
+                        log.info("响应信息-->>>:"+ JSON.toJSONString(body));
                         break;
                     }
                 }

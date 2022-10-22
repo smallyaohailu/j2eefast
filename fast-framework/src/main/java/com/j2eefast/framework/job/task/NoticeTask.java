@@ -7,10 +7,9 @@ package com.j2eefast.framework.job.task;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.bstek.ureport.build.Dataset;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.redis.SysConfigRedis;
@@ -42,8 +41,7 @@ public class NoticeTask {
         List<SysNoticeEntity> listRedisNotice = sysConfigRedis.getRedisNotice();
         long longTime;
         if(ToolUtil.isNotEmpty(listRedisNotice)){
-            JSONArray array= JSONArray.parseArray(JSON.toJSONString(listRedisNotice));
-            listRedisNotice = JSONObject.parseArray(array.toJSONString(), SysNoticeEntity.class);
+            listRedisNotice = JSON.parseArray(JSON.toJSONString(listRedisNotice),SysNoticeEntity.class);
         }else{
            listRedisNotice = new ArrayList<>();
         }

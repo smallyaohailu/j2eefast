@@ -5,7 +5,6 @@
  */
 package com.j2eefast.framework.utils;
 
-
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.framework.sys.entity.SysDictDataEntity;
 import com.j2eefast.framework.sys.service.SysDictDataService;

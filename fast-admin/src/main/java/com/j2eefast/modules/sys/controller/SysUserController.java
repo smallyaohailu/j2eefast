@@ -5,33 +5,33 @@
  */
 package com.j2eefast.modules.sys.controller;
 
-import java.io.File;
-import java.util.*;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.EasyExcel;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
-import com.j2eefast.common.core.utils.*;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.log.entity.SysLoginInfoEntity;
 import com.j2eefast.framework.log.service.SysLoginInfoSerice;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
-import com.j2eefast.framework.sys.entity.*;
+import com.j2eefast.framework.sys.entity.SysUserEntity;
 import com.j2eefast.framework.sys.service.*;
+import com.j2eefast.framework.utils.Constant;
+import com.j2eefast.framework.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.j2eefast.common.core.utils.ValidatorUtil;
-import com.j2eefast.common.core.controller.BaseController;
-import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.utils.UserUtils;
-import cn.hutool.json.JSONUtil;
+
+import java.io.File;
+import java.util.*;
 
 /**
  *  系统用户控制器
@@ -312,9 +312,13 @@ public class SysUserController extends BaseController {
 		if (!flag) {
 			return error(ToolUtil.message("sys.user.oldPasswordError"));
 		}
+
 		if (loginUser.getId().equals(user.getId())){
 			loginUser.setPwdSecurityLevel(user.getPwdSecurityLevel());
 			UserUtils.reloadUser(loginUser);
+		}else{
+			//更新在线用户状态
+			UserUtils.updateUserSessionStatus(user.getId(),-7);
 		}
 		return success();
 	}

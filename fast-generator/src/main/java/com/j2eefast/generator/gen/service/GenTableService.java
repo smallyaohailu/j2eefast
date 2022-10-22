@@ -5,7 +5,7 @@ import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +15,7 @@ import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.mutidatasource.DataSourceContextHolder;
 import com.j2eefast.common.core.mutidatasource.annotaion.mybatis.MybatisMapperRefresh;
 import com.j2eefast.common.core.page.Query;
+import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.Md5Util;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
@@ -24,7 +25,6 @@ import com.j2eefast.common.db.entity.SysDatabaseEntity;
 import com.j2eefast.common.db.utils.SqlExe;
 import com.j2eefast.framework.sys.mapper.SysDatabaseMapper;
 import com.j2eefast.framework.sys.service.SysMenuService;
-import com.j2eefast.framework.utils.Global;
 import com.j2eefast.generator.gen.entity.GenEditCodeEntity;
 import com.j2eefast.generator.gen.entity.GenTableColumnEntity;
 import com.j2eefast.generator.gen.entity.GenTableEntity;
@@ -41,16 +41,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -183,8 +180,6 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
                 log.error("渲染模板失败，表名：" + table.getTableName(), e);
             }
         }
-
-
     }
 
 
@@ -626,7 +621,7 @@ public class GenTableService extends ServiceImpl<GenTableMapper,GenTableEntity> 
 		String tableComment = (String) params.get("tableComment");
 		String dbName = (String) params.get("dbName");
 		Page<GenTableEntity> page = new Query<GenTableEntity>(params).getPage();
-		List<GenTableEntity> list = Lists.newArrayList();
+		List<GenTableEntity> list = null;
 		try {
 			SysDatabaseEntity db = sysDatabaseMapper.getByName(dbName);
 			String dbType = db.getDbType();

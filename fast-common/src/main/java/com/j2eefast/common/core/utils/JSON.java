@@ -1,24 +1,27 @@
+/*
+ * All content copyright http://www.j2eefast.com, unless
+ * otherwise indicated. All rights reserved.
+ * No deletion without permission
+ */
 package com.j2eefast.common.core.utils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * JSON处理类
  * @author zhouzhou
  * @date 2020-03-12 15:18
  */
-public class JSON extends com.alibaba.fastjson.JSON{
-	
+public class JSON extends com.alibaba.fastjson2.JSONObject {
+
 	private static final ObjectMapper 					OBJECT_MAPPER					= new ObjectMapper();
 	private static final ObjectWriter 					OBJECT_WRITER 					= OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
-	
+
 	public static void marshal(File file, Object value) throws Exception
     {
         try{

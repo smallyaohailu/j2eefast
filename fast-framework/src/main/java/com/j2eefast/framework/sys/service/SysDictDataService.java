@@ -7,10 +7,7 @@ package com.j2eefast.framework.sys.service;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -99,8 +96,7 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 			sysConfigRedis.saveOrUpdateDict(dictType,list);
 			return list;
 		}else{
-			com.alibaba.fastjson.JSONArray array= com.alibaba.fastjson.JSONArray.parseArray(JSON.toJSONString(list));
-			list = JSONObject.parseArray(array.toJSONString(), SysDictDataEntity.class);
+			list = JSON.parseArray(JSON.toJSONString(list),SysDictDataEntity.class);
 			return list;
 		}
 	}
@@ -169,8 +165,7 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 			}
 		}
 		String r = "";
-		JSONArray jsonArray = JSONUtil.parseArray(list,false);
-		List<SysDictDataEntity> list1 = jsonArray.toList(SysDictDataEntity.class);
+		List<SysDictDataEntity> list1 = JSON.parseArray(JSON.toJSONString(list),SysDictDataEntity.class);
 		for(SysDictDataEntity dict: list1){
 			if(dict.getDictValue().equals(dictValue)){
 				r = dict.getDictLabel();
@@ -219,8 +214,7 @@ public class SysDictDataService  extends ServiceImpl<SysDictDataMapper,SysDictDa
 				}
 			}
 		}else{
-			JSONArray jsonArray = JSONUtil.parseArray(list,false);
-			List<SysDictDataEntity> list1 = jsonArray.toList(SysDictDataEntity.class);
+			List<SysDictDataEntity> list1 = JSON.parseArray(JSON.toJSONString(list),SysDictDataEntity.class);
 			for(SysDictDataEntity dict: list1){
 				if(dict.getIsDefault().equals("Y")){
 					r = dict.getDictLabel();

@@ -7,9 +7,8 @@ package com.j2eefast.framework.sys.service;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -68,7 +67,7 @@ public class SysNoticeService  extends ServiceImpl<SysNoticeMapper, SysNoticeEnt
                 long longTime;
                 if(ToolUtil.isNotEmpty(listNotice)){
                     JSONArray array= JSONArray.parseArray(JSON.toJSONString(listNotice));
-                    listNotice = JSONObject.parseArray(array.toJSONString(), SysNoticeEntity.class);
+                    listNotice = JSON.parseArray(array.toJSONString(), SysNoticeEntity.class);
                     Date temp = sysNotice.getEndTime();
                     for(SysNoticeEntity notice: listNotice){
                         if(DateUtil.compare(notice.getEndTime(),temp) >= 0){
@@ -77,7 +76,6 @@ public class SysNoticeService  extends ServiceImpl<SysNoticeMapper, SysNoticeEnt
                     }
                     listNotice.add(sysNotice);
                     longTime = DateUtil.between(new Date(),temp, DateUnit.SECOND);
-
                 }else{
                     listNotice = new ArrayList<>(1);
                     listNotice.add(sysNotice);
@@ -102,7 +100,7 @@ public class SysNoticeService  extends ServiceImpl<SysNoticeMapper, SysNoticeEnt
             long longTime;
             if (ToolUtil.isNotEmpty(listNotice)) {
                 JSONArray array = JSONArray.parseArray(JSON.toJSONString(listNotice));
-                listNotice = JSONObject.parseArray(array.toJSONString(), SysNoticeEntity.class);
+                listNotice = JSON.parseArray(array.toJSONString(), SysNoticeEntity.class);
                 Date temp = sysNotice.getEndTime();
                 Iterator<SysNoticeEntity> it = listNotice.iterator();
                 while (it.hasNext()) {
@@ -146,7 +144,7 @@ public class SysNoticeService  extends ServiceImpl<SysNoticeMapper, SysNoticeEnt
             long longTime;
             if (ToolUtil.isNotEmpty(listNotice)) {
                 JSONArray array = JSONArray.parseArray(JSON.toJSONString(listNotice));
-                listNotice = JSONObject.parseArray(array.toJSONString(), SysNoticeEntity.class);
+                listNotice = JSON.parseArray(array.toJSONString(), SysNoticeEntity.class);
                 Iterator<SysNoticeEntity> it = listNotice.iterator();
                 while (it.hasNext()) {
                     SysNoticeEntity notice = it.next();
@@ -179,7 +177,7 @@ public class SysNoticeService  extends ServiceImpl<SysNoticeMapper, SysNoticeEnt
         List<SysNoticeEntity> listNotice = sysConfigRedis.getRedisNotice();
         if(ToolUtil.isNotEmpty(listNotice)){
             JSONArray array= JSONArray.parseArray(JSON.toJSONString(listNotice));
-            listNotice = JSONObject.parseArray(array.toJSONString(), SysNoticeEntity.class);
+            listNotice = JSON.parseArray(array.toJSONString(), SysNoticeEntity.class);
             Date temp;
             Iterator<SysNoticeEntity> it = listNotice.iterator();
             while(it.hasNext()){

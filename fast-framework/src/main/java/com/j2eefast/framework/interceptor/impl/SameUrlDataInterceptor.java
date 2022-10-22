@@ -1,9 +1,8 @@
 package com.j2eefast.framework.interceptor.impl;
 
-import com.j2eefast.common.core.utils.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.j2eefast.framework.interceptor.RepeatSubmitInterceptor;
 import org.springframework.stereotype.Component;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     public boolean isRepeatSubmit(HttpServletRequest request) throws Exception
     {
         // 本次参数及系统时间
-        String nowParams = JSON.marshal(request.getParameterMap());
+        String nowParams = JSON.toJSONString(request.getParameterMap());
         Map<String, Object> nowDataMap = new HashMap<String, Object>();
         nowDataMap.put(REPEAT_PARAMS, nowParams);
         nowDataMap.put(REPEAT_TIME, System.currentTimeMillis());

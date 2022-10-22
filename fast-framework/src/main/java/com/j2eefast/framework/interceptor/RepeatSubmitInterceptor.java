@@ -8,7 +8,7 @@ package com.j2eefast.framework.interceptor;/**
  
  */
 
-import com.j2eefast.common.core.utils.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.framework.annotation.RepeatSubmit;
@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 /**
  *
@@ -44,7 +44,7 @@ public abstract class RepeatSubmitInterceptor implements HandlerInterceptor {
             if (annotation != null)
             {
                 if (this.isRepeatSubmit(request)) {
-                	ServletUtil.renderString(response, JSON.marshal(ResponseData.error("50007", "不允许重复提交，请稍后再试")));
+                	ServletUtil.renderString(response, JSON.toJSONString(ResponseData.error("50007", "不允许重复提交，请稍后再试")));
                     return false;
                 }
             }

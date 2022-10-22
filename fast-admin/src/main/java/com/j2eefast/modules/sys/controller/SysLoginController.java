@@ -5,23 +5,27 @@
  */
 package com.j2eefast.modules.sys.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.LinkedHashMap;
-import java.util.List;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.codec.Base64Encoder;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.PhoneUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
 import com.j2eefast.common.core.base.entity.LoginTenantEntity;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.controller.BaseController;
+import com.j2eefast.common.core.crypto.SoftEncryption;
+import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.exception.ServiceException;
+import com.j2eefast.common.core.io.PropertiesUtils;
+import com.j2eefast.common.core.io.file.MimeType;
 import com.j2eefast.common.core.license.annotation.FastLicense;
+import com.j2eefast.common.core.manager.AsyncManager;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.manager.factory.AsyncFactory;
 import com.j2eefast.framework.shiro.token.MobileToken;
@@ -31,18 +35,11 @@ import com.j2eefast.framework.sys.service.SysDictDataService;
 import com.j2eefast.framework.sys.service.SysTenantService;
 import com.j2eefast.framework.sys.service.SysUserService;
 import com.j2eefast.framework.utils.Constant;
+import com.j2eefast.framework.utils.RedisKeys;
+import com.j2eefast.framework.utils.UserUtils;
 import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.base.Captcha;
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.HexUtil;
-import cn.hutool.core.util.PhoneUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import net.bytebuddy.implementation.bind.annotation.Super;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -53,14 +50,15 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.j2eefast.common.core.crypto.SoftEncryption;
-import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.exception.ServiceException;
-import com.j2eefast.common.core.io.PropertiesUtils;
-import com.j2eefast.common.core.io.file.MimeType;
-import com.j2eefast.common.core.manager.AsyncManager;
-import com.j2eefast.framework.utils.RedisKeys;
-import com.j2eefast.framework.utils.UserUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * 
@@ -296,6 +294,8 @@ public class SysLoginController extends BaseController {
 	@RequestMapping("${shiro.loginUrl}")
 	public String login(ModelMap mmp){
 
+		String requestURI = getHttpServletRequest().getRequestURI();
+		System.out.println(requestURI);
 		// 刷新主页退出
 		if(isAllowRefreshIndex){
 			String logined = super.getCookie("__LOGINED__");

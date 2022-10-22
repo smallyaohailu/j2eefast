@@ -9,13 +9,14 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.http.HtmlUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.support.spring.PropertyPreFilters;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.filter.Filter;
+import com.alibaba.fastjson2.filter.SimplePropertyPreFilter;
+import com.google.common.collect.Lists;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.enums.BusinessStatus;
 import com.j2eefast.common.core.manager.AsyncManager;
-import com.j2eefast.common.core.utils.JSON;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.log.entity.SysOperLogEntity;
@@ -35,13 +36,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,12 +60,12 @@ public class BussinessLogAop {
 	/**
 	 * 排除敏感参数
 	 */
-    public static final String[] EXCLUDE_PARAMETER = { "password", "oldPassword", "newPassword", "confirmPassword" };
+    public static final List<String> EXCLUDE_PARAMETER = Lists.newArrayList("password", "oldPassword", "newPassword", "confirmPassword");
 
 	/**
 	 * 计算请求时间
 	 */
-	private static final ThreadLocal<Long>     STARTTIMETHREADLOCAL     = new NamedThreadLocal<Long>("BussinessLogAop StartTime");
+	private static final ThreadLocal<Long> STRATIGRAPHICAL = new NamedThreadLocal<Long>("BussinessLogAop StartTime");
 	
 	/**
 	 * 配置织入点
@@ -85,7 +86,7 @@ public class BussinessLogAop {
 		// 1、开始时间  
 		long beginTime = System.currentTimeMillis();
 		
-		STARTTIMETHREADLOCAL.set(beginTime);
+		STRATIGRAPHICAL.set(beginTime);
 		
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("请求开始:{} URL:{} IP:{}", DatePattern.NORM_DATETIME_MS_FORMAT.format(new Date()),
@@ -139,8 +140,12 @@ public class BussinessLogAop {
 			
 			//正常返回
 			if(ToolUtil.isNotEmpty(jsonResult)) {
-				// 正常返回参数
-				operLog.setJsonResult(StringUtils.substring(JSON.marshal(jsonResult),0,2000));
+				try {
+					String ref = JSON.toJSONString(jsonResult);
+					// 正常返回参数
+					operLog.setJsonResult(StringUtils.substring(ref,0,2000));
+				}catch (Exception ex) {
+				}
 			}
 			
 			//请求URL
@@ -183,13 +188,13 @@ public class BussinessLogAop {
 			
 			// 得到线程绑定的局部变量（开始时间）
 			long startTime = 0; 
-			if (STARTTIMETHREADLOCAL != null){
-				Long time = STARTTIMETHREADLOCAL.get();
+			if (STRATIGRAPHICAL != null){
+				Long time = STRATIGRAPHICAL.get();
 				if (time != null){
 					startTime = time;
 				}
 				// 用完之后销毁线程变量数据
-				STARTTIMETHREADLOCAL.remove(); 
+				STRATIGRAPHICAL.remove();
 			}
 			if (startTime == 0){
 				operLog.setOperTime(new Date());
@@ -248,8 +253,10 @@ public class BussinessLogAop {
 	/**
      * 忽略敏感字段
      */
-    public PropertyPreFilters.MySimplePropertyPreFilter excludeParameterFilter(){
-        return new PropertyPreFilters().addFilter().addExcludes(EXCLUDE_PARAMETER);
+    public Filter excludeParameterFilter(){
+    	SimplePropertyPreFilter simplePropertyPreFilter =  new SimplePropertyPreFilter();
+    	simplePropertyPreFilter.getExcludes().addAll(EXCLUDE_PARAMETER);
+        return simplePropertyPreFilter;
     }
 	
 	
@@ -259,7 +266,7 @@ public class BussinessLogAop {
 	private void setRequestValue(JoinPoint joinPoint, SysOperLogEntity operLog) throws Exception{
         Map<String, String[]> map = ServletUtil.getRequest().getParameterMap();
         if (ToolUtil.isNotEmpty(map)){
-            String params = JSONObject.toJSONString(map, excludeParameterFilter());
+            String params = JSON.toJSONString(map, excludeParameterFilter());
             operLog.setOperParam(StringUtils.substring(params, 0, 2000));
         }else{
             Object args = joinPoint.getArgs();
@@ -279,7 +286,7 @@ public class BussinessLogAop {
         if (paramsArray != null && paramsArray.length > 0){
             for (int i = 0; i < paramsArray.length; i++){
                 if (ToolUtil.isNotEmpty(paramsArray[i]) && !isFilterObject(paramsArray[i])){
-                    Object jsonObj = JSONObject.toJSONString(paramsArray[i], excludeParameterFilter());
+                    Object jsonObj = JSON.toJSONString(paramsArray[i], excludeParameterFilter());
                     params += jsonObj.toString() + " ";
                 }
             }

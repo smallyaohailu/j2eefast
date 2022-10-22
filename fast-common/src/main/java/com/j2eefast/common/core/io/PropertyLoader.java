@@ -7,7 +7,6 @@ package com.j2eefast.common.core.io;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.parser.ParserConfig;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.boot.env.PropertiesPropertySourceLoader;
 import org.springframework.boot.env.PropertySourceLoader;
@@ -46,8 +45,8 @@ public class PropertyLoader implements PropertySourceLoader, Ordered {
         List<PropertySource<?>> propertySources = new ArrayList<>();
         if (!isLoadSysPropertySource) {
             isLoadSysPropertySource = true;
-            // 开启 FastJSON 安全模式
-            ParserConfig.getGlobalInstance().setSafeMode(true);
+            // 开启 FastJSON2.0 以上版本 新版本 无需设置安全模式
+            // ParserConfig.getGlobalInstance().setSafeMode(true);
             Properties properties = PropertiesUtils.getInstance().getProperties();
             propertySources.add(new OriginTrackedMapPropertySource("j2eefast", properties));
         } else {

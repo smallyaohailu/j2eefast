@@ -5,24 +5,15 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.j2eefast.common.core.config.RabbitmqProducer;
 import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.SpringUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.common.rabbit.constant.RabbitInfo;
 import com.j2eefast.framework.annotation.DataFilter;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleModuleEntity;
@@ -32,6 +23,10 @@ import com.j2eefast.framework.utils.UserUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 角色
@@ -45,10 +40,11 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 	private SysRoleMenuService sysRoleMenuService;
 	@Resource
 	private SysRoleModuleService sysRoleModuleService;
-	@Resource
-	private RabbitmqProducer rabbitmqProducer;
+//	@Resource
+//	private RabbitmqProducer rabbitmqProducer;
 	@Resource
 	private SysRoleDeptService sysRoleDeptService;
+
 	/**
 	 * 页面展示查询翻页
 	 */
@@ -102,8 +98,16 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 				sysRoleModuleService.save(sysRoleModuleEntity);
 			}
 
-			rabbitmqProducer.sendSimpleMessage(RabbitInfo.getAddRoleHard(), JSONObject.toJSONString(role),
-					IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
+
+			//
+//			if(enabled){
+//				Object groupService = SpringUtil.getBean("groupService");
+//				groupService.getClass().in;
+//			}
+
+
+//			rabbitmqProducer.sendSimpleMessage(RabbitInfo.getAddRoleHard(), JSONObject.toJSONString(role),
+//					IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
 
 			return true;
 		}
@@ -134,8 +138,8 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 				sysRoleModuleService.save(sysRoleModuleEntity);
 			}
 
-			rabbitmqProducer.sendSimpleMessage(RabbitInfo.getUpdateRoleHard(), JSONArray.toJSONString(role),
-					IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
+//			rabbitmqProducer.sendSimpleMessage(RabbitInfo.getUpdateRoleHard(), JSON.toJSONString(role),
+//					IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
 
 			//清理权限缓存
 			UserUtils.clearCachedAuthorizationInfo();
@@ -167,8 +171,8 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 		UserUtils.clearCachedAuthorizationInfo();
 
 		if(this.removeByIds(Arrays.asList(ids))){
-			rabbitmqProducer.sendSimpleMessage(RabbitInfo.getDelRoleHard(), ToolUtil.conversion(ids,","),
-					IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
+//			rabbitmqProducer.sendSimpleMessage(RabbitInfo.getDelRoleHard(), ToolUtil.conversion(ids,","),
+//					IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
 			return true;
 		}
 		return false;
@@ -177,8 +181,8 @@ public class SysRoleService  extends ServiceImpl<SysRoleMapper, SysRoleEntity> {
 
 	public  boolean bpmSynchronizationRole(){
 		List<SysRoleEntity> list = this.list();
-		rabbitmqProducer.sendSimpleMessage(RabbitInfo.synchronizationRole(), JSONObject.toJSONString(list),
-				IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
+//		rabbitmqProducer.sendSimpleMessage(RabbitInfo.synchronizationRole(), JSONObject.toJSONString(list),
+//				IdUtil.fastSimpleUUID(), RabbitInfo.EXCHANGE_NAME, RabbitInfo.KEY);
 		return true;
 	}
 
