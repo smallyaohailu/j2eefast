@@ -119,9 +119,8 @@
 				return false;
 			}
 			</#if>
-			var node = sNodes[0].getParentNode();
-			if(node != null){
-				$("#parentIds").val($.tree.getParentIds(node));
+			if(sNodes[0] != null){
+				$("#parentIds").val($.tree.getParentIds(sNodes[0]));
 			}
 			if(opt.common.isNotEmpty(sNodes[0].type)){
 				$("#type").val(sNodes[0].type);
