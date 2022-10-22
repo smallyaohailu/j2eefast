@@ -5,6 +5,7 @@
  */
 package com.j2eefast.framework.bussiness.aop;
 
+import com.google.common.collect.Lists;
 import com.j2eefast.common.core.utils.ServletUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.common.core.xss.SQLFilter;
@@ -37,8 +38,16 @@ import java.util.regex.Pattern;
 @Component
 public class RequiresPermissionsAspect {
 
+    /**
+     * 排除链接 系统必须排除否则会有数据异常
+     */
+    public List<String> excludes = Lists.newArrayList("/sys/config/*",
+            "/sys/dict/*","/tool/gen/column/list",
+            "/tool/gen/column/list","/tool/gen/*",
+            "/sys/database/add","/sys/msg/*","/sys/area/load");
+
     @Value("#{ @environment['fast.xss.excludes'] ?: null }")
-    private String excludes;
+    private String excludes0;
 
     @Pointcut("@annotation(org.apache.shiro.authz.annotation.RequiresPermissions)")
     public void dataFilterCut() {
@@ -57,12 +66,15 @@ public class RequiresPermissionsAspect {
                 map.put(Constant.REQUIRES_PERMISSIONS,dataFilter.value());
                 ServletUtil.getRequest().setAttribute(Constant.REQUIRES_PERMISSIONS,dataFilter.value());
                 List<String> tempExcludes = new ArrayList<>();
-                if(ToolUtil.isNotEmpty(excludes)){
-                    String[] url = excludes.split(",");
+                if(ToolUtil.isNotEmpty(excludes0)){
+                    String[] url = excludes0.split(",");
                     for (int i = 0; url != null && i < url.length; i++) {
-                        tempExcludes.add(url[i]);
+                        if(excludes.indexOf(url[i]) == -1){
+                            excludes.add(url[i]);
+                        }
                     }
                 }
+                tempExcludes = excludes;
                 String path = ServletUtil.getRequest().getServletPath();
                 //排除特例
                 if(ToolUtil.isNotEmpty(tempExcludes)){
