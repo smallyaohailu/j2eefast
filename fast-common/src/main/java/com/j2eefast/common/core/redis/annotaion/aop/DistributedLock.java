@@ -30,6 +30,9 @@ public @interface DistributedLock {
     //try wait time
     long waitTime() default 0L;
 
+    //多线程排队等待
+    boolean queueup() default true;
+
     //时间单位
     TimeUnit timeUnit() default TimeUnit.SECONDS;  
 }

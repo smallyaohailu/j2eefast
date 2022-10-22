@@ -1,10 +1,11 @@
 package com.j2eefast.common.core.manager;
 
+import com.j2eefast.common.core.thread.Threads;
+import com.j2eefast.common.core.utils.SpringUtil;
+
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import com.j2eefast.common.core.thread.Threads;
-import com.j2eefast.common.core.utils.SpringUtil;
 
 /**
  * 异步管理器
@@ -35,8 +36,7 @@ public class AsyncManager {
      * 
      * @param task 任务
      */
-    public void execute(TimerTask task)
-    {
+    public void execute(TimerTask task){
         executor.schedule(task, OPERATE_DELAY_TIME, TimeUnit.MILLISECONDS);
     }
 

@@ -1,6 +1,8 @@
 package com.j2eefast.common.core.redis.annotaion.aop;
 
+import cn.hutool.core.util.RandomUtil;
 import com.j2eefast.common.core.exception.RxcException;
+import com.j2eefast.common.core.utils.Md5Util;
 import com.j2eefast.common.core.utils.ReflectUtils;
 import com.j2eefast.common.core.utils.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,6 @@ public class DistributedLockAop {
 	@Autowired
 	private RedissonClient redisson;
 
-	// 这里需要修改对应的包名
 	@Pointcut("@annotation(com.j2eefast.common.core.redis.annotaion.aop.DistributedLock)")
 	public void RlockAspect() {
 	}
@@ -54,15 +55,30 @@ public class DistributedLockAop {
 			    final boolean status = lock.tryLock(rlockInfo.waitTime(),rlockInfo.releaseTime(), rlockInfo.timeUnit());
 				if (status) {
 					object = proceedingJoinPoint.proceed();
-				}else {
-					log.error("lock failed...", lockKey);
-					throw new RxcException(ToolUtil.message("the data is locked. Please try again later..."));
+				}else{
+					if(rlockInfo.queueup()){
+						//自旋 等候排队 处理
+						while (true){
+							final boolean status0 = lock.tryLock(rlockInfo.waitTime(),rlockInfo.releaseTime(), rlockInfo.timeUnit());
+							if(status0){
+								return proceedingJoinPoint.proceed();
+							}
+							Thread.sleep(RandomUtil.randomInt(1,100));
+						}
+					}else{
+						//异常处理
+						log.error("lock failed...", lockKey);
+						throw new RxcException("请求并发数超出限制",RxcException.CONCURRENT_LIMIT);
+					}
 				}
 			} else {
 				log.error("can't get lock：{}", lockKey);
 				throw new RxcException(ToolUtil.message("the data is locked. Please try again later..."));
 			}
 		}catch (Exception e) {
+			if(e instanceof RxcException){
+				throw new RxcException(((RxcException) e).getMsg(),((RxcException) e).getCode());
+			}
 			throw new RxcException(ToolUtil.message("the data is locked. Please try again later..."));
 		} finally {
 			if (lock != null && lock.isHeldByCurrentThread()) {
@@ -83,7 +99,7 @@ public class DistributedLockAop {
 	* @author mfksn001@163.com
 	* @Date: 2020年9月9日
 	 */
-	public String getLocalKey(ProceedingJoinPoint proceedingJoinPoint, DistributedLock rlockInfo) {
+	public String getLocalKey(ProceedingJoinPoint proceedingJoinPoint, DistributedLock rlockInfo) throws Exception {
 		String businessNo = "";		
 		if (StringUtils.isNoneBlank(rlockInfo.value())) {   //自定义lock name  用在方法上，表示该方法在锁定时间内,缺省20秒，其它线程不能使用
 			businessNo = rlockInfo.value();
@@ -94,7 +110,7 @@ public class DistributedLockAop {
 			String[] parameterNames = methodSignature.getParameterNames();
 			Method mothod = methodSignature.getMethod();
 			//类名+方法名
-			StringBuilder sb = new StringBuilder("Rlock_").append(mothod.getDeclaringClass().getName()).append(".").append(mothod.getName());			
+			StringBuilder sb = new StringBuilder().append(mothod.getDeclaringClass().getName()).append(".").append(mothod.getName());
 			if (parameters != null) {
 				String clazzAttrName = rlockInfo.classAttrName();
 				String[] temp = clazzAttrName.split("\\.") ;
@@ -141,7 +157,9 @@ public class DistributedLockAop {
 				}	
 	          }	
 			}
-			businessNo = sb.toString();			
+			businessNo = sb.toString();
+			//转MD5存储
+			businessNo = "Rlock_"+Md5Util.MD5(businessNo);
 		}
 		return businessNo;
 	}
