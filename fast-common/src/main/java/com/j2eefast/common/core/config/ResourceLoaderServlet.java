@@ -106,7 +106,8 @@ public class ResourceLoaderServlet extends HttpServlet {
 							paramIn.set(k, v);
 						});
 					}
-					outBytes = paramIn.toString().getBytes();
+					//解决Windows环境下乱码问题
+					outBytes = paramIn.toString().getBytes("utf-8");
 				}
 			}
 		}else{
