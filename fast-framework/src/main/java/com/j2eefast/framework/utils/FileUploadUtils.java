@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -82,6 +83,26 @@ public class FileUploadUtils {
      */
     public static List<SysFilesEntity> getBizIdByFileList(Long bizId,String bizType){
         return ConstantFactory.me().getSysFileService().selectSysFilesList(Convert.toStr(bizId),bizType);
+    }
+
+    /**
+     * 根据业务ID,业务类型 获取文件Base64字符串
+     * @param bizId
+     * @param bizType
+     * @return
+     */
+    public static List<String> getBizIdByBase64List(Long bizId,String bizType){
+        List<SysFilesEntity> list = ConstantFactory.me().getSysFileService().selectSysFilesList(Convert.toStr(bizId),bizType);
+        List<String> base64List = new ArrayList<>();
+        list.forEach(e->{
+            //获取数据库文件信息
+            String relativePath = e.getFilePath();
+            String filePath = Global.getAttachPath() + relativePath;
+            if(FileUtil.exist(filePath)){
+                base64List.add(Base64.encode(FileUtil.getInputStream(filePath)));
+            }
+        });
+        return base64List;
     }
     
     /**
