@@ -16,7 +16,7 @@
     <select id="queryByKey" resultType="com.j2eefast.common.config.entity.SysConfigEntity" parameterType="string">
 		SELECT
 		<include refid="Base_Column_List"/>
-		FROM sys_config WHERE param_key = #{paramKey}
+		FROM sys_config WHERE param_key = #{paramKey} AND del_flag = 0
 	</select>
 
 </mapper>
