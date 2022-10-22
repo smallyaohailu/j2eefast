@@ -7,7 +7,6 @@ package com.j2eefast.framework.sys.factory;
 
 import cn.hutool.core.util.IdUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
-import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.SysUserEntity;
 
 /**
@@ -41,6 +40,7 @@ public class UserFactory {
 		loginUser.setAvatar(user.getAvatar());
 		loginUser.setTenantId(user.getTenantId());
 		loginUser.setTenanName(user.getTenantName());
+		loginUser.setLoginStatus(0);
 //		loginUser.setCompName(user.getCompName());
 		loginUser.setCsrfToken(IdUtil.fastSimpleUUID());
 		return loginUser;

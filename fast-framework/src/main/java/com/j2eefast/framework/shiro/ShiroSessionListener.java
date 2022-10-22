@@ -5,16 +5,9 @@
  */
 package com.j2eefast.framework.shiro;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.j2eefast.common.core.constants.ConfigConstant;
-import com.j2eefast.common.core.shiro.RedisSessionDAO;
-import com.j2eefast.common.core.utils.RedisUtil;
-import com.j2eefast.common.core.utils.SpringUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 

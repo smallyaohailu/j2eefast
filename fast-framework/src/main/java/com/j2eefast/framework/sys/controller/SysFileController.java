@@ -161,7 +161,8 @@ public class SysFileController extends BaseController {
 
     @RequestMapping("comm/download")
     public void commDownload(HttpServletRequest request,
-                             HttpServletResponse response, @RequestParam("fileId") Long fileId) {
+                             HttpServletResponse response,
+                             @RequestParam("fileId") Long fileId) {
         try {
             SysFilesEntity file =  sysFileService.getById(fileId);
             if(ToolUtil.isEmpty(file)){

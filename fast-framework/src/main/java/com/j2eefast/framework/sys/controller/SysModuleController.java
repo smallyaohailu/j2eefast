@@ -6,21 +6,24 @@
 package com.j2eefast.framework.sys.controller;
 
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
-import com.j2eefast.common.core.enums.BusinessType;
-import com.j2eefast.common.core.utils.*;
 import com.j2eefast.common.core.controller.BaseController;
+import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ValidatorUtil;
 import com.j2eefast.framework.annotation.RepeatSubmit;
+import com.j2eefast.framework.sys.entity.SysModuleEntity;
+import com.j2eefast.framework.sys.service.SysModuleService;
 import com.j2eefast.framework.utils.Constant;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.ui.ModelMap;
-import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.j2eefast.framework.sys.entity.SysModuleEntity;
-import com.j2eefast.framework.sys.service.SysModuleService;
+
+import java.util.Map;
 
 /**
  * 模块页面控制器
@@ -111,7 +114,7 @@ public class SysModuleController extends BaseController {
     @ResponseBody
     public ResponseData delete(Long[] ids) {
     	
-    	return sysModuleService.deleteBatchByIds(ids)?success():error("删除失败!");
+    	return sysModuleService.deleteBatchByIds(ids) ?success():error("删除失败!");
     	
     }
 
