@@ -8,10 +8,7 @@ package com.j2eefast.framework.config;
 import cn.hutool.core.comparator.ComparableComparator;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
-import com.bstek.ureport.console.ServletAction;
-import com.bstek.ureport.definition.datasource.BuildinDatasource;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.RedisUtil;
@@ -29,14 +26,12 @@ import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -91,6 +86,12 @@ public class BaseInitialze  implements ApplicationRunner {
                 	sysModuleService.setRoles(entity.getId(), entity.getStatus());
                 }
             }else{
+
+                if(!entity.getStatus().equals("0")){
+                    entity.setStatus("0");
+                    sysModuleService.setRoles(entity.getId(), entity.getStatus());
+                }
+
                 // 根据不同模块进行数据库升级
                 if(auto){
                     //检测升级脚本
@@ -106,6 +107,9 @@ public class BaseInitialze  implements ApplicationRunner {
                                 String dbV = entity.getCurrentVersion();
                                 //获取本身系统对应数据库类型
                                 String defaultDbType = DataSourceContext.getDbType(dbType);
+                                if(ToolUtil.isEmpty(defaultDbType)){
+                                    continue;
+                                }
                                 String update_info = "";
                                 for(int i=1;;i++){
                                     if(setting.containsKey("version","v"+i)){
@@ -135,11 +139,6 @@ public class BaseInitialze  implements ApplicationRunner {
                             }
                         }
                     }
-                }
-
-                if(!entity.getStatus().equals("0")){
-                	entity.setStatus("0");
-                    sysModuleService.setRoles(entity.getId(), entity.getStatus());
                 }
             }
         }
