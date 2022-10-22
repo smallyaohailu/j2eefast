@@ -43,7 +43,7 @@
             <ul class="nav navbar-nav" id="topMenu">
                 <#if modules?? && (modules?size > 0)>
                     <#list modules as c>
-                        <#if c?index <= 1>
+                        <#if c?index <= (config.getKey("SYS_TOP_MENU_NUM","3")?number - 1)>
                             <li class="treeview"><a href="javascript:" class="addTabPage" title="${c['moduleName']}" data-code="${c['moduleCode']}"><i class="fa-fw ${c['icon']}"></i> <span class="hidden-xs">${i18n("${c['moduleName']}")}</span></a></li>
                         </#if>
                     </#list>
