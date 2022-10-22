@@ -1,8 +1,8 @@
 # 产品或项目名称
 productName: J2eeFAST 开源版本
 
-# 系统版本
-version: 2.6.0
+# 显示系统版本
+version: 2.7.0
 
 # 设置项目访问路径
 #server:
@@ -29,7 +29,7 @@ aj:
 
 #Shiro 配置
 shiro:
-    ## V2.6.1 以上版本
+    ## V2.6.0 以上版本
     #登录地址 默认 login, 如果有特殊符号请记得URL转码访问
     #loginUrl: /_6OLU0AarrZ5A==__
     #是否隐藏登录页面、如果开启则不过不是配置的登录地址则直接404 默认false、自动跳转登录页面

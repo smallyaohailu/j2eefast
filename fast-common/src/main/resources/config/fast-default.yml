@@ -6,7 +6,7 @@
 productName: J2eeFAST 开源版本
 
 # ¢此版本号最好不要改动、有助于你后期维修解决问题都会用到当前版本¢
-version: 2.6.0
+version: 2.7.0
 
 server:
   tomcat:
@@ -178,11 +178,11 @@ shiro:
 
 #mybatis 配置
 mybatis-plus:
-  mapper-locations: classpath*:mapper/**/*.xml
+  mapper-locations: classpath*:mapper*/**/*.xml
   # 0 防止全表更新与删除 1 防止全部删除 2 防止全部更新
   blockattack: 0
   global-config:
-    banner: false
+    banner: true
     db-config:
       #全局逻辑删除的实体字段名,配置后可以忽略实体字段的@TableLogic 注解
       #logic-delete-field: delFlag
@@ -256,7 +256,7 @@ fast:
     # 过滤开关
     enabled: true
     # 排除链接（多个用逗号分隔）
-    excludes: /sys/notice/*,/tool/gen/db/list
+    excludes: /sys/notice/*
     # 匹配链接
     urlPatterns: /sys/*
   #是否开启csrf 防护,此开启针对需要系统授权所有的POST请求
