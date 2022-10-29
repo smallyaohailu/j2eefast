@@ -79,7 +79,6 @@ public class SchemeHttpsConfig {
 
 	@Bean
 	public FilterRegistrationBean registFilter() {
-
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(new AbsoluteSendRedirectFilter());
 		registration.setName("filterRegistrationBean");

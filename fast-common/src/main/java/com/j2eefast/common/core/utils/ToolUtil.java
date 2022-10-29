@@ -384,7 +384,9 @@ public class ToolUtil{
                                   File... files){
 	    try{
 	        log.info("开始发送准备>>>>>>>>>");
-            parameters.put(ConfigConstant.SQLFILTER, "");
+	        if(!parameters.containsKey(ConfigConstant.SQLFILTER)){
+                parameters.put(ConfigConstant.SQLFILTER, "");
+            }
             HtmlReport htmlReport = ((ExportManager)SpringUtil.getBean("fastExportManager")).exportHtml("fast-"+fileNo+".xml","",parameters);
             log.info("成功获取报表转换>>>>>>>>>");
             FreeMarkerConfigurer freeMarkerConfigurer = SpringUtil.getBean(FreeMarkerConfigurer.class);

@@ -182,7 +182,7 @@ mybatis-plus:
   # 0 防止全表更新与删除 1 防止全部删除 2 防止全部更新
   blockattack: 0
   global-config:
-    banner: true
+    banner: false
     db-config:
       #全局逻辑删除的实体字段名,配置后可以忽略实体字段的@TableLogic 注解
       #logic-delete-field: delFlag

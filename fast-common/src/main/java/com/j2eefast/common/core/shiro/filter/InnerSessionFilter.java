@@ -189,7 +189,8 @@ public class InnerSessionFilter extends AccessControlFilter {
         Serializable sessionId = session.getId();
 
         // 初始化用户的队列放到缓存里
-        Deque<Serializable> deque = (Deque<Serializable>) redisUtil.getSession(getRedisKickoutKey(username));
+        @SuppressWarnings("unchecked")
+		Deque<Serializable> deque = (Deque<Serializable>) redisUtil.getSession(getRedisKickoutKey(username));
         boolean flag = false;
         int firstNum = 0;
         if(deque == null || deque.size()==0) {

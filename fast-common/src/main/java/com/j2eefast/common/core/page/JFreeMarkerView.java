@@ -31,11 +31,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
-import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.ServletUtil;
 import freemarker.core.ParseException;
 import freemarker.ext.jsp.TaglibFactory;

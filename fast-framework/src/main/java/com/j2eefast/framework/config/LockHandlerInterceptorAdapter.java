@@ -7,7 +7,6 @@ package com.j2eefast.framework.config;
 
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;

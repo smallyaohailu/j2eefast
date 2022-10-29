@@ -44,16 +44,19 @@ import com.j2eefast.common.core.utils.ToolUtil;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-
+	// 系统默认语言
 	@Value("#{ @environment['fast.messages.defaultLocale'] ?: 'zh_CN' }")
 	private String defaultLocale;
+	// 语言切换
 	@Value("#{ @environment['fast.messages.enabled'] ?: false }")
 	private boolean msgEnabled;
+	// 资源缓存
 	@Value("#{ @environment['web.staticPrefix'] ?: 'classpath:/static/' }")
 	private String staticPrefix;
+	// 缓存天数
 	@Value("#{ @environment['web.cacheTime'] ?: 25 }")
     private int cacheTime;
-
+	// 配置拦截器
 	@Value("#{${web.adapter.registry} ?: null}")
 	private LinkedHashMap<String, String> adapterRegistry ;
 
