@@ -7,8 +7,10 @@ package com.j2eefast.framework.shiro.service;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HtmlUtil;
 import com.anji.captcha.model.vo.CaptchaVO;
 import com.anji.captcha.service.CaptchaService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -146,8 +148,7 @@ public class SysLoginService implements AuthService {
 
 	/**
 	 * 验证登陆
-	 * @param username
-	 * @param password
+	 * @param taken
 	 * @return
 	 */
 	@Override
@@ -201,7 +202,8 @@ public class SysLoginService implements AuthService {
 				HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
 		password =new String(SoftEncryption.decryptBySM4(Base64.decode(password),
 				HexUtil.decodeHex(kg4)).get("bytes",byte[].class)).trim();
-
+		//XSS过滤
+		username = HtmlUtil.filter(username);
 		//赋值回去
 		taken.setPassword(password.toCharArray());
 
@@ -328,6 +330,11 @@ public class SysLoginService implements AuthService {
 	 */
 	@Override
 	public LoginUserEntity valideCodeLoginVerify(String mobile,String valideCode) {
+
+		//校验是否为手机号码
+		if(!PhoneUtil.isPhone(mobile)){
+			throw new RxcException("请输入正确的手机号码!","60002");
+		}
 
 		//获取请求租户号
 		String tenantId = StrUtil.EMPTY;
