@@ -9,6 +9,8 @@ import cn.hutool.core.comparator.ComparableComparator;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.setting.Setting;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.j2eefast.common.core.constants.ConfigConstant;
 import com.j2eefast.common.core.io.PropertiesUtils;
 import com.j2eefast.common.core.utils.RedisUtil;
@@ -19,7 +21,9 @@ import com.j2eefast.common.db.utils.SqlExe;
 import com.j2eefast.framework.quartz.entity.SysJobEntity;
 import com.j2eefast.framework.quartz.service.SysJobService;
 import com.j2eefast.framework.quartz.utils.ScheduleUtils;
+import com.j2eefast.framework.sys.entity.SysMenuEntity;
 import com.j2eefast.framework.sys.entity.SysModuleEntity;
+import com.j2eefast.framework.sys.service.SysMenuService;
 import com.j2eefast.framework.sys.service.SysModuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
@@ -29,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.util.List;
 
@@ -46,6 +51,8 @@ public class BaseInitialze  implements ApplicationRunner {
 
     @Autowired
     private SysModuleService sysModuleService;
+    @Autowired
+    private SysMenuService sysMenuService;
 	@Qualifier("schedulerFactoryBean")
 	@Autowired
 	private Scheduler scheduler;
@@ -146,7 +153,8 @@ public class BaseInitialze  implements ApplicationRunner {
 		scheduler.clear();
 
         //设置系统版本号
-        redisUtil.set(ConfigConstant.CONFIG_KEY, PropertiesUtils.getInstance().getProperty(ConfigConstant.SYS_VERSION,"1.0.1"),RedisUtil.NOT_EXPIRE);
+        redisUtil.set(ConfigConstant.CONFIG_KEY, PropertiesUtils.getInstance().getProperty(ConfigConstant.SYS_VERSION,
+                "1.0.1"),RedisUtil.NOT_EXPIRE);
 
         /**
          * 检测定时任务
@@ -167,6 +175,19 @@ public class BaseInitialze  implements ApplicationRunner {
             SpringUtil.unregisterBean("ureport.datasourceServletAction");
             SpringUtil.unregisterBean("ureport.htmlPreviewServletAction");
             SpringUtil.unregisterBean("ureport.designerServletAction");
+            if(sysMenuService.count(new QueryWrapper<SysMenuEntity>().eq("id",108)
+                    .eq("hide","1")) > 0){
+                sysMenuService.update(new UpdateWrapper<SysMenuEntity>()
+                        .eq("id",108).eq("hide","1").set("hide","0"));
+                sysMenuService.clearMenuRedis();
+            }
+        }else{
+            if(sysMenuService.count(new QueryWrapper<SysMenuEntity>().eq("id",108)
+                    .eq("hide","0")) > 0){
+                sysMenuService.update(new UpdateWrapper<SysMenuEntity>()
+                        .eq("id",108).eq("hide","0").set("hide","1"));
+                sysMenuService.clearMenuRedis();
+            }
         }
     }
 }
