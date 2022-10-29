@@ -47,6 +47,10 @@ public class SearchFormParser implements Parser<SearchForm> {
 				String loadCss =  ele.getText().trim();
 				form.setLoadCss(loadCss);
 			}
+			if(ele.getName().equals("title-data")){
+				String fromTitle =  ele.getText().trim();
+				form.setFromTitle(fromTitle);
+			}
 		}
 
 		List<Component> components=FormParserUtils.parse(element);

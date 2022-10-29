@@ -1932,6 +1932,15 @@ if (typeof jQuery === "undefined") {
             },
 
             /**
+             * 获取文件名称(不需要后缀)
+             * @param file
+             * @returns {string}
+             */
+            getName: function(file){
+                return (-1 !== file.indexOf('.')) ? file.substring(0, file.lastIndexOf(".")) : '';
+            },
+
+            /**
              * Repair the path(http修复路径)
              * @param path
              * @returns {string}

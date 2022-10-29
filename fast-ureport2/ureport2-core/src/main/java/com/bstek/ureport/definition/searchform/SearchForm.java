@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.bstek.ureport.definition.searchform;
 
+import cn.hutool.core.util.StrUtil;
 import com.bstek.ureport.utils.ToolUtils;
 
 import java.util.List;
@@ -33,6 +34,12 @@ public class SearchForm {
 	 * 初始化JS
 	 */
 	private String loadJs;
+
+	/**
+	 * 表单标题提示
+	 */
+	private String fromTitle;
+
 	private FormPosition formPosition;
 	public String toHtml(RenderContext context){
 
@@ -54,13 +61,12 @@ public class SearchForm {
 
 
 		if(!ToolUtils.isEmpty(components)){
-			sb.append("<div class=\"from-search\"><form class=\"form-horizontal\"><h4 class=\"form-header h4\">报表检索</h4><div class=\"form-body\">");
+			sb.append("<div class=\"from-search\"><form class=\"form-horizontal\"><h4 class=\"form-header h4\">"+ StrUtil.nullToDefault(fromTitle,"")+"</h4><div class=\"form-body\">");
 			for(Component component:components){
 				sb.append(component.toHtml(context));
 			}
 			sb.append("</form></div></div>");
 		}
-
 		return sb.toString();
 	}
 	public String toJs(RenderContext context){
@@ -85,6 +91,14 @@ public class SearchForm {
 
 	public void setLoadJs(String loadJs) {
 		this.loadJs = loadJs;
+	}
+
+	public String getFromTitle() {
+		return fromTitle;
+	}
+
+	public void setFromTitle(String fromTitle) {
+		this.fromTitle = fromTitle;
 	}
 
 	public List<Component> getComponents() {
