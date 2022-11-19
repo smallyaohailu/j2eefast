@@ -5,21 +5,21 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import com.j2eefast.framework.sys.entity.SysFileUploadEntity;
-import com.j2eefast.framework.sys.mapper.SysFileUploadMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.j2eefast.common.core.page.Query;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.framework.sys.entity.SysFileUploadEntity;
+import com.j2eefast.framework.sys.mapper.SysFileUploadMapper;
 import com.j2eefast.framework.utils.Constant;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import javax.annotation.Resource;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.Map;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 /**
  *
  * 系统上传文件业务关联Service接口
@@ -97,6 +97,16 @@ public class SysFileUploadService extends ServiceImpl<SysFileUploadMapper,SysFil
     public boolean removeByBizId(Long fileId, Long bizid){
 		return  this.remove(new QueryWrapper<SysFileUploadEntity>()
 				.eq("file_id",fileId).eq("biz_id",bizid));
+	}
+
+	/**
+	 * 根据业务ID删除业务关联所有文件ID
+	 * @param bizid 业务ID
+	 * @return
+	 */
+	public boolean removeByBizId(Long bizid){
+		return  this.remove(new QueryWrapper<SysFileUploadEntity>()
+				.eq("biz_id",bizid));
 	}
 
 	public boolean removeByFileId(Long fileId){

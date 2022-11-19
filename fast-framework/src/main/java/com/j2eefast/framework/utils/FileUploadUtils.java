@@ -11,6 +11,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.j2eefast.common.core.utils.Global;
 import com.j2eefast.common.core.utils.ServletUtil;
@@ -71,6 +72,31 @@ public class FileUploadUtils {
                     sysFileUploadEntity.setBizType(bizType);
                     ConstantFactory.me().getSysFileUploadService().saveSysFileUpload(sysFileUploadEntity);
                 }
+            }
+        }
+    }
+
+    /**
+     * 保存文件与业务关联数据、 主子表、子表中有上传控件
+     * @param bizId 子表业务主键IDID
+     * @param index 子表数据下标
+     * @param bizType 子表业务类型
+     */
+    public static void saveFileUpload(Long bizId,int index,String bizType){
+        HttpServletRequest request = ServletUtil.getRequest();
+        String fileId = request.getParameter(bizType+"["+index+"]");
+        if(ToolUtil.isNotEmpty(fileId)){
+            SysFileService sysFileService = SpringUtil.getBean(SysFileService.class);
+            if(ConstantFactory.me().getSysFileUploadService().getSysFileUploadByBizId(Convert.toLong(fileId),bizId)){
+                ConstantFactory.me().getSysFileUploadService().remove(new QueryWrapper<SysFileUploadEntity>()
+                        .eq("biz_type",bizType).eq("biz_id",bizId));
+                SysFilesEntity filesEntity = sysFileService.getSysFileById(Convert.toLong(fileId));
+                SysFileUploadEntity sysFileUploadEntity  = new SysFileUploadEntity();
+                sysFileUploadEntity.setBizId(bizId);
+                sysFileUploadEntity.setFileName(filesEntity.getFileName());
+                sysFileUploadEntity.setFileId(filesEntity.getId());
+                sysFileUploadEntity.setBizType(bizType);
+                ConstantFactory.me().getSysFileUploadService().saveSysFileUpload(sysFileUploadEntity);
             }
         }
     }

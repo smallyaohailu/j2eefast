@@ -551,6 +551,8 @@
                     });
                 }
 
+                $.table.uploadfile();
+
                 //select2复选框事件绑定
                 if ($.fn.select2 !== undefined) {
                     $.fn.select2.defaults.set( "theme", "bootstrap" );
@@ -1031,7 +1033,16 @@
                             } else {
                                 obj[key] = "";
                             }
-                        }else{
+                        }else if($(columns[i]).find('input[type="file"]').length == 1){
+                            inputValue = $(columns[i]).find('input[type="file"]');
+                            var key = opt.table.options.columns[i].field;
+                            if (opt.common.isNotEmpty(inputValue.attr("data-value"))) {
+                                obj[key] = inputValue.attr("data-value");
+                            } else {
+                                obj[key] = "";
+                            }
+                        }
+                        else{
                             var selectValue = $(columns[i]).find('select');
                             var key = opt.table.options.columns[i].field;//use.id
                             if (opt.common.isNotEmpty($(inputValue[0]).val())) {
@@ -1057,7 +1068,7 @@
                             } else if (opt.common.isNotEmpty(selectValue.val())) {
                                 obj[key] = selectValue.val();
                             } else {
-                                obj[key] = "";
+                                obj[key] = $(columns[i]).html();
                             }
                         }
 
@@ -1079,21 +1090,150 @@
                 opt.table.set();
                 index = opt.common.isEmpty(index) ? 'index' : index;
                 var currentId = opt.common.isEmpty(tableId) ? opt.table.options.id : tableId;
-                var rows = $('#' + currentId).bootstrapTable('getSelections');//获取选中行
-                if (rows.length == 0) {
+                let $rows = $('#' + currentId).bootstrapTable('getSelections');//获取选中行
+                if ($rows.length == 0) {
                     opt.modal.error($.i18n.prop("请选择要删除的数据"));
                     return;
                 }
                 var count = $("#" + currentId).bootstrapTable('getData').length;
                 that.updataData(count);
                 var indexs = [];
-                for (var i = 0; i < rows.length; i++) {
-                    indexs[i] = rows[i][index];
+                for (var i = 0; i < $rows.length; i++) {
+                    indexs[i] = $rows[i][index];
                 }
                 $('#' + opt.table.options.id).bootstrapTable('remove', {
                     field: index,
                     values: indexs
                 });
+                that.uploadfile();
+            },
+            uploadfile: function(){
+                if($("._template_file").length > 0){
+                    $("._template_file").each(function (index, item) {
+                        var $file = $(item);
+                        $file.change(function(){
+                            if($(this).val() != ""){
+                                //上传服务
+                                var formData = new FormData();
+                                var $fileName = $(this)[0].files[0].name;
+                                var pfxTemp = $(this).data("type");
+                                var $flag = true;
+                                if(pfxTemp != "all"){
+                                    var pfx = opt.common.getExt($fileName);
+                                    if(pfx != pfxTemp){
+                                        opt.modal.error("文件格式不正确!仅支持"+pfxTemp+"格式.");
+                                        $flag = false;
+                                        return;
+                                    }
+                                }
+                                if(!$flag){
+                                    var files = $(this)[0].files[0];
+                                    var $this = $(this);
+                                    //⑦将name 和 files 添加到formData中，键值对形式
+                                    formData.append("file", files);
+                                    formData.append("name", $fileName);
+                                    $.ajax({
+                                        url: baseURL + $(this).data('upload'),
+                                        type: 'POST',
+                                        data: formData,
+                                        processData: false,// ⑧告诉jQuery不要去处理发送的数据
+                                        contentType: false, // ⑨告诉jQuery不要去设置Content-Type请求头
+                                        beforeSend: function () {
+                                            opt.modal.loading("正在上传，请稍后...");
+                                        },
+                                        success: function (result) {
+                                            if(opt.variable.web_status.SUCCESS == result.code){
+                                                $this.attr("data-value",result.fileName+"#"+result.id);
+                                                var $id = $this.attr('id');
+                                                $('#'+$id + "_div").css('display',"block");
+                                                $('#'+$id + "_name").html($fileName);
+                                                $('#'+$id + "_id").val(result.id);
+                                                $this.css('display',"none");
+                                                $('#'+$id + "_del").off('click').on('click',function(){
+                                                    $('#'+$id + "_div").css('display',"none");
+                                                    $('#'+$id).css('display',"block");
+                                                    $('#'+$id+"_name").html("");
+                                                    $('#'+$id).val("");
+                                                    $('#'+$id + "_id").val("");
+                                                    $file.attr("data-value","");
+                                                })
+                                            }else{
+                                                opt.modal.error(result.msg);
+                                            }
+                                            opt.modal.closeLoading();
+                                        }
+                                    });
+                                }
+                            }
+                        })
+                        var $value = $file.data('value');
+                        var $bizId = $file.data('bizid');
+                        var $readonly = $file.data('readonly');
+
+                        var $id = $file.attr('id');
+                        if($value != 'undefined' && opt.common.isNotEmpty($value)){
+                            $('#'+$id + "_div").css('display',"block");
+                            $file.css('display',"none");
+                            $('#'+$id + "_name").html($value.split("#")[0]);
+                            $('#'+$id + "_id").val($value.split("#")[1]);
+                            $('#'+$id + "_del").off('click').on('click',function(){
+                                $('#'+$id + "_div").css('display',"none");
+                                $('#'+$id).css('display',"block");
+                                $('#'+$id+"_name").html("");
+                                $('#'+$id).val("");
+                                $('#'+$id + "_id").val("");
+                                $file.attr("data-value","");
+                            })
+                        }else{
+                            //回显
+                            if($bizId != 'undefined' && opt.common.isNotEmpty($bizId)){
+                                var fileList = $file.data('filelist');
+                                var bizType = $file.data('biztype').split("[")[0];
+                                $.ajax({
+                                    url: baseURL+ fileList + ( - 1 == fileList.indexOf("?") ? "?": "&") + "__t=" + (new Date).getTime(),
+                                    data: {
+                                        bizId: $bizId,
+                                        bizType: bizType
+                                    },
+                                    xhrFields: {
+                                        withCredentials: !0
+                                    },
+                                    dataType: "json",
+                                    success: function(res) {
+                                        if(opt.variable.web_status.SUCCESS === res.code){
+                                            $file.attr('data-bizid','');
+                                            var files = res.fileList;
+                                            if (files && 0 < files.length){
+                                                $('#'+$id + "_div").css('display',"block");
+                                                $file.attr('data-value',files[0].fileName+"#"+files[0].id);
+                                                $file.css('display',"none");
+                                                $('#'+$id + "_id").val(files[0].id);
+                                                if($readonly || $readonly == 'true'){
+                                                    var down = baseURL + $file.data('down') +"?fileId="+ files[0].id;
+                                                    $('#'+$id + "_del").empty();
+                                                    $('#'+$id + "_name").html('<a style="border-bottom: 1px dashed rgb(189, 197, 222);" title="点击下载" target="_blank" href="' + down +
+                                                    '">' + files[0].fileName + '</a>');
+                                                }else{
+                                                    $('#'+$id + "_name").html(files[0].fileName);
+                                                    $('#'+$id + "_del").off('click').on('click',function(){
+                                                        $('#'+$id + "_div").css('display',"none");
+                                                        $('#'+$id).css('display',"block");
+                                                        $('#'+$id+"_name").html("");
+                                                        $('#'+$id).val("");
+                                                        $('#'+$id + "_id").val("");
+                                                        $file.attr("data-value","");
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                        // debugger;
+
+                    })
+                }
             },
             //动态插入数据
             addColumn: function(row,callback,tableId){
@@ -1154,6 +1294,9 @@
                         });
                     });
                 }
+                
+                // 绑定文件
+                that.uploadfile();
 
                 // select2复选框事件绑定
                 if ($.fn.select2 !== undefined) {
