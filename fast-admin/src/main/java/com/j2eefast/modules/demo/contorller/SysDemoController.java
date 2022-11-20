@@ -41,6 +41,17 @@ public class SysDemoController extends BaseController {
         return urlPrefix + "/mode";
     }
 
+    /**
+     * 栅格布局案例
+     * @param mmap
+     * @return
+     */
+    @GetMapping("/layoutForm")
+    public String layoutForm(ModelMap mmap) {
+        return urlPrefix + "/layoutForm";
+    }
+
+
     @RequiresPermissions("sys:demo:component")
     @GetMapping("/component")
     public String component() {

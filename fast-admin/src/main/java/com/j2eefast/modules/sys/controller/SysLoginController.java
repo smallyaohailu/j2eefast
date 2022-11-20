@@ -295,7 +295,6 @@ public class SysLoginController extends BaseController {
 	public String login(ModelMap mmp){
 
 		String requestURI = getHttpServletRequest().getRequestURI();
-		System.out.println(requestURI);
 		// 刷新主页退出
 		if(isAllowRefreshIndex){
 			String logined = super.getCookie("__LOGINED__");

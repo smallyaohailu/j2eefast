@@ -1126,7 +1126,7 @@
                                         return;
                                     }
                                 }
-                                if(!$flag){
+                                if($flag){
                                     var files = $(this)[0].files[0];
                                     var $this = $(this);
                                     //⑦将name 和 files 添加到formData中，键值对形式
@@ -1169,7 +1169,6 @@
                         var $value = $file.data('value');
                         var $bizId = $file.data('bizid');
                         var $readonly = $file.data('readonly');
-
                         var $id = $file.attr('id');
                         if($value != 'undefined' && opt.common.isNotEmpty($value)){
                             $('#'+$id + "_div").css('display',"block");
@@ -1203,10 +1202,10 @@
                                         if(opt.variable.web_status.SUCCESS === res.code){
                                             $file.attr('data-bizid','');
                                             var files = res.fileList;
+                                            $('#'+$id + "_div").css('display',"block");
+                                            $file.css('display',"none");
                                             if (files && 0 < files.length){
-                                                $('#'+$id + "_div").css('display',"block");
                                                 $file.attr('data-value',files[0].fileName+"#"+files[0].id);
-                                                $file.css('display',"none");
                                                 $('#'+$id + "_id").val(files[0].id);
                                                 if($readonly || $readonly == 'true'){
                                                     var down = baseURL + $file.data('down') +"?fileId="+ files[0].id;
@@ -1224,14 +1223,20 @@
                                                         $file.attr("data-value","");
                                                     })
                                                 }
+                                            }else{
+                                                if($readonly || $readonly == 'true'){
+                                                    $('#'+$id + "_del").empty();
+                                                    $('#'+$id + "_name").removeAttr('style').html('<p class="form-control-plaintext-no-content">无附件</p>');
+                                                }
                                             }
                                         }
                                     }
                                 })
+                            }else{
+                                $file.css('display',"block");
                             }
                         }
                         // debugger;
-
                     })
                 }
             },
@@ -1294,7 +1299,7 @@
                         });
                     });
                 }
-                
+
                 // 绑定文件
                 that.uploadfile();
 

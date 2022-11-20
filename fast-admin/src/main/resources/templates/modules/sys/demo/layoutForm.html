@@ -1,0 +1,231 @@
+<!--
+  栅格布局案例
+-->
+<#include "/common/defaultEngine.html"/>
+<@pageTheme mark="${config.optimize()?string('true', 'false')}">
+<@header title="栅格布局" libs=["bootstrapSelect"]/>
+<div class="wrapper wrapper-content ibox-content">
+<@f.form id="form-layout" class="form-horizontal">
+    <h4 class="form-header h4">${i18n("一列")}</h4>
+    <!-- 一列-->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><span style="color: red; ">*</span>${i18n("单行输入框")}：</label>
+                <div class="col-sm-10">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><span style="color: red; ">*</span>${i18n("多行输入框")}：</label>
+                <div class="col-sm-10">
+                    <@f.textarea name="inputTextarea" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END-->
+    <!-- 两列-->
+    <h4 class="form-header h4">${i18n("两列")}</h4>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">${i18n("下拉单选")}：</label>
+                <div class="col-sm-8">
+                    <@f.select name="select1" dictType="sys_normal_disable"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("下拉多选")}：</label>
+                <div class="col-sm-8">
+                    <@f.select name="select2" dictType="sys_normal_disable" blankValue="" blankLabel="" multiple=true/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("输入框")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="username" placeholder="请输入登录账号" autocomplete="off" required=true helpTip="登录账号数字加字母组合,至少3位"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("树选择")}：</label>
+                <div class="col-sm-8">
+                    <@f.treeselect name="compId" boxTitle="选择归属公司" url="sys/comp/treeData?type=0" expandLevel=true
+                    placeholder="请选择归属公司"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- -->
+    <!-- 三列-->
+    <h4 class="form-header h4">${i18n("三列")}</h4>
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>时间：</label>
+                <div class="col-sm-8">
+                    <@f.input name="time" type="date" dataType="datetime" dataFormat="yyyy-MM-dd HH:mm:ss"
+                    placeholder="请选择时间"  butClass="fa fa-calendar-plus-o"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>日期：</label>
+                <div class="col-sm-8">
+                    <@f.input name="date" type="date" dataType="date" dataFormat="yyyy-MM-dd"
+                    placeholder="请选择时间"  butClass="fa fa-calendar-plus-o"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    <span style="color: red; ">*</span>单选框：
+                </label>
+                <div class="col-sm-8">
+                    <@f.radio name="type" dictType="sys_menu_type"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    <span style="color: red; ">*</span>多选框：
+                </label>
+                <div class="col-sm-8">
+                    <@f.checkbox name="postType" dictType="sys_menu_type"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    <span style="color: red; ">*</span>文本显示：
+                </label>
+                <div class="col-sm-8">
+                    <@f.plaintext value="测试"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">
+                    <span style="color: red; ">*</span>文本显示空：
+                </label>
+                <div class="col-sm-8">
+                    <@f.plaintext value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-2 col-sm-9-1 control-label"><span style="color: red; ">*</span>${i18n("单行输入框")}：</label>
+                <div class="col-sm-10 col-sm-9-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END-->
+    <!-- 四列-->
+    <h4 class="form-header h4">${i18n("四列")}</h4>
+    <div class="row">
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>${i18n("单行文本")}：</label>
+                <div class="col-sm-8">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label class="col-sm-1 col-sm-8-1 control-label"><span style="color: red; ">*</span>${i18n("单行输入框")}：</label>
+                <div class="col-sm-11">
+                    <@f.input name="inputTEXT" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+</@f.form>
+    <div class="hr-line-dashed"></div>
+</div>
+<@footer/>
+</@pageTheme>

@@ -123,7 +123,7 @@
                 </a>
             </div>
             <input name="<#if bizType == "">${name}<#else>${bizType}</#if>" id="<#if id == "">${name}<#else>${AssId}</#if>_id" type="hidden"/>
-            <input class="_template_file" <#if readonly>data-down="${downloadUrl}"</#if> data-readonly="${readonly?string('true','false')}" data-upload="${uploadUrl}" data-biztype="<#if bizType == "">${name}<#else>${bizType}</#if>" data-bizid="${bizId}" data-filelist="${fileListUrl}" data-type="${uploadType}" data-value="${value}" id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>"  type="file"/>
+            <input style="display: none;" class="_template_file" <#if readonly>data-down="${downloadUrl}"</#if> data-readonly="${readonly?string('true','false')}" data-upload="${uploadUrl}" data-biztype="<#if bizType == "">${name}<#else>${bizType}</#if>" data-bizid="${bizId}" data-filelist="${fileListUrl}" data-type="${uploadType}" data-value="${value}" id="<#if !template>${AssId?replace(".","_")}<#else>${AssId}</#if>"  type="file"/>
         </div>
     </#if>
 </#macro>
