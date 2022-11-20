@@ -16,12 +16,12 @@
             </li>
              <li>
               <label> ${i18n("业务类型")}：
-               <input type="text"  class="form-control" name="fileUpload.bizType"/> </label>
+               <input type="text" class="form-control" name="fileUpload.bizType"/> </label>
             </li>
-             <li>
-              <label> ${i18n("业务ID")}：
-               <input type="text" class="form-control" name="fileUpload.bizId"/> </label>
-            </li>
+          <li>
+              <label> ${i18n("状态")}：</label>
+              <@f.select name="status" dictType="sys_file_status" blankValue="" blankLabel="所有"/>
+          </li>
         <li>
           <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;&nbsp;${i18n("查询")}</a>
           <a class="btn btn-warning btn-rounded btn-sm" onclick="opt.form.reset()"><i class="fa fa-refresh"></i>&nbsp;${i18n("重置")}</a>
@@ -43,9 +43,6 @@
 <script type="text/javascript">
     var delFlag = "${permission.hasPermi("sys:file:del")}";
     var visible = ${permission.isPermitteds("sys:file:del")?string('true', 'false')};
-     var datas =  ${dict.getDictListJson('sys_file_status')};
-     var ossTypeDict =  ${dict.getDictListJson('sys_oss_type')};
-    var classify =  ${dict.getDictListJson('sys_file_classify')};
     var prefix = baseURL + "sys/file";
 
     $(function() {
@@ -58,6 +55,7 @@
             showPageGo: true,/* 分页设置 */
             pageSize: 10,/* 分页设置 */
             pageList: [10, 30, 50],/* 分页设置 */
+            sortName: "createTime",
             columns: [
                 {title: $.i18n.prop("序号"), width: 5, align: "center", formatter: function (value, row, index) {
                             return $.table.serialNumber(index);
@@ -70,12 +68,12 @@
                         return opt.common.getExt(row.fileName);
                }}
              ,{field : 'classify',title : '${i18n("文件归类")}' ,formatter: function(value, row, index) {
-                        return opt.common.selectDictLabel(classify, value);
+                        return opt.common.selectDictLabel("sys_file_classify", value);
                 }}
               ,{field : 'fileUpload.bizType',title : '${i18n("业务类型")}'}
               ,{field : 'fileUpload.bizId',title : '${i18n("业务ID")}',visible: false}
               ,{field : 'ossType',title : '${i18n("对象存储OSS类型")}',formatter: function (value, row, index) {
-                        return opt.common.selectDictLabels(ossTypeDict, value);
+                        return opt.common.selectDictLabel("sys_oss_type", value);
                }}
               ,{field : 'filePath',title : '${i18n("相对路径")}' ,formatter: function(value, row, index) {
                         return opt.common.tooltip(value,20);
@@ -84,9 +82,9 @@
                         return opt.common.bytesToSize(value);
               }}
               ,{field : 'createBy',title : '${i18n("创建者")}'}
-              ,{field : 'createTime',title : '${i18n("创建时间")}'}
+              ,{field : 'createTime',title : '${i18n("创建时间")}',sortable: true}
               ,{field: 'status', title: "${i18n("状态")}", formatter: function (value, row, index) {
-                        return opt.common.selectDictLabel(datas, value);
+                        return opt.common.selectDictLabel("sys_file_status", value);
                     }
                 }
                  ,{title:"${i18n("操作")}",align: 'center',visible:visible,formatter: function(value, row, index) {

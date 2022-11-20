@@ -69,6 +69,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sysFiles.fileUpload !=null and sysFiles.fileUpload.bizType != null  and sysFiles.fileUpload.bizType != ''">
                 AND up.biz_type = #{sysFiles.fileUpload.bizType}
             </if>
+            <if test="sysFiles.status != null  and sysFiles.status != ''">
+                <choose>
+                    <when test="sysFiles.status == 2">AND up.del_flag = '1'  </when>
+                    <when test="sysFiles.status == 1">AND up.biz_type IS NULL</when>
+                    <otherwise>AND up.del_flag = '0' AND up.biz_type IS NOT NULL</otherwise>
+                </choose>
+            </if>
         </where>
     </select>
     

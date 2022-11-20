@@ -20,6 +20,7 @@ import com.j2eefast.common.core.mutidatasource.DataSourceContextHolder;
 #end
 #if($table.master)
 import ${packageName}.entity.${childTable.className}Entity;
+import import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 #end
 #if($table.child)
@@ -226,6 +227,16 @@ public class ${ClassName}Service extends ServiceImpl<${ClassName}Mapper,${ClassN
 #end
 #if($isImg == "1")
 			FileUploadUtils.me().removeFileUpload(id,"${tableName}_avatar");
+#end
+#if($table.master)
+			//删除子表信息
+			#set($classEnty = $childTable.className.substring(0,1).toLowerCase() + $childTable.className.substring(1))
+			#set($fkeyX = $fKey.javaField.substring(0,1).toUpperCase() + $fKey.javaField.substring(1))
+			List<${childTable.className}> entityList = ${classEnty}Service.list(new
+					QueryWrapper<${childTable.className}>().eq("${fKey.columnName}",id));
+			entityList.forEach(e->{
+					${classEnty}Service.removeById(e.getId());
+			});
 #end
 		}
 #end

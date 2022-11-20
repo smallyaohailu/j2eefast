@@ -102,7 +102,7 @@
                                 if(row.type != 2){
                                     actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("新增")}" onclick="opt.operate.add(\'' + row.id + '\')"><i class="fa fa-plus"></i></a> ');
                                 }
-                                actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="opt.operate.del(\'' + row.id + '\')"><i class="fa fa-trash-o"></i></a> ');
+                                actions.push('<a class="' + delFlag + '" href="javascript:void(0)" title="${i18n("删除")}" onclick="delMenu(\'' + row.id +'\')"><i class="fa fa-trash-o"></i></a> ');
                                 return actions.join('');
 
                             }
@@ -115,6 +115,21 @@
             /* 清空菜单缓存*/
             function clearRedis() {
                 opt.operate.get(prefix + "/clearMenu");
+            }
+
+            function delMenu(id){
+                opt.modal.confirm($.i18n.text("确定删除该条{0}信息吗?",opt.table.options.modalName) +
+                    "<span style='font-weight: 600;color:red'>本删除会<span style='font-weight: 800;font-size:18px;'>彻底</span>删除菜单以下所有信息、" +
+                    "<span style='font-size:18px;font-weight: 800;'>请谨慎操作!</span></span>", function() {
+                    var row = $("#" + opt.table.options.id).bootstrapTreeTable('getSelections')[0];
+                    var url;
+                    if (opt.common.isEmpty(row)) {
+                        url = opt.table.options.delUrl;
+                    }else{
+                        url = opt.table.options.delUrl.replace("{id}",  row[opt.table.options.uniqueId]);
+                    }
+                    opt.operate.get(url);
+                })
             }
         </script>
     </@footer>
