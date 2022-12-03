@@ -365,11 +365,20 @@
 <#macro tip class = "info" <#--样式 默认info -->
             icon = "fa fa-info" <#-- 提示语句前的小图标-->
             animated = "animated bounceInDown"
+            closeTime = 0 <#-- 秒-->
             >
-    <div class="alert alert-dismissible callout callout-${class} ${animated}">
+    <#local  id="${tools.getRandomString(5)}"/>
+    <div id="${id}" class="alert alert-dismissible callout callout-${class} ${animated}">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <p><i class="icon ${icon}"></i><#nested></p>
     </div>
+    <#if closeTime !=0>
+        <script>
+            setTimeout(function(){
+                $("#${id}").find('button').click();
+            },1000 * ${closeTime});
+        </script>
+    </#if>
 </#macro>
 
 <#--
