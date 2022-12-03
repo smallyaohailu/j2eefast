@@ -7,6 +7,7 @@ package com.j2eefast.framework.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.NumberChineseFormatter;
+import cn.hutool.core.util.RandomUtil;
 import org.springframework.stereotype.Component;
 
 import com.j2eefast.common.core.io.PropertiesUtils;
@@ -42,5 +43,8 @@ public class Tools {
     	return PropertiesUtils.getInstance().getProperty(key);
     }
 
+    public String getRandomString(int length){
+        return RandomUtil.randomString(5);
+    }
 }
 
