@@ -10,11 +10,7 @@ import cn.hutool.http.HttpUtil;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
-import com.j2eefast.common.core.utils.FileUploadUtil;
-import com.j2eefast.common.core.utils.Global;
-import com.j2eefast.common.core.utils.PageUtil;
-import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.oss.cloud.CloudStorageService;
 import com.j2eefast.framework.oss.cloud.OSSFactory;
@@ -29,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,8 +49,6 @@ public class SysFileController extends BaseController {
     @Autowired
     private SysFileService sysFileService;
 
-    
-    
     private String prefix = "modules/sys/file";
 
     @RequiresPermissions("sys:file:view")
@@ -68,8 +64,6 @@ public class SysFileController extends BaseController {
         PageUtil page = sysFileService.findPage(params,sysFilesEntity);
 		return success(page);
     }
-
-
 
     /**
      * 删除
@@ -200,6 +194,12 @@ public class SysFileController extends BaseController {
         }
     }
 
+    /**
+     * comm/fileUploadView?fileId=
+     * 通过文件ID 下载文件
+     * @param response
+     * @param fileId 文件ID
+     */
     @RequestMapping("comm/fileUploadView")
     public void fileUploadView(HttpServletResponse response,
                                @RequestParam("fileId") Long fileId) {
@@ -224,6 +224,55 @@ public class SysFileController extends BaseController {
                 }
                 inputStream  = FileUtil.getInputStream(filePath);
             // 第三方配置
+            }else{
+                cloud = OSSFactory.build();
+                inputStream = cloud.download(relativePath);
+            }
+            //转换视图
+            ToolUtil.fileView(response,fileName,inputStream);
+            if(ossType != Constant.CloudService.LOCAL.getValue()){
+                cloud.shutdown();
+            }
+            return;
+        }catch (Exception e){
+            log.error("下载文件异常",e);
+            return;
+        }
+    }
+
+
+    /**
+     * 通过业务ID与业务类型字符,下载第一个文件
+     * @param response
+     * @param pkId 业务ID
+     * @param bizType 业务类型字符
+     */
+    @RequestMapping("comm/filePkIdView")
+    public void fileUploadView(HttpServletResponse response,
+                               @RequestParam("pkId") Long pkId,
+                               @RequestParam("bizType") String bizType) {
+        try {
+            List<SysFilesEntity> list = FileUploadUtils.getBizIdByFileList(pkId,bizType);
+            if(ToolUtil.isEmpty(list)){
+                log.error("文件不存在");
+                return;
+            }
+            SysFilesEntity file = list.get(0);
+            int ossType = Integer.parseInt(file.getOssType());
+            String relativePath = file.getFilePath();
+            String filePath = ((file.getClassify().equals("0") ||
+                    file.getClassify().equals("1")) ? Global.getAttachPath() : Global.getEditorPath() ) + relativePath;
+            String  fileName = file.getFileName();
+            InputStream inputStream = null;
+            CloudStorageService cloud = null;
+            //配置的是本地
+            if(ossType == Constant.CloudService.LOCAL.getValue()) {
+                if(!FileUtil.exist(filePath)){
+                    log.error("文件不存在");
+                    return;
+                }
+                inputStream  = FileUtil.getInputStream(filePath);
+                // 第三方配置
             }else{
                 cloud = OSSFactory.build();
                 inputStream = cloud.download(relativePath);
