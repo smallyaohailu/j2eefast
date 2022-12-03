@@ -3,13 +3,16 @@
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
-package com.j2eefast.modules.sys.controller;
+package com.j2eefast.framework.sys.controller;
 
-import java.util.Map;
 import com.j2eefast.common.config.entity.SysConfigEntity;
 import com.j2eefast.common.config.service.SysConfigService;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.common.core.utils.ResponseData;
+import com.j2eefast.common.core.utils.ValidatorUtil;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.j2eefast.common.core.utils.PageUtil;
-import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.common.core.utils.ValidatorUtil;
-import com.j2eefast.common.core.controller.BaseController;
+
+import java.util.Map;
 
 /**
  * 

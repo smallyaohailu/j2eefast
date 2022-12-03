@@ -3,26 +3,27 @@
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
-package com.j2eefast.modules.sys.controller;
+package com.j2eefast.framework.sys.controller;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.base.entity.Ztree;
+import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.constants.ConfigConstant;
+import com.j2eefast.common.core.controller.BaseController;
+import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.common.core.business.annotaion.BussinessLog;
-import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.sys.entity.SysDictTypeEntity;
 import com.j2eefast.framework.sys.service.SysDictTypeSerive;
-import com.j2eefast.common.core.controller.BaseController;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 

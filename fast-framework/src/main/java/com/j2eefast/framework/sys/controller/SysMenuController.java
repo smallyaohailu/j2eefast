@@ -3,25 +3,26 @@
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
-package com.j2eefast.modules.sys.controller;
+package com.j2eefast.framework.sys.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
 import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.sys.constant.factory.ConstantFactory;
 import com.j2eefast.framework.sys.entity.RouterEntity;
+import com.j2eefast.framework.sys.entity.SysMenuEntity;
 import com.j2eefast.framework.sys.entity.SysModuleEntity;
 import com.j2eefast.framework.sys.entity.SysRoleEntity;
+import com.j2eefast.framework.sys.service.SysMenuService;
 import com.j2eefast.framework.sys.service.SysModuleService;
+import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -30,11 +31,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.j2eefast.common.core.exception.RxcException;
-import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.sys.entity.SysMenuEntity;
-import com.j2eefast.framework.sys.service.SysMenuService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 系统菜单控制器
@@ -318,12 +319,11 @@ public class SysMenuController extends BaseController {
 	@RequiresRoles(Constant.SU_ADMIN)
 	@ResponseBody
 	public ResponseData delete(@PathVariable("menuId") Long menuId) {
-		List<SysMenuEntity> menuList = sysMenuService.findListParentId(menuId);
-		if (menuList.size() > 0) {
-			return error("请先删除子菜单或按钮");
+		if(sysMenuService.delMenuById(menuId)){
+			UserUtils.clearCachedAuthorizationInfo(); //清理权限缓存
+			return success();
 		}
-		UserUtils.clearCachedAuthorizationInfo(); //清理权限缓存
-		return sysMenuService.removeById(menuId)?success():error("删除失败!");
+		return error("删除失败!");
 	}
 
 	@BussinessLog(title = "菜单管理", businessType = BusinessType.CLEAN)

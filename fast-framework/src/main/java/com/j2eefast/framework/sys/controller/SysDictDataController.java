@@ -3,23 +3,24 @@
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
-package com.j2eefast.modules.sys.controller;
+package com.j2eefast.framework.sys.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
+import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.common.core.utils.PageUtil;
 import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.common.core.business.annotaion.BussinessLog;
-import com.j2eefast.common.core.enums.BusinessType;
 import com.j2eefast.framework.redis.SysConfigRedis;
 import com.j2eefast.framework.sys.entity.SysDictDataEntity;
 import com.j2eefast.framework.sys.service.SysDictDataService;
-import com.j2eefast.common.core.controller.BaseController;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 

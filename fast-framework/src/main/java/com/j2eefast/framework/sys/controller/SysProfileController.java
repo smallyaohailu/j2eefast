@@ -3,19 +3,20 @@
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
-package com.j2eefast.modules.sys.controller;
+package com.j2eefast.framework.sys.controller;
 
+import cn.hutool.core.util.ReUtil;
 import com.j2eefast.common.core.base.entity.LoginUserEntity;
-import com.j2eefast.common.core.utils.*;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
 import com.j2eefast.framework.sys.entity.SysUserEntity;
-import com.j2eefast.framework.sys.service.*;
-import com.j2eefast.common.core.controller.BaseController;
+import com.j2eefast.framework.sys.service.SysAuthUserService;
+import com.j2eefast.framework.sys.service.SysUserService;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
-import cn.hutool.core.util.ReUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
 /**

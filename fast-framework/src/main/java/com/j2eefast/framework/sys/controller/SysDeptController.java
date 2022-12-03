@@ -3,15 +3,19 @@
  * otherwise indicated. All rights reserved.
  * No deletion without permission
  */
-package com.j2eefast.modules.sys.controller;
+package com.j2eefast.framework.sys.controller;
 
-import java.util.*;
 import com.j2eefast.common.core.base.entity.Ztree;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ValidatorUtil;
 import com.j2eefast.framework.sys.entity.SysCompEntity;
-import com.j2eefast.framework.sys.service.*;
+import com.j2eefast.framework.sys.entity.SysDeptEntity;
+import com.j2eefast.framework.sys.service.SysCompService;
+import com.j2eefast.framework.sys.service.SysDeptService;
+import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +23,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.common.core.utils.ToolUtil;
-import com.j2eefast.common.core.controller.BaseController;
-import com.j2eefast.framework.utils.Constant;
-import com.j2eefast.framework.sys.entity.SysDeptEntity;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 地区管理
