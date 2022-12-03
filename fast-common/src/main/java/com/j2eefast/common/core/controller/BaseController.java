@@ -9,13 +9,14 @@ import cn.hutool.core.util.StrUtil;
 import com.j2eefast.common.core.utils.CookieUtil;
 import com.j2eefast.common.core.utils.ResponseData;
 import com.j2eefast.common.core.utils.ServletUtil;
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.springframework.beans.factory.annotation.Value;
-
 import java.util.Objects;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Objects;
  * @version: 1.0.1
  */
 public class BaseController {
-	
+
 	/**
 	 * 登录
 	 */
@@ -36,10 +37,21 @@ public class BaseController {
 	
 	@Value("#{ @environment['shiro.successUrl'] ?: '/index' }")
 	protected String successUrl;
+
+    @Value("#{ @environment['web.auto_grow_collection_limit'] ?: 300 }")
+    protected int default_auto_grow_collection_limit;
 	
     protected final String                  REDIRECT                        = "redirect:";
     protected final String                  FORWARD                         = "forward:";
 
+    /**
+     * 设置提交最大数组
+     * @param binder
+     */
+    @InitBinder
+    public void InitBinder(WebDataBinder binder) {
+        binder.setAutoGrowCollectionLimit(default_auto_grow_collection_limit);
+    }
 
     protected HttpServletRequest getHttpServletRequest() {
         return ServletUtil.getRequest();

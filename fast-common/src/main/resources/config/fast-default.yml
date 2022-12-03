@@ -313,6 +313,8 @@ web:
    cacheTime: 25
    # 静态资源路径前缀，可做 CDN 加速优化
    staticPrefix: 'classpath:/static/'
+   # 页面请求数组下标最大值
+   auto_grow_collection_limit: 300
 #日志路径配置
 logging:
     file:
