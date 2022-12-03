@@ -5,8 +5,6 @@
  */
 package com.j2eefast.framework.sys.service;
 
-import java.util.*;
-
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -29,9 +27,12 @@ import com.j2eefast.framework.sys.mapper.SysMenuMapper;
 import com.j2eefast.framework.sys.mapper.SysUserMapper;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 菜单管理
@@ -319,6 +320,44 @@ public class SysMenuService  extends ServiceImpl<SysMenuMapper, SysMenuEntity> {
 	public boolean clearMenuRedis(){
 		redisUtil.deletes(Cache.MODULES_CONSTANT+"*");
 		return  redisUtil.deletes(Cache.MENU_CONSTANT+"*");
+	}
+
+	/**
+	 * 向下循环删除菜单
+	 * @param id 菜单ID
+	 * @return
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public boolean delMenuById(Long id){
+		List<SysMenuEntity> menuList = findParen(id);
+		if(ToolUtil.isNotEmpty(menuList)){
+			List<Long> ids = menuList.stream().map(SysMenuEntity::getId)
+					.collect(Collectors.toList());
+			//批量删除子
+			this.removeBatchByIds(ids);
+		}
+		return this.removeById(id);
+	}
+
+
+	/**
+	 * 获取菜单所有子菜单
+	 * @param id 菜单ID
+	 * @return 子菜单集合
+	 */
+	public List<SysMenuEntity> findParen(Long id){
+		List<SysMenuEntity> subMenu = new ArrayList<>();
+		List<SysMenuEntity> menuList0 = this.list(new QueryWrapper<SysMenuEntity>()
+				.eq("parent_id",id));
+		if(ToolUtil.isNotEmpty(menuList0)){
+			for(SysMenuEntity menu:menuList0){
+				subMenu.addAll(findParen(menu.getId()));
+			}
+		}
+		if(ToolUtil.isNotEmpty(menuList0)){
+			subMenu.addAll(menuList0);
+		}
+		return subMenu;
 	}
 
 	/**
