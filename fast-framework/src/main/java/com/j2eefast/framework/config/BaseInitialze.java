@@ -60,6 +60,9 @@ public class BaseInitialze  implements ApplicationRunner {
     private SysJobService sysJobService;
     @Autowired
     private RedisUtil redisUtil;
+    // 语言切换
+    @Value("#{ @environment['fast.messages.enabled'] ?: false }")
+    private boolean msgEnabled;
 
     /**
      * 是否检测脚本自动升级
@@ -165,6 +168,24 @@ public class BaseInitialze  implements ApplicationRunner {
     			ScheduleUtils.createScheduleJob(scheduler, sysJob);
         	}
         }
+
+
+        if(msgEnabled){
+            if(sysMenuService.count(new QueryWrapper<SysMenuEntity>().eq("id",1447910714162241537L)
+                    .eq("hide","1")) > 0){
+                sysMenuService.update(new UpdateWrapper<SysMenuEntity>()
+                        .eq("id",1447910714162241537L).eq("hide","1").set("hide","0"));
+                sysMenuService.clearMenuRedis();
+            }
+        }else{
+            if(sysMenuService.count(new QueryWrapper<SysMenuEntity>().eq("id",1447910714162241537L)
+                    .eq("hide","0")) > 0){
+                sysMenuService.update(new UpdateWrapper<SysMenuEntity>()
+                        .eq("id",1447910714162241537L).eq("hide","0").set("hide","1"));
+                sysMenuService.clearMenuRedis();
+            }
+        }
+
 
         /**
          * 检测是否加载ureport2 报表
