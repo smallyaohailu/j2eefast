@@ -62,7 +62,7 @@ public class RequiresPermissionsAspect {
         Object[] params = point.getArgs();
         for(Object o:  params){
             if (o != null && o instanceof Map) {
-                Map map = (Map) o;
+                Map<String, Object> map = (Map<String, Object>) o;
                 map.put(Constant.REQUIRES_PERMISSIONS,dataFilter.value());
                 ServletUtil.getRequest().setAttribute(Constant.REQUIRES_PERMISSIONS,dataFilter.value());
                 List<String> tempExcludes = new ArrayList<>();

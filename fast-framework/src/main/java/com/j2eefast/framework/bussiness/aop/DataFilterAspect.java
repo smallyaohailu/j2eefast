@@ -48,7 +48,8 @@ public class DataFilterAspect {
 		Object params = point.getArgs()[0];
 		if (params != null && params instanceof Map) {
 
-			Map map = (Map) params;
+			// 强转
+			Map<String, Object> map = (Map<String, Object>) params;
 			// 先清空防止前端注入
 			map.put(Constant.SQL_FILTER,StrUtil.EMPTY);
 
