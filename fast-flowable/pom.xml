@@ -4,13 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.j2eefast</groupId>
         <artifactId>fast</artifactId>
-        <version>2.7.0</version>
+        <groupId>com.j2eefast</groupId>
+        <version>Final</version>
     </parent>
 
     <artifactId>fast-flowable</artifactId>
     <name>fast 工作流</name>
+    <version>${fast.version}</version>
     <url>http://www.j2eefast.com</url>
 
     <developers>  

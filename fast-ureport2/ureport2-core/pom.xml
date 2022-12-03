@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.j2eefast</groupId>
         <artifactId>fast-ureport2</artifactId>
-        <version>2.7.0</version>
+        <version>Final</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

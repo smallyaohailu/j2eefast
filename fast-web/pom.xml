@@ -5,9 +5,10 @@
   <parent>
       <groupId>com.j2eefast</groupId>
 	  <artifactId>fast</artifactId>
-	  <version>2.7.0</version>
+	  <version>Final</version>
   </parent>
   <artifactId>fast-web</artifactId>
+<version>${fast.version}</version>
   <name>web  应用子模块</name>
   <description>
 	    二次开发子模块

@@ -6,11 +6,12 @@
     <parent>
         <groupId>com.j2eefast</groupId>
         <artifactId>fast</artifactId>
-        <version>2.7.0</version>
+        <version>Final</version>
     </parent>
 
     <artifactId>fast-common</artifactId>
     <name>fast 公共工具</name>
+    <version>${fast.version}</version>
     <url>http://www.j2eefast.com</url>
 
 

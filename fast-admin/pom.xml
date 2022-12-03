@@ -7,11 +7,12 @@
 	<parent>
 		<artifactId>fast</artifactId>
 		<groupId>com.j2eefast</groupId>
-		<version>2.7.0</version>
+		<version>Final</version>
 	</parent>
 
 	<packaging>jar</packaging>
 	<artifactId>fast-admin</artifactId>
+	<version>${fast.version}</version>
 	<name>fast 服务入口</name>
 	<description>
 		fast 服务入口
@@ -36,7 +37,6 @@
 	<!-- 打包编码, 版本号, 日期-->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>2.7.0</version>
 	</properties>
 
 	<dependencies>
@@ -68,7 +68,7 @@
 	<build>
 	
 		<!--打包后的项目名称 -->
-		<finalName>fast-v${version}-${build.time}</finalName>
+		<finalName>fast-v${fast.version}-${build.time}</finalName>
 
         <plugins>
         	<!-- 生成打包时间使用GMT+8 -->
