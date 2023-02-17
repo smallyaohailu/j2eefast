@@ -198,7 +198,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<!-- 生成环境排除非压缩JS-->
+					<!-- 生产环境排除非压缩JS-->
 					<excludes>
 						<exclude>static/css/animate.css</exclude>
 						<exclude>static/css/style.css</exclude>
