@@ -1,5 +1,3 @@
-###  [ 在线报表-相关介绍 ](https://www.yuque.com/u1174484/j2eefast/co4vmm)
-
 <p align="center">
 <img width="280" height="280" src="https://images.gitee.com/uploads/images/2020/0927/225746_1bb32a4b_1816537.png">
 </p>
@@ -31,7 +29,10 @@ J2eeFAST 是一个 Java EE 企业级快速开发平台， **致力于打造中�
 #### 演示地址
 
 1.  演示地址： http://www.j2eefast.com <br>账号 ：admin 密码：admin
-2.  功能还在陆续更新中......
+2.  最新演示地址 http://124.222.205.174/fast
+3.  功能还在陆续更新中......
+
+####  [ 在线报表-相关介绍 ](https://www.yuque.com/u1174484/j2eefast/co4vmm)
 
 #### [内置功能](https://www.yuque.com/u1174484/j2eefast/wtakf0)
 
@@ -90,7 +91,7 @@ J2eeFAST 是一个 Java EE 企业级快速开发平台， **致力于打造中�
 #### 关于系统
 * J2eeFAST (快速开发开源系统)名字由来:包含作者对于软件开发的美好幻想，希望软件开发变的快速而简单，每个人都能分享自己的技术从而达到快速又强大的软件系统,让我们有更多的时间去陪伴家人!你可能在本系统中看到众多优秀开源项目的影子，因为她本身集成了众多优秀的开源项目精华功能，在这种环境中成长的，但是她目前还有很多缺点，希望大神们嘴下留情。如果你也喜欢开源、喜欢本项目,作者欢迎您的加入, J2eeFAST会因为您的加入而变的更加完善与丰富!
 * 如果本项目对你有帮助,[请点击Star收藏](https://gitee.com/zhouhuanOGP/J2EEFAST),**本项目会长期维护**,若你在使用中有任何问题或建议,欢迎在[码云issue提交问题](https://gitee.com/zhouhuanOGP/J2EEFAST/issues)作者会第一时间处理，让我们一起完善J2eeFAST
-* 官网: [http://www.j2eefast.com](http://www.j2eefast.com)
+* 官网: [http://www.j2eefast.com](http://www.j2eefast.com)  最新演示地址 http://124.222.205.174/fast
 * 关于文档：[语雀 文档](https://www.yuque.com/u1174484/j2eefast/tv3kee)
 * 关于更新：项目现在会放缓更新优化细节,演示网站会不定期暂停访问,带来不便尽情谅解!
 * QQ群： [805468934①(大群)](https://jq.qq.com/?_wv=1027&k=5xTlnN6) 、 [239367801②](https://jq.qq.com/?_wv=1027&k=mx2H3mNH)
