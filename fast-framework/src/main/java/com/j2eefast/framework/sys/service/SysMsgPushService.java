@@ -5,28 +5,28 @@
  */
 package com.j2eefast.framework.sys.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.j2eefast.common.core.page.Query;
+import com.j2eefast.common.core.utils.PageUtil;
+import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.sys.entity.SysMsgCcUserEntity;
 import com.j2eefast.framework.sys.entity.SysMsgPushEntity;
 import com.j2eefast.framework.sys.entity.SysMsgPushUserEntity;
 import com.j2eefast.framework.sys.mapper.SysMsgPushMapper;
-import com.j2eefast.common.core.page.Query;
-import com.j2eefast.common.core.utils.PageUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.j2eefast.common.core.utils.ToolUtil;
 import com.j2eefast.framework.utils.Constant;
+import com.j2eefast.framework.utils.FileUploadUtils;
 import com.j2eefast.framework.utils.UserUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.List;
+import javax.annotation.Resource;
 import java.util.Arrays;
-import com.j2eefast.framework.utils.FileUploadUtils;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 内部消息Service接口
@@ -192,6 +192,45 @@ public class SysMsgPushService extends ServiceImpl<SysMsgPushMapper,SysMsgPushEn
 		}
 		return false;
 	}
+
+
+	/**
+	 * 读取合规性检查
+	 * @param msgId 消息ID
+	 * @param userId 用户ID
+	 * @return
+	 */
+	public boolean readComplianceInspection(Long msgId, Long userId){
+		long pushCount =  sysMsgPushUserService.count(new QueryWrapper<SysMsgPushUserEntity>()
+				.eq("msg_id",msgId).eq("user_id",userId));
+		long ccCount =  sysMsgCcUserService.count(new QueryWrapper<SysMsgCcUserEntity>()
+				.eq("msg_id",msgId).eq("user_id",userId));
+		long count =  this.count(new QueryWrapper<SysMsgPushEntity>()
+				.eq("id",msgId).eq("send_user_id",userId));
+		if(pushCount > 0 || ccCount > 0
+				|| count > 0){
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 修改已读标志
+	 * @param msgId
+	 * @param userId
+	 * @return
+	 */
+	public boolean updateReadTag(Long msgId, Long userId){
+		if(sysMsgPushUserService.count(new QueryWrapper<SysMsgPushUserEntity>()
+				.eq("msg_id",msgId).eq("user_id",userId)) > 0){
+			return  sysMsgPushUserService.setIsRead("1",msgId,userId);
+		}else{
+			return sysMsgCcUserService.update(new UpdateWrapper<SysMsgCcUserEntity>()
+					.set("is_read","1").eq("msg_id",msgId).eq("user_id",userId));
+		}
+	}
+
+
 
 	/**
      * 根居ID获取对象

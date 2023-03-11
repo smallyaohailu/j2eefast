@@ -18,7 +18,6 @@ import com.j2eefast.framework.sys.service.SysUserService;
 import com.j2eefast.framework.utils.Constant;
 import com.j2eefast.framework.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -59,14 +58,14 @@ public class SysProfileController extends BaseController {
     }
 
     @RequestMapping("/oauth2/list")
-    @RequiresPermissions("sys:oauth2:list")
+//    @RequiresPermissions("sys:oauth2:list")
     @ResponseBody
     public ResponseData list(@RequestParam Map<String, Object> params) {
         PageUtil page = sysAuthUserService.findPage(params);
         return success(page);
     }
 
-    @RequiresPermissions("sys:oauth2:del")
+//    @RequiresPermissions("sys:oauth2:del")
     @RequestMapping( value = "/oauth2/del", method = RequestMethod.POST)
     @ResponseBody
     public ResponseData delAuth(Long id) {

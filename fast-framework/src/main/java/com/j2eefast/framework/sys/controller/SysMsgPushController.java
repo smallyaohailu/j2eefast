@@ -5,32 +5,30 @@
  */
 package com.j2eefast.framework.sys.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.j2eefast.common.core.business.annotaion.BussinessLog;
+import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.common.core.enums.BusinessType;
+import com.j2eefast.common.core.exception.RxcException;
 import com.j2eefast.common.core.utils.*;
 import com.j2eefast.framework.annotation.RepeatSubmit;
-import com.j2eefast.common.core.controller.BaseController;
 import com.j2eefast.framework.sys.entity.SysMsgCcUserEntity;
 import com.j2eefast.framework.sys.entity.SysMsgCommentsEntity;
+import com.j2eefast.framework.sys.entity.SysMsgPushEntity;
 import com.j2eefast.framework.sys.entity.SysMsgPushUserEntity;
 import com.j2eefast.framework.sys.service.SysMsgCcUserService;
 import com.j2eefast.framework.sys.service.SysMsgCommentsService;
+import com.j2eefast.framework.sys.service.SysMsgPushService;
 import com.j2eefast.framework.sys.service.SysMsgPushUserService;
 import com.j2eefast.framework.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.*;
-import com.j2eefast.framework.sys.entity.SysMsgPushEntity;
-import com.j2eefast.framework.sys.service.SysMsgPushService;
-
-import javax.annotation.Resource;
 
 /**
  * 内部消息页面控制器
@@ -116,7 +114,6 @@ public class SysMsgPushController extends BaseController{
     }
 
 
-    @RequiresPermissions("sys:comment:add")
     @RequestMapping(value = "/commets/list", method = RequestMethod.POST)
     @ResponseBody
     public ResponseData commetList(@RequestParam Map<String, Object> params,SysMsgCommentsEntity sysMsgComments){
@@ -126,7 +123,6 @@ public class SysMsgPushController extends BaseController{
     }
 
 
-    @RequiresPermissions("sys:comment:del")
     @RequestMapping(value = "/commets/del", method = RequestMethod.POST)
     @ResponseBody
     public ResponseData commetDel(Long id){
@@ -134,11 +130,14 @@ public class SysMsgPushController extends BaseController{
     }
 
     @RepeatSubmit
-    @RequiresPermissions("sys:comment:add")
     @BussinessLog(title = "发布评论", businessType = BusinessType.INSERT)
     @RequestMapping(value = "/addCommets", method = RequestMethod.POST)
     @ResponseBody
     public ResponseData addSysComments(@Validated SysMsgCommentsEntity sysMsgComments){
+        if(!sysMsgPushService.readComplianceInspection(sysMsgComments.getMsgId(),
+                UserUtils.getUserId())){
+            throw new RxcException("请求数据非法,请确定请求!","A0420");
+        }
         //校验参数
         ValidatorUtil.validateEntity(sysMsgComments);
         return SysMsgCommentsService.addSysMsgComments(sysMsgComments)? success(): error("新增失败!");
@@ -159,11 +158,13 @@ public class SysMsgPushController extends BaseController{
         return prefix + "/view";
     }
 
-    @RequiresPermissions("sys:msg:view")
     @GetMapping("/pushView/{id}")
     public String pushView(@PathVariable("id") Long id, ModelMap mmap){
+        if(!sysMsgPushService.readComplianceInspection(id,UserUtils.getUserId())){
+            throw new RxcException("请求数据非法,请确定请求!","A0420");
+        }
         //修改阅读标志
-        sysMsgPushUserService.setIsRead("1",id,UserUtils.getUserId());
+        sysMsgPushService.updateReadTag(id,UserUtils.getUserId());
         //查询消息数据
         SysMsgPushEntity sysMsgPush = sysMsgPushService.findSysMsgPushById(id);
         List<SysMsgPushUserEntity> pushUserList =  sysMsgPushUserService.findList(sysMsgPush.getId());

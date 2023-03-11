@@ -115,6 +115,7 @@ public class SysMsgPushUserService extends ServiceImpl<SysMsgPushUserMapper,SysM
 
 
 	public boolean setIsRead(String isRead, Long msgId, Long userId){
+
 		return this.baseMapper.setIsRead(isRead,msgId,userId) > 0;
 	}
 
