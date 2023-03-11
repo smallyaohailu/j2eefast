@@ -6,17 +6,14 @@
 package com.j2eefast.common.core.listener;
 
 import cn.hutool.core.util.StrUtil;
-import com.j2eefast.common.core.utils.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.j2eefast.common.core.base.entity.BaseEntity;
 import com.j2eefast.common.core.base.entity.annotaion.JsonListBaselgonre;
 import com.j2eefast.common.core.base.entity.annotaion.JsonListFiledIgnore;
+import com.j2eefast.common.core.base.entity.annotaion.JsonListNoOutNull;
 import com.j2eefast.common.core.enums.ConvertType;
-import com.j2eefast.common.core.utils.PageUtil;
-import com.j2eefast.common.core.utils.ResponseData;
-import com.j2eefast.common.core.utils.ServletUtil;
-import com.j2eefast.common.core.utils.ToolUtil;
+import com.j2eefast.common.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
@@ -26,6 +23,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -81,6 +79,7 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                     //需要转换的字段
                     List<Map<String, ConvertType>> conver = new ArrayList<>();
                     List<Map<String,String[]>> objList = new ArrayList<>();
+                    boolean outNull = true;
                     if(page.getList().size() > 0){
                         //获取List 对象 遍历 是否有禁止输出或者转换的字段
                         Class clazz = page.getList().get(0).getClass();
@@ -110,6 +109,10 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                                         }
                                     }
                                 }
+                            }
+                            // 类上有标注null字段不输出注解
+                            if(annotation.annotationType().equals(JsonListNoOutNull.class)){
+                                outNull = false;
                             }
                         }
                         List fieldsList = new ArrayList<Field>();
@@ -236,14 +239,24 @@ public class LicenseResponseBodyAdvice implements ResponseBodyAdvice {
                                 });
                             }
                         }
-                        body =  JSONObject.parseObject(c.toString());
+                        if(outNull){
+                            // 不去除空
+                            body = c;
+                        }else{
+                            body =  JSONObject.parseObject(c.toString());
+                        }
                     }else{
                         JSONObject c = JSON.parseObject(JSON.marshal(rd));
                         JSONObject __JSON__ = c.getJSONObject("data").getJSONObject("__JSON__");
                         if(ToolUtil.isEmpty(__JSON__)){
                             c.getJSONObject("data").remove("__JSON__");
                         }
-                        body =  JSONObject.parseObject(c.toString());
+                        if(outNull){
+                            // 不去除空 null 字段
+                            body = c;
+                        }else{
+                            body =  JSONObject.parseObject(c.toString());
+                        }
                     }
                 }
             }catch (Exception e){
